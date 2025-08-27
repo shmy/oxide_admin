@@ -5,7 +5,7 @@ macro_rules! id {
 
         use serde::{Deserialize, Serialize};
 
-        use crate::shared::id_generator::IdGenerator;
+        use $crate::shared::id_generator::IdGenerator;
 
         #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, sqlx::Type)]
         #[sqlx(transparent)]
