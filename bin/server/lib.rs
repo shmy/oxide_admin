@@ -196,7 +196,7 @@ async fn start_background_job(manager: BackgroundJobManager, notify: Arc<Notify>
 }
 
 async fn build_background_job(provider: Provider) -> Result<(BackgroundJobManager, Jobs)> {
-    let manager = BackgroundJobManager::try_new(DATA_DIR.join("job.sqlite")).await?;
+    let manager = BackgroundJobManager::try_new(DATA_DIR.join("data.sqlite")).await?;
     let manager = manager.migrate().await?;
     let (manager, delete_expired_kv_job) = manager.register::<DeleteExpiredKvJob>(provider.clone());
     let (manager, delete_outdate_temp_dir_job) =
