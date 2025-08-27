@@ -37,8 +37,9 @@ async fn current(
     Inject(service): Inject<IamService>,
     Inject(user_service): Inject<UserService>,
 ) -> JsonResponseType<response::CurrentResponse> {
-    let user = user_service.retrieve(id.clone()).await?;
-    let pages = service.get_available_pages(id).await?;
+    let (user, pages) = tokio::try_join!(user_service.retrieve(id.clone()), async {
+        service.get_available_pages(id).await.map_err(Into::into)
+    })?;
     JsonResponse::ok(response::CurrentResponse { user, pages })
 }
 

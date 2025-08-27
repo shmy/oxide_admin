@@ -3,6 +3,7 @@ use clap::Parser;
 use humantime::parse_duration;
 use infrastructure::shared::config::{Config, Database, Jwt, Log, Server, Upload};
 use tracing_appender::rolling::Rotation;
+
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
 /// 启动 Web 服务器

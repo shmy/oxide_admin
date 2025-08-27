@@ -26,9 +26,9 @@ pub async fn user_authn_required(
             return unauthorized(err.to_string());
         }
     };
-    request
-        .extensions_mut()
-        .insert::<ValidUser>(ValidUser::new(id));
-    request.extensions_mut().insert::<IamService>(service);
+
+    let extensions_mut = request.extensions_mut();
+    extensions_mut.insert::<ValidUser>(ValidUser::new(id));
+    extensions_mut.insert::<IamService>(service);
     next.run(request).await
 }
