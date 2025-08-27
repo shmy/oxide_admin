@@ -1,7 +1,6 @@
 use anyhow::Result;
 use clap::Parser as _;
 use infrastructure::shared::config::Config;
-use infrastructure::shared::pool;
 use server::cli::Cli;
 
 #[global_allocator]
