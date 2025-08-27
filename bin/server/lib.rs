@@ -15,6 +15,7 @@ use background_job::Storage;
 use infrastructure::shared::{
     config::Config,
     path::{DATA_DIR, LOG_DIR},
+    pool,
 };
 use infrastructure::{migration, shared::kv::Kv, shared::pool::Pool, shared::provider::Provider};
 use std::{
@@ -32,12 +33,15 @@ use tracing_subscriber::{
 
 pub mod cli;
 
-pub async fn bootstrap(pool: Pool, config: Config) -> Result<()> {
+pub async fn bootstrap(config: Config) -> Result<()> {
     let _guard = init_tracing(&config.log.level, config.log.rolling_kind.clone());
     let ip = Ipv4Addr::from_str(&config.server.bind)?;
     let addr = SocketAddrV4::new(ip, config.server.port);
     let listener = TcpListener::bind(addr).await?;
-    let kv = Kv::try_new(DATA_DIR.join("data.redb"))?;
+    let (pool, kv) = tokio::try_join!(pool::try_new(&config.database), async {
+        Kv::try_new(DATA_DIR.join("data.redb"))
+    })?;
+
     let provider = Provider::builder()
         .pool(pool.clone())
         .kv(kv)
