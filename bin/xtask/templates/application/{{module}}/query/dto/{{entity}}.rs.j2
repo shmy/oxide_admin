@@ -1,0 +1,9 @@
+use serde::Serialize;
+use sqlx::FromRow;
+
+#[derive(Debug, Serialize, FromRow)]
+pub struct {{entity | pascal_case}}Dto {
+    {%- for field in fields %}
+    pub {{field.name}}: {{field.type}},
+    {%- endfor %}
+}

@@ -1,0 +1,60 @@
+use crate::shared::command_handler::{CommandHandler, CommandResult};
+use bon::Builder;
+use domain::iam::error::IamError;
+use domain::iam::event::IamEvent;
+use domain::iam::repository::user_repository::UserRepository;
+use domain::shared::domain_repository::DomainRepository;
+use domain::shared::token_issuer::{TokenIssuerOutput, TokenIssuerTrait};
+use domain::shared::token_store::TokenStoreTrait;
+use infrastructure::implementation::token_issuer_impl::TokenIssuerImpl;
+use infrastructure::implementation::token_store_impl::TokenStoreImpl;
+use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
+use nject::injectable;
+use serde::Deserialize;
+
+#[derive(Deserialize, Builder)]
+pub struct SignInCommand {
+    account: String,
+    password: String,
+}
+
+#[injectable]
+pub struct SignInCommandHandler {
+    user_repository: UserRepositoryImpl,
+    token_issuer: TokenIssuerImpl,
+    token_store: TokenStoreImpl,
+}
+
+impl CommandHandler for SignInCommandHandler {
+    type Command = SignInCommand;
+    type Output = TokenIssuerOutput;
+    type Event = IamEvent;
+    type Error = IamError;
+
+    async fn execute(
+        &self,
+        cmd: Self::Command,
+    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+        let mut user = self.user_repository.by_account(cmd.account).await?;
+        user.assert_activated()?;
+        user.password.verify(&cmd.password)?;
+        let token_output = self.token_issuer.generate(user.id.to_string())?;
+        user.update_refresh_token(
+            Some(token_output.refresh_token.clone()),
+            Some(token_output.refresh_token_expires_at.naive_utc()),
+        );
+        let id = user.id.clone();
+        tokio::try_join!(
+            self.token_store.store(
+                user.id.to_string(),
+                token_output.access_token.clone(),
+                token_output.access_token_expires_at,
+            ),
+            self.user_repository.save(user),
+        )?;
+        Ok(CommandResult::with_event(
+            token_output,
+            IamEvent::UserLoginSucceeded { id },
+        ))
+    }
+}

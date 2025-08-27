@@ -1,0 +1,97 @@
+[package]
+name = "oxide_admin"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = [
+    "app/adapter",
+    "app/application",
+    "app/domain",
+    "app/infrastructure",
+    "bin/server",
+    "bin/xtask",
+    "crates/background_job",
+    "crates/single_flight_derive",
+]
+
+[workspace.dependencies]
+serde = { version = "1", default-features = false }
+serde_json = { version = "1", default-features = false }
+serde_with = { version = "3", default-features = false }
+serde_urlencoded = { version = "0.7", default-features = false }
+anyhow = { version = "1", default-features = false }
+thiserror = { version = "2", default-features = false }
+mimalloc = { version = "0.1", default-features = false }
+clap = { version = "4.5", default-features = false }
+axum = { version = "0.8", default-features = false }
+axum_typed_multipart = { version = "0.16", default-features = false }
+tower-http = { version = "0.6", default-features = false }
+tower_governor = { version = "0.8", default-features = false }
+tokio = { version = "1", default-features = false }
+tokio-stream = { version = "0.1", default-features = false }
+parking_lot = { version = "0.12", default-features = false }
+futures-util = { version = "0.3", default-features = false }
+humantime = { version = "2.2", default-features = false }
+sysinfo = { version = "0.37", default-features = false }
+sqlx = { version = "0.8", default-features = false }
+moka = { version = "0.12", default-features = false }
+singleflight-async = { version = "0.2", default-features = false }
+tempfile = { version = "3", default-features = false }
+imageformat = { version = "0.3", default-features = false }
+image = { version = "0.25", default-features = false }
+
+redb = { version = "3", default-features = false }
+tracing = { version = "0.1", default-features = false }
+tracing-appender = { version = "0.2", default-features = false }
+tracing-subscriber = { version = "0.3", default-features = false }
+include_dir = { version = "0.7", default-features = false }
+mime_guess = { version = "2.0", default-features = false }
+chrono = { version = "0.4", default-features = false }
+chrono-tz = { version = "0.10", default-features = false }
+rmp-serde = { version = "1.3", default-features = false }
+bon = { version = "3.7", default-features = false }
+readonly = { version = "0.2", default-features = false }
+argon2 = { version = "0.5", default-features = false }
+dotenv = { version = "0.15", default-features = false }
+nject = { version = "0.4", default-features = false }
+tempoid = { version = "0.1", default-features = false }
+jsonwebtoken = { version = "9.3", default-features = false }
+dotenvy = { version = "0.15", default-features = false }
+tokio-cron-scheduler = { version = "0.14", default-features = false }
+twox-hash = { version = "2.1", default-features = false }
+cruet = { version = "0.15", default-features = false }
+hmac-sha256 = { version = "1.1", default-features = false }
+hex = { version = "0.4", default-features = false }
+const_format = { version = "0.2", default-features = false }
+
+adapter = { path = "app/adapter" }
+application = { path = "app/application" }
+domain = { path = "app/domain" }
+infrastructure = { path = "app/infrastructure" }
+background_job = { path = "crates/background_job" }
+single_flight_derive = { path = "crates/single_flight_derive" }
+
+[profile.dev]
+debug = "line-tables-only" # 生成调试信息，便于调试
+opt-level = 0              # 不做任何优化，快速编译
+incremental = true         # 启用增量编译，加速编译过程
+overflow-checks = true     # 启用溢出检查，方便调试
+panic = "unwind"           # 保留 panic 时的栈信息，方便调试
+codegen-units = 8          # 多单元代码生成，加速编译（注意：过多可能降低优化效果）
+lto = "off"                # 关闭全局优化，减少编译时间
+strip = false              # 保留符号表，方便调试
+
+[profile.dev.package."*"]
+opt-level = 0
+
+[profile.release]
+debug = 0               # 不生成调试信息，减小体积
+rpath = false           # 不生成运行时库路径
+incremental = false     # 禁用增量编译，release 不需要
+overflow-checks = false # 禁用溢出检查，性能更好
+panic = "abort"         # panic 直接中止，节省代码体积
+codegen-units = 1       # 更长编译时间换取更好优化
+lto = "fat"             # 跨 crate 全局优化，性能极佳
+opt-level = 3           # 最高性能优化
+strip = true            # 去除符号表，最小体积

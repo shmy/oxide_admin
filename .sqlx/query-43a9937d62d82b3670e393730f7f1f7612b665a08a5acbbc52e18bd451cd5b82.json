@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT COUNT(*) as \"count!\"\n            FROM _users\n            WHERE ($1::text IS NULL OR account LIKE CONCAT('%', $1, '%'))\n                AND ($2::text IS NULL OR name LIKE CONCAT('%', $2, '%'))\n                AND ($3::boolean IS NULL OR privileged = $3)\n                AND ($4::boolean IS NULL OR enabled = $4)\n                AND ($5::text IS NULL OR $5 = ANY(role_ids))\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Bool",
+        "Bool",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "43a9937d62d82b3670e393730f7f1f7612b665a08a5acbbc52e18bd451cd5b82"
+}

@@ -1,0 +1,24 @@
+[package]
+name = "adapter"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+axum = { workspace = true, features = ["http1", "tokio", "json", "query"] }
+axum_typed_multipart = { workspace = true, features = ["tempfile_3"] }
+tower-http = { workspace = true, features = ["fs"] }
+tower_governor = { workspace = true, features = ["axum", "tracing"] }
+tempfile = { workspace = true }
+tracing = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_urlencoded = { workspace = true }
+include_dir = { workspace = true }
+mime_guess = { workspace = true }
+anyhow = { workspace = true }
+nject = { workspace = true, features = ["macro"] }
+
+application = { workspace = true }
+domain = { workspace = true }

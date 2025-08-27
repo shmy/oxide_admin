@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App</title>
+    <link rel="stylesheet" href="<%= assetPrefix %>/static/lib/jssdk/antd.css" />
+    <link rel="stylesheet" href="<%= assetPrefix %>/static/lib/jssdk/iconfont.css" />
+</head>
+
+<body>
+
+    <div id="<%= mountId %>"></div>
+    <script src="<%= assetPrefix %>/static/lib/jssdk/sdk.js"></script>
+    <script src="<%= assetPrefix %>/static/lib/jssdk/rest.js"></script>
+    <script>; (function (w) { w.React = w.amisRequire('react'); w.ReactDOM = w.amisRequire('react-dom'); })(window);</script>
+</body>
+
+</html>

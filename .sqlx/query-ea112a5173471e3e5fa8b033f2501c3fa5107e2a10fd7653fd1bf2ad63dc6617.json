@@ -1,0 +1,77 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH before AS (\n                SELECT * FROM _roles WHERE id = ANY($1) AND privileged != true\n            ),\n            updated AS (\n                UPDATE _roles SET enabled = $2\n                WHERE id = ANY($1) AND privileged != true\n                RETURNING *\n            )\n            SELECT\n            before.id as before_id, before.name as before_name, before.privileged as before_privileged, before.permission_ids as \"before_permission_ids: Vec<PermissionCode>\", before.enabled as before_enabled,\n            updated.id as updated_id, updated.name as updated_name, updated.privileged as updated_privileged, updated.permission_ids as \"updated_permission_ids: Vec<PermissionCode>\", updated.enabled as updated_enabled\n            FROM before\n            JOIN updated ON before.id = updated.id;\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "before_id",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "before_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "before_privileged",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "before_permission_ids: Vec<PermissionCode>",
+        "type_info": "Int4Array"
+      },
+      {
+        "ordinal": 4,
+        "name": "before_enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "updated_id",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "updated_privileged",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "updated_permission_ids: Vec<PermissionCode>",
+        "type_info": "Int4Array"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_enabled",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "BpcharArray",
+        "Bool"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "ea112a5173471e3e5fa8b033f2501c3fa5107e2a10fd7653fd1bf2ad63dc6617"
+}

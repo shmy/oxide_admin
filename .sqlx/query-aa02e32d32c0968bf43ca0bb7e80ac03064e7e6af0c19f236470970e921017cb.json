@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM _roles WHERE id = ANY($1) AND privileged != true RETURNING id, name, privileged, permission_ids as \"permission_ids: Vec<PermissionCode>\", enabled\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "privileged",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "permission_ids: Vec<PermissionCode>",
+        "type_info": "Int4Array"
+      },
+      {
+        "ordinal": 4,
+        "name": "enabled",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "BpcharArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "aa02e32d32c0968bf43ca0bb7e80ac03064e7e6af0c19f236470970e921017cb"
+}

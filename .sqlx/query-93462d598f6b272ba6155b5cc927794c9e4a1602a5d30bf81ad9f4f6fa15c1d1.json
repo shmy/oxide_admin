@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            u.id as id,\n            u.account as account,\n            u.portrait as portrait,\n            u.name as name,\n            u.role_ids as \"role_ids: Vec<RoleId>\",\n            u.privileged as privileged,\n            u.enabled as enabled,\n            u.created_at as created_at,\n            u.updated_at as updated_at,\n            COALESCE(array_agg(r.name) FILTER (WHERE r.name IS NOT NULL), '{}') as \"role_names!: Vec<String>\"\n        FROM _users as u\n        LEFT JOIN _roles as r ON r.id = ANY(u.role_ids)\n        WHERE u.id = $1\n        GROUP BY u.id\n        LIMIT 1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "account",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "portrait",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "role_ids: Vec<RoleId>",
+        "type_info": "BpcharArray"
+      },
+      {
+        "ordinal": 5,
+        "name": "privileged",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 8,
+        "name": "updated_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 9,
+        "name": "role_names!: Vec<String>",
+        "type_info": "VarcharArray"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bpchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "93462d598f6b272ba6155b5cc927794c9e4a1602a5d30bf81ad9f4f6fa15c1d1"
+}

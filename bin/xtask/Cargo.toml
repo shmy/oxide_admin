@@ -1,0 +1,30 @@
+[package]
+name = "xtask"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "xtask"
+path = "main.rs"
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true, features = [
+    "std",
+    "help",
+    "env",
+    "derive",
+    "error-context",
+] }
+dotenv = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true, features = ["std"] }
+tokio = { workspace = true, features = ["full"] }
+sqlx = { workspace = true, features = ["default", "runtime-tokio"] }
+cruet = { version = "0.15", default-features = false }
+walkdir = { version = "2.5", default-features = false }
+minijinja = { version = "2.11", default-features = false, features = [
+    "serde",
+    "loader",
+    "builtins",
+] }

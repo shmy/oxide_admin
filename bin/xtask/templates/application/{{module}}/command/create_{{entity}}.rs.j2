@@ -1,0 +1,28 @@
+use anyhow::Result;
+use bon::Builder;
+use domain::{{module}}::{entity::{{entity}}::{{entity | pascal_case}}, value_object::{{entity}}_id::{{entity | pascal_case}}Id};
+use domain::shared::domain_repository::DomainRepository;
+use infrastructure::repository::{{module}}::{{entity}}_repository::{{entity | pascal_case}}RepositoryImpl;
+use serde::Deserialize;
+use shared::pool::Pool;
+
+#[derive(Deserialize, Builder)]
+pub struct Create{{entity | pascal_case}}Command {
+    {%- for field in domain_fields %}
+    {{field.name}}: {{field.type}},
+    {%- endfor %}
+}
+
+impl Create{{entity | pascal_case}}Command {
+    pub async fn execute(self, pool: &Pool) -> Result<{{entity | pascal_case}}> {
+        let {{entity}} = {{entity | pascal_case}}::builder()
+            .id({{entity | pascal_case}}Id::generate())
+            {%- for field in domain_fields %}
+            .{{field.name}}(self.{{field.name}})
+            {%- endfor %}
+            .build();
+        let {{entity}}_repo = {{entity | pascal_case}}RepositoryImpl::builder().pool(pool).build();
+        let {{entity}} = {{entity}}_repo.save({{entity}}).await?;
+        Ok({{entity}})
+    }
+}

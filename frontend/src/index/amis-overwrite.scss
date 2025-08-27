@@ -1,0 +1,22 @@
+:root {
+    --Spinner-bg: url(./infinite-spinner.svg);
+    --fonts-size-1: 48px;
+    --fonts-size-2: 40px;
+    --fonts-size-3: 32px;
+    --fonts-size-4: 24px;
+    --fonts-size-5: 20px;
+    --fonts-size-6: 16px;
+    --fonts-size-7: 15px;
+    --fonts-size-8: 14px;
+    --fonts-size-9: 13px;
+}
+
+.amis-scope {
+    .antd-Layout--asideFixed.antd-Layout--folded {
+
+        // 修复侧边栏菜单项目收起的宽度未充满
+        .antd-Layout-asideInner {
+            padding-right: 0;
+        }
+    }
+}

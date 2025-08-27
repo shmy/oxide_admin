@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT privileged, role_ids as \"role_ids: Vec<RoleId>\" from _users WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "privileged",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 1,
+        "name": "role_ids: Vec<RoleId>",
+        "type_info": "BpcharArray"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bpchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "5995a55fc8492603cee67a702f3747a9de13ce0ab4b9bf173f05d67bccbc35da"
+}

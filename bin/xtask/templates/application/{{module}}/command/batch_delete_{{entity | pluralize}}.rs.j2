@@ -1,0 +1,21 @@
+use anyhow::Result;
+use bon::Builder;
+use domain::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
+use domain::shared::domain_repository::DomainRepository;
+use infrastructure::repository::{{module}}::{{entity}}_repository::{{entity | pascal_case}}RepositoryImpl;
+use serde::Deserialize;
+use shared::pool::Pool;
+
+#[derive(Deserialize, Builder)]
+pub struct BatchDelete{{entity | pascal_case | pluralize}}Command {
+    ids: Vec<String>,
+}
+
+impl BatchDelete{{entity | pascal_case | pluralize}}Command {
+    pub async fn execute(self, pool: &Pool) -> Result<()> {
+        let {{entity}}_repo = {{entity | pascal_case}}RepositoryImpl::builder().pool(pool).build();
+        let ids = self.ids.into_iter().map({{entity | pascal_case}}Id::new_unchecked).collect();
+        {{entity}}_repo.batch_delete(ids).await?;
+        Ok(())
+    }
+}

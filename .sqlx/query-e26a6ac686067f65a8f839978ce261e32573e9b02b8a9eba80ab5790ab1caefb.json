@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM _users WHERE id = ANY($1) AND privileged != true RETURNING id, account, portrait, name, privileged, password, role_ids as \"role_ids: Vec<RoleId>\", enabled, refresh_token, refresh_token_expired_at\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "account",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "portrait",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "privileged",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "password",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "role_ids: Vec<RoleId>",
+        "type_info": "BpcharArray"
+      },
+      {
+        "ordinal": 7,
+        "name": "enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "refresh_token",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "refresh_token_expired_at",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "BpcharArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "e26a6ac686067f65a8f839978ce261e32573e9b02b8a9eba80ab5790ab1caefb"
+}

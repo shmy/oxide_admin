@@ -1,0 +1,24 @@
+[package]
+name = "background_job"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tokio = { workspace = true, features = ["time"] }
+apalis = { version = "0.7", default-features = false, features = [
+    "limit",
+    "tracing",
+    "retry",
+] }
+apalis-core = { version = "0.7", default-features = false }
+apalis-sql = { version = "0.7", default-features = false, features = [
+    "sqlite",
+    "migrate",
+    "tokio-comp",
+] }
+serde = { workspace = true, default-features = false, features = ["derive"] }

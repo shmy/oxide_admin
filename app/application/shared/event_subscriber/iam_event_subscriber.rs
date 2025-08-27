@@ -1,0 +1,145 @@
+use crate::{
+    iam::service::{role_service::RoleService, user_service::UserService},
+    shared::event::Event,
+    system::service::file_service::FileService,
+};
+use domain::{iam::event::IamEvent, shared::permission_resolver::PermissionResolver};
+use infrastructure::shared::event_bus::EventSubscriber;
+use std::fmt::Debug;
+
+#[derive(Clone)]
+pub struct IamEventSubscriber<T>
+where
+    T: PermissionResolver,
+{
+    permission_resolver: T,
+    user_service: UserService,
+    role_service: RoleService,
+    file_service: FileService,
+}
+
+impl<T> Debug for IamEventSubscriber<T>
+where
+    T: PermissionResolver,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("IamEventSubscriber").finish()
+    }
+}
+
+impl<T> IamEventSubscriber<T>
+where
+    T: PermissionResolver,
+{
+    pub fn new(
+        permission_resolver: T,
+        user_service: UserService,
+        role_service: RoleService,
+        file_service: FileService,
+    ) -> Self {
+        Self {
+            permission_resolver,
+            user_service,
+            role_service,
+            file_service,
+        }
+    }
+
+    fn is_users_changed(event: &IamEvent) -> bool {
+        matches!(
+            event,
+            IamEvent::UsersCreated { .. }
+                | IamEvent::UsersUpdated { .. }
+                | IamEvent::UsersDeleted { .. }
+        )
+    }
+
+    fn is_roles_changed(event: &IamEvent) -> bool {
+        matches!(
+            event,
+            IamEvent::RolesCreated { .. }
+                | IamEvent::RolesUpdated { .. }
+                | IamEvent::RolesDeleted { .. }
+        )
+    }
+    fn is_permission_changed(event: &IamEvent) -> bool {
+        matches!(
+            event,
+            IamEvent::UsersUpdated { .. }
+                | IamEvent::UsersDeleted { .. }
+                | IamEvent::RolesUpdated { .. }
+                | IamEvent::RolesDeleted { .. }
+        )
+    }
+}
+
+impl<T> EventSubscriber<Event> for IamEventSubscriber<T>
+where
+    T: PermissionResolver + Clone + Debug + Send + Sync + 'static,
+{
+    async fn on_received(&self, event: Event) -> anyhow::Result<()> {
+        match event {
+            Event::Iam(e) => {
+                if Self::is_permission_changed(&e)
+                    && let Err(err) = self.permission_resolver.refresh().await
+                {
+                    tracing::error!(?e, error = %err, "权限刷新失败");
+                }
+                if Self::is_users_changed(&e) {
+                    self.user_service.clean_cache();
+                }
+                if Self::is_roles_changed(&e) {
+                    self.role_service.clean_cache();
+                }
+                match e {
+                    IamEvent::UsersCreated { items } => {
+                        let paths = items
+                            .into_iter()
+                            .filter_map(|item| item.portrait.clone())
+                            .collect::<Vec<_>>();
+                        if let Err(err) = self.file_service.set_files_used(&paths).await {
+                            tracing::error!(error = %err, "UsersCreated: failed to set files used");
+                        }
+                    }
+                    IamEvent::UsersUpdated { items } => {
+                        let (mut unused_paths, mut used_paths) = (Vec::new(), Vec::new());
+
+                        for item in items {
+                            match (&item.before.portrait, &item.after.portrait) {
+                                (Some(before), Some(after)) if before != after => {
+                                    // 用户修改了头像
+                                    unused_paths.push(before.clone());
+                                    used_paths.push(after.clone());
+                                }
+                                (Some(before), None) => {
+                                    unused_paths.push(before.clone()); // 用户删除了头像
+                                }
+                                (None, Some(after)) => {
+                                    used_paths.push(after.clone()); // 用户新增了头像
+                                }
+                                _ => {} // 没有变化的情况，不操作
+                            }
+                        }
+                        if let Err(err) = self.file_service.set_files_unused(&unused_paths).await {
+                            tracing::error!(error = %err, "UsersUpdated: failed to set files unused");
+                        }
+                        if let Err(err) = self.file_service.set_files_used(&used_paths).await {
+                            tracing::error!(error = %err, "UsersUpdated: failed to set files used");
+                        }
+                    }
+                    IamEvent::UsersDeleted { items } => {
+                        let paths = items
+                            .into_iter()
+                            .filter_map(|item| item.portrait.clone())
+                            .collect::<Vec<_>>();
+                        if let Err(err) = self.file_service.set_files_unused(&paths).await {
+                            tracing::error!(error = %err, "UsersDeleted: failed to set files unused");
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+        Ok(())
+    }
+}

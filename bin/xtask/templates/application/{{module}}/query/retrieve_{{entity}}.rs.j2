@@ -1,0 +1,29 @@
+use anyhow::Result;
+use bon::Builder;
+use domain::{{module}}::error::{{module | pascal_case}}Error;
+use serde::Deserialize;
+use shared::pool::Pool;
+
+use crate::{{module}}::query::dto::{{entity}}::{{entity | pascal_case}}Dto;
+
+#[derive(Deserialize, Builder)]
+pub struct Retrieve{{entity | pascal_case}}Query {
+    id: String,
+}
+
+impl Retrieve{{entity | pascal_case}}Query {
+    pub async fn query(&self, pool: &Pool) -> Result<{{entity | pascal_case}}Dto> {
+        let row_opt = sqlx::query_as!(
+            {{entity | pascal_case}}Dto,
+            r#"
+        SELECT {{fields | map(attribute="name") | join(', ')}}
+        FROM {{table_name}}
+        WHERE id = ?
+        "#,
+            self.id,
+        )
+        .fetch_optional(pool)
+        .await?;
+        row_opt.ok_or({{module | pascal_case}}Error::{{entity | pascal_case}}NotFound.into())
+    }
+}

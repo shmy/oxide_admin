@@ -1,0 +1,8 @@
+#[derive(Debug, thiserror::Error)]
+pub enum {{module | pascal_case}}Error {
+    #[error("{{entity | pascal_case}}不存在")]
+    {{entity | pascal_case}}NotFound,
+    
+    #[error("数据库错误: {0}")]
+    DatabaseError(#[from] sqlx::Error),
+}

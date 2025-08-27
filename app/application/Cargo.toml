@@ -1,0 +1,31 @@
+[package]
+name = "application"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+tokio = { workspace = true, features = ["full"] }
+tokio-stream = { workspace = true }
+futures-util = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_with = { workspace = true, features = ["alloc", "macros", "chrono_0_4"] }
+tracing = { workspace = true }
+anyhow = { workspace = true }
+bon = { workspace = true }
+moka = { workspace = true }
+singleflight-async = { workspace = true }
+tempfile = { workspace = true }
+imageformat = { workspace = true }
+twox-hash = { workspace = true, features = ["xxhash64"] }
+sqlx = { workspace = true }
+nject = { workspace = true, features = ["macro"] }
+sysinfo = { workspace = true, features = ["system"] }
+image = { workspace = true, features = ["png", "webp", "jpeg"] }
+
+domain = { workspace = true }
+infrastructure = { workspace = true }
+background_job = { workspace = true }
+single_flight_derive = { workspace = true }

@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id, name, privileged, permission_ids as \"permission_ids: Vec<PermissionCode>\", enabled\n        FROM _roles WHERE id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "privileged",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "permission_ids: Vec<PermissionCode>",
+        "type_info": "Int4Array"
+      },
+      {
+        "ordinal": 4,
+        "name": "enabled",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bpchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "ea779f15cc3f8c73beef43f4984932fdf93856d8e8fee855212576b440af8a80"
+}

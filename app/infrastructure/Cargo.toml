@@ -1,0 +1,42 @@
+[package]
+name = "infrastructure"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+axum = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-appender = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true, features = ["std"] }
+serde_urlencoded = { workspace = true }
+rmp-serde = { workspace = true }
+sqlx = { workspace = true, features = [
+    "runtime-tokio",
+    "postgres",
+    "migrate",
+    "chrono",
+    "json",
+    "derive",
+] }
+redb = { workspace = true }
+moka = { workspace = true, features = ["future"] }
+singleflight-async = { workspace = true }
+tempoid = { workspace = true }
+jsonwebtoken = { workspace = true }
+nject = { workspace = true, features = ["macro"] }
+bon = { workspace = true }
+chrono = { workspace = true }
+chrono-tz = { workspace = true, features = ["std"] }
+const_format = { workspace = true }
+readonly = { workspace = true }
+hmac-sha256 = { workspace = true }
+hex = { workspace = true, features = ["alloc"] }
+
+domain = { workspace = true }
+single_flight_derive = { workspace = true }

@@ -1,0 +1,45 @@
+use anyhow::Result;
+use bon::Builder;
+use serde::Deserialize;
+use shared::pool::Pool;
+
+use crate::{
+    {{module}}::query::dto::{{entity}}::{{entity | pascal_case}}Dto,
+    shared::paging_result::{PagingResult, TotalRow},
+};
+
+#[derive(Deserialize, Builder)]
+pub struct Search{{entity | pascal_case | pluralize}}Query {
+    page: i64,
+    page_size: i64,
+}
+
+impl Search{{entity | pascal_case | pluralize}}Query {
+    pub async fn query(&self, pool: &Pool) -> Result<PagingResult<{{entity | pascal_case}}Dto>> {
+        let count_future = sqlx::query_as!(
+            TotalRow,
+            r#"
+            SELECT COUNT(*) as count 
+            FROM {{table_name}}
+            "#,
+        )
+        .fetch_one(pool);
+        let offset = (self.page - 1) * self.page_size;
+        let rows_future = sqlx::query_as!(
+            {{entity | pascal_case}}Dto,
+            r#"
+        SELECT {{fields | map(attribute="name") | join(', ')}}
+        FROM {{table_name}} 
+        LIMIT ?1 OFFSET ?2
+        "#,
+            self.page_size,
+            offset,
+        )
+        .fetch_all(pool);
+        let (TotalRow { count }, rows) = tokio::try_join!(count_future, rows_future)?;
+        Ok(PagingResult {
+            total: count as u64,
+            items: rows,
+        })
+    }
+}

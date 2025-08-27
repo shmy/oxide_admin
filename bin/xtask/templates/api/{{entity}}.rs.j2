@@ -1,0 +1,69 @@
+use application::{{module}}::{
+    command::{
+        batch_delete_{{entity | pluralize}}::BatchDelete{{entity | pascal_case | pluralize}}Command, create_{{entity}}::Create{{entity | pascal_case}}Command,
+        update_{{entity}}::Update{{entity | pascal_case}}Command,
+    },
+    query::{dto::{{entity}}::{{entity | pascal_case}}Dto, retrieve_{{entity}}::Retrieve{{entity | pascal_case}}Query, search_{{entity}}s::Search{{entity | pascal_case | pluralize}}Query},
+};
+use application::shared::paging_result::PagingResult;
+use axum::{
+    Json, Router,
+    extract::{Path, Query, State},
+    routing::{get, post, put},
+};
+
+use crate::{
+    WebState,
+    internal::response::{JsonResponse, JsonResponsePagingType, JsonResponseType, PagingResponse},
+};
+
+async fn paging(
+    State(state): State<WebState>,
+    Query(query): Query<Search{{entity | pascal_case | pluralize}}Query>,
+) -> JsonResponsePagingType<{{entity | pascal_case}}Dto> {
+    let PagingResult { total, items } = query.query(state.pool()).await?;
+    JsonResponse::ok(PagingResponse { total, items })
+}
+
+async fn retrieve(
+    State(state): State<WebState>,
+    Path(id): Path<String>,
+) -> JsonResponseType<{{entity | pascal_case}}Dto> {
+    let query = Retrieve{{entity | pascal_case}}Query::builder().id(id).build();
+    let {{entity}} = query.query(state.pool()).await?;
+    JsonResponse::ok({{entity}})
+}
+
+async fn batch_delete(
+    State(state): State<WebState>,
+    Json(command): Json<BatchDelete{{entity | pascal_case | pluralize}}Command>,
+) -> JsonResponseType<()> {
+    command.execute(state.pool()).await?;
+    JsonResponse::ok(())
+}
+
+async fn create(
+    State(state): State<WebState>,
+    Json(command): Json<Create{{entity | pascal_case}}Command>,
+) -> JsonResponseType<()> {
+    let _ = command.execute(state.pool()).await?;
+    JsonResponse::ok(())
+}
+
+async fn update(
+    State(state): State<WebState>,
+    Path(id): Path<String>,
+    Json(command): Json<Update{{entity | pascal_case}}Command>,
+) -> JsonResponseType<()> {
+    let _ = command.execute(id, state.pool()).await?;
+    JsonResponse::ok(())
+}
+
+pub fn routing() -> Router<WebState> {
+    Router::new()
+        .route("/", get(paging))
+        .route("/", post(create))
+        .route("/{id}", get(retrieve))
+        .route("/{id}", put(update))
+        .route("/batch/delete", post(batch_delete))
+}

@@ -1,0 +1,137 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH before AS (\n                SELECT * FROM _users WHERE id = ANY($1) AND privileged != true\n            ),\n            updated AS (\n                UPDATE _users SET enabled = $2\n                WHERE id = ANY($1) AND privileged != true\n                RETURNING *\n            )\n            SELECT\n            before.id as before_id, before.account as before_account, before.portrait as before_portrait, before.name as before_name, before.privileged as before_privileged, before.password as before_password, before.role_ids as \"before_role_ids: Vec<RoleId>\", before.enabled as before_enabled, before.refresh_token as before_refresh_token, before.refresh_token_expired_at as before_refresh_token_expired_at,\n            updated.id as updated_id, updated.account as updated_account, updated.portrait as updated_portrait, updated.name as updated_name, updated.privileged as updated_privileged, updated.password as updated_password, updated.role_ids as \"updated_role_ids: Vec<RoleId>\", updated.enabled as updated_enabled, updated.refresh_token as updated_refresh_token, updated.refresh_token_expired_at as updated_refresh_token_expired_at\n            FROM before\n            JOIN updated ON before.id = updated.id;\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "before_id",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "before_account",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "before_portrait",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "before_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "before_privileged",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "before_password",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "before_role_ids: Vec<RoleId>",
+        "type_info": "BpcharArray"
+      },
+      {
+        "ordinal": 7,
+        "name": "before_enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "before_refresh_token",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "before_refresh_token_expired_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_id",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "updated_account",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "updated_portrait",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "updated_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "updated_privileged",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 15,
+        "name": "updated_password",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 16,
+        "name": "updated_role_ids: Vec<RoleId>",
+        "type_info": "BpcharArray"
+      },
+      {
+        "ordinal": 17,
+        "name": "updated_enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 18,
+        "name": "updated_refresh_token",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 19,
+        "name": "updated_refresh_token_expired_at",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "BpcharArray",
+        "Bool"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "9dd2ac0729a940a3de40148a7576a9c8890d330c09c203702d983c59fca06f5d"
+}
