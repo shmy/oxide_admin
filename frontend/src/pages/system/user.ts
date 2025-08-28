@@ -11,8 +11,8 @@ const buildDrawer = (isAdd = true) => {
   const icon = isAdd ? "fas fa-plus" : "fas fa-edit";
   const tooltip = isAdd ? null : "编辑";
 
-  const api = isAdd ? "post:" + endpoint : "put:" + endpoint + "/$id";
-  const initApi = isAdd ? null : "get:" + endpoint + "/$id";
+  const api = isAdd ? `post:${endpoint}` : `put:${endpoint}/$id`;
+  const initApi = isAdd ? null : `get:${endpoint}/$id`;
 
   return {
     label: label,
