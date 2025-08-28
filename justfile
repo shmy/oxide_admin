@@ -5,7 +5,7 @@ check:
     cargo watch -q -c -x "check --workspace" -w app -w crates -w bin
 
 setup:
-    sqlx migrate run --source app/migration/sql
+    sqlx migrate run --source app/infrastructure/migration/sql
 
 build_frontend:
     #! /bin/sh

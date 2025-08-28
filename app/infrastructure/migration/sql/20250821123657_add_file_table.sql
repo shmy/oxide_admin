@@ -4,7 +4,8 @@ CREATE TABLE
         id CHAR(24) PRIMARY KEY NOT NULL,
         path VARCHAR(64) NOT NULL,
         status SMALLINT NOT NULL,
-        created_at TIMESTAMP NOT NULL
+        created_at TIMESTAMP NOT NULL,
+        updated_at TIMESTAMP NOT NULL
     );
 
 CREATE INDEX idx_files_path ON _files (path);

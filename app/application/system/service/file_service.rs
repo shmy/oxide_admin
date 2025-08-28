@@ -40,11 +40,12 @@ impl FileService {
         let now = self.ct.now();
         let id = IdGenerator::primary_id();
         let _ = sqlx::query!(
-            "INSERT INTO _files (id, path, status, created_at) VALUES ($1, $2, $3, $4)",
+            "INSERT INTO _files (id, path, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
             id,
             relative_path,
             FileStatus::Unused as FileStatus,
-            now
+            now,
+            now,
         )
         .execute(&self.pool)
         .await?;
@@ -65,11 +66,13 @@ impl FileService {
         if relative_paths.is_empty() {
             return Ok(());
         }
+        let now = self.ct.now();
         sqlx::query!(
             r#"
-            UPDATE _files SET status = $1 WHERE path = ANY($2)
+            UPDATE _files SET status = $1, updated_at = $2 WHERE path = ANY($3)
             "#,
             status as FileStatus,
+            now,
             relative_paths,
         )
         .execute(&self.pool)
