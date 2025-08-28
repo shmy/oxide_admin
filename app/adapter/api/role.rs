@@ -1,7 +1,7 @@
 use application::{
     iam::{
         command::{
-            batch_delete_role::{BatchDeleteRolesCommand, BatchDeleteRolesCommandHandler},
+            batch_delete_roles::{BatchDeleteRolesCommand, BatchDeleteRolesCommandHandler},
             batch_disable_roles::{BatchDisableRolesCommand, BatchDisableRolesCommandHandler},
             batch_enable_roles::{BatchEnableRolesCommand, BatchEnableRolesCommandHandler},
             create_role::{CreateRoleCommand, CreateRoleCommandHandler},

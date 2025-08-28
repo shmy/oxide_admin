@@ -1,4 +1,4 @@
-pub mod batch_delete_role;
+pub mod batch_delete_roles;
 pub mod batch_delete_users;
 pub mod batch_disable_roles;
 pub mod batch_disable_users;

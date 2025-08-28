@@ -1,21 +1,39 @@
 use anyhow::Result;
 use bon::Builder;
-use domain::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
-use domain::shared::domain_repository::DomainRepository;
+use domain::{
+    {{module}}::{error::{{module | pascal_case }}Error, event::{{module | pascal_case }}Event, value_object::{{entity}}_id::{{entity | pascal_case}}Id},
+    shared::domain_repository::DomainRepository,
+};
 use infrastructure::repository::{{module}}::{{entity}}_repository::{{entity | pascal_case}}RepositoryImpl;
+use nject::injectable;
 use serde::Deserialize;
-use shared::pool::Pool;
+
+use crate::shared::command_handler::{CommandHandler, CommandResult};
 
 #[derive(Deserialize, Builder)]
-pub struct BatchDelete{{entity | pascal_case | pluralize}}Command {
-    ids: Vec<String>,
+pub struct BatchDelete{{entity | pluralize | pascal_case}}Command {
+    ids: Vec<{{entity | pascal_case}}Id>,
 }
 
-impl BatchDelete{{entity | pascal_case | pluralize}}Command {
-    pub async fn execute(self, pool: &Pool) -> Result<()> {
-        let {{entity}}_repo = {{entity | pascal_case}}RepositoryImpl::builder().pool(pool).build();
-        let ids = self.ids.into_iter().map({{entity | pascal_case}}Id::new_unchecked).collect();
-        {{entity}}_repo.batch_delete(ids).await?;
-        Ok(())
+#[injectable]
+pub struct BatchDelete{{entity | pluralize | pascal_case}}CommandHandler {
+    {{entity}}_repo: {{entity | pascal_case}}RepositoryImpl,
+}
+
+impl CommandHandler for BatchDelete{{entity | pluralize | pascal_case}}CommandHandler {
+    type Command = BatchDelete{{entity | pluralize | pascal_case}}Command;
+    type Output = ();
+    type Event = {{module | pascal_case }}Event;
+    type Error = {{module | pascal_case }}Error;
+
+    async fn execute(
+        &self,
+        cmd: Self::Command,
+    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+        let items = self.{{entity}}_repo.batch_delete(&cmd.ids).await?;
+        Ok(CommandResult::with_event(
+            (),
+            {{module | pascal_case }}Event::{{entity | pluralize | pascal_case}}Deleted { items },
+        ))
     }
 }

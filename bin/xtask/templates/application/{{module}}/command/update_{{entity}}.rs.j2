@@ -1,29 +1,56 @@
 use anyhow::Result;
 use bon::Builder;
-use domain::{{module}}::{entity::{{entity}}::{{entity | pascal_case}}, value_object::{{entity}}_id::{{entity | pascal_case}}Id};
+use domain::{{module}}::error::{{module | pascal_case }}Error;
+use domain::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
+use domain::{{module}}::{entity::{{entity}}::{{entity | pascal_case}}, event::{{module | pascal_case }}Event};
 use domain::shared::domain_repository::DomainRepository;
+use domain::shared::event_util::UpdatedEvent;
 use infrastructure::repository::{{module}}::{{entity}}_repository::{{entity | pascal_case}}RepositoryImpl;
+use nject::injectable;
 use serde::Deserialize;
-use shared::pool::Pool;
+
+use crate::shared::command_handler::{CommandHandler, CommandResult};
 
 #[derive(Deserialize, Builder)]
 pub struct Update{{entity | pascal_case}}Command {
+    id: {{entity | pascal_case}}Id,
     {%- for field in domain_fields %}
     {{field.name}}: Option<{{field.type}}>,
     {%- endfor %}
 }
 
-impl Update{{entity | pascal_case}}Command {
-    pub async fn execute(self, id: String, pool: &Pool) -> Result<{{entity | pascal_case}}> {
-        let {{entity}}_repo = {{entity | pascal_case}}RepositoryImpl::builder().pool(pool).build();
-        let mut {{entity}} = {{entity}}_repo.by_id({{entity | pascal_case}}Id::new_unchecked(id)).await?;
-        {%- for field in domain_fields %}
-        if let Some({{field.name}}) = self.{{field.name}} {
-            {{entity}}.update_{{field.name}}({{field.name}});
+#[injectable]
+pub struct Update{{entity | pascal_case}}CommandHandler {
+    {{entity}}_repo: {{entity | pascal_case}}RepositoryImpl,
+}
 
+impl CommandHandler for Update{{entity | pascal_case}}CommandHandler {
+    type Command = Update{{entity | pascal_case}}Command;
+    type Output = {{entity | pascal_case}};
+    type Event = {{module | pascal_case }}Event;
+    type Error = {{module | pascal_case }}Error;
+
+    async fn execute(
+        &self,
+        cmd: Self::Command,
+    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+        let id = cmd.id;
+        let mut {{entity}} = self.{{entity}}_repo.by_id(&id).await?;
+        let before = {{entity}}.clone();
+        {%- for field in domain_fields %}
+        if let Some({{field.name}}) = cmd.{{field.name}} {
+            {{entity}}.update_{{field.name}}({{field.name}});
         }
         {%- endfor %}
-        let {{entity}} = {{entity}}_repo.save({{entity}}).await?;
-        Ok({{entity}})
+        let {{entity}} = self.{{entity}}_repo.save({{entity}}).await?;
+        Ok(CommandResult::with_event(
+            {{entity}}.clone(),
+            {{module | pascal_case }}Event::{{entity | pluralize | pascal_case}}Updated {
+                items: vec![UpdatedEvent {
+                    before,
+                    after: {{entity}},
+                }],
+            },
+        ))
     }
 }

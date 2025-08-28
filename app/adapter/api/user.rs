@@ -33,7 +33,7 @@ use crate::{
     },
 };
 
-async fn paging(
+async fn search(
     Inject(query_handler): Inject<SearchUsersQueryHandler>,
     Inject(hmac_util): Inject<HmacUtil>,
     Query(query): Query<SearchUsersQuery>,
@@ -131,7 +131,7 @@ mod request {
 
 pub fn routing() -> Router<WebState> {
     Router::new()
-        .route_with_permission("/", get(paging), perms!(SYSTEM_USER))
+        .route_with_permission("/", get(search), perms!(SYSTEM_USER))
         .route_with_permission("/", post(create), perms!(SYSTEM_USER))
         .route_with_permission("/{id}", get(retrieve), perms!(SYSTEM_USER))
         .route_with_permission("/{id}", put(update), perms!(SYSTEM_USER))

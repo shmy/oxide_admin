@@ -1,7 +1,7 @@
 use serde::Serialize;
-use sqlx::FromRow;
+use sqlx::{prelude::FromRow, types::chrono};
 
-#[derive(Debug, Serialize, FromRow)]
+#[derive(Debug, Clone, Serialize, FromRow)]
 pub struct {{entity | pascal_case}}Dto {
     {%- for field in fields %}
     pub {{field.name}}: {{field.type}},
