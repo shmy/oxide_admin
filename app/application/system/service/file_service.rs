@@ -8,13 +8,6 @@ use infrastructure::{
 use nject::injectable;
 use sqlx::prelude::FromRow;
 
-#[derive(Debug, sqlx::Type)]
-#[repr(i16)]
-pub enum FileStatus {
-    Unused = 1,
-    Used = 2,
-}
-
 #[derive(Clone)]
 #[injectable]
 pub struct FileService {
@@ -29,8 +22,7 @@ impl FileService {
 
         (sqlx::query_as!(
             File,
-            "SELECT path, status from _files WHERE status = $1 AND created_at < $2",
-            FileStatus::Unused as FileStatus,
+            "SELECT path, used from _files WHERE used = false AND created_at < $1",
             two_days_ago
         )
         .fetch(&self.pool)) as _
@@ -40,10 +32,10 @@ impl FileService {
         let now = self.ct.now();
         let id = IdGenerator::primary_id();
         let _ = sqlx::query!(
-            "INSERT INTO _files (id, path, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
+            "INSERT INTO _files (id, path, used, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
             id,
             relative_path,
-            FileStatus::Unused as FileStatus,
+            false,
             now,
             now,
         )
@@ -53,25 +45,23 @@ impl FileService {
     }
 
     pub async fn set_files_unused(&self, relative_paths: &[String]) -> Result<()> {
-        self.set_files_status(relative_paths, FileStatus::Unused)
-            .await
+        self.set_files_status(relative_paths, false).await
     }
 
     pub async fn set_files_used(&self, relative_paths: &[String]) -> Result<()> {
-        self.set_files_status(relative_paths, FileStatus::Used)
-            .await
+        self.set_files_status(relative_paths, true).await
     }
 
-    async fn set_files_status(&self, relative_paths: &[String], status: FileStatus) -> Result<()> {
+    async fn set_files_status(&self, relative_paths: &[String], used: bool) -> Result<()> {
         if relative_paths.is_empty() {
             return Ok(());
         }
         let now = self.ct.now();
         sqlx::query!(
             r#"
-            UPDATE _files SET status = $1, updated_at = $2 WHERE path = ANY($3)
+            UPDATE _files SET used = $1, updated_at = $2 WHERE path = ANY($3)
             "#,
-            status as FileStatus,
+            used,
             now,
             relative_paths,
         )
@@ -99,5 +89,5 @@ impl FileService {
 #[derive(Clone, FromRow)]
 pub struct File {
     pub path: String,
-    pub status: i64,
+    pub used: bool,
 }
