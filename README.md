@@ -5,25 +5,29 @@
 - 使用现代化的Rust和Amis.js/React技术栈
 - 遵循领域驱动设计(DDD)和整洁架构原则
 
+## 在线预览
+> 由于使用 `Render`的免费计划，访问可能较慢，15分钟无操作会冻结实例，之后访问需要经过`Render`的中间页，请知悉。
+
+[https://oxide-admin.onrender.com/_](https://oxide-admin.onrender.com/_)
+
 ## ✨ 特性
 - DDD架构：遵循领域驱动设计(DDD)和整洁架构原则，实现适配展示、应用服务、领域模型、基础设施层的分离；
-- 事件总线: 内置事件系统，通过发布/监听领域事件来解耦业务逻辑；
+- 事件总线：内置事件系统，通过发布/监听领域事件来解耦业务逻辑；
 - 依赖注入：由`nject` crate进行支持；
-- 代码生成: 一键生成各个模块的代码，诸如`CRUD`、`CommandHandler`、`QueryHandler`等等；
+- 代码生成：一键生成各个模块的代码，诸如`CRUD`、`CommandHandler`、`QueryHandler`等等；
 - 时区配置：配置数据库时区；
 - 用户认证：使用`JWT`，支持`refresh_token`和`access_token`的签发、验证和刷新；
-- 用户授权：前端菜单权限及接口权限验证；
+- 用户授权：内置`RBAC`，灵活的控制前端菜单权限以及接口权限验证；
 - 数据库自动迁移：部署时无需手动迁移；
 - 速率限制中间件: 可对路由进行限速；
 - 日志轮转、日志分级：由`tracing` crate进行支持；
 - 内建*single_flight*宏：缓解数据库压力；
 - 文件上传及访问签名：内建单文件上传、图片上传、分片上传等接口，适配`Amis`；
-- 接口缓存，支持`max_capacity` `ttl`
+- 接口缓存：支持`max_capacity` `ttl`，由`moka` crate进行支持；
 - 定时任务：由`tokio-cron-scheduler` crate进行支持；
 - 后台任务：由`apalis` crate进行支持；
 - 优雅关停：严谨地结束服务、释放资源；
 - 多源配置：支持环境变量、`.env`文件，或者使用`cli`参数；
-- 前端架构：前端使用`Amis`低代码，可以完成比较完善的CRUD功能，也可以通过React自定义组件进行补充；
 - ...
 
 ## 🎈前端
