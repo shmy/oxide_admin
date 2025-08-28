@@ -4090,9 +4090,13 @@ dependencies = [
  "cruet",
  "dotenv",
  "minijinja",
+ "prettyplease",
+ "proc-macro2",
+ "quote",
  "serde",
  "serde_json",
  "sqlx",
+ "syn",
  "tokio",
  "walkdir",
 ]

@@ -28,3 +28,13 @@ minijinja = { version = "2.11", default-features = false, features = [
     "loader",
     "builtins",
 ] }
+
+
+prettyplease = { version = "0.2", default-features = false }
+syn = { version = "2.0", default-features = false, features = [
+    "full",
+    "parsing",
+    "printing",
+] }
+quote = { version = "1.0", default-features = false, features = ["proc-macro"] }
+proc-macro2 = { version = "1.0", default-features = false }

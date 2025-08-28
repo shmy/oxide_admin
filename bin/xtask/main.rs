@@ -9,11 +9,13 @@ use tokio::process::Command;
 use crate::{
     cli::{Cli, SubCommands},
     database::TableInfoTrait,
+    generate::domain::generate_domain,
     template::TemplateEngine,
 };
 
 mod cli;
 mod database;
+mod generate;
 mod template;
 mod util;
 
@@ -96,12 +98,6 @@ async fn generate_api(context: Value) -> Result<()> {
 async fn generate_application(context: Value) -> Result<()> {
     let template = TemplateEngine::from("application").with_context(context);
     template.render_to(APP_DIR.join("application")).await?;
-    Ok(())
-}
-
-async fn generate_domain(context: Value) -> Result<()> {
-    let template = TemplateEngine::from("domain").with_context(context);
-    template.render_to(APP_DIR.join("domain")).await?;
     Ok(())
 }
 
