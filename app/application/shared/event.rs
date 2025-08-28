@@ -11,7 +11,7 @@ pub enum Event {
 }
 
 impl From<IamEvent> for Event {
-    fn from(event: IamEvent) -> Self {
-        Self::Iam(event)
+    fn from(value: IamEvent) -> Self {
+        Self::Iam(value)
     }
 }
