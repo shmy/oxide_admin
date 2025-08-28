@@ -1,31 +1,3 @@
-use std::ops::Deref;
+use crate::id;
 
-use serde::Serialize;
-
-#[derive(Debug, Serialize, sqlx::Type)]
-#[sqlx(transparent)]
-pub struct {{entity | pascal_case}}Id(String);
-
-impl {{entity | pascal_case}}Id {
-    pub fn generate() -> Self {
-        Self(cuid2::cuid())
-    }
-
-    pub fn new_unchecked(id: String) -> Self {
-        Self(id)
-    }
-}
-
-impl Deref for {{entity | pascal_case}}Id {
-    type Target = str;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl From<String> for {{entity | pascal_case}}Id {
-    fn from(value: String) -> Self {
-        Self::new_unchecked(value)
-    }
-}
+id!({{entity | pascal_case}}id);

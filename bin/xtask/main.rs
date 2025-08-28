@@ -33,7 +33,7 @@ async fn main() -> Result<()> {
     let cli: Cli = Cli::parse();
     dotenv::dotenv().ok();
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL provided");
-    let db = database::sqlite::Sqlite::new(&database_url).await?;
+    let db = database::postgres::Postgres::new(&database_url).await?;
     let module = cli.module;
     let entity = cli.entity;
     let table = cli.table;

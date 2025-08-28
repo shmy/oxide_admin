@@ -20,7 +20,7 @@ dotenv = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
 tokio = { workspace = true, features = ["full"] }
-sqlx = { workspace = true, features = ["default", "runtime-tokio"] }
+sqlx = { workspace = true, features = ["default", "postgres", "runtime-tokio"] }
 cruet = { version = "0.15", default-features = false }
 walkdir = { version = "2.5", default-features = false }
 minijinja = { version = "2.11", default-features = false, features = [
