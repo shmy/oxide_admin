@@ -1,69 +1,83 @@
-use application::{{module}}::{
-    command::{
-        batch_delete_{{entity | pluralize}}::BatchDelete{{entity | pascal_case | pluralize}}Command, create_{{entity}}::Create{{entity | pascal_case}}Command,
-        update_{{entity}}::Update{{entity | pascal_case}}Command,
+use application::{
+    {{module}}::{
+        command::{
+            batch_delete_{{entity | pluralize}}::{BatchDelete{{entity | pluralize | pascal_case}}Command, BatchDelete{{entity | pluralize | pascal_case}}CommandHandler},
+            create_{{entity}}::{Create{{entity | pascal_case}}Command, Create{{entity | pascal_case}}CommandHandler},
+            update_{{entity}}::{Update{{entity | pascal_case}}Command, Update{{entity | pascal_case}}CommandHandler},
+        },
+        dto::{{entity}}::{{entity | pascal_case}}Dto,
+        query::{
+            retrieve_{{entity}}::{Retrieve{{entity | pascal_case}}Query, Retrieve{{entity | pascal_case}}QueryHandler},
+            search_{{entity}}s::{Search{{entity | pascal_case}}sQuery, Search{{entity | pascal_case}}sQueryHandler},
+        },
     },
-    query::{dto::{{entity}}::{{entity | pascal_case}}Dto, retrieve_{{entity}}::Retrieve{{entity | pascal_case}}Query, search_{{entity}}s::Search{{entity | pascal_case | pluralize}}Query},
+    shared::{command_handler::CommandHandler, paging_result::PagingResult},
 };
-use application::shared::paging_result::PagingResult;
 use axum::{
     Json, Router,
-    extract::{Path, Query, State},
+    extract::{Path, Query},
     routing::{get, post, put},
 };
+use domain::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
+use domain::iam::value_object::permission_code::{{(module ~ "_" ~ entity) | uppercase}};
 
 use crate::{
-    WebState,
-    internal::response::{JsonResponse, JsonResponsePagingType, JsonResponseType, PagingResponse},
+    WebState, perms,
+    shared::{
+        extractor::inject::Inject,
+        middleware::perm_router_ext::PermRouterExt as _,
+        response::{JsonResponse, JsonResponsePagingType, JsonResponseType, PagingResponse},
+    },
 };
 
-async fn paging(
-    State(state): State<WebState>,
-    Query(query): Query<Search{{entity | pascal_case | pluralize}}Query>,
+async fn search(
+    Inject(query_handler): Inject<Search{{entity | pascal_case}}sQueryHandler>,
+    Query(query): Query<Search{{entity | pascal_case}}sQuery>,
 ) -> JsonResponsePagingType<{{entity | pascal_case}}Dto> {
-    let PagingResult { total, items } = query.query(state.pool()).await?;
+    let PagingResult { total, items } = query_handler.query(query).await?;
     JsonResponse::ok(PagingResponse { total, items })
 }
 
 async fn retrieve(
-    State(state): State<WebState>,
-    Path(id): Path<String>,
+    Inject(query_handler): Inject<Retrieve{{entity | pascal_case}}QueryHandler>,
+    Path(id): Path<{{entity | pascal_case}}Id>,
 ) -> JsonResponseType<{{entity | pascal_case}}Dto> {
-    let query = Retrieve{{entity | pascal_case}}Query::builder().id(id).build();
-    let {{entity}} = query.query(state.pool()).await?;
+    let {{entity}} = query_handler
+        .query(Retrieve{{entity | pascal_case}}Query::builder().id(id).build())
+        .await?;
     JsonResponse::ok({{entity}})
 }
 
 async fn batch_delete(
-    State(state): State<WebState>,
-    Json(command): Json<BatchDelete{{entity | pascal_case | pluralize}}Command>,
+    Inject(command_handler): Inject<BatchDelete{{entity | pascal_case}}sCommandHandler>,
+    Json(command): Json<BatchDelete{{entity | pascal_case}}sCommand>,
 ) -> JsonResponseType<()> {
-    command.execute(state.pool()).await?;
+    command_handler.handle(command).await?;
     JsonResponse::ok(())
 }
 
 async fn create(
-    State(state): State<WebState>,
+    Inject(command_handler): Inject<Create{{entity | pascal_case}}CommandHandler>,
     Json(command): Json<Create{{entity | pascal_case}}Command>,
 ) -> JsonResponseType<()> {
-    let _ = command.execute(state.pool()).await?;
+    let _ = command_handler.handle(command).await?;
     JsonResponse::ok(())
 }
 
 async fn update(
-    State(state): State<WebState>,
-    Path(id): Path<String>,
+    Inject(command_handler): Inject<Update{{entity | pascal_case}}CommandHandler>,
+    Path(_id): Path<{{entity | pascal_case}}Id>,
     Json(command): Json<Update{{entity | pascal_case}}Command>,
 ) -> JsonResponseType<()> {
-    let _ = command.execute(id, state.pool()).await?;
+    let _ = command_handler.handle(command).await?;
     JsonResponse::ok(())
 }
 
 pub fn routing() -> Router<WebState> {
     Router::new()
-        .route("/", get(paging))
-        .route("/", post(create))
-        .route("/{id}", get(retrieve))
-        .route("/{id}", put(update))
-        .route("/batch/delete", post(batch_delete))
+        .route_with_permission("/", get(search), perms!({{(module ~ "_" ~ entity) | uppercase}}))
+        .route_with_permission("/", post(create), perms!({{(module ~ "_" ~ entity) | uppercase}}))
+        .route_with_permission("/{id}", get(retrieve), perms!({{(module ~ "_" ~ entity) | uppercase}}))
+        .route_with_permission("/{id}", put(update), perms!({{(module ~ "_" ~ entity) | uppercase}}))
+        .route_with_permission("/batch/delete", post(batch_delete), perms!({{(module ~ "_" ~ entity) | uppercase}}))
 }
