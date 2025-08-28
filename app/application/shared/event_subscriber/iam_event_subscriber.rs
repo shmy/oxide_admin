@@ -78,6 +78,7 @@ where
     T: PermissionResolver + Clone + Debug + Send + Sync + 'static,
 {
     async fn on_received(&self, event: Event) -> anyhow::Result<()> {
+        #[allow(irrefutable_let_patterns)]
         if let Event::Iam(e) = event {
             if Self::is_permission_changed(&e)
                 && let Err(err) = self.permission_resolver.refresh().await
