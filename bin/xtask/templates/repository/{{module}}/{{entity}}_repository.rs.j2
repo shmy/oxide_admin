@@ -26,7 +26,7 @@ impl DomainRepository for {{entity | pascal_case}}RepositoryImpl {
     async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, {{module | pascal_case}}Error> {
         let row_opt = sqlx::query!(
             r#"
-        SELECT id, {{domain_fields | map(attribute="name") | join(', ')}} FROM {{table_name}} WHERE id = $1
+        SELECT id as "id: {{entity | pascal_case}}Id", {{domain_fields | map(attribute="name") | join(', ')}} FROM {{table_name}} WHERE id = $1
         "#,
             id
         )
@@ -36,7 +36,7 @@ impl DomainRepository for {{entity | pascal_case}}RepositoryImpl {
         row_opt
             .map(|row| {
                 {{entity | pascal_case}}::builder()
-                    .id({{entity | pascal_case}}Id::new_unchecked(row.id))
+                    .id(row.id)
                     {%- for field in domain_fields %}
                     .{{field.name}}(row.{{field.name}})
                     {%- endfor %}
@@ -80,7 +80,7 @@ impl DomainRepository for {{entity | pascal_case}}RepositoryImpl {
         }
         let items = sqlx::query!(
             r#"
-            DELETE FROM {{table_name}} WHERE id = ANY($1) RETURNING id, {{domain_fields | map(attribute="name") | join(', ')}}
+            DELETE FROM {{table_name}} WHERE id = ANY($1) RETURNING id as "id: {{entity | pascal_case}}Id", {{domain_fields | map(attribute="name") | join(', ')}}
             "#,
             &ids.inner_vec()
         )
@@ -91,7 +91,7 @@ impl DomainRepository for {{entity | pascal_case}}RepositoryImpl {
             .into_iter()
             .map(|row| {
                 {{entity | pascal_case}}::builder()
-                    .id({{entity | pascal_case}}Id::new_unchecked(row.id))
+                    .id(row.id)
                     {%- for field in domain_fields %}
                     .{{field.name}}(row.{{field.name}})
                     {%- endfor %}
