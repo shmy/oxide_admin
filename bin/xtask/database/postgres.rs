@@ -42,19 +42,47 @@ impl TableInfoTrait for Postgres {
 }
 
 fn type_mapping(r#type: &str, notnull: bool) -> String {
-    let ty = if r#type.starts_with("VARCHAR") {
-        "String".to_string()
-    } else {
-        match r#type {
-            "text" | "character" | "character varying" => "String",
-            "boolean" => "bool",
-            "smallint" => "i16",
-            "JSONB" | "ARRAY" => "serde_json::Value",
-            "timestamp without time zone" => "chrono::NaiveDateTime",
-            _ => r#type,
-        }
-        .to_string()
+    let ty = match r#type.to_lowercase().as_str() {
+        // 文本
+        "text" | "character" | "character varying" => "String".to_string(),
+
+        // 布尔
+        "boolean" => "bool".to_string(),
+
+        // 整数
+        "smallint" | "int2" => "i16".to_string(),
+        "integer" | "int4" => "i32".to_string(),
+        "bigint" | "int8" => "i64".to_string(),
+
+        // 浮点
+        "real" | "float4" => "f32".to_string(),
+        "double precision" | "float8" => "f64".to_string(),
+
+        // 数值/小数
+        "numeric" | "decimal" => "rust_decimal::Decimal".to_string(),
+
+        // 时间日期
+        "date" => "chrono::NaiveDate".to_string(),
+        "time without time zone" => "chrono::NaiveTime".to_string(),
+        "timestamp without time zone" => "chrono::NaiveDateTime".to_string(),
+        "timestamp with time zone" => "chrono::DateTime<chrono::FixedOffset>".to_string(),
+
+        // JSON
+        "json" | "jsonb" => "serde_json::Value".to_string(),
+
+        // UUID
+        "uuid" => "uuid::Uuid".to_string(),
+
+        // 字节流
+        "bytea" => "Vec<u8>".to_string(),
+
+        // 数组类型，先粗暴映射成 JSON
+        t if t.ends_with("[]") => "serde_json::Value".to_string(),
+
+        // 其他（保留原样，可能需要手动处理）
+        other => other.to_string(),
     };
+
     if notnull {
         ty
     } else {
