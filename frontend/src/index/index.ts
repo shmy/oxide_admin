@@ -68,9 +68,12 @@ const buildDropdown = () => {
   };
 };
 
+const assetPrefix = import.meta.env.ASSET_PREFIX;
+
 const schemas = {
   type: "app",
-  brandName: "授权管理",
+  brandName: "Oxide Admin",
+  logo: assetPrefix + "/static/image/logo.png",
   api: "/profile/current",
   header: {
     type: "container",

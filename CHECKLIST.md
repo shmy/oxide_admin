@@ -23,6 +23,8 @@
 [x] Backend code generation
 [ ] Frontend code generation
 [ ] Release时才嵌入前端
+[ ] 单元测试
+[ ] l10n
 [-] 审计 现在只是log
 [x] data目录
 [x] 定时任务

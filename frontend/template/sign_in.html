@@ -1,46 +1,89 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>登录</title>
+        <link
+            rel="icon"
+            type="image/png"
+            href="<%= assetPrefix %>/static/image/logo.png"
+        />
+        <link
+            rel="prefetch"
+            href="<%= assetPrefix %>/static/lib/jssdk/antd.css"
+        />
+        <link
+            rel="prefetch"
+            href="<%= assetPrefix %>/static/lib/jssdk/iconfont.css"
+        />
+        <link
+            rel="prefetch"
+            href="<%= assetPrefix %>/static/lib/jssdk/sdk.js"
+        />
+        <link
+            rel="prefetch"
+            href="<%= assetPrefix %>/static/lib/jssdk/rest.js"
+        />
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录</title>
-    <link rel="prefetch" href="<%= assetPrefix %>/static/lib/jssdk/antd.css" />
-    <link rel="prefetch" href="<%= assetPrefix %>/static/lib/jssdk/iconfont.css" />
-    <link rel="prefetch" href="<%= assetPrefix %>/static/lib/jssdk/sdk.js" />
-    <link rel="prefetch" href="<%= assetPrefix %>/static/lib/jssdk/rest.js" />
-</head>
-
-<body>
-
-    <div id="<%= mountId %>" class="h-screen w-screen flex flex-col justify-center items-center">
-        <form id="form" class="w-[320px] flex flex-col gap-4">
-            <div>
-                <label for="account" class="block mb-2 text-sm font-medium text-gray-900">
-                    账号
-                </label>
-                <input type="text" id="account" name="account" autofocus
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 px-3"
-                    placeholder="请输入账号" required />
-            </div>
-            <div>
-                <label for="password" class="block mb-2 text-sm font-medium text-gray-900">
-                    密码
-                </label>
-                <input type="password" id="password" name="password"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 px-3"
-                    placeholder="请输入密码" required />
-            </div>
-            <div id="error" class="text-red-500 text-sm text-center"></div>
-            <div>
-                <button id="submit" type="submit"
-                    class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none">
-                    立即登录
-                </button>
-                <div id="success" style="display: none;" class="text-blue-500 text-base text-center">登录成功，正在跳转中...</div>
-            </div>
-        </form>
-    </div>
-</body>
-
+    <body>
+        <div
+            id="<%= mountId %>"
+            class="h-screen w-screen flex flex-col justify-center items-center"
+        >
+            <form id="form" class="w-[320px] flex flex-col gap-4">
+                <div>
+                    <label
+                        for="account"
+                        class="block mb-2 text-sm font-medium text-gray-900"
+                    >
+                        账号
+                    </label>
+                    <input
+                        type="text"
+                        id="account"
+                        name="account"
+                        autofocus
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 px-3"
+                        placeholder="请输入账号"
+                        required
+                    />
+                </div>
+                <div>
+                    <label
+                        for="password"
+                        class="block mb-2 text-sm font-medium text-gray-900"
+                    >
+                        密码
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 px-3"
+                        placeholder="请输入密码"
+                        required
+                    />
+                </div>
+                <div id="error" class="text-red-500 text-sm text-center"></div>
+                <div>
+                    <button
+                        id="submit"
+                        type="submit"
+                        class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none"
+                    >
+                        立即登录
+                    </button>
+                    <div
+                        id="success"
+                        style="display: none"
+                        class="text-blue-500 text-base text-center"
+                    >
+                        登录成功，正在跳转中...
+                    </div>
+                </div>
+            </form>
+        </div>
+    </body>
 </html>
