@@ -20,7 +20,9 @@
 [x] single_flight derive for function
 [x] Log rotation(日志轮转、日志分级)
 [x] Uploads 访问链接签名/验证
-[ ] Code generation
+[x] Backend code generation
+[ ] Frontend code generation
+[ ] Release时才嵌入前端
 [-] 审计 现在只是log
 [x] data目录
 [x] 定时任务

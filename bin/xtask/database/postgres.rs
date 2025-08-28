@@ -46,9 +46,7 @@ fn type_mapping(r#type: &str, notnull: bool) -> String {
         "String".to_string()
     } else {
         match r#type {
-            "text" => "String",
-            "character" => "String",
-            "character varying" => "String",
+            "text" | "character" | "character varying" => "String",
             "boolean" => "bool",
             "smallint" => "i16",
             "JSONB" | "ARRAY" => "serde_json::Value",
