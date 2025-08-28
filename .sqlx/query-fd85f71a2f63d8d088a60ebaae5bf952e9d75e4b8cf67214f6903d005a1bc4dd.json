@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, name, permission_ids as \"permission_ids: Vec<PermissionCode>\", privileged, enabled, created_at, updated_at\n        FROM _roles\n        WHERE id = $1\n        LIMIT 1\n        ",
+  "query": "\n            SELECT id, name, permission_ids as \"permission_ids: Vec<PermissionCode>\", privileged, enabled, created_at, updated_at\n            FROM _roles\n            WHERE id = $1\n            LIMIT 1\n        ",
   "describe": {
     "columns": [
       {
@@ -54,5 +54,5 @@
       false
     ]
   },
-  "hash": "c0ae9bb412e5501c990587fea23d016d6abcc073b2ee2b32036ba7e7c8aecc5a"
+  "hash": "fd85f71a2f63d8d088a60ebaae5bf952e9d75e4b8cf67214f6903d005a1bc4dd"
 }

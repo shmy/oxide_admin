@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, account, portrait, name, privileged, password, role_ids as \"role_ids: Vec<RoleId>\", enabled, refresh_token, refresh_token_expired_at\n        FROM _users WHERE refresh_token = $1\n        ",
+  "query": "\n        SELECT id as \"id: UserId\", account, portrait, name, privileged, password as \"password: HashedPassword\", role_ids as \"role_ids: Vec<RoleId>\", enabled, refresh_token, refresh_token_expired_at\n        FROM _users WHERE refresh_token = $1\n        ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "id",
+        "name": "id: UserId",
         "type_info": "Bpchar"
       },
       {
@@ -30,7 +30,7 @@
       },
       {
         "ordinal": 5,
-        "name": "password",
+        "name": "password: HashedPassword",
         "type_info": "Varchar"
       },
       {
@@ -72,5 +72,5 @@
       true
     ]
   },
-  "hash": "fb5e2abfe93549943f9495e342d4df11d1b8b9164f964c32c7b345647db89758"
+  "hash": "d07485f96d76ed2ffe9a1bf4d66760928614d9531633d2c7a7e95855e36f2f55"
 }

@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            DELETE FROM _users WHERE id = ANY($1) AND privileged != true RETURNING id, account, portrait, name, privileged, password, role_ids as \"role_ids: Vec<RoleId>\", enabled, refresh_token, refresh_token_expired_at\n            ",
+  "query": "\n        SELECT id as \"id: UserId\", account, portrait, name, privileged, password as \"password: HashedPassword\", role_ids as \"role_ids: Vec<RoleId>\", enabled, refresh_token, refresh_token_expired_at\n        FROM _users WHERE id = $1\n        ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "id",
+        "name": "id: UserId",
         "type_info": "Bpchar"
       },
       {
@@ -30,7 +30,7 @@
       },
       {
         "ordinal": 5,
-        "name": "password",
+        "name": "password: HashedPassword",
         "type_info": "Varchar"
       },
       {
@@ -56,7 +56,7 @@
     ],
     "parameters": {
       "Left": [
-        "BpcharArray"
+        "Bpchar"
       ]
     },
     "nullable": [
@@ -72,5 +72,5 @@
       true
     ]
   },
-  "hash": "e26a6ac686067f65a8f839978ce261e32573e9b02b8a9eba80ab5790ab1caefb"
+  "hash": "6f4bf94b30fb54ab83f81ee2707a57fb109658d6ceb94d4ba57c128922be9676"
 }
