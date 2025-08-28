@@ -29,7 +29,7 @@ impl DomainRepository for RoleRepositoryImpl {
     async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, IamError> {
         let row_opt = sqlx::query!(
             r#"
-        SELECT id, name, privileged, permission_ids as "permission_ids: Vec<PermissionCode>", enabled
+        SELECT id as "id: RoleId", name, privileged, permission_ids as "permission_ids: Vec<PermissionCode>", enabled
         FROM _roles WHERE id = $1
         "#,
             id
@@ -40,7 +40,7 @@ impl DomainRepository for RoleRepositoryImpl {
         row_opt
             .map(|row| {
                 Role::builder()
-                    .id(RoleId::new_unchecked(row.id))
+                    .id(row.id)
                     .enabled(row.enabled)
                     .name(row.name)
                     .privileged(row.privileged)
@@ -88,7 +88,7 @@ impl DomainRepository for RoleRepositoryImpl {
         }
         let items = sqlx::query!(
             r#"
-            DELETE FROM _roles WHERE id = ANY($1) AND privileged != true RETURNING id, name, privileged, permission_ids as "permission_ids: Vec<PermissionCode>", enabled
+            DELETE FROM _roles WHERE id = ANY($1) AND privileged != true RETURNING id as "id: RoleId", name, privileged, permission_ids as "permission_ids: Vec<PermissionCode>", enabled
             "#,
             &ids.inner_vec()
         )
@@ -99,7 +99,7 @@ impl DomainRepository for RoleRepositoryImpl {
             .into_iter()
             .map(|row| {
                 Role::builder()
-                    .id(RoleId::new_unchecked(row.id))
+                    .id(row.id)
                     .enabled(row.enabled)
                     .name(row.name)
                     .privileged(row.privileged)
@@ -131,8 +131,8 @@ impl RoleRepository for RoleRepositoryImpl {
                 RETURNING *
             )
             SELECT
-            before.id as before_id, before.name as before_name, before.privileged as before_privileged, before.permission_ids as "before_permission_ids: Vec<PermissionCode>", before.enabled as before_enabled,
-            updated.id as updated_id, updated.name as updated_name, updated.privileged as updated_privileged, updated.permission_ids as "updated_permission_ids: Vec<PermissionCode>", updated.enabled as updated_enabled
+            before.id as "before_id: RoleId", before.name as before_name, before.privileged as before_privileged, before.permission_ids as "before_permission_ids: Vec<PermissionCode>", before.enabled as before_enabled,
+            updated.id as "updated_id: RoleId", updated.name as updated_name, updated.privileged as updated_privileged, updated.permission_ids as "updated_permission_ids: Vec<PermissionCode>", updated.enabled as updated_enabled
             FROM before
             JOIN updated ON before.id = updated.id;
             "#,
@@ -146,14 +146,14 @@ impl RoleRepository for RoleRepositoryImpl {
             .into_iter()
             .map(|row| UpdatedEvent {
                 before: Role::builder()
-                    .id(RoleId::new_unchecked(row.before_id))
+                    .id(row.before_id)
                     .enabled(row.before_enabled)
                     .name(row.before_name)
                     .privileged(row.before_privileged)
                     .permission_ids(row.before_permission_ids)
                     .build(),
                 after: Role::builder()
-                    .id(RoleId::new_unchecked(row.updated_id))
+                    .id(row.updated_id)
                     .enabled(row.updated_enabled)
                     .name(row.updated_name)
                     .privileged(row.updated_privileged)

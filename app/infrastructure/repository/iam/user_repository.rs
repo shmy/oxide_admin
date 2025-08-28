@@ -33,7 +33,7 @@ impl DomainRepository for UserRepositoryImpl {
     async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, IamError> {
         let row_opt = sqlx::query!(
             r#"
-        SELECT id, account, portrait, name, privileged, password, role_ids as "role_ids: Vec<RoleId>", enabled, refresh_token, refresh_token_expired_at
+        SELECT id as "id: UserId", account, portrait, name, privileged, password as "password: HashedPassword", role_ids as "role_ids: Vec<RoleId>", enabled, refresh_token, refresh_token_expired_at
         FROM _users WHERE id = $1
         "#,
             id
@@ -43,12 +43,12 @@ impl DomainRepository for UserRepositoryImpl {
         row_opt
             .map(|row| {
                 User::builder()
-                    .id(UserId::new_unchecked(row.id))
+                    .id(row.id)
                     .account(row.account)
                     .maybe_portrait(row.portrait)
                     .privileged(row.privileged)
                     .name(row.name)
-                    .password(HashedPassword::new_unchecked(row.password))
+                    .password(row.password)
                     .role_ids(row.role_ids)
                     .enabled(row.enabled)
                     .maybe_refresh_token(row.refresh_token)
@@ -109,7 +109,7 @@ impl DomainRepository for UserRepositoryImpl {
 
         let items = sqlx::query!(
             r#"
-            DELETE FROM _users WHERE id = ANY($1) AND privileged != true RETURNING id, account, portrait, name, privileged, password, role_ids as "role_ids: Vec<RoleId>", enabled, refresh_token, refresh_token_expired_at
+            DELETE FROM _users WHERE id = ANY($1) AND privileged != true RETURNING id as "id: UserId", account, portrait, name, privileged, password as "password: HashedPassword", role_ids as "role_ids: Vec<RoleId>", enabled, refresh_token, refresh_token_expired_at
             "#,
             &ids.inner_vec()
         )
@@ -120,12 +120,12 @@ impl DomainRepository for UserRepositoryImpl {
             .into_iter()
             .map(|row| {
                 User::builder()
-                    .id(UserId::new_unchecked(row.id))
+                    .id(row.id)
                     .account(row.account)
                     .maybe_portrait(row.portrait)
                     .privileged(row.privileged)
                     .name(row.name)
-                    .password(HashedPassword::new_unchecked(row.password))
+                    .password(row.password)
                     .role_ids(row.role_ids)
                     .enabled(row.enabled)
                     .maybe_refresh_token(row.refresh_token)
@@ -141,7 +141,7 @@ impl UserRepository for UserRepositoryImpl {
     async fn by_account(&self, account: String) -> Result<Self::Entity, Self::Error> {
         let row_opt = sqlx::query!(
             r#"
-        SELECT id, account, portrait, name, privileged, password, role_ids as "role_ids: Vec<RoleId>", enabled, refresh_token, refresh_token_expired_at
+        SELECT id as "id: UserId", account, portrait, name, privileged, password as "password: HashedPassword", role_ids as "role_ids: Vec<RoleId>", enabled, refresh_token, refresh_token_expired_at
         FROM _users WHERE account = $1
         "#,
             account
@@ -151,12 +151,12 @@ impl UserRepository for UserRepositoryImpl {
         row_opt
             .map(|row| {
                 User::builder()
-                    .id(UserId::new_unchecked(row.id))
+                    .id(row.id)
                     .account(row.account)
                     .maybe_portrait(row.portrait)
                     .privileged(row.privileged)
                     .name(row.name)
-                    .password(HashedPassword::new_unchecked(row.password))
+                    .password(row.password)
                     .role_ids(row.role_ids)
                     .enabled(row.enabled)
                     .maybe_refresh_token(row.refresh_token)
@@ -169,7 +169,7 @@ impl UserRepository for UserRepositoryImpl {
     async fn by_refresh_token(&self, refresh_token: String) -> Result<Self::Entity, Self::Error> {
         let row_opt = sqlx::query!(
             r#"
-        SELECT id, account, portrait, name, privileged, password, role_ids as "role_ids: Vec<RoleId>", enabled, refresh_token, refresh_token_expired_at
+        SELECT id as "id: UserId", account, portrait, name, privileged, password as "password: HashedPassword", role_ids as "role_ids: Vec<RoleId>", enabled, refresh_token, refresh_token_expired_at
         FROM _users WHERE refresh_token = $1
         "#,
             refresh_token
@@ -179,12 +179,12 @@ impl UserRepository for UserRepositoryImpl {
         row_opt
             .map(|row| {
                 User::builder()
-                    .id(UserId::new_unchecked(row.id))
+                    .id(row.id)
                     .account(row.account)
                     .maybe_portrait(row.portrait)
                     .privileged(row.privileged)
                     .name(row.name)
-                    .password(HashedPassword::new_unchecked(row.password))
+                    .password(row.password)
                     .role_ids(row.role_ids)
                     .enabled(row.enabled)
                     .maybe_refresh_token(row.refresh_token)
@@ -213,8 +213,8 @@ impl UserRepository for UserRepositoryImpl {
                 RETURNING *
             )
             SELECT
-            before.id as before_id, before.account as before_account, before.portrait as before_portrait, before.name as before_name, before.privileged as before_privileged, before.password as before_password, before.role_ids as "before_role_ids: Vec<RoleId>", before.enabled as before_enabled, before.refresh_token as before_refresh_token, before.refresh_token_expired_at as before_refresh_token_expired_at,
-            updated.id as updated_id, updated.account as updated_account, updated.portrait as updated_portrait, updated.name as updated_name, updated.privileged as updated_privileged, updated.password as updated_password, updated.role_ids as "updated_role_ids: Vec<RoleId>", updated.enabled as updated_enabled, updated.refresh_token as updated_refresh_token, updated.refresh_token_expired_at as updated_refresh_token_expired_at
+            before.id as "before_id: UserId", before.account as before_account, before.portrait as before_portrait, before.name as before_name, before.privileged as before_privileged, before.password as "before_password: HashedPassword", before.role_ids as "before_role_ids: Vec<RoleId>", before.enabled as before_enabled, before.refresh_token as before_refresh_token, before.refresh_token_expired_at as before_refresh_token_expired_at,
+            updated.id as "updated_id: UserId", updated.account as updated_account, updated.portrait as updated_portrait, updated.name as updated_name, updated.privileged as updated_privileged, updated.password as "updated_password: HashedPassword", updated.role_ids as "updated_role_ids: Vec<RoleId>", updated.enabled as updated_enabled, updated.refresh_token as updated_refresh_token, updated.refresh_token_expired_at as updated_refresh_token_expired_at
             FROM before
             JOIN updated ON before.id = updated.id;
             "#,
@@ -228,24 +228,24 @@ impl UserRepository for UserRepositoryImpl {
             .into_iter()
             .map(|row| UpdatedEvent {
                 before: User::builder()
-                    .id(UserId::new_unchecked(row.before_id))
+                    .id(row.before_id)
                     .account(row.before_account)
                     .maybe_portrait(row.before_portrait)
                     .privileged(row.before_privileged)
                     .name(row.before_name)
-                    .password(HashedPassword::new_unchecked(row.before_password))
+                    .password(row.before_password)
                     .role_ids(row.before_role_ids)
                     .enabled(row.before_enabled)
                     .maybe_refresh_token(row.before_refresh_token)
                     .maybe_refresh_token_expired_at(row.before_refresh_token_expired_at)
                     .build(),
                 after: User::builder()
-                    .id(UserId::new_unchecked(row.updated_id))
+                    .id(row.updated_id)
                     .account(row.updated_account)
                     .maybe_portrait(row.updated_portrait)
                     .privileged(row.updated_privileged)
                     .name(row.updated_name)
-                    .password(HashedPassword::new_unchecked(row.updated_password))
+                    .password(row.updated_password)
                     .role_ids(row.updated_role_ids)
                     .enabled(row.updated_enabled)
                     .maybe_refresh_token(row.updated_refresh_token)
