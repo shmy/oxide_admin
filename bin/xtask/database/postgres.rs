@@ -50,6 +50,7 @@ fn type_mapping(r#type: &str, notnull: bool) -> String {
             "character" => "String",
             "character varying" => "String",
             "boolean" => "bool",
+            "smallint" => "i16",
             "JSONB" | "ARRAY" => "serde_json::Value",
             "timestamp without time zone" => "chrono::NaiveDateTime",
             _ => r#type,

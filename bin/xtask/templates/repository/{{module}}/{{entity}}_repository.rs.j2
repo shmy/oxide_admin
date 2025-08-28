@@ -1,32 +1,36 @@
 use std::result::Result;
 
-use bon::Builder;
-use domain::{{module}}::{
-    entity::{{entity}}::{{entity | pascal_case}}, error::{{module | pascal_case}}Error, value_object::{{entity}}_id::{{entity | pascal_case}}Id,
-};
+use domain::{{module}}::repository::{{entity}}_repository::{{entity | pascal_case}}Repository;
+use domain::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
+use domain::{{module}}::{entity::{{entity}}::{{entity | pascal_case}}, error::{{module | pascal_case}}Error};
 use domain::shared::domain_repository::DomainRepository;
-use sqlx::{Pool, Sqlite};
+use domain::shared::to_inner_vec::ToInnerVec;
+use nject::injectable;
 
-#[derive(Builder)]
-pub struct {{entity | pascal_case}}RepositoryImpl<'a> {
-    pool: &'a Pool<Sqlite>,
+use crate::shared::chrono_tz::ChronoTz;
+use crate::shared::pool::Pool;
+
+#[injectable]
+pub struct {{entity | pascal_case}}RepositoryImpl {
+    pool: Pool,
+    ct: ChronoTz,
 }
 
-impl<'a> DomainRepository for {{entity | pascal_case}}RepositoryImpl<'a> {
+impl DomainRepository for {{entity | pascal_case}}RepositoryImpl {
     type Entity = {{entity | pascal_case}};
 
     type EntityId = {{entity | pascal_case}}Id;
 
     type Error = {{module | pascal_case}}Error;
 
-    async fn by_id(&self, id: Self::EntityId) -> Result<Self::Entity, {{module | pascal_case}}Error> {
+    async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, {{module | pascal_case}}Error> {
         let row_opt = sqlx::query!(
             r#"
-        SELECT id, {{domain_fields | map(attribute="name") | join(', ')}} FROM {{table_name}} WHERE id = ?
+        SELECT id, {{domain_fields | map(attribute="name") | join(', ')}} FROM {{table_name}} WHERE id = $1
         "#,
             id
         )
-        .fetch_optional(self.pool)
+        .fetch_optional(&self.pool)
         .await
         .map_err({{module | pascal_case}}Error::DatabaseError)?;
         row_opt
@@ -42,14 +46,14 @@ impl<'a> DomainRepository for {{entity | pascal_case}}RepositoryImpl<'a> {
     }
 
     async fn save(&self, entity: Self::Entity) -> Result<Self::Entity, {{module | pascal_case}}Error> {
-        let now = chrono::Utc::now().naive_utc();
+        let now = self.ct.now();
 
         sqlx::query!(
             r#"
             INSERT INTO {{table_name}} ({{fields | map(attribute="name") | join(', ')}})
             VALUES (
                     {%- for f in fields -%}
-                    {{ "?" }}{{ ", " if not loop.last }}
+                    {{ "$" ~ loop.index }}{{ ", " if not loop.last }}
                     {%- endfor -%}
             )
             ON CONFLICT (id) DO UPDATE SET
@@ -58,35 +62,44 @@ impl<'a> DomainRepository for {{entity | pascal_case}}RepositoryImpl<'a> {
                 {%- endfor %}
                 updated_at = EXCLUDED.updated_at
             "#,
-            entity.id,
+            &entity.id,
             {%- for f in domain_fields %}
-            entity.{{f.name}},
+            &entity.{{f.name}},
             {%- endfor %}
-            now,
-            now,
+            &now,
+            &now,
         )
-        .execute(self.pool)
-        .await
-        .map_err({{module | pascal_case}}Error::DatabaseError)?;
+        .execute(&self.pool)
+        .await.map_err({{module | pascal_case}}Error::DatabaseError)?;
         Ok(entity)
     }
 
-    async fn batch_delete(&self, ids: Vec<Self::EntityId>) -> Result<(), Self::Error> {
+    async fn batch_delete(&self, ids: &[Self::EntityId]) -> Result<Vec<Self::Entity>, Self::Error> {
         if ids.is_empty() {
-            return Ok(());
+            return Ok(Vec::with_capacity(0));
         }
-        let placeholders = vec!["?"; ids.len()].join(", ");
-        let sql = format!("DELETE FROM {{table_name}} WHERE id IN ({})", placeholders);
-
-        let mut query = sqlx::query(&sql);
-        for id in ids {
-            query = query.bind(id);
-        }
-
-        query
-            .execute(self.pool)
-            .await
-            .map_err({{module | pascal_case}}Error::DatabaseError)?;
-        Ok(())
+        let items = sqlx::query!(
+            r#"
+            DELETE FROM {{table_name}} WHERE id = ANY($1) RETURNING id, {{domain_fields | map(attribute="name") | join(', ')}}
+            "#,
+            &ids.inner_vec()
+        )
+        .fetch_all(&self.pool)
+        .await
+        .map_err({{module | pascal_case}}Error::DatabaseError)?;
+        let items = items
+            .into_iter()
+            .map(|row| {
+                {{entity | pascal_case}}::builder()
+                    .id({{entity | pascal_case}}Id::new_unchecked(row.id))
+                    {%- for field in domain_fields %}
+                    .{{field.name}}(row.{{field.name}})
+                    {%- endfor %}
+                    .build()
+            })
+            .collect();
+        Ok(items)
     }
 }
+
+impl {{entity | pascal_case}}Repository for {{entity | pascal_case}}RepositoryImpl {}

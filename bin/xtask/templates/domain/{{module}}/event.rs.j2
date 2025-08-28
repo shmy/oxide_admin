@@ -1,15 +1,10 @@
-use crate::{
-    iam::{
-        entity::{role::Role, user::User},
-        value_object::user_id::UserId,
-    },
-    shared::event_util::UpdatedEvent,
-};
+use crate::{{module}}::entity::{{entity}}::{{entity | pascal_case}};
+use crate::shared::event_util::UpdatedEvent;
 
 #[derive(Debug, Clone)]
 pub enum {{module | pascal_case}}Event {
-    {{entity | pluralize}}Created { items: Vec<{{entity | pascal_case}}> },
-    {{entity | pluralize}}Updated { items: Vec<UpdatedEvent<{{entity | pascal_case}}>> },
-    {{entity | pluralize}}Deleted { items: Vec<{{entity | pascal_case}}> },
+    {{entity | pluralize | pascal_case}}Created { items: Vec<{{entity | pascal_case}}> },
+    {{entity | pluralize | pascal_case}}Updated { items: Vec<UpdatedEvent<{{entity | pascal_case}}>> },
+    {{entity | pluralize | pascal_case}}Deleted { items: Vec<{{entity | pascal_case}}> },
 
 }
