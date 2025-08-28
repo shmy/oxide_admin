@@ -1,5 +1,5 @@
 use crate::{
-    iam::service::{role_service::RoleService, user_service::UserService},
+    iam::query::{search_roles::SearchRolesQueryHandler, search_users::SearchUsersQueryHandler},
     shared::event::Event,
     system::service::file_service::FileService,
 };
@@ -13,8 +13,8 @@ where
     T: PermissionResolver,
 {
     permission_resolver: T,
-    user_service: UserService,
-    role_service: RoleService,
+    search_user_query_handler: SearchUsersQueryHandler,
+    search_role_query_handler: SearchRolesQueryHandler,
     file_service: FileService,
 }
 
@@ -33,14 +33,14 @@ where
 {
     pub fn new(
         permission_resolver: T,
-        user_service: UserService,
-        role_service: RoleService,
+        search_user_query_handler: SearchUsersQueryHandler,
+        search_role_query_handler: SearchRolesQueryHandler,
         file_service: FileService,
     ) -> Self {
         Self {
             permission_resolver,
-            user_service,
-            role_service,
+            search_user_query_handler,
+            search_role_query_handler,
             file_service,
         }
     }
@@ -86,10 +86,10 @@ where
                     tracing::error!(?e, error = %err, "权限刷新失败");
                 }
                 if Self::is_users_changed(&e) {
-                    self.user_service.clean_cache();
+                    self.search_user_query_handler.clean_cache();
                 }
                 if Self::is_roles_changed(&e) {
-                    self.role_service.clean_cache();
+                    self.search_role_query_handler.clean_cache();
                 }
                 match e {
                     IamEvent::UsersCreated { items } => {

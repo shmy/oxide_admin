@@ -1,5 +1,5 @@
 use crate::{
-    iam::service::{role_service::RoleService, user_service::UserService},
+    iam::query::{search_roles::SearchRolesQueryHandler, search_users::SearchUsersQueryHandler},
     shared::{
         event::EVENT_BUS,
         event_subscriber::{
@@ -18,14 +18,14 @@ pub mod log_event_subscriber;
 
 pub async fn register_subscribers(provider: &Provider) -> Result<()> {
     let permission_resolver = provider.provide::<PermissionResolverImpl>();
-    let user_service = provider.provide::<UserService>();
-    let role_service = provider.provide::<RoleService>();
+    let search_user_query_handler = provider.provide::<SearchUsersQueryHandler>();
+    let search_role_query_handler = provider.provide::<SearchRolesQueryHandler>();
     let file_service = provider.provide::<FileService>();
     EVENT_BUS.subscribe(LogEventSubscriber);
     EVENT_BUS.subscribe(IamEventSubscriber::new(
         permission_resolver,
-        user_service,
-        role_service,
+        search_user_query_handler,
+        search_role_query_handler,
         file_service,
     ));
 

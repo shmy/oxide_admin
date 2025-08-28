@@ -1,11 +1,8 @@
 use std::time::Duration;
 
 use bon::Builder;
-use domain::iam::{
-    error::IamError,
-    value_object::{role_id::RoleId, user_id::UserId},
-};
-use infrastructure::{shared::cloneable_error::CloneableError, shared::pool::Pool};
+use domain::iam::value_object::role_id::RoleId;
+use infrastructure::shared::{cloneable_error::CloneableError, pool::Pool};
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
@@ -16,7 +13,6 @@ use crate::{
     impl_static_cache,
     shared::{
         cache_type::{CacheType, hash_encode},
-        dto::OptionDto,
         paging_query::PagingQuery,
         paging_result::PagingResult,
     },
@@ -32,29 +28,35 @@ impl_static_cache!(
     CACHE_TTL
 );
 
+#[serde_as]
+#[derive(Clone, PartialEq, Eq, Hash, Deserialize, Builder)]
+pub struct SearchUsersQuery {
+    #[serde(flatten)]
+    paging: PagingQuery,
+    account: Option<String>,
+    name: Option<String>,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
+    privileged: Option<bool>,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
+    enabled: Option<bool>,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
+    role_id: Option<String>,
+}
+
 #[derive(Clone)]
 #[injectable]
-pub struct UserService {
+pub struct SearchUsersQueryHandler {
     pool: Pool,
     #[inject(&SEARCH_CACHE)]
     cache: &'static CacheType<PagingResult<UserDto>>,
 }
 
-impl UserService {
-    pub fn clean_cache(&self) {
-        self.cache.invalidate_all();
-    }
-
-    pub async fn search_cached(
-        &self,
-        query: SearchUsersQuery,
-    ) -> Result<PagingResult<UserDto>, CloneableError> {
-        let key = hash_encode(&query);
-        self.cache.get_with(key, self.search(query)).await
-    }
-
+impl SearchUsersQueryHandler {
     #[single_flight]
-    pub async fn search(
+    pub async fn query(
         &self,
         query: SearchUsersQuery,
     ) -> Result<PagingResult<UserDto>, CloneableError> {
@@ -117,66 +119,15 @@ impl UserService {
         Ok(PagingResult { total, items: rows })
     }
 
-    #[single_flight]
-    pub async fn retrieve(&self, id: UserId) -> Result<UserDto, CloneableError> {
-        let row_opt = sqlx::query_as!(
-            UserDto,
-            r#"
-        SELECT
-            u.id as id,
-            u.account as account,
-            u.portrait as portrait,
-            u.name as name,
-            u.role_ids as "role_ids: Vec<RoleId>",
-            u.privileged as privileged,
-            u.enabled as enabled,
-            u.created_at as created_at,
-            u.updated_at as updated_at,
-            COALESCE(array_agg(r.name) FILTER (WHERE r.name IS NOT NULL), '{}') as "role_names!: Vec<String>"
-        FROM _users as u
-        LEFT JOIN _roles as r ON r.id = ANY(u.role_ids)
-        WHERE u.id = $1
-        GROUP BY u.id
-        LIMIT 1
-        "#,
-            &id,
-        )
-        .fetch_optional(&self.pool)
-        .await?;
-        row_opt.ok_or(CloneableError::from(anyhow::anyhow!(
-            IamError::UserNotFound
-        )))
+    pub fn clean_cache(&self) {
+        self.cache.invalidate_all();
     }
 
-    #[single_flight]
-    pub async fn list_options(&self) -> Result<Vec<OptionDto>, CloneableError> {
-        let options = sqlx::query_as!(
-            OptionDto::<String>,
-            r#"
-        SELECT name as label, id as value FROM _users ORDER BY updated_at DESC
-        "#
-        )
-        .fetch_all(&self.pool)
-        .await?;
-
-        Ok(options)
+    pub async fn query_cached(
+        &self,
+        query: SearchUsersQuery,
+    ) -> Result<PagingResult<UserDto>, CloneableError> {
+        let key = hash_encode(&query);
+        self.cache.get_with(key, self.query(query)).await
     }
-}
-
-#[serde_as]
-#[derive(Clone, PartialEq, Eq, Hash, Deserialize, Builder)]
-pub struct SearchUsersQuery {
-    #[serde(flatten)]
-    paging: PagingQuery,
-    account: Option<String>,
-    name: Option<String>,
-    #[serde_as(as = "NoneAsEmptyString")]
-    #[serde(default)]
-    privileged: Option<bool>,
-    #[serde_as(as = "NoneAsEmptyString")]
-    #[serde(default)]
-    enabled: Option<bool>,
-    #[serde_as(as = "NoneAsEmptyString")]
-    #[serde(default)]
-    role_id: Option<String>,
 }

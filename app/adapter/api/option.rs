@@ -1,5 +1,8 @@
 use application::{
-    iam::service::{iam_service::IamService, page::Page, role_service::RoleService},
+    iam::{
+        query::option_roles::OptionRolesQueryHandler,
+        service::{iam_service::IamService, page::Page},
+    },
     shared::dto::OptionDto,
 };
 use axum::{Router, routing::get};
@@ -12,8 +15,10 @@ use crate::{
     },
 };
 
-async fn roles(Inject(service): Inject<RoleService>) -> JsonResponseType<Vec<OptionDto>> {
-    let items = service.get_all().await?;
+async fn roles(
+    Inject(query_handler): Inject<OptionRolesQueryHandler>,
+) -> JsonResponseType<Vec<OptionDto>> {
+    let items = query_handler.query().await?;
     JsonResponse::ok(items)
 }
 

@@ -8,7 +8,10 @@ use application::{
             update_role::{UpdateRoleCommand, UpdateRoleCommandHandler},
         },
         dto::role::RoleDto,
-        service::role_service::{RoleService, SearchRolesQuery},
+        query::{
+            retrieve_role::{RetrieveRoleQuery, RetrieveRoleQueryHandler},
+            search_roles::{SearchRolesQuery, SearchRolesQueryHandler},
+        },
     },
     shared::{command_handler::CommandHandler, paging_result::PagingResult},
 };
@@ -28,19 +31,21 @@ use crate::{
     },
 };
 
-async fn paging(
-    Inject(service): Inject<RoleService>,
+async fn search(
+    Inject(query_handler): Inject<SearchRolesQueryHandler>,
     Query(query): Query<SearchRolesQuery>,
 ) -> JsonResponsePagingType<RoleDto> {
-    let PagingResult { total, items } = service.search_cached(query).await?;
+    let PagingResult { total, items } = query_handler.query(query).await?;
     JsonResponse::ok(PagingResponse { total, items })
 }
 
 async fn retrieve(
-    Inject(service): Inject<RoleService>,
+    Inject(query_handler): Inject<RetrieveRoleQueryHandler>,
     Path(id): Path<RoleId>,
 ) -> JsonResponseType<RoleDto> {
-    let role = service.retrieve(id).await?;
+    let role = query_handler
+        .query(RetrieveRoleQuery::builder().id(id).build())
+        .await?;
     JsonResponse::ok(role)
 }
 
@@ -87,7 +92,7 @@ async fn update(
 
 pub fn routing() -> Router<WebState> {
     Router::new()
-        .route_with_permission("/", get(paging), perms!(SYSTEM_ROLE))
+        .route_with_permission("/", get(search), perms!(SYSTEM_ROLE))
         .route_with_permission("/", post(create), perms!(SYSTEM_ROLE))
         .route_with_permission("/{id}", get(retrieve), perms!(SYSTEM_ROLE))
         .route_with_permission("/{id}", put(update), perms!(SYSTEM_ROLE))

@@ -6,10 +6,12 @@ use application::{
                 UpdateUserSelfPasswordCommand, UpdateUserSelfPasswordCommandHandler,
             },
         },
-        service::{iam_service::IamService, user_service::UserService},
+        query::retrieve_user::{RetrieveUserQuery, RetrieveUserQueryHandler},
+        service::iam_service::IamService,
     },
     shared::command_handler::CommandHandler,
 };
+
 use axum::{
     Json, Router,
     routing::{get, post, put},
@@ -35,11 +37,12 @@ async fn sign_out(
 async fn current(
     ValidUser(id): ValidUser,
     Inject(service): Inject<IamService>,
-    Inject(user_service): Inject<UserService>,
+    Inject(query_handler): Inject<RetrieveUserQueryHandler>,
 ) -> JsonResponseType<response::CurrentResponse> {
-    let (user, pages) = tokio::try_join!(user_service.retrieve(id.clone()), async {
-        service.get_available_pages(id).await.map_err(Into::into)
-    })?;
+    let (user, pages) = tokio::try_join!(
+        query_handler.query(RetrieveUserQuery::builder().id(id.clone()).build()),
+        async { service.get_available_pages(id).await.map_err(Into::into) }
+    )?;
     JsonResponse::ok(response::CurrentResponse { user, pages })
 }
 

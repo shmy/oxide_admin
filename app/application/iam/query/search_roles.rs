@@ -1,21 +1,20 @@
 use bon::Builder;
 use domain::iam::value_object::permission_code::PermissionCode;
-use domain::iam::{error::IamError, value_object::role_id::RoleId};
-use infrastructure::shared::cloneable_error::CloneableError;
-use infrastructure::shared::pool::Pool;
-use nject::{inject, injectable};
+use infrastructure::shared::{cloneable_error::CloneableError, pool::Pool};
+use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
 use single_flight_derive::single_flight;
-use std::hash::Hash;
 use std::time::Duration;
 
-use crate::impl_static_cache;
-use crate::shared::cache_type::{CacheType, hash_encode};
-use crate::shared::dto::OptionDto;
 use crate::{
     iam::dto::role::RoleDto,
-    shared::{paging_query::PagingQuery, paging_result::PagingResult},
+    impl_static_cache,
+    shared::{
+        cache_type::{CacheType, hash_encode},
+        paging_query::PagingQuery,
+        paging_result::PagingResult,
+    },
 };
 
 const CACHE_CAPACITY: u64 = 100;
@@ -28,29 +27,34 @@ impl_static_cache!(
     CACHE_TTL
 );
 
+#[serde_as]
+#[derive(Clone, Eq, PartialEq, Hash, Deserialize, Builder)]
+pub struct SearchRolesQuery {
+    #[serde(flatten)]
+    paging: PagingQuery,
+    name: Option<String>,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
+    privileged: Option<bool>,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
+    enabled: Option<bool>,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
+    permission_id: Option<i32>,
+}
+
 #[derive(Clone)]
 #[injectable]
-pub struct RoleService {
+pub struct SearchRolesQueryHandler {
     pool: Pool,
     #[inject(&SEARCH_CACHE)]
     cache: &'static CacheType<PagingResult<RoleDto>>,
 }
 
-impl RoleService {
-    pub fn clean_cache(&self) {
-        self.cache.invalidate_all();
-    }
-
-    pub async fn search_cached(
-        &self,
-        query: SearchRolesQuery,
-    ) -> Result<PagingResult<RoleDto>, CloneableError> {
-        let key = hash_encode(&query);
-        self.cache.get_with(key, self.search(query)).await
-    }
-
+impl SearchRolesQueryHandler {
     #[single_flight]
-    pub async fn search(
+    pub async fn query(
         &self,
         query: SearchRolesQuery,
     ) -> Result<PagingResult<RoleDto>, CloneableError> {
@@ -96,51 +100,15 @@ impl RoleService {
         Ok(PagingResult { total, items: rows })
     }
 
-    #[single_flight]
-    pub async fn retrieve(&self, id: RoleId) -> Result<RoleDto, CloneableError> {
-        let row_opt = sqlx::query_as!(
-            RoleDto,
-            r#"
-        SELECT id, name, permission_ids as "permission_ids: Vec<PermissionCode>", privileged, enabled, created_at, updated_at
-        FROM _roles
-        WHERE id = $1
-        LIMIT 1
-        "#,
-            &id,
-        )
-        .fetch_optional(&self.pool)
-        .await?;
-        row_opt.ok_or(anyhow::anyhow!(IamError::RoleNotFound).into())
+    pub fn clean_cache(&self) {
+        self.cache.invalidate_all();
     }
 
-    #[single_flight]
-    pub async fn get_all(&self) -> Result<Vec<OptionDto>, CloneableError> {
-        let options = sqlx::query_as!(
-            OptionDto::<String>,
-            r#"
-        SELECT name as label, id as value FROM _roles ORDER BY updated_at DESC
-        "#
-        )
-        .fetch_all(&self.pool)
-        .await?;
-
-        Ok(options)
+    pub async fn query_cached(
+        &self,
+        query: SearchRolesQuery,
+    ) -> Result<PagingResult<RoleDto>, CloneableError> {
+        let key = hash_encode(&query);
+        self.cache.get_with(key, self.query(query)).await
     }
-}
-
-#[serde_as]
-#[derive(Clone, Eq, PartialEq, Hash, Deserialize, Builder)]
-pub struct SearchRolesQuery {
-    #[serde(flatten)]
-    paging: PagingQuery,
-    name: Option<String>,
-    #[serde_as(as = "NoneAsEmptyString")]
-    #[serde(default)]
-    privileged: Option<bool>,
-    #[serde_as(as = "NoneAsEmptyString")]
-    #[serde(default)]
-    enabled: Option<bool>,
-    #[serde_as(as = "NoneAsEmptyString")]
-    #[serde(default)]
-    permission_id: Option<i32>,
 }

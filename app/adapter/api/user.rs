@@ -9,7 +9,10 @@ use application::{
             update_user_password::{UpdateUserPasswordCommand, UpdateUserPasswordCommandHandler},
         },
         dto::user::UserDto,
-        service::user_service::{SearchUsersQuery, UserService},
+        query::{
+            retrieve_user::{RetrieveUserQuery, RetrieveUserQueryHandler},
+            search_users::{SearchUsersQuery, SearchUsersQueryHandler},
+        },
     },
     re_export::hmac_util::HmacUtil,
     shared::{command_handler::CommandHandler, paging_result::PagingResult},
@@ -31,11 +34,11 @@ use crate::{
 };
 
 async fn paging(
-    Inject(service): Inject<UserService>,
+    Inject(query_handler): Inject<SearchUsersQueryHandler>,
     Inject(hmac_util): Inject<HmacUtil>,
     Query(query): Query<SearchUsersQuery>,
 ) -> JsonResponsePagingType<UserDto> {
-    let PagingResult { total, items } = service.search_cached(query).await?;
+    let PagingResult { total, items } = query_handler.query_cached(query).await?;
     let items = items
         .into_iter()
         .map(|user| sign_user_portrait(user, &hmac_util))
@@ -44,11 +47,13 @@ async fn paging(
 }
 
 async fn retrieve(
-    Inject(service): Inject<UserService>,
+    Inject(query_handler): Inject<RetrieveUserQueryHandler>,
     Inject(hmac_util): Inject<HmacUtil>,
     Path(id): Path<UserId>,
 ) -> JsonResponseType<UserDto> {
-    let user = service.retrieve(id).await?;
+    let user = query_handler
+        .query(RetrieveUserQuery::builder().id(id).build())
+        .await?;
     JsonResponse::ok(sign_user_portrait(user, &hmac_util))
 }
 
