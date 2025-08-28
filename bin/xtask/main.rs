@@ -3,14 +3,16 @@ use std::{path::PathBuf, sync::LazyLock};
 use anyhow::Result;
 use clap::Parser;
 use cruet::Inflector;
-use minijinja::{Value, context};
+use minijinja::context;
 use tokio::process::Command;
 
 use crate::{
     cli::{Cli, SubCommands},
     database::TableInfoTrait,
-    generate::domain::generate_domain,
-    template::TemplateEngine,
+    generate::{
+        api::generate_api, application::generate_application, domain::generate_domain,
+        repository::generate_repository,
+    },
 };
 
 mod cli;
@@ -83,28 +85,6 @@ async fn main() -> Result<()> {
         .arg("fmt")
         .current_dir(ROOT_DIR.as_path())
         .status()
-        .await?;
-    Ok(())
-}
-
-async fn generate_api(context: Value) -> Result<()> {
-    let template = TemplateEngine::from("api").with_context(context);
-    template
-        .render_to(APP_DIR.join("adapter").join("api"))
-        .await?;
-    Ok(())
-}
-
-async fn generate_application(context: Value) -> Result<()> {
-    let template = TemplateEngine::from("application").with_context(context);
-    template.render_to(APP_DIR.join("application")).await?;
-    Ok(())
-}
-
-async fn generate_repository(context: Value) -> Result<()> {
-    let template = TemplateEngine::from("repository").with_context(context);
-    template
-        .render_to(APP_DIR.join("infrastructure").join("repository"))
         .await?;
     Ok(())
 }

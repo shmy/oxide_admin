@@ -27,8 +27,7 @@ pub async fn generate_domain(context: Value) -> Result<()> {
             .as_path(),
         &module,
         &entity,
-    )
-    .await?;
+    )?;
     append_event(
         APP_DIR
             .join("domain")
@@ -37,12 +36,11 @@ pub async fn generate_domain(context: Value) -> Result<()> {
             .as_path(),
         &module,
         &entity,
-    )
-    .await?;
+    )?;
     Ok(())
 }
 
-async fn append_error(path: &Path, module: &str, entity: &str) -> Result<()> {
+fn append_error(path: &Path, module: &str, entity: &str) -> Result<()> {
     if !fs::exists(&path).map(|d| d)? {
         let basic = format!(
             r#"
@@ -90,7 +88,7 @@ async fn append_error(path: &Path, module: &str, entity: &str) -> Result<()> {
     Ok(())
 }
 
-async fn append_event(path: &Path, module: &str, entity: &str) -> Result<()> {
+fn append_event(path: &Path, module: &str, entity: &str) -> Result<()> {
     if !fs::exists(&path).map(|d| d)? {
         let basic = format!(
             r#"
@@ -139,11 +137,12 @@ async fn append_event(path: &Path, module: &str, entity: &str) -> Result<()> {
                 entity,
                 entity.to_pascal_case()
             );
-            if !code.contains(&entity_use_statement) {
-                import_code.push(entity_use_statement);
-            }
+
             let already_exists = variants.iter().any(|v| v.ident == variant_created);
             if !already_exists {
+                if !code.contains(&entity_use_statement) {
+                    import_code.push(entity_use_statement);
+                }
                 let variant_tokens = quote! {
                     #variant_created { items: Vec<#entity_ty> }
                 };
@@ -154,7 +153,7 @@ async fn append_event(path: &Path, module: &str, entity: &str) -> Result<()> {
             let already_exists = variants.iter().any(|v| v.ident == variant_updated);
             if !already_exists {
                 let variant_tokens = quote! {
-                    #variant_updated { items: Vec<#entity_ty> }
+                    #variant_updated { items: Vec<UpdatedEvent<#entity_ty>> }
                 };
                 let variant: syn::Variant = syn::parse2(variant_tokens)?;
                 variants.push(variant);
@@ -162,7 +161,7 @@ async fn append_event(path: &Path, module: &str, entity: &str) -> Result<()> {
             let already_exists = variants.iter().any(|v| v.ident == variant_deleted);
             if !already_exists {
                 let variant_tokens = quote! {
-                    #variant_deleted { items: Vec<UpdatedEvent<#entity_ty>> }
+                    #variant_deleted { items: Vec<#entity_ty> }
                 };
                 let variant: syn::Variant = syn::parse2(variant_tokens)?;
                 variants.push(variant);
