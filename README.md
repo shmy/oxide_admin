@@ -1,5 +1,8 @@
 > 一个基于Rust和Amis.js/React的后台管理系统起始模版
 
+[![Build](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml/badge.svg)](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml)
+![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)
+
 ## 🎯 项目目标
 - 提供一个快速构建后台管理系统的起点
 - 使用现代化的Rust和Amis.js/React技术栈
@@ -9,6 +12,11 @@
 > 由于使用 `Render`的免费计划，访问可能较慢，15分钟无操作会冻结实例，之后访问需要经过`Render`的中间页，请知悉。
 
 [https://oxide-admin.onrender.com/_](https://oxide-admin.onrender.com/_)
+> 请勿修改密码
+
+- 账号：admin
+- 密码：123456
+
 
 ## ✨ 特性
 - DDD架构：遵循领域驱动设计(DDD)和整洁架构原则，实现适配展示、应用服务、领域模型、基础设施层的分离；
@@ -28,6 +36,7 @@
 - 后台任务：由`apalis` crate进行支持；
 - 优雅关停：严谨地结束服务、释放资源；
 - 多源配置：支持环境变量、`.env`文件，或者使用`cli`参数；
+- Github CI：自动构建`x86_64-unknown-linux-musl`；
 - ...
 
 ## 🎈前端

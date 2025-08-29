@@ -22,7 +22,7 @@
 [x] Uploads 访问链接签名/验证
 [x] Backend code generation
 [x] Release时才嵌入前端
-[ ] CI
+[x] CI
 [ ] Frontend code generation
 [ ] 单元测试
 [ ] l10n
