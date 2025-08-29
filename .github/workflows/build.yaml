@@ -43,7 +43,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Build frontend
-        run: pnpm install && pnpm run build
+        run: cd frontend && pnpm install && pnpm run build
 
       - name: Build x86_64-unknown-linux-musl
         run: |
