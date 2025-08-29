@@ -2,7 +2,6 @@ FROM node:22-alpine AS frontend-build
 WORKDIR /frontend
 RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY frontend/ ./
-RUN pnpm config set registry https://mirrors.cloud.tencent.com/npm/ --location=global
 RUN pnpm install
 RUN pnpm run build
 
