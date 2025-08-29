@@ -49,3 +49,9 @@ jobs:
         run: |
           cargo build --package server --release --target x86_64-unknown-linux-musl --locked
           ls -lh target/x86_64-unknown-linux-musl/release
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: server_x86_64-unknown-linux-musl
+          path: target/x86_64-unknown-linux-musl/release/server
