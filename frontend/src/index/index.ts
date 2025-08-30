@@ -1,5 +1,4 @@
 import "./index.scss";
-import { ReactTest } from "../components/react-test";
 import {
   history,
   isCurrentUrl,
@@ -8,7 +7,7 @@ import {
 } from "../lib/amis_router";
 import { getAccessToken, redirectToSignIn, signOut } from "../lib/authn";
 import http from "../lib/http";
-import { ByteDisplay } from "../components/byte-display";
+import { lazy } from "react";
 
 if (!getAccessToken()) {
   redirectToSignIn();
@@ -16,16 +15,15 @@ if (!getAccessToken()) {
 
 const amisLib = amisRequire("amis");
 const amis = amisRequire("amis/embed");
-
 amisLib.Renderer({
   type: "react-test",
   autoVar: true,
-})(ReactTest);
+})(lazy(() => import("../components/react-test")));
 
 amisLib.FormItem({
   type: "byte-display",
   autoVar: true,
-})(ByteDisplay);
+})(lazy(() => import("../components/byte-display")));
 
 const buildDropdown = () => {
   return {

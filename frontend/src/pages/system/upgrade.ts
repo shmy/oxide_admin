@@ -8,6 +8,9 @@ const schema = {
     api: "post:/profile/upgrade",
     body: [
       {
+        type: "react-test",
+      },
+      {
         type: "alert",
         body: "请注意：更新过程中会导致短暂停止服务。",
         level: "warning",

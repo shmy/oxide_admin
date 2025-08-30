@@ -1,35 +1,33 @@
-import { Button, FloatButton } from "antd";
+import { Button, Segmented } from "antd";
 import { useEffect } from "react";
 
-export const ReactTest = () => {
+const ReactTest = () => {
   useEffect(() => {
-    console.log("useEffect 1234");
+    console.log("ReactTest onMounted");
     return () => {
-      console.log("onMounted");
+      console.log("ReactTest onUnmounted");
     };
   }, []);
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={() => {
-          console.log("click");
-        }}
-        className="react-test"
-      >
-        ReactTest
-      </button>
       <Button
         type="primary"
         onClick={() => {
           console.log("click");
         }}
       >
-        {" "}
-        1
+        This is button
       </Button>
-      <FloatButton />
+      <br />
+      <Segmented<string>
+        options={["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"]}
+        onChange={(value) => {
+          console.log(value); // string
+        }}
+      />
     </div>
   );
 };
+
+export default ReactTest;
