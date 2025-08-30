@@ -2,7 +2,7 @@ use std::sync::LazyLock;
 
 use bon::Builder;
 use domain::iam::value_object::permission_code::{
-    NONE, PermissionCode, SYSTEM_INFO, SYSTEM_UPGRADE,
+    NONE, PermissionCode, SYSTEM_EXAMPLE, SYSTEM_INFO,
 };
 use serde::Serialize;
 
@@ -68,11 +68,11 @@ pub static PAGES: LazyLock<[Page; 1]> = LazyLock::new(|| {
                 .schema_api(build_schema_url!("/system/info"))
                 .build(),
             Page::builder()
-                .key(SYSTEM_UPGRADE)
-                .label("系统更新")
-                .url("/system/upgrade")
-                .icon("fas fa-rocket")
-                .schema_api(build_schema_url!("/system/upgrade"))
+                .key(SYSTEM_EXAMPLE)
+                .label("示例页面")
+                .url("/system/example")
+                .icon("fas fa-hexagon-nodes")
+                .schema_api(build_schema_url!("/system/example"))
                 .build(),
         ])
         .build()]

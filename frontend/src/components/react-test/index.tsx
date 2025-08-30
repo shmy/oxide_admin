@@ -17,9 +17,10 @@ const ReactTest = () => {
           console.log("click");
         }}
       >
-        This is button
+        我是Antd的Button
       </Button>
       <br />
+      <h3>我是Antd的Segmented</h3>
       <Segmented<string>
         options={["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"]}
         onChange={(value) => {

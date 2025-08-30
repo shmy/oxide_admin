@@ -43,5 +43,5 @@ define_permissions! {
     SYSTEM_USER = 101,
     SYSTEM_ROLE = 102,
     SYSTEM_INFO = 103,
-    SYSTEM_UPGRADE = 104,
+    SYSTEM_EXAMPLE = 104,
 }
