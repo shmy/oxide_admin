@@ -12,7 +12,6 @@ members = [
     "bin/server",
     "bin/xtask",
     "crates/background_job",
-    "crates/event_macros",
     "crates/single_flight",
     "crates/single_flight_macros",
 ]
@@ -66,7 +65,6 @@ cruet = { version = "0.15", default-features = false }
 hmac-sha256 = { version = "1.1", default-features = false }
 hex = { version = "0.4", default-features = false }
 const_format = { version = "0.2", default-features = false }
-inventory = { version = "0.3", default-features = false }
 
 syn = { version = "2.0" }
 quote = { version = "1.0" }
@@ -79,7 +77,6 @@ infrastructure = { path = "app/infrastructure" }
 background_job = { path = "crates/background_job" }
 single_flight = { path = "crates/single_flight" }
 single_flight_macros = { path = "crates/single_flight_macros" }
-event_macros = { path = "crates/event_macros" }
 
 [profile.dev]
 debug = "line-tables-only" # 生成调试信息，便于调试

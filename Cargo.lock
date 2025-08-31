@@ -138,13 +138,12 @@ dependencies = [
  "anyhow",
  "background_job",
  "bon",
+ "cruet",
  "domain",
- "event_macros",
  "futures-util",
  "image",
  "imageformat",
  "infrastructure",
- "inventory",
  "moka",
  "nject",
  "serde",
@@ -893,16 +892,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "event_macros"
-version = "0.1.0"
-dependencies = [
- "inventory",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "fastrand"
 version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1562,15 +1551,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-appender",
-]
-
-[[package]]
-name = "inventory"
-version = "0.3.21"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc61209c082fbeb19919bee74b176221b27223e27b65d781eb91af24eb1fb46e"
-dependencies = [
- "rustversion",
 ]
 
 [[package]]
