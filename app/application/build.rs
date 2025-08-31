@@ -4,21 +4,18 @@ use anyhow::Result;
 use cruet::Inflector as _;
 
 fn main() -> Result<()> {
-    registry_events()?;
+    generate_subscribers()?;
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=shared/event_subscriber");
     Ok(())
 }
 
-fn registry_events() -> Result<()> {
+fn generate_subscribers() -> Result<()> {
     let mut entries = fs::read_dir("shared/event_subscriber")?;
     let mut contents = Vec::new();
     while let Some(Ok(entry)) = entries.next() {
         if entry.metadata()?.is_file() {
             let filename = entry.file_name();
-            if filename == "mod.rs" {
-                continue;
-            }
             let stem = Path::new(&filename).file_stem().unwrap().to_string_lossy();
             let struct_name = stem.to_pascal_case();
             let file_content = fs::read_to_string(entry.path())?;
