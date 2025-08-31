@@ -26,7 +26,6 @@ sqlx = { workspace = true, features = [
 ] }
 redb = { workspace = true }
 moka = { workspace = true, features = ["future"] }
-singleflight-async = { workspace = true }
 tempoid = { workspace = true }
 jsonwebtoken = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
@@ -39,4 +38,4 @@ hmac-sha256 = { workspace = true }
 hex = { workspace = true, features = ["alloc"] }
 
 domain = { workspace = true }
-single_flight_derive = { workspace = true }
+single_flight = { workspace = true }

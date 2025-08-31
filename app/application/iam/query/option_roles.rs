@@ -1,6 +1,6 @@
 use infrastructure::shared::{cloneable_error::CloneableError, pool::Pool};
 use nject::injectable;
-use single_flight_derive::single_flight;
+use single_flight::single_flight;
 
 use crate::shared::dto::OptionDto;
 

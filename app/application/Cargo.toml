@@ -16,7 +16,6 @@ tracing = { workspace = true }
 anyhow = { workspace = true }
 bon = { workspace = true }
 moka = { workspace = true }
-singleflight-async = { workspace = true }
 tempfile = { workspace = true }
 imageformat = { workspace = true }
 twox-hash = { workspace = true, features = ["xxhash64"] }
@@ -29,5 +28,5 @@ inventory = { workspace = true }
 domain = { workspace = true }
 infrastructure = { workspace = true }
 background_job = { workspace = true }
-single_flight_derive = { workspace = true }
+single_flight = { workspace = true }
 event_derive = { workspace = true }

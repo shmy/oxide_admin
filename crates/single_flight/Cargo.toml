@@ -1,0 +1,11 @@
+[package]
+name = "single_flight"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+singleflight-async = { workspace = true }
+single_flight_derive = { workspace = true }

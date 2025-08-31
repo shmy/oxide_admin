@@ -6,7 +6,7 @@ use infrastructure::shared::{cloneable_error::CloneableError, pool::Pool};
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
-use single_flight_derive::single_flight;
+use single_flight::single_flight;
 
 use crate::{
     iam::dto::user::UserDto,

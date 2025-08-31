@@ -67,8 +67,8 @@ pub fn generate(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let expanded = quote! {
         #vis #sig where #output_ty: Clone {
             // 函数作用域 static
-            static #static_ident: std::sync::LazyLock<singleflight_async::SingleFlight<#key_ty, #output_ty>> =
-                           std::sync::LazyLock::new(singleflight_async::SingleFlight::new);
+            static #static_ident: std::sync::LazyLock<single_flight::SingleFlight<#key_ty, #output_ty>> =
+                           std::sync::LazyLock::new(single_flight::SingleFlight::new);
 
             let key = #key_expr;
             #static_ident.work(key, || async move #block).await

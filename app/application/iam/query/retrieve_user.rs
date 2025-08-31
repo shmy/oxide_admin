@@ -5,7 +5,7 @@ use domain::iam::{error::IamError, value_object::role_id::RoleId};
 use infrastructure::shared::{cloneable_error::CloneableError, pool::Pool};
 use nject::injectable;
 use serde::Deserialize;
-use single_flight_derive::single_flight;
+use single_flight::single_flight;
 
 #[derive(Clone, PartialEq, Eq, Hash, Deserialize, Builder)]
 pub struct RetrieveUserQuery {

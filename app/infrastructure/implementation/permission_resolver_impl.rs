@@ -7,7 +7,7 @@ use domain::shared::permission_resolver::PermissionResolver;
 use domain::shared::to_inner_vec::ToInnerVec;
 use moka::future::Cache;
 use nject::injectable;
-use single_flight_derive::single_flight;
+use single_flight::single_flight;
 use sqlx::prelude::FromRow;
 use std::collections::HashSet;
 use std::sync::LazyLock;
