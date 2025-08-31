@@ -1,8 +1,12 @@
 use anyhow::Result;
+pub use apalis::prelude::{Data, Error, GoTo, StepBuilder, SteppableStorage, Storage};
 use apalis::{
     layers::{WorkerBuilderExt as _, retry::RetryPolicy},
     prelude::*,
 };
+pub use apalis_core::codec::json::JsonCodec;
+pub use apalis_core::step::StepFn;
+pub use apalis_sql::context::SqlContext;
 use apalis_sql::sqlx::ConnectOptions as _;
 use apalis_sql::{
     sqlite::SqliteStorage,
@@ -14,12 +18,6 @@ use apalis_sql::{
 use serde::{Serialize, de::DeserializeOwned};
 use std::{path::Path, sync::Arc, time::Duration};
 use tracing::log::LevelFilter;
-
-pub use apalis::prelude::{Data, Error, GoTo, StepBuilder, SteppableStorage, Storage};
-pub use apalis_core::codec::json::JsonCodec;
-pub use apalis_core::step::StepFn;
-pub use apalis_sql::context::SqlContext;
-
 pub type JobStorage<T> = SqliteStorage<T>;
 pub type SteppedJobStorage = SqliteStorage<StepRequest<String>>;
 

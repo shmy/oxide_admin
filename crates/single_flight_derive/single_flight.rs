@@ -3,7 +3,7 @@ use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{ItemFn, parse_macro_input};
 
-pub fn generate(_attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn generate(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as ItemFn);
 
     let vis = &input.vis;
