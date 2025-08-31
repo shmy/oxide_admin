@@ -32,7 +32,7 @@ fn append_domain_event(path: &Path, module: &str) -> Result<()> {
     let mut syntax = parse_file(&code)?;
 
     let enum_ident = Ident::new("Event", Span::call_site());
-    let event_ident = Ident::new(&format!("{}", module.to_pascal_case()), Span::call_site());
+    let event_ident = Ident::new(&module.to_pascal_case().to_string(), Span::call_site());
     let domain_event_ident = Ident::new(
         &format!("{}Event", module.to_pascal_case()),
         Span::call_site(),

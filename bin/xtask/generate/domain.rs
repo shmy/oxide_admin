@@ -41,7 +41,7 @@ pub async fn generate_domain(context: Value) -> Result<()> {
 }
 
 fn append_error(path: &Path, module: &str, entity: &str) -> Result<()> {
-    if !fs::exists(&path).map(|d| d)? {
+    if !fs::exists(path)? {
         let basic = format!(
             r#"
             #[derive(Debug, thiserror::Error)]
@@ -52,7 +52,7 @@ fn append_error(path: &Path, module: &str, entity: &str) -> Result<()> {
             "#,
             module.to_pascal_case()
         );
-        fs::write(&path, basic)?;
+        fs::write(path, basic)?;
     }
     let code = fs::read_to_string(path)?;
     let mut syntax = parse_file(&code)?;
@@ -89,7 +89,7 @@ fn append_error(path: &Path, module: &str, entity: &str) -> Result<()> {
 }
 
 fn append_event(path: &Path, module: &str, entity: &str) -> Result<()> {
-    if !fs::exists(&path).map(|d| d)? {
+    if !fs::exists(path)? {
         let basic = format!(
             r#"
             use crate::shared::event_util::UpdatedEvent;
@@ -100,14 +100,14 @@ fn append_event(path: &Path, module: &str, entity: &str) -> Result<()> {
             "#,
             module.to_pascal_case()
         );
-        fs::write(&path, basic)?;
+        fs::write(path, basic)?;
     }
     let code = fs::read_to_string(path)?;
     let mut syntax = parse_file(&code)?;
 
     let enum_name = format!("{}Event", module.to_pascal_case());
     let enum_ident = Ident::new(&enum_name, Span::call_site());
-    let entity_ty: syn::Type = parse_str(&format!("{}", entity.to_pascal_case()))?;
+    let entity_ty: syn::Type = parse_str(&entity.to_pascal_case().to_string())?;
     let variant_created = Ident::new(
         &format!("{}Created", entity.to_plural().to_pascal_case()),
         Span::call_site(),
