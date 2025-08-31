@@ -26,6 +26,7 @@
 [ ] Frontend code generation
 [ ] event_derive crate
 [ ] event crate
+[ ] 验证码
 [ ] 单元测试
 [ ] l10n
 [-] 审计 现在只是log

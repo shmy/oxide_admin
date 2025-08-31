@@ -4,7 +4,7 @@ use crate::{
     system::service::file_service::FileService,
 };
 use domain::{iam::event::IamEvent, shared::permission_resolver::PermissionResolver};
-use event_derive::EventSubscriber;
+use event_macros::event_subscriber;
 use infrastructure::{
     implementation::permission_resolver_impl::PermissionResolverImpl,
     shared::event_bus::EventSubscriber,
@@ -12,8 +12,9 @@ use infrastructure::{
 use nject::injectable;
 use std::fmt::Debug;
 
-#[derive(Clone, EventSubscriber)]
+#[derive(Clone)]
 #[injectable]
+#[event_subscriber]
 pub struct IamEventSubscriber {
     permission_resolver: PermissionResolverImpl,
     search_user_query_handler: SearchUsersQueryHandler,

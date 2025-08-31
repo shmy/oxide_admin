@@ -29,4 +29,4 @@ domain = { workspace = true }
 infrastructure = { workspace = true }
 background_job = { workspace = true }
 single_flight = { workspace = true }
-event_derive = { workspace = true }
+event_macros = { workspace = true }

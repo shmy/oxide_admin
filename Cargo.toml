@@ -12,9 +12,9 @@ members = [
     "bin/server",
     "bin/xtask",
     "crates/background_job",
-    "crates/event_derive",
+    "crates/event_macros",
     "crates/single_flight",
-    "crates/single_flight_derive",
+    "crates/single_flight_macros",
 ]
 
 [workspace.dependencies]
@@ -78,8 +78,8 @@ domain = { path = "app/domain" }
 infrastructure = { path = "app/infrastructure" }
 background_job = { path = "crates/background_job" }
 single_flight = { path = "crates/single_flight" }
-single_flight_derive = { path = "crates/single_flight_derive" }
-event_derive = { path = "crates/event_derive" }
+single_flight_macros = { path = "crates/single_flight_macros" }
+event_macros = { path = "crates/event_macros" }
 
 [profile.dev]
 debug = "line-tables-only" # 生成调试信息，便于调试
