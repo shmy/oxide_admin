@@ -4,47 +4,30 @@ use crate::{
     system::service::file_service::FileService,
 };
 use domain::{iam::event::IamEvent, shared::permission_resolver::PermissionResolver};
-use infrastructure::shared::event_bus::EventSubscriber;
+use event_derive::EventSubscriber;
+use infrastructure::{
+    implementation::permission_resolver_impl::PermissionResolverImpl,
+    shared::event_bus::EventSubscriber,
+};
+use nject::injectable;
 use std::fmt::Debug;
 
-#[derive(Clone)]
-pub struct IamEventSubscriber<T>
-where
-    T: PermissionResolver,
-{
-    permission_resolver: T,
+#[derive(Clone, EventSubscriber)]
+#[injectable]
+pub struct IamEventSubscriber {
+    permission_resolver: PermissionResolverImpl,
     search_user_query_handler: SearchUsersQueryHandler,
     search_role_query_handler: SearchRolesQueryHandler,
     file_service: FileService,
 }
 
-impl<T> Debug for IamEventSubscriber<T>
-where
-    T: PermissionResolver,
-{
+impl Debug for IamEventSubscriber {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("IamEventSubscriber").finish()
     }
 }
 
-impl<T> IamEventSubscriber<T>
-where
-    T: PermissionResolver,
-{
-    pub fn new(
-        permission_resolver: T,
-        search_user_query_handler: SearchUsersQueryHandler,
-        search_role_query_handler: SearchRolesQueryHandler,
-        file_service: FileService,
-    ) -> Self {
-        Self {
-            permission_resolver,
-            search_user_query_handler,
-            search_role_query_handler,
-            file_service,
-        }
-    }
-
+impl IamEventSubscriber {
     fn is_users_changed(event: &IamEvent) -> bool {
         matches!(
             event,
@@ -73,10 +56,7 @@ where
     }
 }
 
-impl<T> EventSubscriber<Event> for IamEventSubscriber<T>
-where
-    T: PermissionResolver + Clone + Debug + Send + Sync + 'static,
-{
+impl EventSubscriber<Event> for IamEventSubscriber {
     async fn on_received(&self, event: Event) -> anyhow::Result<()> {
         #[allow(irrefutable_let_patterns)]
         if let Event::Iam(e) = event {

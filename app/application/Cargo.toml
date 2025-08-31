@@ -24,8 +24,10 @@ sqlx = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 sysinfo = { workspace = true, features = ["system"] }
 image = { workspace = true, features = ["png", "webp", "jpeg"] }
+inventory = { workspace = true }
 
 domain = { workspace = true }
 infrastructure = { workspace = true }
 background_job = { workspace = true }
 single_flight_derive = { workspace = true }
+event_derive = { workspace = true }

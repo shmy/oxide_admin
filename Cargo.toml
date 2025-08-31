@@ -12,6 +12,7 @@ members = [
     "bin/server",
     "bin/xtask",
     "crates/background_job",
+    "crates/event_derive",
     "crates/single_flight_derive",
 ]
 
@@ -64,6 +65,7 @@ cruet = { version = "0.15", default-features = false }
 hmac-sha256 = { version = "1.1", default-features = false }
 hex = { version = "0.4", default-features = false }
 const_format = { version = "0.2", default-features = false }
+inventory = { version = "0.3", default-features = false }
 
 adapter = { path = "app/adapter" }
 application = { path = "app/application" }
@@ -71,6 +73,7 @@ domain = { path = "app/domain" }
 infrastructure = { path = "app/infrastructure" }
 background_job = { path = "crates/background_job" }
 single_flight_derive = { path = "crates/single_flight_derive" }
+event_derive = { path = "crates/event_derive" }
 
 [profile.dev]
 debug = "line-tables-only" # 生成调试信息，便于调试

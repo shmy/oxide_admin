@@ -24,6 +24,8 @@
 [x] Release时才嵌入前端
 [x] CI
 [ ] Frontend code generation
+[ ] event_derive crate
+[ ] event crate
 [ ] 单元测试
 [ ] l10n
 [-] 审计 现在只是log

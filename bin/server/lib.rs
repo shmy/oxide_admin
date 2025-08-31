@@ -48,7 +48,7 @@ pub async fn bootstrap(config: Config) -> Result<()> {
         .config(config)
         .build();
     migration::migrate(&provider).await?;
-    register_subscribers(&provider).await?;
+    register_subscribers(&provider);
 
     let app = adapter::routing(WebState::new(provider.clone()));
     let notify_shutdown = Arc::new(Notify::new());
