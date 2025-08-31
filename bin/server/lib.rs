@@ -1,13 +1,13 @@
 use adapter::WebState;
 use anyhow::Result;
 use application::shared::{
-    event_subscriber::register_subscribers,
-    job::{
+    background_job::{
         Jobs, delete_expired_kv_job::DeleteExpiredKvJob,
         delete_outdate_log_dir_job::DeleteOutdateLogDirJob,
         delete_outdate_temp_dir_job::DeleteOutdateTempDirJob,
         delete_unused_file_job::DeleteUnusedFileJob,
     },
+    event_subscriber::register_subscribers,
 };
 use axum::Router;
 use background_job::BackgroundJobManager;
