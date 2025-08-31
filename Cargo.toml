@@ -68,6 +68,10 @@ hex = { version = "0.4", default-features = false }
 const_format = { version = "0.2", default-features = false }
 inventory = { version = "0.3", default-features = false }
 
+syn = { version = "2.0" }
+quote = { version = "1.0" }
+proc-macro2 = { version = "1.0" }
+
 adapter = { path = "app/adapter" }
 application = { path = "app/application" }
 domain = { path = "app/domain" }
