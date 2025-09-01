@@ -5,7 +5,7 @@ use application::shared::{
         Jobs, delete_expired_kv_job::DeleteExpiredKvJob,
         delete_outdate_log_dir_job::DeleteOutdateLogDirJob,
         delete_outdate_temp_dir_job::DeleteOutdateTempDirJob,
-        delete_unused_file_job::DeleteUnusedFileJob,
+        delete_unused_file_job::DeleteUnusedFileJob, register_jobs,
     },
     event_subscriber::register_subscribers,
 };
@@ -58,7 +58,7 @@ pub async fn bootstrap(config: Config) -> Result<()> {
         provider.clone(),
         notify_shutdown.clone(),
     ));
-    let (manager, jobs) = build_background_job(provider.clone()).await?;
+    let (manager, jobs) = build_background_job(&provider).await?;
     let scheduler_handle = tokio::spawn(start_scheduler(jobs, notify_shutdown.clone()));
     let background_job_handle =
         tokio::spawn(start_background_job(manager, notify_shutdown.clone()));
@@ -195,24 +195,10 @@ async fn start_background_job(manager: BackgroundJobManager, notify: Arc<Notify>
     Ok(())
 }
 
-async fn build_background_job(provider: Provider) -> Result<(BackgroundJobManager, Jobs)> {
+async fn build_background_job(provider: &Provider) -> Result<(BackgroundJobManager, Jobs)> {
     let manager = BackgroundJobManager::try_new(DATA_DIR.join("data.sqlite")).await?;
     let manager = manager.migrate().await?;
-    let (manager, delete_expired_kv_job) = manager.register::<DeleteExpiredKvJob>(provider.clone());
-    let (manager, delete_outdate_temp_dir_job) =
-        manager.register::<DeleteOutdateTempDirJob>(provider.clone());
-    let (manager, delete_outdate_log_dir_job) =
-        manager.register::<DeleteOutdateLogDirJob>(provider.clone());
-    let (manager, delete_unused_file_job) = manager.register::<DeleteUnusedFileJob>(provider);
-    Ok((
-        manager,
-        Jobs {
-            delete_expired_kv_job,
-            delete_outdate_temp_dir_job,
-            delete_outdate_log_dir_job,
-            delete_unused_file_job,
-        },
-    ))
+    register_jobs(manager, provider)
 }
 
 async fn shutdown_signal() {
