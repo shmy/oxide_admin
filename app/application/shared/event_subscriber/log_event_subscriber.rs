@@ -4,13 +4,13 @@ use nject::injectable;
 
 use crate::shared::event::Event;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 #[injectable]
 pub struct LogEventSubscriber;
 
 impl EventSubscriber<Event> for LogEventSubscriber {
     async fn on_received(&self, event: Event) -> Result<()> {
-        tracing::info!("{self:?}: {event:?}");
+        tracing::info!("on_received: {event:?}");
         Ok(())
     }
 }

@@ -9,7 +9,6 @@ use infrastructure::{
     shared::event_bus::EventSubscriber,
 };
 use nject::injectable;
-use std::fmt::Debug;
 
 #[derive(Clone)]
 #[injectable]
@@ -18,12 +17,6 @@ pub struct IamEventSubscriber {
     search_user_query_handler: SearchUsersQueryHandler,
     search_role_query_handler: SearchRolesQueryHandler,
     file_service: FileService,
-}
-
-impl Debug for IamEventSubscriber {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("IamEventSubscriber").finish()
-    }
 }
 
 impl IamEventSubscriber {

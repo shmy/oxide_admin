@@ -1,25 +1,25 @@
 use anyhow::Result;
-use std::fmt::Debug;
 use tokio::sync::broadcast::{self, Receiver, Sender};
-use tracing::{error, info};
+use tracing::error;
 
-pub trait EventSubscriber<T>: Clone + Debug + Send + Sync + 'static {
+pub trait EventSubscriber<T>: Clone + Send + Sync + 'static {
     fn on_received(&self, event: T) -> impl Future<Output = Result<()>> + Send;
 }
 
-pub struct EventBus<T: Debug + Clone + Send + Sync + 'static> {
+pub struct EventBus<T: Clone + Send + Sync + 'static> {
     sender: Sender<T>,
 }
 
-impl<T: Debug + Clone + Send + Sync + 'static> EventBus<T> {
+impl<T: Clone + Send + Sync + 'static> EventBus<T> {
     pub fn new(buffer: usize) -> Self {
         let (sender, _) = broadcast::channel(buffer);
         Self { sender }
     }
 
-    pub fn publish(&self, event: T) -> Result<()> {
-        self.sender.send(event)?;
-        Ok(())
+    pub fn publish(&self, event: T) {
+        if let Err(err) = self.sender.send(event) {
+            tracing::error!(%err, "Failed to publish event");
+        }
     }
 
     pub fn subscribe<H>(&self, handler: H)
@@ -27,7 +27,6 @@ impl<T: Debug + Clone + Send + Sync + 'static> EventBus<T> {
         H: EventSubscriber<T>,
     {
         let receiver = self.sender.subscribe();
-        info!("Event subscriber [{:?}] has been registered", &handler);
         tokio::spawn(Self::start_listening::<H>(receiver, handler));
     }
 

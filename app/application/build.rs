@@ -26,8 +26,9 @@ fn generate_subscribers() -> Result<()> {
             continue;
         }
         contents.push(format!(
-            "\tEVENT_BUS.subscribe(provider.provide::<{}::{}>());",
-            stem, struct_name
+            r#"    EVENT_BUS.subscribe(provider.provide::<{}::{}>());
+    tracing::info!("Event subscriber [{}] has been registered");"#,
+            stem, struct_name, struct_name
         ));
     }
     let code = format!(
@@ -63,15 +64,15 @@ fn generate_jobs() -> Result<()> {
         ));
         field_stems.push(format!("\t\t{}", stem));
         register_stems.push(format!(
-            "\t let (manager, {}) = manager.register::<{}::{}>(provider.clone());",
-            stem, stem, struct_name
+            r#"    let (manager, {}) = manager.register::<{}::{}>(provider.clone());
+    tracing::info!("Background job [{}] has been registered");"#,
+            stem, stem, struct_name, struct_name
         ));
     }
     let jobs = format!(
         r#"use anyhow::Result;
 use background_job::{{BackgroundJobManager, JobStorage}};
 use infrastructure::shared::provider::Provider;
-
 #[derive(Clone, Debug)]
 pub struct Jobs {{
 {}
@@ -82,12 +83,12 @@ pub struct Jobs {{
     let func = format!(
         r#"pub fn register_jobs(manager: BackgroundJobManager, provider: &Provider) -> Result<(BackgroundJobManager, Jobs)> {{
 {}
-Ok((
-    manager,
-    Jobs {{
-{}
-    }},
-))
+    Ok((
+        manager,
+        Jobs {{
+    {}
+        }},
+    ))
 }}"#,
         register_stems.join("\n"),
         field_stems.join(",\n")

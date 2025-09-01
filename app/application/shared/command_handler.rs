@@ -45,7 +45,7 @@ pub trait CommandHandler {
         async {
             let CommandResult { output, events } = self.execute(cmd).await?;
             for event in events {
-                let _ = EVENT_BUS.publish(event.into());
+                EVENT_BUS.publish(event.into());
             }
             Ok(output)
         }
