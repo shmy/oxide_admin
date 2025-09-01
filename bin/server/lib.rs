@@ -57,7 +57,9 @@ pub async fn bootstrap(config: Config) -> Result<()> {
         provider.clone(),
         notify_shutdown.clone(),
     ));
-    let (manager, jobs) = build_background_job(&provider).await?;
+    let manager = BackgroundJobManager::try_new(DATA_DIR.join("data.sqlite")).await?;
+    let manager = manager.migrate().await?;
+    let (manager, jobs) = register_jobs(manager, &provider);
     let scheduler_handle = tokio::spawn(start_scheduler(jobs, notify_shutdown.clone()));
     let background_job_handle =
         tokio::spawn(start_background_job(manager, notify_shutdown.clone()));
@@ -192,14 +194,6 @@ async fn start_background_job(manager: BackgroundJobManager, notify: Arc<Notify>
     manager.run_with_signal(shutdown).await?;
     info!("Background job shutdown complete");
     Ok(())
-}
-
-async fn build_background_job(
-    provider: &Provider,
-) -> Result<(BackgroundJobManager, BackgroundJobs)> {
-    let manager = BackgroundJobManager::try_new(DATA_DIR.join("data.sqlite")).await?;
-    let manager = manager.migrate().await?;
-    register_jobs(manager, provider)
 }
 
 async fn shutdown_signal() {

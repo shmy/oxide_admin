@@ -70,8 +70,7 @@ fn generate_jobs() -> Result<()> {
         ));
     }
     let jobs = format!(
-        r#"use anyhow::Result;
-use background_job::{{BackgroundJobManager, JobStorage}};
+        r#"use background_job::{{BackgroundJobManager, JobStorage}};
 use infrastructure::shared::provider::Provider;
 #[derive(Clone, Debug)]
 pub struct BackgroundJobs {{
@@ -81,14 +80,14 @@ pub struct BackgroundJobs {{
     );
 
     let func = format!(
-        r#"pub fn register_jobs(manager: BackgroundJobManager, provider: &Provider) -> Result<(BackgroundJobManager, BackgroundJobs)> {{
+        r#"pub fn register_jobs(manager: BackgroundJobManager, provider: &Provider) -> (BackgroundJobManager, BackgroundJobs) {{
 {}
-    Ok((
+    (
         manager,
         BackgroundJobs {{
 {}
         }},
-    ))
+    )
 }}"#,
         register_stems.join("\n"),
         field_stems.join(",\n")
