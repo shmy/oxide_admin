@@ -62,7 +62,7 @@ fn generate_jobs() -> Result<()> {
             "\t pub {}: JobStorage<{}::{}>,",
             stem, stem, struct_name
         ));
-        field_stems.push(format!("\t\t{}", stem));
+        field_stems.push(format!("\t\t\t{}", stem));
         register_stems.push(format!(
             r#"    let (manager, {}) = manager.register::<{}::{}>(provider.clone());
     tracing::info!("Background job [{}] has been registered");"#,
@@ -74,19 +74,19 @@ fn generate_jobs() -> Result<()> {
 use background_job::{{BackgroundJobManager, JobStorage}};
 use infrastructure::shared::provider::Provider;
 #[derive(Clone, Debug)]
-pub struct Jobs {{
+pub struct BackgroundJobs {{
 {}
 }}"#,
         struct_stems.join("\n")
     );
 
     let func = format!(
-        r#"pub fn register_jobs(manager: BackgroundJobManager, provider: &Provider) -> Result<(BackgroundJobManager, Jobs)> {{
+        r#"pub fn register_jobs(manager: BackgroundJobManager, provider: &Provider) -> Result<(BackgroundJobManager, BackgroundJobs)> {{
 {}
     Ok((
         manager,
-        Jobs {{
-    {}
+        BackgroundJobs {{
+{}
         }},
     ))
 }}"#,

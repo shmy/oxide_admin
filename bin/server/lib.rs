@@ -2,7 +2,7 @@ use adapter::WebState;
 use anyhow::Result;
 use application::shared::{
     background_job::{
-        Jobs, delete_expired_kv_job::DeleteExpiredKvJob,
+        BackgroundJobs, delete_expired_kv_job::DeleteExpiredKvJob,
         delete_outdate_log_dir_job::DeleteOutdateLogDirJob,
         delete_outdate_temp_dir_job::DeleteOutdateTempDirJob,
         delete_unused_file_job::DeleteUnusedFileJob, register_jobs,
@@ -49,7 +49,6 @@ pub async fn bootstrap(config: Config) -> Result<()> {
         .build();
     migration::migrate(&provider).await?;
     register_subscribers(&provider);
-
     let app = adapter::routing(WebState::new(provider.clone()));
     let notify_shutdown = Arc::new(Notify::new());
     let server_handle = tokio::spawn(start_http_server(
@@ -111,7 +110,7 @@ async fn start_http_server(
     Ok(())
 }
 
-async fn start_scheduler(jobs: Jobs, notify: Arc<Notify>) -> Result<()> {
+async fn start_scheduler(jobs: BackgroundJobs, notify: Arc<Notify>) -> Result<()> {
     let mut sched = JobScheduler::new().await?;
     let cloned_jobs = jobs.clone();
     sched
@@ -195,7 +194,9 @@ async fn start_background_job(manager: BackgroundJobManager, notify: Arc<Notify>
     Ok(())
 }
 
-async fn build_background_job(provider: &Provider) -> Result<(BackgroundJobManager, Jobs)> {
+async fn build_background_job(
+    provider: &Provider,
+) -> Result<(BackgroundJobManager, BackgroundJobs)> {
     let manager = BackgroundJobManager::try_new(DATA_DIR.join("data.sqlite")).await?;
     let manager = manager.migrate().await?;
     register_jobs(manager, provider)
