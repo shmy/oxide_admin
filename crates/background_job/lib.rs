@@ -46,7 +46,7 @@ impl BackgroundJobManager {
             .enable_tracing()
             .concurrency(T::CONCURRENCY)
             .retry(RetryPolicy::retries(T::RETRIES))
-            .backend(storage.clone())
+            .backend(storage)
             .build_fn(move |params: T::Params| {
                 let job = job.clone();
                 async move {
@@ -60,22 +60,17 @@ impl BackgroundJobManager {
         self
     }
 
-    pub fn register_stepped<T>(
-        mut self,
-        data: T::State,
-    ) -> (Self, SqliteStorage<StepRequest<String>>)
+    pub fn register_stepped<T>(mut self, storage: SqliteStorage<StepRequest<String>>) -> Self
     where
         T: SteppedJob,
     {
-        let storage = SqliteStorage::new(self.pool.clone());
         let worker = WorkerBuilder::new(T::NAME)
             .enable_tracing()
             .concurrency(T::CONCURRENCY)
-            .data(data)
-            .backend(storage.clone())
+            .backend(storage)
             .build_stepped(T::steps());
         self.monitor = self.monitor.register(worker);
-        (self, storage)
+        self
     }
 
     pub async fn run_with_signal<S>(self, signal: S) -> Result<()>
@@ -103,10 +98,9 @@ pub trait Job: Clone + Send + Sync + Unpin + 'static {
 }
 
 pub trait SteppedJob: Serialize + DeserializeOwned + Clone + Send + Sync + Unpin + 'static {
-    type State: Clone + Send + Sync + Unpin + 'static;
-    type Input: Clone + Send + Sync + Unpin + 'static;
+    type Params: Clone + Send + Sync + Unpin + 'static;
     const NAME: &'static str;
     const CONCURRENCY: usize;
 
-    fn steps() -> StepBuilder<SqlContext, String, Self::Input, (), JsonCodec<String>, usize>;
+    fn steps() -> StepBuilder<SqlContext, String, Self::Params, (), JsonCodec<String>, usize>;
 }
