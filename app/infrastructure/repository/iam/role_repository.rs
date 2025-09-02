@@ -11,7 +11,7 @@ use nject::injectable;
 
 use crate::shared::chrono_tz::ChronoTz;
 use crate::shared::error_util::is_unique_constraint_error;
-use crate::shared::pool::PgPool;
+use crate::shared::pg_pool::PgPool;
 
 #[injectable]
 pub struct RoleRepositoryImpl {

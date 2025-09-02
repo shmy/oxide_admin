@@ -9,7 +9,7 @@ use tracing::info;
 use crate::repository::iam::role_repository::RoleRepositoryImpl;
 use crate::repository::iam::user_repository::UserRepositoryImpl;
 use crate::shared::kv::{Kv, KvTrait as _};
-use crate::shared::pool::PgPool;
+use crate::shared::pg_pool::PgPool;
 use crate::shared::provider::Provider;
 
 const INSERT_USER_ROLE_KEY: &str = "insert_user_role";

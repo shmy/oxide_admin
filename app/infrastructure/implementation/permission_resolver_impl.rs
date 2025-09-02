@@ -14,7 +14,7 @@ use std::sync::LazyLock;
 use std::time::Duration;
 
 use crate::shared::cloneable_error::CloneableError;
-use crate::shared::pool::PgPool;
+use crate::shared::pg_pool::PgPool;
 
 static PERMISSION_MAP: LazyLock<Cache<UserId, PermissionGroup>> = LazyLock::new(|| {
     Cache::<UserId, PermissionGroup>::builder()

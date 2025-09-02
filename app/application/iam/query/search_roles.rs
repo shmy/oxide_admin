@@ -1,6 +1,6 @@
 use bon::Builder;
 use domain::iam::value_object::permission_code::PermissionCode;
-use infrastructure::shared::{cloneable_error::CloneableError, pool::PgPool};
+use infrastructure::shared::{cloneable_error::CloneableError, pg_pool::PgPool};
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};

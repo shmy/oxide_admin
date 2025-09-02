@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use bon::Builder;
 use domain::iam::value_object::role_id::RoleId;
-use infrastructure::shared::{cloneable_error::CloneableError, pool::PgPool};
+use infrastructure::shared::{cloneable_error::CloneableError, pg_pool::PgPool};
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};

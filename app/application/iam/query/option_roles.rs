@@ -1,4 +1,4 @@
-use infrastructure::shared::{cloneable_error::CloneableError, pool::PgPool};
+use infrastructure::shared::{cloneable_error::CloneableError, pg_pool::PgPool};
 use nject::injectable;
 use single_flight::single_flight;
 

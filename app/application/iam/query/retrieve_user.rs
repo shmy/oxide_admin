@@ -2,7 +2,7 @@ use crate::iam::dto::user::UserDto;
 use bon::Builder;
 use domain::iam::value_object::user_id::UserId;
 use domain::iam::{error::IamError, value_object::role_id::RoleId};
-use infrastructure::shared::{cloneable_error::CloneableError, pool::PgPool};
+use infrastructure::shared::{cloneable_error::CloneableError, pg_pool::PgPool};
 use nject::injectable;
 use serde::Deserialize;
 use single_flight::single_flight;

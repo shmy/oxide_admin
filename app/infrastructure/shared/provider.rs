@@ -2,7 +2,7 @@ use bon::Builder;
 
 use nject::provider;
 
-use crate::shared::{config::Config, kv::Kv, pool::PgPool, sqlite_pool::SqlitePool};
+use crate::shared::{config::Config, kv::Kv, pg_pool::PgPool, sqlite_pool::SqlitePool};
 
 #[derive(Clone, Builder)]
 #[provider]

@@ -6,7 +6,7 @@ pub mod event_bus;
 pub mod hmac_util;
 pub mod kv;
 pub mod path;
-pub mod pool;
+pub mod pg_pool;
 pub mod provider;
 pub mod serde_util;
 pub mod sqlite_pool;
