@@ -32,7 +32,7 @@ pub struct SubCommandArgs {
     #[arg(long, short)]
     pub entity: String,
 
-    /// table name, default: same to entity name
+    /// table name, default: plural to entity name
     #[arg(long, short)]
     pub table: Option<String>,
 }
