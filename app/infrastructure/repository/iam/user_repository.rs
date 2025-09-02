@@ -1,4 +1,5 @@
 use anyhow::Result;
+use chrono::NaiveDateTime;
 use domain::iam::value_object::role_id::RoleId;
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::to_inner_vec::ToInnerVec;
@@ -12,6 +13,7 @@ use domain::{
     shared::domain_repository::DomainRepository,
 };
 use nject::injectable;
+use sqlx::prelude::FromRow;
 
 use crate::shared::chrono_tz::ChronoTz;
 use crate::shared::error_util::is_unique_constraint_error;
@@ -31,7 +33,8 @@ impl DomainRepository for UserRepositoryImpl {
     type Error = IamError;
 
     async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, IamError> {
-        let row_opt = sqlx::query!(
+        let row_opt = sqlx::query_as!(
+            UserDto,
             r#"
         SELECT id as "id: UserId", account, portrait, name, privileged, password as "password: HashedPassword", role_ids as "role_ids: Vec<RoleId>", enabled, refresh_token, refresh_token_expired_at
         FROM _users WHERE id = $1
@@ -40,22 +43,7 @@ impl DomainRepository for UserRepositoryImpl {
         )
         .fetch_optional(&self.pool)
         .await.map_err(IamError::DatabaseError)?;
-        row_opt
-            .map(|row| {
-                User::builder()
-                    .id(row.id)
-                    .account(row.account)
-                    .maybe_portrait(row.portrait)
-                    .privileged(row.privileged)
-                    .name(row.name)
-                    .password(row.password)
-                    .role_ids(row.role_ids)
-                    .enabled(row.enabled)
-                    .maybe_refresh_token(row.refresh_token)
-                    .maybe_refresh_token_expired_at(row.refresh_token_expired_at)
-                    .build()
-            })
-            .ok_or(IamError::UserNotFound)
+        row_opt.map(Into::into).ok_or(IamError::UserNotFound)
     }
 
     async fn save(&self, entity: Self::Entity) -> Result<Self::Entity, IamError> {
@@ -107,7 +95,8 @@ impl DomainRepository for UserRepositoryImpl {
             return Ok(Vec::with_capacity(0));
         }
 
-        let items = sqlx::query!(
+        let items = sqlx::query_as!(
+            UserDto,
             r#"
             DELETE FROM _users WHERE id = ANY($1) AND privileged != true RETURNING id as "id: UserId", account, portrait, name, privileged, password as "password: HashedPassword", role_ids as "role_ids: Vec<RoleId>", enabled, refresh_token, refresh_token_expired_at
             "#,
@@ -116,30 +105,15 @@ impl DomainRepository for UserRepositoryImpl {
         .fetch_all(&self.pool)
         .await
         .map_err(IamError::DatabaseError)?;
-        let items = items
-            .into_iter()
-            .map(|row| {
-                User::builder()
-                    .id(row.id)
-                    .account(row.account)
-                    .maybe_portrait(row.portrait)
-                    .privileged(row.privileged)
-                    .name(row.name)
-                    .password(row.password)
-                    .role_ids(row.role_ids)
-                    .enabled(row.enabled)
-                    .maybe_refresh_token(row.refresh_token)
-                    .maybe_refresh_token_expired_at(row.refresh_token_expired_at)
-                    .build()
-            })
-            .collect();
+        let items = items.into_iter().map(Into::into).collect();
         Ok(items)
     }
 }
 
 impl UserRepository for UserRepositoryImpl {
     async fn by_account(&self, account: String) -> Result<Self::Entity, Self::Error> {
-        let row_opt = sqlx::query!(
+        let row_opt = sqlx::query_as!(
+            UserDto,
             r#"
         SELECT id as "id: UserId", account, portrait, name, privileged, password as "password: HashedPassword", role_ids as "role_ids: Vec<RoleId>", enabled, refresh_token, refresh_token_expired_at
         FROM _users WHERE account = $1
@@ -148,26 +122,12 @@ impl UserRepository for UserRepositoryImpl {
         )
         .fetch_optional(&self.pool)
         .await.map_err(IamError::DatabaseError)?;
-        row_opt
-            .map(|row| {
-                User::builder()
-                    .id(row.id)
-                    .account(row.account)
-                    .maybe_portrait(row.portrait)
-                    .privileged(row.privileged)
-                    .name(row.name)
-                    .password(row.password)
-                    .role_ids(row.role_ids)
-                    .enabled(row.enabled)
-                    .maybe_refresh_token(row.refresh_token)
-                    .maybe_refresh_token_expired_at(row.refresh_token_expired_at)
-                    .build()
-            })
-            .ok_or(IamError::UserNotFound)
+        row_opt.map(Into::into).ok_or(IamError::UserNotFound)
     }
 
     async fn by_refresh_token(&self, refresh_token: String) -> Result<Self::Entity, Self::Error> {
-        let row_opt = sqlx::query!(
+        let row_opt = sqlx::query_as!(
+            UserDto,
             r#"
         SELECT id as "id: UserId", account, portrait, name, privileged, password as "password: HashedPassword", role_ids as "role_ids: Vec<RoleId>", enabled, refresh_token, refresh_token_expired_at
         FROM _users WHERE refresh_token = $1
@@ -176,22 +136,7 @@ impl UserRepository for UserRepositoryImpl {
         )
         .fetch_optional(&self.pool)
         .await.map_err(IamError::DatabaseError)?;
-        row_opt
-            .map(|row| {
-                User::builder()
-                    .id(row.id)
-                    .account(row.account)
-                    .maybe_portrait(row.portrait)
-                    .privileged(row.privileged)
-                    .name(row.name)
-                    .password(row.password)
-                    .role_ids(row.role_ids)
-                    .enabled(row.enabled)
-                    .maybe_refresh_token(row.refresh_token)
-                    .maybe_refresh_token_expired_at(row.refresh_token_expired_at)
-                    .build()
-            })
-            .ok_or(IamError::UserNotFound)
+        row_opt.map(Into::into).ok_or(IamError::UserNotFound)
     }
 
     async fn toggle_enabled(
@@ -254,5 +199,36 @@ impl UserRepository for UserRepositoryImpl {
             })
             .collect();
         Ok(items)
+    }
+}
+
+#[derive(FromRow)]
+struct UserDto {
+    id: UserId,
+    account: String,
+    portrait: Option<String>,
+    name: String,
+    privileged: bool,
+    password: HashedPassword,
+    role_ids: Vec<RoleId>,
+    enabled: bool,
+    refresh_token: Option<String>,
+    refresh_token_expired_at: Option<NaiveDateTime>,
+}
+
+impl From<UserDto> for User {
+    fn from(value: UserDto) -> Self {
+        Self::builder()
+            .id(value.id)
+            .account(value.account)
+            .maybe_portrait(value.portrait)
+            .privileged(value.privileged)
+            .name(value.name)
+            .password(value.password)
+            .role_ids(value.role_ids)
+            .enabled(value.enabled)
+            .maybe_refresh_token(value.refresh_token)
+            .maybe_refresh_token_expired_at(value.refresh_token_expired_at)
+            .build()
     }
 }

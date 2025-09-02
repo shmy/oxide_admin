@@ -1,13 +1,11 @@
 use bon::Builder;
-use serde::Serialize;
-use sqlx::prelude::FromRow;
 
 use crate::iam::{
     error::IamError,
     value_object::{permission_code::PermissionCode, role_id::RoleId},
 };
 
-#[derive(Debug, Clone, Builder, Serialize, FromRow)]
+#[derive(Debug, Clone, Builder)]
 #[readonly::make]
 pub struct Role {
     pub id: RoleId,

@@ -3,11 +3,9 @@ use crate::iam::{
     value_object::{hashed_password::HashedPassword, role_id::RoleId, user_id::UserId},
 };
 use bon::Builder;
-use serde::Serialize;
-use sqlx::prelude::FromRow;
 use sqlx::types::chrono::{NaiveDateTime, Utc};
 
-#[derive(Debug, Clone, Builder, Serialize, FromRow)]
+#[derive(Debug, Clone, Builder)]
 #[readonly::make]
 pub struct User {
     pub id: UserId,
@@ -15,13 +13,10 @@ pub struct User {
     pub portrait: Option<String>,
     pub name: String,
     pub privileged: bool,
-    #[serde(skip_serializing)]
     pub password: HashedPassword,
     pub role_ids: Vec<RoleId>,
     pub enabled: bool,
-    #[serde(skip_serializing)]
     pub refresh_token: Option<String>,
-    #[serde(skip_serializing)]
     pub refresh_token_expired_at: Option<NaiveDateTime>,
 }
 

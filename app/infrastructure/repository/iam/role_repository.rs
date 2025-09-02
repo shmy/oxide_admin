@@ -8,6 +8,7 @@ use domain::shared::domain_repository::DomainRepository;
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::to_inner_vec::ToInnerVec;
 use nject::injectable;
+use sqlx::prelude::FromRow;
 
 use crate::shared::chrono_tz::ChronoTz;
 use crate::shared::error_util::is_unique_constraint_error;
@@ -27,7 +28,8 @@ impl DomainRepository for RoleRepositoryImpl {
     type Error = IamError;
 
     async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, IamError> {
-        let row_opt = sqlx::query!(
+        let row_opt = sqlx::query_as!(
+            RoleDto,
             r#"
         SELECT id as "id: RoleId", name, privileged, permission_ids as "permission_ids: Vec<PermissionCode>", enabled
         FROM _roles WHERE id = $1
@@ -37,17 +39,7 @@ impl DomainRepository for RoleRepositoryImpl {
         .fetch_optional(&self.pool)
         .await
         .map_err(IamError::DatabaseError)?;
-        row_opt
-            .map(|row| {
-                Role::builder()
-                    .id(row.id)
-                    .enabled(row.enabled)
-                    .name(row.name)
-                    .privileged(row.privileged)
-                    .permission_ids(row.permission_ids)
-                    .build()
-            })
-            .ok_or(IamError::RoleNotFound)
+        row_opt.map(Into::into).ok_or(IamError::RoleNotFound)
     }
 
     async fn save(&self, entity: Self::Entity) -> Result<Self::Entity, IamError> {
@@ -86,7 +78,8 @@ impl DomainRepository for RoleRepositoryImpl {
         if ids.is_empty() {
             return Ok(Vec::with_capacity(0));
         }
-        let items = sqlx::query!(
+        let items = sqlx::query_as!(
+            RoleDto,
             r#"
             DELETE FROM _roles WHERE id = ANY($1) AND privileged != true RETURNING id as "id: RoleId", name, privileged, permission_ids as "permission_ids: Vec<PermissionCode>", enabled
             "#,
@@ -95,18 +88,7 @@ impl DomainRepository for RoleRepositoryImpl {
         .fetch_all(&self.pool)
         .await
         .map_err(IamError::DatabaseError)?;
-        let items = items
-            .into_iter()
-            .map(|row| {
-                Role::builder()
-                    .id(row.id)
-                    .enabled(row.enabled)
-                    .name(row.name)
-                    .privileged(row.privileged)
-                    .permission_ids(row.permission_ids)
-                    .build()
-            })
-            .collect();
+        let items = items.into_iter().map(Into::into).collect();
         Ok(items)
     }
 }
@@ -162,5 +144,26 @@ impl RoleRepository for RoleRepositoryImpl {
             })
             .collect();
         Ok(items)
+    }
+}
+
+#[derive(FromRow)]
+struct RoleDto {
+    id: RoleId,
+    name: String,
+    privileged: bool,
+    permission_ids: Vec<PermissionCode>,
+    enabled: bool,
+}
+
+impl From<RoleDto> for Role {
+    fn from(value: RoleDto) -> Self {
+        Self::builder()
+            .id(value.id)
+            .enabled(value.enabled)
+            .name(value.name)
+            .privileged(value.privileged)
+            .permission_ids(value.permission_ids)
+            .build()
     }
 }
