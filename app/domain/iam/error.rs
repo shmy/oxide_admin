@@ -29,6 +29,12 @@ pub enum IamError {
     #[error("验证码生成失败")]
     CaptchaFailedGenerate,
 
+    #[error("验证码无效")]
+    CaptchaInvalid,
+
+    #[error("验证码错误")]
+    CaptchaIncorrect,
+
     #[error("Token 签名错误")]
     AccessTokenFailedGenerate,
     #[error("Token 解析错误")]

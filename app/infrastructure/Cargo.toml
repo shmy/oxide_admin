@@ -39,3 +39,4 @@ hex = { workspace = true, features = ["alloc"] }
 
 domain = { workspace = true }
 single_flight = { workspace = true }
+captcha_generator = { workspace = true }

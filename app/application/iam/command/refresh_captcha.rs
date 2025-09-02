@@ -1,19 +1,19 @@
 use std::time::Duration;
 
-use crate::iam::service::iam_service::{Captcha, IamService};
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::iam::error::IamError;
 use domain::iam::event::IamEvent;
+use domain::shared::captcha_issuer::{Captcha, CaptchaIssuerTrait as _};
+use infrastructure::implementation::captcha_issuer_impl::CaptchaIssuerImpl;
 use nject::injectable;
 use serde::Deserialize;
-
 #[derive(Deserialize, Builder)]
 pub struct RefreshCaptchaCommand {}
 
 #[injectable]
 pub struct RefreshCaptchaCommandHandler {
-    service: IamService,
+    captcha_issuer: CaptchaIssuerImpl,
 }
 
 impl CommandHandler for RefreshCaptchaCommandHandler {
@@ -26,8 +26,8 @@ impl CommandHandler for RefreshCaptchaCommandHandler {
         _cmd: Self::Command,
     ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
         let output = self
-            .service
-            .generate_captcha_with_ttl(Duration::from_secs(60))
+            .captcha_issuer
+            .generate_with_ttl(Duration::from_secs(60))
             .await
             .map_err(|_| IamError::CaptchaFailedGenerate)?;
         Ok(CommandResult::without_events(output))

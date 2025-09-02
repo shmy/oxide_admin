@@ -1,3 +1,4 @@
+pub mod captcha_issuer;
 pub mod domain_repository;
 pub mod event_util;
 pub mod id_generator;

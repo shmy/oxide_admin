@@ -1604,6 +1604,7 @@ dependencies = [
  "anyhow",
  "axum",
  "bon",
+ "captcha_generator",
  "chrono",
  "chrono-tz",
  "const_format",

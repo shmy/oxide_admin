@@ -3,9 +3,12 @@ use bon::Builder;
 use domain::iam::error::IamError;
 use domain::iam::event::IamEvent;
 use domain::iam::repository::user_repository::UserRepository;
+use domain::shared::captcha_issuer::CaptchaIssuerTrait as _;
 use domain::shared::domain_repository::DomainRepository;
 use domain::shared::token_issuer::{TokenIssuerOutput, TokenIssuerTrait};
 use domain::shared::token_store::TokenStoreTrait;
+use futures_util::TryFutureExt;
+use infrastructure::implementation::captcha_issuer_impl::CaptchaIssuerImpl;
 use infrastructure::implementation::token_issuer_impl::TokenIssuerImpl;
 use infrastructure::implementation::token_store_impl::TokenStoreImpl;
 use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
@@ -16,10 +19,13 @@ use serde::Deserialize;
 pub struct SignInCommand {
     account: String,
     password: String,
+    captcha_key: String,
+    captcha_value: String,
 }
 
 #[injectable]
 pub struct SignInCommandHandler {
+    captcha_issuer: CaptchaIssuerImpl,
     user_repository: UserRepositoryImpl,
     token_issuer: TokenIssuerImpl,
     token_store: TokenStoreImpl,
@@ -35,6 +41,10 @@ impl CommandHandler for SignInCommandHandler {
         &self,
         cmd: Self::Command,
     ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+        self.captcha_issuer
+            .verify(&cmd.captcha_key, &cmd.captcha_value)
+            .map_err(|_| IamError::CaptchaInvalid)
+            .await?;
         let mut user = self.user_repository.by_account(cmd.account).await?;
         user.assert_activated()?;
         user.password.verify(&cmd.password)?;
