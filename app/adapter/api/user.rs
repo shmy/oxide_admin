@@ -15,7 +15,7 @@ use application::{
         },
     },
     re_export::hmac_util::HmacUtil,
-    shared::{command_handler::CommandHandler, paging_result::PagingResult},
+    shared::{ command_handler::CommandHandler, paging_result::PagingResult},
 };
 use axum::{
     Json, Router,
