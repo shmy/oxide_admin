@@ -73,6 +73,13 @@ const schemas = {
   brandName: "Oxide Admin",
   logo: assetPrefix + "/static/image/logo.png",
   api: "/profile/current",
+  asideBefore: {
+    "type": "container",
+    "className": "text-center my-2 hidden m:block",
+    "body": [
+      buildDropdown()
+    ]
+  },
   header: {
     type: "container",
     className: "w-full ",
