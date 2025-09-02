@@ -23,9 +23,9 @@
 [x] Backend code generation
 [x] Release时才嵌入前端
 [x] CI
+[x] Event auto subscribe
+[x] Job auto register
 [ ] Frontend code generation
-[ ] event_derive crate
-[ ] event crate
 [ ] 验证码
 [ ] 单元测试
 [ ] l10n
