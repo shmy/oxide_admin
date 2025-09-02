@@ -104,7 +104,6 @@ impl BackgroundJobManager {
         S: Send + Future<Output = std::io::Result<()>>,
     {
         self.monitor.run_with_signal(signal).await?;
-        self.pool.close().await;
         Ok(())
     }
 }

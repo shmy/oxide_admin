@@ -4,9 +4,10 @@ use application::shared::{background_job::register_jobs, event_subscriber::regis
 use axum::Router;
 use background_job::BackgroundJobManager;
 use infrastructure::shared::{
-    config::Config,
+    config::{Config, Server},
     path::{DATA_DIR, LOG_DIR},
-    pg_pool, sqlite_pool,
+    pg_pool,
+    sqlite_pool::{self, SqlitePool},
 };
 use infrastructure::{
     migration, shared::kv::Kv, shared::pg_pool::PgPool, shared::provider::Provider,
@@ -27,48 +28,19 @@ pub mod cli;
 
 pub async fn bootstrap(config: Config) -> Result<()> {
     let _guard = init_tracing(&config.log.level, config.log.rolling_kind.clone());
-    let ip = Ipv4Addr::from_str(&config.server.bind)?;
-    let addr = SocketAddrV4::new(ip, config.server.port);
-    let listener = TcpListener::bind(addr).await?;
-    let (pg_pool, sqlite_pool, kv) = tokio::try_join!(
-        pg_pool::try_new(&config.database),
-        sqlite_pool::try_new(DATA_DIR.join("data.sqlite")),
-        async { Kv::try_new(DATA_DIR.join("data.redb")) }
-    )?;
-
-    let provider = Provider::builder()
-        .pg_pool(pg_pool.clone())
-        .sqlite_pool(sqlite_pool.clone())
-        .kv(kv)
-        .config(config)
-        .build();
-    let (_, _, manager) = tokio::try_join!(
-        migration::migrate(&provider),
-        async {
-            register_subscribers(&provider);
-            anyhow::Ok(())
-        },
-        async {
-            let manager = BackgroundJobManager::new(sqlite_pool);
-            let manager = manager.migrate().await?;
-            let manager = register_jobs(manager, &provider);
-            anyhow::Ok(manager)
-        }
-    )?;
-
+    let listener = build_listener(&config.server).await?;
+    let provider = build_provider(config).await?;
+    let job_manager = build_job_manager(&provider).await?;
     let notify_shutdown = Arc::new(Notify::new());
     let background_job_handle =
-        tokio::spawn(start_background_job(manager, notify_shutdown.clone()));
+        tokio::spawn(start_background_job(job_manager, notify_shutdown.clone()));
     let app = adapter::routing(WebState::new(provider.clone()));
-    let server_handle = tokio::spawn(start_http_server(
-        listener,
-        app,
-        provider.clone(),
-        notify_shutdown.clone(),
-    ));
+    let server_handle = tokio::spawn(start_http_server(listener, app, notify_shutdown.clone()));
     shutdown_signal().await;
     notify_shutdown.notify_waiters();
     let _ = tokio::join!(background_job_handle, server_handle);
+    provider.provide::<PgPool>().close().await;
+    provider.provide::<SqlitePool>().close().await;
     info!("👋 Goodbye!");
     Ok(())
 }
@@ -95,12 +67,47 @@ fn init_tracing(level: &str, rotation: Rotation) -> WorkerGuard {
     guard
 }
 
-async fn start_http_server(
-    listener: TcpListener,
-    app: Router,
-    provider: Provider,
-    notify: Arc<Notify>,
-) -> Result<()> {
+async fn build_listener(server: &Server) -> Result<TcpListener> {
+    let ip = Ipv4Addr::from_str(&server.bind)?;
+    let addr = SocketAddrV4::new(ip, server.port);
+    let listener = TcpListener::bind(addr).await?;
+    Ok(listener)
+}
+
+async fn build_provider(config: Config) -> Result<Provider> {
+    let (pg_pool, sqlite_pool, kv) = tokio::try_join!(
+        pg_pool::try_new(&config.database),
+        sqlite_pool::try_new(DATA_DIR.join("data.sqlite")),
+        async { Kv::try_new(DATA_DIR.join("data.redb")) }
+    )?;
+
+    let provider = Provider::builder()
+        .pg_pool(pg_pool.clone())
+        .sqlite_pool(sqlite_pool.clone())
+        .kv(kv)
+        .config(config)
+        .build();
+    Ok(provider)
+}
+
+async fn build_job_manager(provider: &Provider) -> Result<BackgroundJobManager> {
+    let (_, _, manager) = tokio::try_join!(
+        migration::migrate(provider),
+        async {
+            register_subscribers(provider);
+            anyhow::Ok(())
+        },
+        async {
+            let manager = BackgroundJobManager::new(provider.provide());
+            let manager = manager.migrate().await?;
+            let manager = register_jobs(manager, provider);
+            anyhow::Ok(manager)
+        }
+    )?;
+    Ok(manager)
+}
+
+async fn start_http_server(listener: TcpListener, app: Router, notify: Arc<Notify>) -> Result<()> {
     let shutdown = async move {
         notify.notified().await;
         info!("Received shutdown signal, shutting down server...");
@@ -113,7 +120,6 @@ async fn start_http_server(
     .with_graceful_shutdown(shutdown)
     .await?;
     info!("Server shutdown complete");
-    provider.provide::<PgPool>().close().await;
     Ok(())
 }
 

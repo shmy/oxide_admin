@@ -26,6 +26,7 @@
 [x] Event auto subscribe
 [x] Job auto register
 [x] 验证码
+[ ] Repository models
 [ ] Frontend code generation
 [ ] 单元测试
 [ ] l10n
@@ -34,6 +35,6 @@
 [x] 定时任务
 [x] Dockerfile
 [x] Cron to delete cleanup TEMP_DIR
-[x] Files Management & Cron to delete unused files - 需同步到telepathy
-[x] 优雅关停 - 需同步到telepathy
-[x] 后台任务 - 需同步到telepathy
+[x] Files Management & Cron to delete unused files
+[x] 优雅关停
+[x] 后台任务
