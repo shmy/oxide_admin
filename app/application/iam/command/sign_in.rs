@@ -7,7 +7,6 @@ use domain::shared::captcha_issuer::CaptchaIssuerTrait as _;
 use domain::shared::domain_repository::DomainRepository;
 use domain::shared::token_issuer::{TokenIssuerOutput, TokenIssuerTrait};
 use domain::shared::token_store::TokenStoreTrait;
-use futures_util::TryFutureExt;
 use infrastructure::implementation::captcha_issuer_impl::CaptchaIssuerImpl;
 use infrastructure::implementation::token_issuer_impl::TokenIssuerImpl;
 use infrastructure::implementation::token_store_impl::TokenStoreImpl;
@@ -43,7 +42,6 @@ impl CommandHandler for SignInCommandHandler {
     ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
         self.captcha_issuer
             .verify(&cmd.captcha_key, &cmd.captcha_value)
-            .map_err(|_| IamError::CaptchaInvalid)
             .await?;
         let mut user = self.user_repository.by_account(cmd.account).await?;
         user.assert_activated()?;

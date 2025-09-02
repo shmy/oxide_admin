@@ -28,8 +28,7 @@ impl CommandHandler for RefreshCaptchaCommandHandler {
         let output = self
             .captcha_issuer
             .generate_with_ttl(Duration::from_secs(60))
-            .await
-            .map_err(|_| IamError::CaptchaFailedGenerate)?;
+            .await?;
         Ok(CommandResult::without_events(output))
     }
 }
