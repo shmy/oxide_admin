@@ -68,7 +68,7 @@ fn type_mapping(r#type: &str, notnull: bool) -> String {
         "timestamp with time zone" => "chrono::DateTime<chrono::FixedOffset>".to_string(),
 
         // JSON
-        "json" | "jsonb" => "serde_json::Value".to_string(),
+        "array" | "json" | "jsonb" => "serde_json::Value".to_string(),
 
         // UUID
         "uuid" => "uuid::Uuid".to_string(),

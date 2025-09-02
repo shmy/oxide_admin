@@ -1,10 +1,8 @@
 use bon::Builder;
-use serde::Serialize;
-use sqlx::prelude::FromRow;
 
 use crate::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
 
-#[derive(Debug, Clone, Builder, Serialize, FromRow)]
+#[derive(Debug, Clone, Builder)]
 #[readonly::make]
 pub struct {{entity | pascal_case}} {
     pub id: {{entity | pascal_case}}Id,
