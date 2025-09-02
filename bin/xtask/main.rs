@@ -38,9 +38,16 @@ async fn main() -> Result<()> {
     dotenv::dotenv().ok();
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL provided");
     let db = database::postgres::Postgres::new(&database_url).await?;
-    let module = cli.module;
-    let entity = cli.entity;
-    let table = cli.table;
+    let args = match &cli.command {
+        SubCommands::Scaffold(sub_command_args) => sub_command_args,
+        SubCommands::Api(sub_command_args) => sub_command_args,
+        SubCommands::Application(sub_command_args) => sub_command_args,
+        SubCommands::Domain(sub_command_args) => sub_command_args,
+        SubCommands::Repository(sub_command_args) => sub_command_args,
+    };
+    let module = args.module.to_string();
+    let entity = args.entity.to_string();
+    let table = args.table.clone();
 
     let table_name = table.unwrap_or_else(|| entity.to_plural());
     let fields = db.table_info(&table_name).await?;
@@ -68,11 +75,11 @@ async fn main() -> Result<()> {
         domain_fields => domain_fields,
     };
     match cli.command {
-        SubCommands::Api => generate_api(context).await?,
-        SubCommands::Application => generate_application(context).await?,
-        SubCommands::Domain => generate_domain(context).await?,
-        SubCommands::Repository => generate_repository(context).await?,
-        SubCommands::Scaffold => {
+        SubCommands::Api(_) => generate_api(context).await?,
+        SubCommands::Application(_) => generate_application(context).await?,
+        SubCommands::Domain(_) => generate_domain(context).await?,
+        SubCommands::Repository(_) => generate_repository(context).await?,
+        SubCommands::Scaffold(_) => {
             tokio::try_join!(
                 generate_api(context.clone()),
                 generate_application(context.clone()),

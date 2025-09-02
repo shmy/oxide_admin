@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
@@ -7,6 +7,23 @@ pub struct Cli {
     // command
     #[command(subcommand)]
     pub command: SubCommands,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum SubCommands {
+    Scaffold(SubCommandArgs),
+    Api(SubCommandArgs),
+    Application(SubCommandArgs),
+    Domain(SubCommandArgs),
+    Repository(SubCommandArgs),
+    // /// CommandHandler
+    // Ch,
+    // /// QueryHandler
+    // Qh,
+}
+
+#[derive(Debug, Args)]
+pub struct SubCommandArgs {
     /// module name
     #[arg(long, short)]
     pub module: String,
@@ -18,17 +35,4 @@ pub struct Cli {
     /// table name, default: same to entity name
     #[arg(long, short)]
     pub table: Option<String>,
-}
-
-#[derive(Debug, Subcommand)]
-pub enum SubCommands {
-    Scaffold,
-    Api,
-    Application,
-    Domain,
-    Repository,
-    // /// CommandHandler
-    // Ch,
-    // /// QueryHandler
-    // Qh,
 }
