@@ -19,7 +19,7 @@ fn main() -> Result<()> {
 
 fn generate_subscribers() -> Result<()> {
     let entries = read_rs("shared/event_subscriber")?;
-    let mut contents = Vec::new();
+    let mut events = Vec::new();
     for entry in entries {
         let stem = entry.file_stem().unwrap().to_string_lossy();
         let struct_name = stem.to_pascal_case();
@@ -27,20 +27,10 @@ fn generate_subscribers() -> Result<()> {
         if !file_content.contains(&format!("struct {}", struct_name)) {
             continue;
         }
-        contents.push(format!(
-            r#"    EVENT_BUS.subscribe(provider.provide::<{}::{}>());
-    tracing::info!("Event subscriber [{}] has been registered");"#,
-            stem, struct_name, struct_name
-        ));
+        events.push(stem.to_string());
     }
-    let code = format!(
-        r#"use crate::shared::event::EVENT_BUS;
-use infrastructure::shared::provider::Provider;
-pub fn register_subscribers(provider: &Provider) {{
-{}
-}}"#,
-        contents.join("\n")
-    );
+    let env = build_env();
+    let code = env.render_str(EVENT_TEMPLATE, EventContext { events })?;
     let out_dir = std::env::var("OUT_DIR")?;
     let out_path = Path::new(&out_dir).join("subscribers.rs");
 
@@ -111,6 +101,25 @@ fn build_env() -> Environment<'static> {
     env.add_filter("uppercase", |s: String| s.to_uppercase());
     env
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct EventContext {
+    events: Vec<String>,
+}
+
+const EVENT_TEMPLATE: &str = r#"#[allow(unused_imports)]
+use crate::shared::event::EVENT_BUS;
+#[allow(unused_imports)]
+use infrastructure::shared::provider::Provider;
+
+pub fn register_subscribers(provider: &Provider) {
+    {%- for event in events %}
+
+    EVENT_BUS.subscribe(provider.provide::<{{event}}::{{event | pascal_case}}>());
+    tracing::info!("Event subscriber [{{event | pascal_case}}] has been registered");
+    {%- endfor %}
+}
+"#;
 
 #[derive(Serialize, Deserialize)]
 pub struct JobContext {
