@@ -2,10 +2,10 @@ use crate::{{module}}::dto::{{entity}}::{{entity | pascal_case}}Dto;
 use bon::Builder;
 use domain::{{module}}::error::{{module | pascal_case}}Error;
 use domain::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
-use infrastructure::shared::{cloneable_error::CloneableError, pool::Pool};
+use infrastructure::shared::{cloneable_error::CloneableError, pg_pool::PgPool};
 use nject::injectable;
 use serde::Deserialize;
-use single_flight_derive::single_flight;
+use single_flight::single_flight;
 
 #[derive(Clone, PartialEq, Eq, Hash, Deserialize, Builder)]
 pub struct Retrieve{{entity | pascal_case}}Query {
@@ -14,7 +14,7 @@ pub struct Retrieve{{entity | pascal_case}}Query {
 
 #[injectable]
 pub struct Retrieve{{entity | pascal_case}}QueryHandler {
-    pool: Pool,
+    pool: PgPool,
 }
 
 impl Retrieve{{entity | pascal_case}}QueryHandler {

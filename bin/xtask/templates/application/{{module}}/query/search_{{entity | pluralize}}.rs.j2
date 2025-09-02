@@ -1,10 +1,10 @@
 use bon::Builder;
-use infrastructure::shared::{cloneable_error::CloneableError, pool::Pool};
+use infrastructure::shared::{cloneable_error::CloneableError, pg_pool::PgPool};
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::serde_as;
-use single_flight_derive::single_flight;
 use std::time::Duration;
+use single_flight::single_flight;
 
 use crate::{
     {{module}}::dto::{{entity}}::{{entity | pascal_case}}Dto,
@@ -36,7 +36,7 @@ pub struct Search{{entity | pluralize | pascal_case}}Query {
 #[derive(Clone)]
 #[injectable]
 pub struct Search{{entity | pluralize | pascal_case}}QueryHandler {
-    pool: Pool,
+    pool: PgPool,
     #[inject(&SEARCH_CACHE)]
     cache: &'static CacheType<PagingResult<{{entity | pascal_case}}Dto>>,
 }
