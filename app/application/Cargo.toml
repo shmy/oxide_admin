@@ -27,6 +27,7 @@ image = { workspace = true, features = ["png", "webp", "jpeg"] }
 domain = { workspace = true }
 infrastructure = { workspace = true }
 background_job = { workspace = true }
+captcha_generator = { workspace = true }
 single_flight = { workspace = true }
 
 

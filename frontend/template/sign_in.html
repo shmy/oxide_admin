@@ -31,6 +31,21 @@
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 px-3"
                     placeholder="请输入密码" required />
             </div>
+            <input id="captcha-key" name="captcha-key" type="hidden">
+            <div>
+                <label for="captcha" class="block mb-2 text-sm font-medium text-gray-900">
+                    验证码
+                </label>
+                <div class="flex gap-2">
+                    <input type="text" id="captcha" name="captcha"
+                        class="flex-1 w-0 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 px-3"
+                        placeholder="请输入验证码" required />
+                    <div id="captcha-wrapper"
+                        class="flex-1 w-0 rounded-lg cursor-pointer flex items-center justify-center">
+
+                    </div>
+                </div>
+            </div>
             <div id="error" class="text-red-500 text-sm text-center"></div>
             <div>
                 <button id="submit" type="submit"
@@ -43,6 +58,16 @@
             </div>
         </form>
     </div>
+    <template id="loading-tpl">
+        <svg class="size-5" fill="hsl(228, 97%, 42%)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" />
+            <path
+                d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z">
+                <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12"
+                    repeatCount="indefinite" />
+            </path>
+        </svg>
+    </template>
 </body>
 
 </html>

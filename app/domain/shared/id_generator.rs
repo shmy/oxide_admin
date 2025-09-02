@@ -24,4 +24,14 @@ impl IdGenerator {
         })
         .to_string()
     }
+
+    pub fn random() -> String {
+        tempoid::TempoId::generate_custom(TempoIdOptions {
+            time_length: 8,
+            random_length: 12,
+            alphabet: ALPHABET,
+            ..Default::default()
+        })
+        .to_string()
+    }
 }

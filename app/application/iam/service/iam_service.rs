@@ -1,8 +1,12 @@
+use std::time::Duration;
+
 use crate::iam::service::page::{PAGES, Page, SHARED_PAGES};
 use anyhow::{Result, bail};
+use captcha_generator::CaptchaTrait as _;
 use domain::iam::value_object::permission_code::{ALL_PERMISSIONS, NONE, PermissionCode};
 use domain::iam::value_object::permission_group::PermissionGroup;
 use domain::iam::value_object::user_id::UserId;
+use domain::shared::id_generator::IdGenerator;
 use domain::shared::permission_resolver::PermissionResolver;
 use domain::shared::token_issuer::{TokenIssuerTrait, UserClaims};
 use domain::shared::token_store::TokenStoreTrait;
@@ -10,6 +14,7 @@ use infrastructure::implementation::permission_resolver_impl::PermissionResolver
 use infrastructure::implementation::token_issuer_impl::TokenIssuerImpl;
 use infrastructure::implementation::token_store_impl::TokenStoreImpl;
 use infrastructure::shared::config::Config;
+use infrastructure::shared::kv::{Kv, KvTrait as _};
 use nject::injectable;
 
 #[derive(Clone)]
@@ -19,9 +24,39 @@ pub struct IamService {
     token_store: TokenStoreImpl,
     permission_resolver: PermissionResolverImpl,
     config: Config,
+    kv: Kv,
 }
 
 impl IamService {
+    fn fill_captcha_key(key: &str) -> String {
+        format!("captcha:{key}")
+    }
+}
+
+impl IamService {
+    pub async fn generate_captcha_with_ttl(&self, ttl: Duration) -> Result<Captcha> {
+        let math = captcha_generator::math::MathCaptcha::new(100, 140, 40);
+        let captcha_data = math.generate()?;
+        let key = IdGenerator::random();
+        let full_key = Self::fill_captcha_key(&key);
+        self.kv.set_with_ex(&full_key, captcha_data.value, ttl)?;
+        Ok(Captcha {
+            bytes: captcha_data.bytes,
+            key,
+        })
+    }
+
+    async fn verify_captcha(&self, key: &str, value: &str) -> Result<()> {
+        let full_key = Self::fill_captcha_key(key);
+        let existing_value = self.kv.get::<String>(&full_key)?;
+        if existing_value != value {
+            return Err(anyhow::anyhow!("验证码错误"));
+        }
+
+        let _ = self.kv.delete(&full_key);
+        Ok(())
+    }
+
     pub async fn verify_token(&self, token: &str) -> Result<UserId> {
         let secret = &self.config.jwt.access_token_secret;
         let claims = self.token_issuer.verify::<UserClaims>(token, secret)?;
@@ -98,4 +133,9 @@ impl IamService {
             })
             .collect()
     }
+}
+
+pub struct Captcha {
+    pub bytes: Vec<u8>, // 图形验证码的原始数据
+    pub key: String,    // 与存储绑定，用于校验
 }

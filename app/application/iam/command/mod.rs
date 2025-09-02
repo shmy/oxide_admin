@@ -6,6 +6,7 @@ pub mod batch_enable_roles;
 pub mod batch_enable_users;
 pub mod create_role;
 pub mod create_user;
+pub mod refresh_captcha;
 pub mod refresh_token;
 pub mod sign_in;
 pub mod sign_out;

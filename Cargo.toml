@@ -12,6 +12,7 @@ members = [
     "bin/server",
     "bin/xtask",
     "crates/background_job",
+    "crates/captcha_generator",
     "crates/single_flight",
     "crates/single_flight_macros",
 ]
@@ -29,6 +30,7 @@ axum = { version = "0.8", default-features = false }
 axum_typed_multipart = { version = "0.16", default-features = false }
 tower-http = { version = "0.6", default-features = false }
 tower_governor = { version = "0.8", default-features = false }
+governor = { version = "0.10", default-features = false }
 tokio = { version = "1", default-features = false }
 tokio-stream = { version = "0.1", default-features = false }
 parking_lot = { version = "0.12", default-features = false }
@@ -74,6 +76,7 @@ application = { path = "app/application" }
 domain = { path = "app/domain" }
 infrastructure = { path = "app/infrastructure" }
 background_job = { path = "crates/background_job" }
+captcha_generator = { path = "crates/captcha_generator" }
 single_flight = { path = "crates/single_flight" }
 single_flight_macros = { path = "crates/single_flight_macros" }
 

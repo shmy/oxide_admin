@@ -26,6 +26,9 @@ pub enum IamError {
     #[error("角色已存在")]
     RoleDuplicated,
 
+    #[error("验证码生成失败")]
+    CaptchaFailedGenerate,
+
     #[error("Token 签名错误")]
     AccessTokenFailedGenerate,
     #[error("Token 解析错误")]
