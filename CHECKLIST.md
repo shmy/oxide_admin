@@ -25,8 +25,8 @@
 [x] CI
 [x] Event auto subscribe
 [x] Job auto register
+[x] 验证码
 [ ] Frontend code generation
-[ ] 验证码
 [ ] 单元测试
 [ ] l10n
 [-] 审计 现在只是log
