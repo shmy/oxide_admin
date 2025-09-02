@@ -57,7 +57,7 @@ async fn retrieve(
     JsonResponse::ok(sign_user_portrait(user, &hmac_util))
 }
 
-fn sign_user_portrait(user: UserDto, hmac: &HmacUtil) -> UserDto {
+pub fn sign_user_portrait(user: UserDto, hmac: &HmacUtil) -> UserDto {
     UserDto {
         portrait: hmac.sign_path_opt(user.portrait),
         ..user

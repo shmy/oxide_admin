@@ -8,6 +8,7 @@ import {
 import { getAccessToken, redirectToSignIn, signOut } from "../lib/authn";
 import http from "../lib/http";
 import { lazy } from "react";
+import { logoUrl } from "../lib/constant";
 
 if (!getAccessToken()) {
   redirectToSignIn();
@@ -28,7 +29,11 @@ amisLib.FormItem({
 const buildDropdown = () => {
   return {
     type: "dropdown-button",
-    label: "${user.name} (${user.account})",
+    style: {
+      "--portrait-url": `url(\${user.portrait}), url('${logoUrl}')`,
+    },
+    className: "header-dropdown",
+    label: "${user.name}(${user.account})",
     size: "lg",
     trigger: "click",
     buttons: [

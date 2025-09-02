@@ -10,3 +10,25 @@ body,
     padding: 0;
     -webkit-tap-highlight-color: transparent;
 }
+
+.header-dropdown {
+    .antd-Button {
+        position: relative;
+        padding-left: 50px;
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-image: var(--portrait-url);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+    }
+}

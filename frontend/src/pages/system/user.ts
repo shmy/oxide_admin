@@ -1,7 +1,8 @@
+import { logoUrl } from "../../lib/constant";
 import { enabledStatuses } from "../../lib/options";
 import { buildCrudTable } from "../../lib/table";
 
-export {};
+export { };
 const endpoint = "/users";
 
 const buildDrawer = (isAdd = true) => {
@@ -231,6 +232,7 @@ const schema = {
         name: "portrait",
         label: "头像",
         type: "avatar",
+        defaultAvatar: logoUrl,
         shape: "rounded",
         onError: "return true;",
         src: "${portrait}",
