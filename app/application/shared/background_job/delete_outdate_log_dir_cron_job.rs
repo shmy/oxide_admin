@@ -1,31 +1,24 @@
 use anyhow::Result;
-use background_job::Job;
+use background_job::CronJob;
 use futures_util::StreamExt;
 use infrastructure::shared::{config::Config, path::LOG_DIR};
 use nject::injectable;
-use serde::{Deserialize, Serialize};
 use std::time::{Duration, SystemTime};
 use tokio::fs;
 use tracing::warn;
 
-#[derive(Clone, Serialize, Deserialize)]
-pub struct DeleteOutdateLogDirJobParams;
-
 #[derive(Clone)]
 #[injectable]
-pub struct DeleteOutdateLogDirJob {
+pub struct DeleteOutdateLogDirCronJob {
     config: Config,
 }
 
-impl Job for DeleteOutdateLogDirJob {
-    type Params = DeleteOutdateLogDirJobParams;
-
-    const NAME: &'static str = "delete_outdate_log_dir_job";
-    const CONCURRENCY: usize = 1;
-    const RETRIES: usize = 0;
+impl CronJob for DeleteOutdateLogDirCronJob {
+    const NAME: &'static str = "delete_outdate_log_dir_cron_job";
+    const SCHEDULE: &'static str = "at 02:01 am";
     const TIMEOUT: Duration = Duration::from_secs(30);
 
-    async fn execute(&self, _params: Self::Params) -> Result<()> {
+    async fn execute(&self) -> Result<()> {
         let config = &self.config;
         let period_secs = config.log.rolling_period.as_secs();
         let now = SystemTime::now();

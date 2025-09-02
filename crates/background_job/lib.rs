@@ -6,10 +6,14 @@ use apalis::{
 };
 pub use apalis_core::codec::json::JsonCodec;
 pub use apalis_core::step::StepFn;
+use apalis_cron::{CronContext, CronStream, Schedule};
 pub use apalis_sql::context::SqlContext;
-use apalis_sql::{sqlite::SqliteStorage, sqlx};
+use apalis_sql::{
+    sqlite::SqliteStorage,
+    sqlx::{self, types::chrono::Local},
+};
 use serde::{Serialize, de::DeserializeOwned};
-use std::{sync::Arc, time::Duration};
+use std::{str::FromStr as _, sync::Arc, time::Duration};
 pub type JobStorage<T> = SqliteStorage<T>;
 pub type SteppedJobStorage = SqliteStorage<StepRequest<String>>;
 
@@ -73,6 +77,28 @@ impl BackgroundJobManager {
         self
     }
 
+    pub fn register_cron<T>(mut self, job: T) -> Self
+    where
+        T: CronJob,
+    {
+        let cron = english_to_cron::str_cron_syntax(T::SCHEDULE).expect("build cron syntax");
+        let schedule = Schedule::from_str(&cron).expect("build schedule");
+        let cron_stream = CronStream::new(schedule);
+        let worker = WorkerBuilder::new(T::NAME)
+            .enable_tracing()
+            .backend(cron_stream)
+            .build_fn(move |_ctx: CronContext<Local>| {
+                let job = job.clone();
+                async move {
+                    if let Err(err) = tokio::time::timeout(T::TIMEOUT, job.execute()).await {
+                        tracing::error!(%err, "Failed to run cron job {}", T::NAME);
+                    }
+                }
+            });
+        self.monitor = self.monitor.register(worker);
+        self
+    }
+
     pub async fn run_with_signal<S>(self, signal: S) -> Result<()>
     where
         S: Send + Future<Output = std::io::Result<()>>,
@@ -82,6 +108,7 @@ impl BackgroundJobManager {
         Ok(())
     }
 }
+
 pub trait JobParams: Serialize + DeserializeOwned + Clone + Send + Sync + Unpin + 'static {}
 
 impl<T> JobParams for T where T: Serialize + DeserializeOwned + Clone + Send + Sync + Unpin + 'static
@@ -97,10 +124,17 @@ pub trait Job: Clone + Send + Sync + Unpin + 'static {
     fn execute(&self, params: Self::Params) -> impl Future<Output = Result<()>> + Send;
 }
 
-pub trait SteppedJob: Serialize + DeserializeOwned + Clone + Send + Sync + Unpin + 'static {
-    type Params: Clone + Send + Sync + Unpin + 'static;
+pub trait SteppedJob: Clone + Send + Sync + Unpin + 'static {
+    type Params: JobParams;
     const NAME: &'static str;
     const CONCURRENCY: usize;
 
     fn steps() -> StepBuilder<SqlContext, String, Self::Params, (), JsonCodec<String>, usize>;
+}
+
+pub trait CronJob: Clone + Send + Sync + Unpin + 'static {
+    const NAME: &'static str;
+    const SCHEDULE: &'static str;
+    const TIMEOUT: Duration;
+    fn execute(&self) -> impl Future<Output = Result<()>> + Send;
 }

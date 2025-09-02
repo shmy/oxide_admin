@@ -59,7 +59,6 @@ nject = { version = "0.4", default-features = false }
 tempoid = { version = "0.1", default-features = false }
 jsonwebtoken = { version = "9.3", default-features = false }
 dotenvy = { version = "0.15", default-features = false }
-tokio-cron-scheduler = { version = "0.14", default-features = false }
 twox-hash = { version = "2.1", default-features = false }
 cruet = { version = "0.15", default-features = false }
 hmac-sha256 = { version = "1.1", default-features = false }

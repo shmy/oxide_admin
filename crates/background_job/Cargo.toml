@@ -15,7 +15,9 @@ apalis = { version = "0.7", default-features = false, features = [
     "tracing",
     "retry",
 ] }
+english-to-cron = { version = "0.1", default-features = false }
 apalis-core = { version = "0.7", default-features = false }
+apalis-cron = { version = "0.7", default-features = false }
 apalis-sql = { version = "0.7", default-features = false, features = [
     "sqlite",
     "migrate",

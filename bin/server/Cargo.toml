@@ -32,13 +32,8 @@ tracing-subscriber = { workspace = true, features = [
     "env-filter",
     "json",
 ] }
-tokio-cron-scheduler = { workspace = true, features = [
-    "tracing-subscriber",
-    "english",
-] }
 
 background_job = { workspace = true }
-
 adapter = { workspace = true }
 application = { workspace = true }
 infrastructure = { workspace = true }

@@ -50,7 +50,9 @@ pub fn register_subscribers(provider: &Provider) {{
 
 fn generate_jobs() -> Result<()> {
     let entries = read_rs("shared/background_job")?;
-    let mut items = Vec::new();
+    let mut jobs = Vec::new();
+    let mut stepped_jobs = Vec::new();
+    let mut cron_jobs = Vec::new();
     for entry in entries {
         let stem = entry.file_stem().unwrap().to_string_lossy();
         let struct_name = stem.to_pascal_case();
@@ -58,11 +60,25 @@ fn generate_jobs() -> Result<()> {
         if !file_content.contains(&format!("struct {}", struct_name)) {
             continue;
         }
-        items.push(stem.to_string());
+        let stem = stem.to_string();
+        if stem.ends_with("stepped_job") {
+            stepped_jobs.push(stem);
+        } else if stem.ends_with("cron_job") {
+            cron_jobs.push(stem);
+        } else {
+            jobs.push(stem);
+        }
     }
 
     let env = build_env();
-    let code = env.render_str(JOB_TEMPLATE, JobContext { items })?;
+    let code = env.render_str(
+        JOB_TEMPLATE,
+        JobContext {
+            jobs,
+            cron_jobs,
+            stepped_jobs,
+        },
+    )?;
     let out_dir = std::env::var("OUT_DIR")?;
     let out_path = Path::new(&out_dir).join("jobs.rs");
 
@@ -98,25 +114,38 @@ fn build_env() -> Environment<'static> {
 
 #[derive(Serialize, Deserialize)]
 pub struct JobContext {
-    items: Vec<String>,
+    jobs: Vec<String>,
+    stepped_jobs: Vec<String>,
+    cron_jobs: Vec<String>,
 }
 
-const JOB_TEMPLATE: &str = r#"
+const JOB_TEMPLATE: &str = r#"#[allow(unused_imports)]
 use background_job::{BackgroundJobManager, JobStorage};
+#[allow(unused_imports)]
 use infrastructure::shared::provider::Provider;
+#[allow(unused_imports)]
 use infrastructure::shared::sqlite_pool::SqlitePool;
+#[allow(unused_imports)]
 use nject::injectable;
+#[allow(unused_imports)]
 use background_job::Storage;
 
 pub fn register_jobs(manager: BackgroundJobManager, provider: &Provider) -> BackgroundJobManager {
-    {%- for item in items %}
+    {%- for job in jobs %}
+
     let storage = JobStorage::new(provider.provide());
-    let manager = manager.register::<{{item}}::{{item | pascal_case}}>(provider.provide(), storage);
-    tracing::info!("Background job [{{item | pascal_case}}] has been registered");
+    let manager = manager.register::<{{job}}::{{job | pascal_case}}>(provider.provide(), storage);
+    tracing::info!("Job [{{job | pascal_case}}] has been registered");
+    {%- endfor %}
+
+    {%- for job in cron_jobs %}
+
+    let manager = manager.register_cron::<{{job}}::{{job | pascal_case}}>(provider.provide());
+    tracing::info!("Cron job [{{job | pascal_case}}] has been registered");
     {%- endfor %}
     manager
 }
-{%- for item in items %}
+{%- for item in jobs %}
 
 #[injectable]
 pub struct {{item | pascal_case}}Dispatcher {

@@ -1,34 +1,25 @@
 use anyhow::Result;
-use background_job::Job;
+use background_job::CronJob;
 use futures_util::StreamExt as _;
 use infrastructure::shared::path::UPLOAD_DIR;
 use nject::injectable;
-use serde::{Deserialize, Serialize};
 use tokio::fs;
 
 use crate::system::service::file_service::FileService;
 
-#[derive(Clone, Serialize, Deserialize)]
-pub struct DeleteUnusedFileJobParams;
-
 #[derive(Clone)]
 #[injectable]
-pub struct DeleteUnusedFileJob {
+pub struct DeleteUnusedFileCronJob {
     file_service: FileService,
 }
 
-impl Job for DeleteUnusedFileJob {
-    type Params = DeleteUnusedFileJobParams;
-
-    const NAME: &'static str = "delete_unused_file_job";
-
-    const CONCURRENCY: usize = 1;
-
-    const RETRIES: usize = 0;
+impl CronJob for DeleteUnusedFileCronJob {
+    const NAME: &'static str = "delete_unused_file_cron_job";
+    const SCHEDULE: &'static str = "at 00:01 am";
 
     const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30);
 
-    async fn execute(&self, _params: Self::Params) -> Result<()> {
+    async fn execute(&self) -> Result<()> {
         let file_service = &self.file_service;
         let stream = file_service.unused_2days_ago();
         stream
