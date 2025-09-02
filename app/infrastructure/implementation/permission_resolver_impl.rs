@@ -14,7 +14,7 @@ use std::sync::LazyLock;
 use std::time::Duration;
 
 use crate::shared::cloneable_error::CloneableError;
-use crate::shared::pool::Pool;
+use crate::shared::pool::PgPool;
 
 static PERMISSION_MAP: LazyLock<Cache<UserId, PermissionGroup>> = LazyLock::new(|| {
     Cache::<UserId, PermissionGroup>::builder()
@@ -26,7 +26,7 @@ static PERMISSION_MAP: LazyLock<Cache<UserId, PermissionGroup>> = LazyLock::new(
 #[derive(Debug, Clone)]
 #[injectable]
 pub struct PermissionResolverImpl {
-    pool: Pool,
+    pool: PgPool,
 }
 
 impl PermissionResolverImpl {

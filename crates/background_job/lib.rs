@@ -7,17 +7,9 @@ use apalis::{
 pub use apalis_core::codec::json::JsonCodec;
 pub use apalis_core::step::StepFn;
 pub use apalis_sql::context::SqlContext;
-use apalis_sql::sqlx::ConnectOptions as _;
-use apalis_sql::{
-    sqlite::SqliteStorage,
-    sqlx::{
-        self,
-        sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions},
-    },
-};
+use apalis_sql::{sqlite::SqliteStorage, sqlx};
 use serde::{Serialize, de::DeserializeOwned};
-use std::{path::Path, sync::Arc, time::Duration};
-use tracing::log::LevelFilter;
+use std::{sync::Arc, time::Duration};
 pub type JobStorage<T> = SqliteStorage<T>;
 pub type SteppedJobStorage = SqliteStorage<StepRequest<String>>;
 
@@ -27,20 +19,11 @@ pub struct BackgroundJobManager {
 }
 
 impl BackgroundJobManager {
-    pub async fn try_new(path: impl AsRef<Path>) -> Result<Self> {
-        let connection_options = SqliteConnectOptions::new()
-            .filename(path)
-            .create_if_missing(true)
-            .journal_mode(SqliteJournalMode::Wal);
-        let connection_options = connection_options.log_statements(LevelFilter::Trace);
-
-        let pool = SqlitePoolOptions::default()
-            .connect_with(connection_options)
-            .await?;
-        Ok(Self {
+    pub fn new(pool: sqlx::SqlitePool) -> Self {
+        Self {
             pool,
             monitor: Monitor::new(),
-        })
+        }
     }
 
     pub async fn migrate(self) -> Result<Self> {
@@ -55,26 +38,26 @@ impl BackgroundJobManager {
         Ok(())
     }
 
-    pub fn register<T>(mut self, data: T::State) -> (Self, SqliteStorage<T>)
+    pub fn register<T>(mut self, job: T, storage: SqliteStorage<T::Params>) -> Self
     where
         T: Job,
     {
-        let storage: SqliteStorage<T> = SqliteStorage::new(self.pool.clone());
-
         let worker = WorkerBuilder::new(T::NAME)
             .enable_tracing()
             .concurrency(T::CONCURRENCY)
             .retry(RetryPolicy::retries(T::RETRIES))
-            .data(data)
             .backend(storage.clone())
-            .build_fn(|job: T, data: Data<T::State>| async move {
-                match tokio::time::timeout(T::TIMEOUT, T::execute(job, &data)).await {
-                    Ok(res) => res.map_err(|err| Error::Failed(Arc::new(err.into()))),
-                    Err(e) => Err(Error::Abort(Arc::new(e.into()))),
+            .build_fn(move |params: T::Params| {
+                let job = job.clone();
+                async move {
+                    match tokio::time::timeout(T::TIMEOUT, job.execute(params)).await {
+                        Ok(res) => res.map_err(|err| Error::Failed(Arc::new(err.into()))),
+                        Err(e) => Err(Error::Abort(Arc::new(e.into()))),
+                    }
                 }
             });
         self.monitor = self.monitor.register(worker);
-        (self, storage)
+        self
     }
 
     pub fn register_stepped<T>(
@@ -104,15 +87,19 @@ impl BackgroundJobManager {
         Ok(())
     }
 }
+pub trait JobParams: Serialize + DeserializeOwned + Clone + Send + Sync + Unpin + 'static {}
 
-pub trait Job: Serialize + DeserializeOwned + Clone + Send + Sync + Unpin + 'static {
-    type State: Clone + Send + Sync + Unpin + 'static;
+impl<T> JobParams for T where T: Serialize + DeserializeOwned + Clone + Send + Sync + Unpin + 'static
+{}
+
+pub trait Job: Clone + Send + Sync + Unpin + 'static {
+    type Params: JobParams;
     const NAME: &'static str;
     const CONCURRENCY: usize;
     const RETRIES: usize;
     const TIMEOUT: Duration;
 
-    fn execute(job: Self, state: &Self::State) -> impl Future<Output = Result<()>> + Send;
+    fn execute(&self, params: Self::Params) -> impl Future<Output = Result<()>> + Send;
 }
 
 pub trait SteppedJob: Serialize + DeserializeOwned + Clone + Send + Sync + Unpin + 'static {

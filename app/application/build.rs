@@ -5,6 +5,8 @@ use std::{
 
 use anyhow::Result;
 use cruet::Inflector as _;
+use minijinja::Environment;
+use serde::{Deserialize, Serialize};
 
 fn main() -> Result<()> {
     generate_subscribers()?;
@@ -48,9 +50,7 @@ pub fn register_subscribers(provider: &Provider) {{
 
 fn generate_jobs() -> Result<()> {
     let entries = read_rs("shared/background_job")?;
-    let mut struct_stems = Vec::new();
-    let mut field_stems = Vec::new();
-    let mut register_stems = Vec::new();
+    let mut items = Vec::new();
     for entry in entries {
         let stem = entry.file_stem().unwrap().to_string_lossy();
         let struct_name = stem.to_pascal_case();
@@ -58,44 +58,15 @@ fn generate_jobs() -> Result<()> {
         if !file_content.contains(&format!("struct {}", struct_name)) {
             continue;
         }
-        struct_stems.push(format!(
-            "\t pub {}: JobStorage<{}::{}>,",
-            stem, stem, struct_name
-        ));
-        field_stems.push(format!("\t\t\t{}", stem));
-        register_stems.push(format!(
-            r#"    let (manager, {}) = manager.register::<{}::{}>(provider.clone());
-    tracing::info!("Background job [{}] has been registered");"#,
-            stem, stem, struct_name, struct_name
-        ));
+        items.push(stem.to_string());
     }
-    let jobs = format!(
-        r#"use background_job::{{BackgroundJobManager, JobStorage}};
-use infrastructure::shared::provider::Provider;
-#[derive(Clone, Debug)]
-pub struct BackgroundJobs {{
-{}
-}}"#,
-        struct_stems.join("\n")
-    );
 
-    let func = format!(
-        r#"pub fn register_jobs(manager: BackgroundJobManager, provider: &Provider) -> (BackgroundJobManager, BackgroundJobs) {{
-{}
-    (
-        manager,
-        BackgroundJobs {{
-{}
-        }},
-    )
-}}"#,
-        register_stems.join("\n"),
-        field_stems.join(",\n")
-    );
+    let env = build_env();
+    let code = env.render_str(JOB_TEMPLATE, JobContext { items })?;
     let out_dir = std::env::var("OUT_DIR")?;
     let out_path = Path::new(&out_dir).join("jobs.rs");
 
-    fs::write(out_path, format!("{}\n{}", jobs, func))?;
+    fs::write(out_path, code)?;
     Ok(())
 }
 
@@ -117,3 +88,48 @@ fn read_rs(path: impl AsRef<Path>) -> Result<Vec<PathBuf>> {
         .collect();
     Ok(items)
 }
+
+fn build_env() -> Environment<'static> {
+    let mut env = Environment::new();
+    env.add_filter("pascal_case", |s: String| s.to_pascal_case());
+    env.add_filter("uppercase", |s: String| s.to_uppercase());
+    env
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct JobContext {
+    items: Vec<String>,
+}
+
+const JOB_TEMPLATE: &str = r#"
+use background_job::{BackgroundJobManager, JobStorage};
+use infrastructure::shared::provider::Provider;
+use infrastructure::shared::sqlite_pool::SqlitePool;
+use nject::injectable;
+use background_job::Storage;
+
+pub fn register_jobs(manager: BackgroundJobManager, provider: &Provider) -> BackgroundJobManager {
+    {%- for item in items %}
+    let storage = JobStorage::new(provider.provide());
+    let manager = manager.register::<{{item}}::{{item | pascal_case}}>(provider.provide(), storage);
+    tracing::info!("Background job [{{item | pascal_case}}] has been registered");
+    {%- endfor %}
+    manager
+}
+{%- for item in items %}
+
+#[injectable]
+pub struct {{item | pascal_case}}Dispatcher {
+    #[inject(|sqlite_pool: SqlitePool| JobStorage::new(sqlite_pool) )]
+    pub storage: JobStorage<{{item}}::{{item | pascal_case}}Params>,
+}
+
+impl {{item | pascal_case}}Dispatcher {
+    pub async fn dispatch(&mut self, params: {{item}}::{{item | pascal_case}}Params) {
+        if let Err(err) = self.storage.push(params).await {
+            tracing::error!(%err, "Failed to push [{{item | pascal_case}}]");
+        }
+    }
+}
+{%- endfor %}
+"#;

@@ -15,11 +15,11 @@ use nject::injectable;
 
 use crate::shared::chrono_tz::ChronoTz;
 use crate::shared::error_util::is_unique_constraint_error;
-use crate::shared::pool::Pool;
+use crate::shared::pool::PgPool;
 
 #[injectable]
 pub struct UserRepositoryImpl {
-    pool: Pool,
+    pool: PgPool,
     ct: ChronoTz,
 }
 

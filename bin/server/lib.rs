@@ -1,31 +1,21 @@
 use adapter::WebState;
 use anyhow::Result;
-use application::shared::{
-    background_job::{
-        BackgroundJobs, delete_expired_kv_job::DeleteExpiredKvJob,
-        delete_outdate_log_dir_job::DeleteOutdateLogDirJob,
-        delete_outdate_temp_dir_job::DeleteOutdateTempDirJob,
-        delete_unused_file_job::DeleteUnusedFileJob, register_jobs,
-    },
-    event_subscriber::register_subscribers,
-};
+use application::shared::{background_job::register_jobs, event_subscriber::register_subscribers};
 use axum::Router;
 use background_job::BackgroundJobManager;
-use background_job::Storage;
 use infrastructure::shared::{
     config::Config,
     path::{DATA_DIR, LOG_DIR},
-    pool,
+    pool, sqlite_pool,
 };
-use infrastructure::{migration, shared::kv::Kv, shared::pool::Pool, shared::provider::Provider};
+use infrastructure::{migration, shared::kv::Kv, shared::pool::PgPool, shared::provider::Provider};
 use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     str::FromStr as _,
     sync::Arc,
 };
 use tokio::{net::TcpListener, signal, sync::Notify};
-use tokio_cron_scheduler::{Job, JobScheduler};
-use tracing::{error, info, warn};
+use tracing::{info, warn};
 use tracing_appender::{non_blocking::WorkerGuard, rolling::Rotation};
 use tracing_subscriber::{
     EnvFilter, Layer, layer::SubscriberExt as _, util::SubscriberInitExt as _,
@@ -38,12 +28,15 @@ pub async fn bootstrap(config: Config) -> Result<()> {
     let ip = Ipv4Addr::from_str(&config.server.bind)?;
     let addr = SocketAddrV4::new(ip, config.server.port);
     let listener = TcpListener::bind(addr).await?;
-    let (pool, kv) = tokio::try_join!(pool::try_new(&config.database), async {
-        Kv::try_new(DATA_DIR.join("data.redb"))
-    })?;
+    let (pg_pool, sqlite_pool, kv) = tokio::try_join!(
+        pool::try_new(&config.database),
+        sqlite_pool::try_new(DATA_DIR.join("data.sqlite")),
+        async { Kv::try_new(DATA_DIR.join("data.redb")) }
+    )?;
 
     let provider = Provider::builder()
-        .pool(pool.clone())
+        .pg_pool(pg_pool.clone())
+        .sqlite_pool(sqlite_pool.clone())
         .kv(kv)
         .config(config)
         .build();
@@ -57,15 +50,14 @@ pub async fn bootstrap(config: Config) -> Result<()> {
         provider.clone(),
         notify_shutdown.clone(),
     ));
-    let manager = BackgroundJobManager::try_new(DATA_DIR.join("data.sqlite")).await?;
+    let manager = BackgroundJobManager::new(sqlite_pool);
     let manager = manager.migrate().await?;
-    let (manager, jobs) = register_jobs(manager, &provider);
-    let scheduler_handle = tokio::spawn(start_scheduler(jobs, notify_shutdown.clone()));
+    let manager = register_jobs(manager, &provider);
     let background_job_handle =
         tokio::spawn(start_background_job(manager, notify_shutdown.clone()));
     shutdown_signal().await;
     notify_shutdown.notify_waiters();
-    let _ = tokio::join!(server_handle, scheduler_handle, background_job_handle);
+    let _ = tokio::join!(server_handle, background_job_handle);
     info!("👋 Goodbye!");
     Ok(())
 }
@@ -108,82 +100,82 @@ async fn start_http_server(
     .with_graceful_shutdown(shutdown)
     .await?;
     info!("Server shutdown complete");
-    provider.provide::<Pool>().close().await;
+    provider.provide::<PgPool>().close().await;
     Ok(())
 }
 
-async fn start_scheduler(jobs: BackgroundJobs, notify: Arc<Notify>) -> Result<()> {
-    let mut sched = JobScheduler::new().await?;
-    let cloned_jobs = jobs.clone();
-    sched
-        .add(Job::new_async("every 1 hour", move |_uuid, _l| {
-            let mut cloned_jobs = cloned_jobs.clone();
-            Box::pin(async move {
-                if let Err(e) = cloned_jobs
-                    .delete_expired_kv_job
-                    .push(DeleteExpiredKvJob)
-                    .await
-                {
-                    error!("Failed to enqueue DeleteExpiredKvJob: {:?}", e);
-                }
-            })
-        })?)
-        .await?;
+// async fn start_scheduler(jobs: BackgroundJobs, notify: Arc<Notify>) -> Result<()> {
+//     let mut sched = JobScheduler::new().await?;
+//     let cloned_jobs = jobs.clone();
+//     sched
+//         .add(Job::new_async("every 1 hour", move |_uuid, _l| {
+//             let mut cloned_jobs = cloned_jobs.clone();
+//             Box::pin(async move {
+//                 if let Err(e) = cloned_jobs
+//                     .delete_expired_kv_job
+//                     .push(DeleteExpiredKvJobParams)
+//                     .await
+//                 {
+//                     error!("Failed to enqueue DeleteExpiredKvJob: {:?}", e);
+//                 }
+//             })
+//         })?)
+//         .await?;
 
-    let cloned_jobs = jobs.clone();
-    sched
-        .add(Job::new_async("at 00:01 am", move |_uuid, _l| {
-            let mut cloned_jobs = cloned_jobs.clone();
-            Box::pin(async move {
-                if let Err(e) = cloned_jobs
-                    .delete_unused_file_job
-                    .push(DeleteUnusedFileJob)
-                    .await
-                {
-                    error!("Failed to enqueue DeleteUnusedFileJob: {:?}", e);
-                }
-            })
-        })?)
-        .await?;
+//     let cloned_jobs = jobs.clone();
+//     sched
+//         .add(Job::new_async("at 00:01 am", move |_uuid, _l| {
+//             let mut cloned_jobs = cloned_jobs.clone();
+//             Box::pin(async move {
+//                 if let Err(e) = cloned_jobs
+//                     .delete_unused_file_job
+//                     .push(DeleteUnusedFileJobParams)
+//                     .await
+//                 {
+//                     error!("Failed to enqueue DeleteUnusedFileJob: {:?}", e);
+//                 }
+//             })
+//         })?)
+//         .await?;
 
-    let cloned_jobs = jobs.clone();
-    sched
-        .add(Job::new_async("at 01:01 am", move |_uuid, _l| {
-            let mut cloned_jobs = cloned_jobs.clone();
-            Box::pin(async move {
-                if let Err(e) = cloned_jobs
-                    .delete_outdate_temp_dir_job
-                    .push(DeleteOutdateTempDirJob)
-                    .await
-                {
-                    error!("Failed to enqueue DeleteOutdateTempDirJob: {:?}", e);
-                }
-            })
-        })?)
-        .await?;
+//     let cloned_jobs = jobs.clone();
+//     sched
+//         .add(Job::new_async("at 01:01 am", move |_uuid, _l| {
+//             let mut cloned_jobs = cloned_jobs.clone();
+//             Box::pin(async move {
+//                 if let Err(e) = cloned_jobs
+//                     .delete_outdate_temp_dir_job
+//                     .push(DeleteOutdateTempDirJobParams)
+//                     .await
+//                 {
+//                     error!("Failed to enqueue DeleteOutdateTempDirJob: {:?}", e);
+//                 }
+//             })
+//         })?)
+//         .await?;
 
-    let cloned_jobs = jobs.clone();
-    sched
-        .add(Job::new_async("at 02:01 am", move |_uuid, _l| {
-            let mut cloned_jobs = cloned_jobs.clone();
-            Box::pin(async move {
-                if let Err(e) = cloned_jobs
-                    .delete_outdate_log_dir_job
-                    .push(DeleteOutdateLogDirJob)
-                    .await
-                {
-                    error!("Failed to enqueue DeleteOutdateLogDirJob: {:?}", e);
-                }
-            })
-        })?)
-        .await?;
-    sched.start().await?;
-    notify.notified().await;
-    info!("Received shutdown signal, shutting down scheduler...");
-    sched.shutdown().await?;
-    info!("Scheduler shutdown complete");
-    Ok(())
-}
+//     let cloned_jobs = jobs.clone();
+//     sched
+//         .add(Job::new_async("at 02:01 am", move |_uuid, _l| {
+//             let mut cloned_jobs = cloned_jobs.clone();
+//             Box::pin(async move {
+//                 if let Err(e) = cloned_jobs
+//                     .delete_outdate_log_dir_job
+//                     .push(DeleteOutdateLogDirJobParams)
+//                     .await
+//                 {
+//                     error!("Failed to enqueue DeleteOutdateLogDirJob: {:?}", e);
+//                 }
+//             })
+//         })?)
+//         .await?;
+//     sched.start().await?;
+//     notify.notified().await;
+//     info!("Received shutdown signal, shutting down scheduler...");
+//     sched.shutdown().await?;
+//     info!("Scheduler shutdown complete");
+//     Ok(())
+// }
 
 async fn start_background_job(manager: BackgroundJobManager, notify: Arc<Notify>) -> Result<()> {
     let shutdown = async move {

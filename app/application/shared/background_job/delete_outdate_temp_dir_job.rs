@@ -3,16 +3,21 @@ use std::time::{Duration, SystemTime};
 use anyhow::Result;
 use background_job::Job;
 use futures_util::StreamExt as _;
-use infrastructure::{shared::path::TEMP_DIR, shared::provider::Provider};
+use infrastructure::shared::path::TEMP_DIR;
+use nject::injectable;
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 use tracing::warn;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
+pub struct DeleteOutdateTempDirJobParams;
+
+#[derive(Clone)]
+#[injectable]
 pub struct DeleteOutdateTempDirJob;
 
 impl Job for DeleteOutdateTempDirJob {
-    type State = Provider;
+    type Params = DeleteOutdateTempDirJobParams;
 
     const NAME: &'static str = "delete_outdate_temp_dir_job";
 
@@ -22,7 +27,7 @@ impl Job for DeleteOutdateTempDirJob {
 
     const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30);
 
-    async fn execute(_job: Self, _state: &Self::State) -> Result<()> {
+    async fn execute(&self, _params: Self::Params) -> Result<()> {
         let now = SystemTime::now();
 
         if let Ok(dir) = fs::read_dir(TEMP_DIR.as_path()).await {

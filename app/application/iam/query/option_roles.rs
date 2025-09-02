@@ -1,4 +1,4 @@
-use infrastructure::shared::{cloneable_error::CloneableError, pool::Pool};
+use infrastructure::shared::{cloneable_error::CloneableError, pool::PgPool};
 use nject::injectable;
 use single_flight::single_flight;
 
@@ -6,7 +6,7 @@ use crate::shared::dto::OptionDto;
 
 #[injectable]
 pub struct OptionRolesQueryHandler {
-    pool: Pool,
+    pool: PgPool,
 }
 
 impl OptionRolesQueryHandler {

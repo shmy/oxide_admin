@@ -1,6 +1,6 @@
 use bon::Builder;
 use domain::iam::value_object::permission_code::PermissionCode;
-use infrastructure::shared::{cloneable_error::CloneableError, pool::Pool};
+use infrastructure::shared::{cloneable_error::CloneableError, pool::PgPool};
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
@@ -47,7 +47,7 @@ pub struct SearchRolesQuery {
 #[derive(Clone)]
 #[injectable]
 pub struct SearchRolesQueryHandler {
-    pool: Pool,
+    pool: PgPool,
     #[inject(&SEARCH_CACHE)]
     cache: &'static CacheType<PagingResult<RoleDto>>,
 }

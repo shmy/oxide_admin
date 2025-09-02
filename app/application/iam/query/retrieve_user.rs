@@ -2,7 +2,7 @@ use crate::iam::dto::user::UserDto;
 use bon::Builder;
 use domain::iam::value_object::user_id::UserId;
 use domain::iam::{error::IamError, value_object::role_id::RoleId};
-use infrastructure::shared::{cloneable_error::CloneableError, pool::Pool};
+use infrastructure::shared::{cloneable_error::CloneableError, pool::PgPool};
 use nject::injectable;
 use serde::Deserialize;
 use single_flight::single_flight;
@@ -14,7 +14,7 @@ pub struct RetrieveUserQuery {
 
 #[injectable]
 pub struct RetrieveUserQueryHandler {
-    pool: Pool,
+    pool: PgPool,
 }
 
 impl RetrieveUserQueryHandler {

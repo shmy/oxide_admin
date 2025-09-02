@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use bon::Builder;
 use domain::iam::value_object::role_id::RoleId;
-use infrastructure::shared::{cloneable_error::CloneableError, pool::Pool};
+use infrastructure::shared::{cloneable_error::CloneableError, pool::PgPool};
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
@@ -49,7 +49,7 @@ pub struct SearchUsersQuery {
 #[derive(Clone)]
 #[injectable]
 pub struct SearchUsersQueryHandler {
-    pool: Pool,
+    pool: PgPool,
     #[inject(&SEARCH_CACHE)]
     cache: &'static CacheType<PagingResult<UserDto>>,
 }

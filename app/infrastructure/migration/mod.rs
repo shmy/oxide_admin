@@ -9,20 +9,20 @@ use tracing::info;
 use crate::repository::iam::role_repository::RoleRepositoryImpl;
 use crate::repository::iam::user_repository::UserRepositoryImpl;
 use crate::shared::kv::{Kv, KvTrait as _};
-use crate::shared::pool::Pool;
+use crate::shared::pool::PgPool;
 use crate::shared::provider::Provider;
 
 const INSERT_USER_ROLE_KEY: &str = "insert_user_role";
 
 pub async fn migrate(provider: &Provider) -> Result<()> {
-    let pool = provider.provide::<Pool>();
+    let pool = provider.provide::<PgPool>();
     let kv = provider.provide::<Kv>();
     sqlx::migrate!("./migration/sql").run(&pool).await?;
     insert_user_role(&pool, &kv, provider).await?;
     Ok(())
 }
 
-async fn insert_user_role(pool: &Pool, kv: &Kv, provider: &Provider) -> Result<()> {
+async fn insert_user_role(pool: &PgPool, kv: &Kv, provider: &Provider) -> Result<()> {
     let inserted = kv.get::<bool>(INSERT_USER_ROLE_KEY).unwrap_or_default();
     if inserted {
         info!("User role already inserted");

@@ -3,7 +3,7 @@ use domain::shared::id_generator::IdGenerator;
 use futures_util::stream::BoxStream;
 use infrastructure::{
     shared::chrono_tz::{ChronoTz, Duration},
-    shared::pool::Pool,
+    shared::pool::PgPool,
 };
 use nject::injectable;
 use sqlx::prelude::FromRow;
@@ -12,7 +12,7 @@ use sqlx::prelude::FromRow;
 #[injectable]
 pub struct FileService {
     ct: ChronoTz,
-    pool: Pool,
+    pool: PgPool,
 }
 
 impl FileService {

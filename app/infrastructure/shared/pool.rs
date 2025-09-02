@@ -6,7 +6,7 @@ use tracing::log::LevelFilter;
 
 use crate::shared::config::Database;
 
-pub type Pool = sqlx::Pool<sqlx::Postgres>;
+pub type PgPool = sqlx::Pool<sqlx::Postgres>;
 
 pub async fn try_new(db: &Database) -> Result<sqlx::Pool<sqlx::Postgres>> {
     let pool_connection_options: PgConnectOptions = db.url.parse()?;

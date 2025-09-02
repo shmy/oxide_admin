@@ -33,3 +33,9 @@ single_flight = { workspace = true }
 [build-dependencies]
 anyhow = { workspace = true }
 cruet = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+minijinja = { version = "2.11", default-features = false, features = [
+    "serde",
+    "loader",
+    "builtins",
+] }

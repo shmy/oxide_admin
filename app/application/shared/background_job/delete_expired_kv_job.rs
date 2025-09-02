@@ -1,17 +1,21 @@
 use anyhow::Result;
 use background_job::Job;
-use infrastructure::{
-    shared::kv::{Kv, KvTrait as _},
-    shared::provider::Provider,
-};
+use infrastructure::shared::kv::{Kv, KvTrait as _};
+use nject::injectable;
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DeleteExpiredKvJob;
+#[derive(Clone, Serialize, Deserialize)]
+pub struct DeleteExpiredKvJobParams;
+
+#[derive(Clone)]
+#[injectable]
+pub struct DeleteExpiredKvJob {
+    kv: Kv,
+}
 
 impl Job for DeleteExpiredKvJob {
-    type State = Provider;
+    type Params = DeleteExpiredKvJobParams;
 
     const NAME: &'static str = "delete_expired_kv_job";
 
@@ -21,10 +25,9 @@ impl Job for DeleteExpiredKvJob {
 
     const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30);
 
-    async fn execute(_job: Self, state: &Self::State) -> Result<()> {
-        let kv = state.provide::<Kv>();
+    async fn execute(&self, _params: Self::Params) -> Result<()> {
         info!("Start delete expired kv job");
-        let _ = kv.delete_expired();
+        let _ = self.kv.delete_expired();
         Ok(())
     }
 }
