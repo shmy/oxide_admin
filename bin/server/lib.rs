@@ -31,10 +31,10 @@ pub async fn bootstrap(config: Config) -> Result<()> {
     let listener = build_listener(&config.server).await?;
     let provider = build_provider(config).await?;
     let job_manager = build_job_manager(&provider).await?;
+    let app = adapter::routing(WebState::new(provider.clone()));
     let notify_shutdown = Arc::new(Notify::new());
     let background_job_handle =
         tokio::spawn(start_background_job(job_manager, notify_shutdown.clone()));
-    let app = adapter::routing(WebState::new(provider.clone()));
     let server_handle = tokio::spawn(start_http_server(listener, app, notify_shutdown.clone()));
     shutdown_signal().await;
     notify_shutdown.notify_waiters();
