@@ -2,7 +2,7 @@ use anyhow::Result;
 use bon::Builder;
 use domain::{
     {{module}}::{error::{{module | pascal_case }}Error, event::{{module | pascal_case }}Event, value_object::{{entity}}_id::{{entity | pascal_case}}Id},
-    shared::domain_repository::DomainRepository,
+    shared::port::domain_repository::DomainRepository,
 };
 use infrastructure::repository::{{module}}::{{entity}}_repository::{{entity | pascal_case}}RepositoryImpl;
 use nject::injectable;

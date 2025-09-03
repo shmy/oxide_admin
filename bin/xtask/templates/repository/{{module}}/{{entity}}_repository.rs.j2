@@ -1,9 +1,9 @@
 use std::result::Result;
 use sqlx::FromRow;
-use domain::{{module}}::repository::{{entity}}_repository::{{entity | pascal_case}}Repository;
+use domain::{{module}}::port::{{entity}}_repository::{{entity | pascal_case}}Repository;
 use domain::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
 use domain::{{module}}::{entity::{{entity}}::{{entity | pascal_case}}, error::{{module | pascal_case}}Error};
-use domain::shared::domain_repository::DomainRepository;
+use domain::shared::port::domain_repository::DomainRepository;
 use domain::shared::to_inner_vec::ToInnerVec;
 use nject::injectable;
 

@@ -4,7 +4,7 @@ use domain::{{module}}::error::{{module | pascal_case }}Error;
 use domain::{{module}}::event::{{module | pascal_case }}Event;
 use domain::{{module}}::entity::{{entity}}::{{entity | pascal_case}};
 use domain::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
-use domain::shared::domain_repository::DomainRepository;
+use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::{{module}}::{{entity}}_repository::{{entity | pascal_case}}RepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
