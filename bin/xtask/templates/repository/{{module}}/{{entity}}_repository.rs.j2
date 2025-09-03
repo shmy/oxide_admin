@@ -23,7 +23,7 @@ impl DomainRepository for {{entity | pascal_case}}RepositoryImpl {
 
     type Error = {{module | pascal_case}}Error;
 
-    async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, {{module | pascal_case}}Error> {
+    async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, Self::Error> {
         let row_opt = sqlx::query_as!(
             {{entity | pascal_case}}Dto,
             r#"
@@ -39,7 +39,7 @@ impl DomainRepository for {{entity | pascal_case}}RepositoryImpl {
             .ok_or({{module | pascal_case}}Error::{{entity | pascal_case}}NotFound)
     }
 
-    async fn save(&self, entity: Self::Entity) -> Result<Self::Entity, {{module | pascal_case}}Error> {
+    async fn save(&self, entity: Self::Entity) -> Result<Self::Entity, Self::Error> {
         let now = self.ct.now();
 
         sqlx::query!(

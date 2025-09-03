@@ -58,7 +58,7 @@ impl UploadService {
         tokio::try_join!(
             async {
                 let _ = file.persist(filepath);
-                anyhow::Ok(())
+                Ok(())
             },
             self.file_service.create(&relative_path)
         )?;
@@ -197,7 +197,7 @@ impl SupportedFormat {
         format: SupportedFormat,
         mut file: NamedTempFile,
         filepath: PathBuf,
-    ) -> anyhow::Result<()> {
+    ) -> Result<()> {
         if let SupportedFormat::Webp = format {
             return persist_file(file, filepath.as_path()).await;
         }
@@ -216,7 +216,7 @@ impl SupportedFormat {
             let output_file = std::fs::File::create(filepath)?;
             let mut buf_writer = std::io::BufWriter::new(output_file);
             img.write_to(&mut buf_writer, ImageFormat::WebP)?;
-            anyhow::Ok(())
+            Ok(())
         })
         .await?
     }

@@ -32,7 +32,7 @@ impl DomainRepository for UserRepositoryImpl {
 
     type Error = IamError;
 
-    async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, IamError> {
+    async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, Self::Error> {
         let row_opt = sqlx::query_as!(
             UserDto,
             r#"
@@ -46,7 +46,7 @@ impl DomainRepository for UserRepositoryImpl {
         row_opt.map(Into::into).ok_or(IamError::UserNotFound)
     }
 
-    async fn save(&self, entity: Self::Entity) -> Result<Self::Entity, IamError> {
+    async fn save(&self, entity: Self::Entity) -> Result<Self::Entity, Self::Error> {
         let now = self.ct.now();
         sqlx::query!(
             r#"

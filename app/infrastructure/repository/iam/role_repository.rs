@@ -27,7 +27,7 @@ impl DomainRepository for RoleRepositoryImpl {
 
     type Error = IamError;
 
-    async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, IamError> {
+    async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, Self::Error> {
         let row_opt = sqlx::query_as!(
             RoleDto,
             r#"
@@ -42,7 +42,7 @@ impl DomainRepository for RoleRepositoryImpl {
         row_opt.map(Into::into).ok_or(IamError::RoleNotFound)
     }
 
-    async fn save(&self, entity: Self::Entity) -> Result<Self::Entity, IamError> {
+    async fn save(&self, entity: Self::Entity) -> Result<Self::Entity, Self::Error> {
         let now = self.ct.now();
 
         sqlx::query!(
