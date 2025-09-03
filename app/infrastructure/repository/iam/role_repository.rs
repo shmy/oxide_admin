@@ -1,11 +1,11 @@
 use std::result::Result;
 
-use domain::iam::repository::role_repository::RoleRepository;
+use domain::iam::port::role_repository::RoleRepository;
 use domain::iam::value_object::permission_code::PermissionCode;
 use domain::iam::value_object::role_id::RoleId;
 use domain::iam::{entity::role::Role, error::IamError};
-use domain::shared::domain_repository::DomainRepository;
 use domain::shared::event_util::UpdatedEvent;
+use domain::shared::port::domain_repository::DomainRepository;
 use domain::shared::to_inner_vec::ToInnerVec;
 use nject::injectable;
 use sqlx::prelude::FromRow;

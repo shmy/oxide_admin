@@ -1,6 +1,6 @@
 use domain::{
     iam::error::IamError,
-    shared::token_issuer::{TokenIssuerOutput, TokenIssuerTrait, UserClaims},
+    shared::port::token_issuer::{TokenIssuerOutput, TokenIssuerTrait, UserClaims},
 };
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use nject::injectable;

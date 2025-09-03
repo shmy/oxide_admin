@@ -1,7 +1,7 @@
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use anyhow::Result;
 use bon::Builder;
-use domain::iam::repository::role_repository::RoleRepository;
+use domain::iam::port::role_repository::RoleRepository;
 use domain::iam::value_object::role_id::RoleId;
 use domain::iam::{error::IamError, event::IamEvent};
 use infrastructure::repository::iam::role_repository::RoleRepositoryImpl;

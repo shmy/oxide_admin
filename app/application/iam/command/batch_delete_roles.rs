@@ -2,7 +2,7 @@ use anyhow::Result;
 use bon::Builder;
 use domain::{
     iam::{error::IamError, event::IamEvent, value_object::role_id::RoleId},
-    shared::domain_repository::DomainRepository,
+    shared::port::domain_repository::DomainRepository,
 };
 use infrastructure::repository::iam::role_repository::RoleRepositoryImpl;
 use nject::injectable;

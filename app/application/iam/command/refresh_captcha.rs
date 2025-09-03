@@ -4,8 +4,8 @@ use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::iam::error::IamError;
 use domain::iam::event::IamEvent;
-use domain::shared::captcha_issuer::{Captcha, CaptchaIssuerTrait as _};
-use infrastructure::implementation::captcha_issuer_impl::CaptchaIssuerImpl;
+use domain::shared::port::captcha_issuer::{Captcha, CaptchaIssuerTrait as _};
+use infrastructure::port::captcha_issuer_impl::CaptchaIssuerImpl;
 use nject::injectable;
 use serde::Deserialize;
 #[derive(Deserialize, Builder)]

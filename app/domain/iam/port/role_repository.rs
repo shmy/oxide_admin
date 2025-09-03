@@ -1,6 +1,6 @@
 use crate::{
     iam::value_object::role_id::RoleId,
-    shared::{domain_repository::DomainRepository, event_util::UpdatedEvent},
+    shared::{event_util::UpdatedEvent, port::domain_repository::DomainRepository},
 };
 
 pub trait RoleRepository: DomainRepository {

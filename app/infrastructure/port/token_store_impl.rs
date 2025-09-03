@@ -1,4 +1,4 @@
-use domain::{iam::error::IamError, shared::token_store::TokenStoreTrait};
+use domain::{iam::error::IamError, shared::port::token_store::TokenStoreTrait};
 use nject::injectable;
 use sqlx::types::chrono::{DateTime, Utc};
 

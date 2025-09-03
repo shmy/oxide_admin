@@ -3,12 +3,12 @@ use anyhow::{Result, bail};
 use domain::iam::value_object::permission_code::{ALL_PERMISSIONS, NONE, PermissionCode};
 use domain::iam::value_object::permission_group::PermissionGroup;
 use domain::iam::value_object::user_id::UserId;
-use domain::shared::permission_resolver::PermissionResolver;
-use domain::shared::token_issuer::{TokenIssuerTrait, UserClaims};
-use domain::shared::token_store::TokenStoreTrait;
-use infrastructure::implementation::permission_resolver_impl::PermissionResolverImpl;
-use infrastructure::implementation::token_issuer_impl::TokenIssuerImpl;
-use infrastructure::implementation::token_store_impl::TokenStoreImpl;
+use domain::shared::port::permission_resolver::PermissionResolver;
+use domain::shared::port::token_issuer::{TokenIssuerTrait, UserClaims};
+use domain::shared::port::token_store::TokenStoreTrait;
+use infrastructure::port::permission_resolver_impl::PermissionResolverImpl;
+use infrastructure::port::token_issuer_impl::TokenIssuerImpl;
+use infrastructure::port::token_store_impl::TokenStoreImpl;
 use infrastructure::shared::config::Config;
 use nject::injectable;
 

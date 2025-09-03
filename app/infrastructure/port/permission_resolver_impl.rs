@@ -3,7 +3,7 @@ use domain::iam::value_object::permission_code::{ALL_PERMISSIONS, PermissionCode
 use domain::iam::value_object::permission_group::PermissionGroup;
 use domain::iam::value_object::role_id::RoleId;
 use domain::iam::value_object::user_id::UserId;
-use domain::shared::permission_resolver::PermissionResolver;
+use domain::shared::port::permission_resolver::PermissionResolver;
 use domain::shared::to_inner_vec::ToInnerVec;
 use moka::future::Cache;
 use nject::injectable;

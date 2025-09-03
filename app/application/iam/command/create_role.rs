@@ -4,7 +4,7 @@ use domain::iam::error::IamError;
 use domain::iam::event::IamEvent;
 use domain::iam::value_object::permission_code::PermissionCode;
 use domain::iam::{entity::role::Role, value_object::role_id::RoleId};
-use domain::shared::domain_repository::DomainRepository;
+use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::iam::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;

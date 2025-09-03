@@ -2,8 +2,8 @@ use captcha_generator::CaptchaTrait as _;
 use domain::{
     iam::error::IamError,
     shared::{
-        captcha_issuer::{Captcha, CaptchaIssuerTrait},
         id_generator::IdGenerator,
+        port::captcha_issuer::{Captcha, CaptchaIssuerTrait},
     },
 };
 use nject::injectable;

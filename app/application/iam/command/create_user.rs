@@ -7,7 +7,7 @@ use domain::iam::{
     entity::user::User, value_object::hashed_password::HashedPassword,
     value_object::user_id::UserId,
 };
-use domain::shared::domain_repository::DomainRepository;
+use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use infrastructure::shared::hmac_util::HmacUtil;
 use nject::injectable;

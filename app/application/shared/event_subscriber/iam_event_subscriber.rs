@@ -3,10 +3,9 @@ use crate::{
     shared::event::Event,
     system::service::file_service::FileService,
 };
-use domain::{iam::event::IamEvent, shared::permission_resolver::PermissionResolver};
+use domain::{iam::event::IamEvent, shared::port::permission_resolver::PermissionResolver};
 use infrastructure::{
-    implementation::permission_resolver_impl::PermissionResolverImpl,
-    shared::event_bus::EventSubscriber,
+    port::permission_resolver_impl::PermissionResolverImpl, shared::event_bus::EventSubscriber,
 };
 use nject::injectable;
 

@@ -7,10 +7,10 @@ use domain::{
     iam::{
         entity::user::User,
         error::IamError,
-        repository::user_repository::UserRepository,
+        port::user_repository::UserRepository,
         value_object::{hashed_password::HashedPassword, user_id::UserId},
     },
-    shared::domain_repository::DomainRepository,
+    shared::port::domain_repository::DomainRepository,
 };
 use nject::injectable;
 use sqlx::prelude::FromRow;
