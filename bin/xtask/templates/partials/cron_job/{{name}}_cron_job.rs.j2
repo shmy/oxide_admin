@@ -1,0 +1,18 @@
+use anyhow::Result;
+use background_job::CronJob;
+use nject::injectable;
+
+#[derive(Clone)]
+#[injectable]
+pub struct {{name | pascal_case}}CronJob;
+
+impl CronJob for {{name | pascal_case}}CronJob {
+    const NAME: &'static str = "{{name}}_cron_job";
+    const SCHEDULE: &'static str = "every 5 seconds";
+    const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30);
+
+    async fn execute(&self) -> Result<()> {
+
+        Ok(())
+    }
+}
