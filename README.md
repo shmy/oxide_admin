@@ -59,7 +59,7 @@ oxide_admin/
 │   ├── application/        # 应用层 (用例/服务)
 │   ├── domain/             # 领域层 (实体/值对象)
 │   ├── infrastructure/     # 基础设施层 (技术实现)
-│         └── implementation/   # 领域实现
+│         └── port/             # 领域实现
 │         └── migration/        # 数据库迁移
 │         └── repository/       # 仓储实现
 ├── frontend/             # 前端应用
@@ -79,8 +79,8 @@ cd oxide_admin
 docker compose up -d
 # setup env
 cp .env.example .env
-# install sqlx-cli
-cargo install sqlx-cli
+# install sqlx-cli & cargo-watch
+cargo install sqlx-cli cargo-watch
 # setup sqlx migration
 just setup
 ```
@@ -116,4 +116,15 @@ just build_windows_x86_64_msvc
 - 编译Docker image
 ```bash
 just build_container
+```
+
+## 📃 代码生成
+### CRUD 生成
+```bash
+cargo g scaffold -h
+```
+
+### 更多详见
+```bash
+cargo g -h
 ```
