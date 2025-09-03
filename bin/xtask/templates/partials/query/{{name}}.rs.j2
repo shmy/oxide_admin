@@ -1,0 +1,20 @@
+use anyhow::Result;
+use crate::iam::dto::user::UserDto;
+use bon::Builder;
+use nject::injectable;
+use serde::Deserialize;
+
+#[derive(Deserialize, Builder)]
+pub struct {{name | pascal_case}}Query {
+}
+
+#[injectable]
+pub struct {{name | pascal_case}}QueryHandler {
+}
+
+impl {{name | pascal_case}}QueryHandler {
+    pub async fn query(&self, _query: {{name | pascal_case}}Query) -> Result<UserDto> {
+
+        todo!()
+    }
+}

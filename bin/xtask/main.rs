@@ -60,32 +60,10 @@ async fn main() -> Result<()> {
             generate_module(sub_command_args, GenerateModuleType::Repository, db).await
         }
         SubCommands::Ch => {
-            let base = APP_DIR.join("application");
-            let name = Text::new("What's command name?").prompt()?.to_snake_case();
-            let modules: Vec<String> = list_modules(&base).await?;
-            let module = Select::new("What's your module choice?", modules).prompt()?;
-            let command_dir = base.join(&module).join("command");
-            fs::create_dir_all(&command_dir).await?;
-            let file_path = command_dir.join(format!("{name}.rs"));
-            let context = context! {
-                name => name,
-                module => module,
-            };
-            let template = TemplateEngine::from("partials/command").with_context(context);
-            template.render_to(&command_dir).await?;
-            println!("{:?}", file_path);
-            Ok(())
+            generate_application_partials(APP_DIR.join("application"), "command").await
         }
         SubCommands::Qh => {
-            let base = PathBuf::from("app/application");
-            let name = Text::new("What's query name?").prompt()?.to_snake_case();
-            let modules: Vec<String> = list_modules("app/application").await?;
-            let module = Select::new("What's your module choice?", modules).prompt()?;
-            let command_dir = base.join(module).join("query");
-            fs::create_dir_all(&command_dir).await?;
-            let file_path = command_dir.join(format!("{name}.rs"));
-            println!("{:?}", file_path);
-            Ok(())
+            generate_application_partials(APP_DIR.join("application"), "query").await
         }
     }?;
 
@@ -174,4 +152,19 @@ async fn list_modules(base: impl AsRef<Path>) -> Result<Vec<String>> {
     }
 
     Ok(modules)
+}
+
+async fn generate_application_partials(base: PathBuf, dir_name: &str) -> Result<()> {
+    let name = Text::new("What's name?").prompt()?.to_snake_case();
+    let modules: Vec<String> = list_modules(&base).await?;
+    let module = Select::new("What's your module choice?", modules).prompt()?;
+    let sub_dir = base.join(&module).join(dir_name);
+    fs::create_dir_all(&sub_dir).await?;
+    let context = context! {
+        name => name,
+        module => module,
+    };
+    let template = TemplateEngine::from(&format!("partials/{dir_name}")).with_context(context);
+    template.render_to(&sub_dir).await?;
+    Ok(())
 }
