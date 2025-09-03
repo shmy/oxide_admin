@@ -65,6 +65,25 @@ async fn main() -> Result<()> {
         SubCommands::Qh => {
             generate_application_partials(APP_DIR.join("application"), "query").await
         }
+        SubCommands::Job => {
+            todo!()
+        }
+        SubCommands::Event => {
+            let name = Text::new("What's name?").prompt()?.to_snake_case();
+            let context = context! {
+                name => name,
+            };
+            let template = TemplateEngine::from("partials/event").with_context(context);
+            template
+                .render_to(
+                    APP_DIR
+                        .join("application")
+                        .join("shared")
+                        .join("event_subscriber"),
+                )
+                .await?;
+            Ok(())
+        }
     }?;
 
     Command::new("cargo")

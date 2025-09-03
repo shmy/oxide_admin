@@ -25,6 +25,10 @@ pub enum SubCommands {
     Ch,
     /// Generate QueryHandler
     Qh,
+    /// Generate JobHandler
+    Job,
+    /// Generate EventHandler
+    Event,
 }
 
 #[derive(Debug, Args)]
