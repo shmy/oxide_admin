@@ -6,7 +6,7 @@ use std::{
 use anyhow::Result;
 use clap::Parser;
 use cruet::Inflector;
-use inquire::{Select, Text};
+use inquire::{Select, Text, validator::ValueRequiredValidator};
 use minijinja::context;
 use tokio::{fs, process::Command};
 
@@ -59,17 +59,39 @@ async fn main() -> Result<()> {
         SubCommands::Repository(sub_command_args) => {
             generate_module(sub_command_args, GenerateModuleType::Repository, db).await
         }
-        SubCommands::Ch => {
+        SubCommands::Command => {
             generate_application_partials(APP_DIR.join("application"), "command").await
         }
-        SubCommands::Qh => {
+        SubCommands::Query => {
             generate_application_partials(APP_DIR.join("application"), "query").await
         }
         SubCommands::Job => {
-            todo!()
+            let name = Text::new("What's name?")
+                .with_validator(ValueRequiredValidator::default())
+                .prompt()?
+                .to_snake_case();
+            let job_types: Vec<&str> = vec!["job", "cron_job", "stepped_job"];
+            let r#type = Select::new("What's your job type choice?", job_types).prompt()?;
+            let context = context! {
+                name => name,
+            };
+            let template =
+                TemplateEngine::from(&format!("partials/{}", r#type)).with_context(context);
+            template
+                .render_to(
+                    APP_DIR
+                        .join("application")
+                        .join("shared")
+                        .join("background_job"),
+                )
+                .await?;
+            Ok(())
         }
         SubCommands::Event => {
-            let name = Text::new("What's name?").prompt()?.to_snake_case();
+            let name = Text::new("What's name?")
+                .with_validator(ValueRequiredValidator::default())
+                .prompt()?
+                .to_snake_case();
             let context = context! {
                 name => name,
             };
@@ -174,7 +196,10 @@ async fn list_modules(base: impl AsRef<Path>) -> Result<Vec<String>> {
 }
 
 async fn generate_application_partials(base: PathBuf, dir_name: &str) -> Result<()> {
-    let name = Text::new("What's name?").prompt()?.to_snake_case();
+    let name = Text::new("What's name?")
+        .with_validator(ValueRequiredValidator::default())
+        .prompt()?
+        .to_snake_case();
     let modules: Vec<String> = list_modules(&base).await?;
     let module = Select::new("What's your module choice?", modules).prompt()?;
     let sub_dir = base.join(&module).join(dir_name);

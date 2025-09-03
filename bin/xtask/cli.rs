@@ -21,13 +21,13 @@ pub enum SubCommands {
     Domain(SubCommandArgs),
     /// Generate repository only
     Repository(SubCommandArgs),
-    /// Generate CommandHandler
-    Ch,
-    /// Generate QueryHandler
-    Qh,
-    /// Generate JobHandler
+    /// Generate command and command handler
+    Command,
+    /// Generate query and query handler
+    Query,
+    /// Generate job
     Job,
-    /// Generate EventHandler
+    /// Generate event subscriber
     Event,
 }
 
