@@ -182,12 +182,12 @@ async fn list_modules(base: impl AsRef<Path>) -> Result<Vec<String>> {
 
     while let Some(entry) = entries.next_entry().await? {
         let path = entry.path();
-        if path.is_dir() {
-            if let Some(name) = path.file_name() {
-                let name = name.to_string_lossy().to_string();
-                if name != "shared" {
-                    modules.push(name);
-                }
+        if path.is_dir()
+            && let Some(name) = path.file_name()
+        {
+            let name = name.to_string_lossy().to_string();
+            if name != "shared" {
+                modules.push(name);
             }
         }
     }
