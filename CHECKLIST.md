@@ -29,7 +29,7 @@
 [x] Repository models generation
 [x] Job code generation
 [x] Cron Job code generation
-[ ] Stepped Job code generation
+[x] Stepped Job code generation
 [x] Event code generation
 [x] Command code generation
 [x] Query code generation
