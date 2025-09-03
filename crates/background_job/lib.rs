@@ -16,6 +16,8 @@ use serde::{Serialize, de::DeserializeOwned};
 use std::{str::FromStr as _, sync::Arc, time::Duration};
 pub type JobStorage<T> = SqliteStorage<T>;
 pub type SteppedJobStorage = SqliteStorage<StepRequest<String>>;
+pub type SteppedJobBuilder<T> =
+    StepBuilder<SqlContext, String, <T as SteppedJob>::Params, (), JsonCodec<String>, usize>;
 
 pub struct BackgroundJobManager {
     pool: sqlx::SqlitePool,
@@ -128,7 +130,7 @@ pub trait SteppedJob: Clone + Send + Sync + Unpin + 'static {
     const NAME: &'static str;
     const CONCURRENCY: usize;
 
-    fn steps() -> StepBuilder<SqlContext, String, Self::Params, (), JsonCodec<String>, usize>;
+    fn steps() -> SteppedJobBuilder<Self>;
 }
 
 pub trait CronJob: Clone + Send + Sync + Unpin + 'static {

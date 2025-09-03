@@ -129,7 +129,7 @@ pub struct JobContext {
 }
 
 const JOB_TEMPLATE: &str = r#"#[allow(unused_imports)]
-use background_job::{BackgroundJobManager, JobStorage};
+use background_job::{BackgroundJobManager, JobStorage, SteppableStorage, SteppedJobStorage};
 #[allow(unused_imports)]
 use infrastructure::shared::provider::Provider;
 #[allow(unused_imports)]
@@ -145,6 +145,13 @@ pub fn register_jobs(manager: BackgroundJobManager, provider: &Provider) -> Back
     let storage = JobStorage::new(provider.provide());
     let manager = manager.register::<{{job}}::{{job | pascal_case}}>(provider.provide(), storage);
     tracing::info!("Job [{{job | pascal_case}}] has been registered");
+    {%- endfor %}
+
+    {%- for job in stepped_jobs %}
+
+    let storage = SteppedJobStorage::new(provider.provide());
+    let manager = manager.register_stepped::<{{job}}::{{job | pascal_case}}>(storage);
+    tracing::info!("Stepped job [{{job | pascal_case}}] has been registered");
     {%- endfor %}
 
     {%- for job in cron_jobs %}
@@ -166,6 +173,23 @@ impl {{item | pascal_case}}Dispatcher {
     pub async fn dispatch(&mut self, params: {{item}}::{{item | pascal_case}}Params) {
         if let Err(err) = self.storage.push(params).await {
             tracing::error!(%err, "Failed to push [{{item | pascal_case}}]");
+        }
+    }
+}
+{%- endfor %}
+
+{%- for item in stepped_jobs %}
+
+#[injectable]
+pub struct {{item | pascal_case}}Dispatcher {
+    #[inject(|sqlite_pool: SqlitePool| SteppedJobStorage::new(sqlite_pool) )]
+    pub storage: SteppedJobStorage,
+}
+
+impl {{item | pascal_case}}Dispatcher {
+    pub async fn dispatch(&mut self, params: {{item}}::{{item | pascal_case}}Step1) {
+        if let Err(err) = self.storage.start_stepped(params).await {
+            tracing::error!(%err, "Failed to start_stepped [{{item | pascal_case}}]");
         }
     }
 }
