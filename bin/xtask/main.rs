@@ -1,18 +1,23 @@
-use std::{path::PathBuf, sync::LazyLock};
+use std::{
+    path::{Path, PathBuf},
+    sync::LazyLock,
+};
 
 use anyhow::Result;
 use clap::Parser;
 use cruet::Inflector;
+use inquire::{Select, Text};
 use minijinja::context;
-use tokio::process::Command;
+use tokio::{fs, process::Command};
 
 use crate::{
-    cli::{Cli, SubCommands},
-    database::TableInfoTrait,
+    cli::{Cli, SubCommandArgs, SubCommands},
+    database::{TableInfoTrait, postgres::Postgres},
     generate::{
         api::generate_api, application::generate_application, domain::generate_domain,
         repository::generate_repository,
     },
+    template::TemplateEngine,
 };
 
 mod cli;
@@ -38,13 +43,74 @@ async fn main() -> Result<()> {
     dotenv::dotenv().ok();
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL provided");
     let db = database::postgres::Postgres::new(&database_url).await?;
-    let args = match &cli.command {
-        SubCommands::Scaffold(sub_command_args) => sub_command_args,
-        SubCommands::Api(sub_command_args) => sub_command_args,
-        SubCommands::Application(sub_command_args) => sub_command_args,
-        SubCommands::Domain(sub_command_args) => sub_command_args,
-        SubCommands::Repository(sub_command_args) => sub_command_args,
-    };
+    match &cli.command {
+        SubCommands::Scaffold(sub_command_args) => {
+            generate_module(sub_command_args, GenerateModuleType::Scaffold, db).await
+        }
+        SubCommands::Api(sub_command_args) => {
+            generate_module(sub_command_args, GenerateModuleType::Api, db).await
+        }
+        SubCommands::Application(sub_command_args) => {
+            generate_module(sub_command_args, GenerateModuleType::Application, db).await
+        }
+        SubCommands::Domain(sub_command_args) => {
+            generate_module(sub_command_args, GenerateModuleType::Domain, db).await
+        }
+        SubCommands::Repository(sub_command_args) => {
+            generate_module(sub_command_args, GenerateModuleType::Repository, db).await
+        }
+        SubCommands::Ch => {
+            let base = APP_DIR.join("application");
+            let name = Text::new("What's command name?").prompt()?.to_snake_case();
+            let modules: Vec<String> = list_modules(&base).await?;
+            let module = Select::new("What's your module choice?", modules).prompt()?;
+            let command_dir = base.join(&module).join("command");
+            fs::create_dir_all(&command_dir).await?;
+            let file_path = command_dir.join(format!("{name}.rs"));
+            let context = context! {
+                name => name,
+                module => module,
+            };
+            let template = TemplateEngine::from("partials/command").with_context(context);
+            template.render_to(&command_dir).await?;
+            println!("{:?}", file_path);
+            Ok(())
+        }
+        SubCommands::Qh => {
+            let base = PathBuf::from("app/application");
+            let name = Text::new("What's query name?").prompt()?.to_snake_case();
+            let modules: Vec<String> = list_modules("app/application").await?;
+            let module = Select::new("What's your module choice?", modules).prompt()?;
+            let command_dir = base.join(module).join("query");
+            fs::create_dir_all(&command_dir).await?;
+            let file_path = command_dir.join(format!("{name}.rs"));
+            println!("{:?}", file_path);
+            Ok(())
+        }
+    }?;
+
+    Command::new("cargo")
+        .arg("fmt")
+        .arg("--all")
+        .current_dir(ROOT_DIR.as_path())
+        .status()
+        .await?;
+    Ok(())
+}
+
+enum GenerateModuleType {
+    Scaffold,
+    Domain,
+    Repository,
+    Api,
+    Application,
+}
+
+async fn generate_module(
+    args: &SubCommandArgs,
+    r#type: GenerateModuleType,
+    db: Postgres,
+) -> Result<()> {
     let module = args.module.to_string();
     let entity = args.entity.to_string();
     let table = args.table.clone();
@@ -74,12 +140,12 @@ async fn main() -> Result<()> {
         fields => fields,
         domain_fields => domain_fields,
     };
-    match cli.command {
-        SubCommands::Api(_) => generate_api(context).await?,
-        SubCommands::Application(_) => generate_application(context).await?,
-        SubCommands::Domain(_) => generate_domain(context).await?,
-        SubCommands::Repository(_) => generate_repository(context).await?,
-        SubCommands::Scaffold(_) => {
+    match r#type {
+        GenerateModuleType::Api => generate_api(context).await?,
+        GenerateModuleType::Application => generate_application(context).await?,
+        GenerateModuleType::Domain => generate_domain(context).await?,
+        GenerateModuleType::Repository => generate_repository(context).await?,
+        GenerateModuleType::Scaffold => {
             tokio::try_join!(
                 generate_api(context.clone()),
                 generate_application(context.clone()),
@@ -88,10 +154,24 @@ async fn main() -> Result<()> {
             )?;
         }
     }
-    Command::new("cargo")
-        .arg("fmt")
-        .current_dir(ROOT_DIR.as_path())
-        .status()
-        .await?;
     Ok(())
+}
+
+async fn list_modules(base: impl AsRef<Path>) -> Result<Vec<String>> {
+    let mut entries = fs::read_dir(base).await?;
+    let mut modules = Vec::new();
+
+    while let Some(entry) = entries.next_entry().await? {
+        let path = entry.path();
+        if path.is_dir() {
+            if let Some(name) = path.file_name() {
+                let name = name.to_string_lossy().to_string();
+                if name != "shared" {
+                    modules.push(name);
+                }
+            }
+        }
+    }
+
+    Ok(modules)
 }

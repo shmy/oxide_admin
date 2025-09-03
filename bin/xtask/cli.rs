@@ -11,15 +11,20 @@ pub struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub enum SubCommands {
+    /// Generate api application domain repository together
     Scaffold(SubCommandArgs),
+    /// Generate api only
     Api(SubCommandArgs),
+    /// Generate application only
     Application(SubCommandArgs),
+    /// Generate domain only
     Domain(SubCommandArgs),
+    /// Generate repository only
     Repository(SubCommandArgs),
-    // /// CommandHandler
-    // Ch,
-    // /// QueryHandler
-    // Qh,
+    /// Generate CommandHandler
+    Ch,
+    /// Generate QueryHandler
+    Qh,
 }
 
 #[derive(Debug, Args)]

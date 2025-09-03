@@ -1,0 +1,29 @@
+use nject::injectable;
+use crate::shared::command_handler::{CommandHandler, CommandResult};
+use domain::{{module}}::{error::{{module | pascal_case}}Error, event::{{module | pascal_case}}Event};
+use bon::Builder;
+use serde::Deserialize;
+
+#[derive(Deserialize, Builder)]
+pub struct {{name | pascal_case}}Command {
+}
+
+#[injectable]
+pub struct {{name | pascal_case}}CommandHandler {
+}
+
+impl CommandHandler for {{name | pascal_case}}CommandHandler {
+    type Command = {{name | pascal_case}}Command;
+    type Output = ();
+    type Event = {{module | pascal_case}}Event;
+    type Error = {{module | pascal_case}}Error;
+
+    async fn execute(
+            &self,
+            cmd: Self::Command,
+        ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+        todo!();
+
+        Ok(CommandResult::without_events(todo!()))
+    }
+}
