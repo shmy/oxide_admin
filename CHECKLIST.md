@@ -27,10 +27,12 @@
 [x] Job auto register
 [x] 验证码
 [x] Repository models generation
-[ ] Job code generation
-[ ] Event code generation
-[ ] Command code generation
-[ ] Query code generation
+[x] Job code generation
+[x] Cron Job code generation
+[ ] Stepped Job code generation
+[x] Event code generation
+[x] Command code generation
+[x] Query code generation
 [ ] Frontend code generation
 [ ] 单元测试
 [ ] l10n

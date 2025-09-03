@@ -12,7 +12,7 @@ impl CronJob for {{name | pascal_case}}CronJob {
     const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30);
 
     async fn execute(&self) -> Result<()> {
-
+        tracing::info!("{{name}}_cron_job executing");
         Ok(())
     }
 }
