@@ -187,7 +187,7 @@ pub struct {{item | pascal_case}}Dispatcher {
 }
 
 impl {{item | pascal_case}}Dispatcher {
-    pub async fn dispatch(&mut self, params: {{item}}::{{item | pascal_case}}Step1) {
+    pub async fn dispatch(&mut self, params: {{item}}::{{item | pascal_case}}Begin) {
         if let Err(err) = self.storage.start_stepped(params).await {
             tracing::error!(%err, "Failed to start_stepped [{{item | pascal_case}}]");
         }

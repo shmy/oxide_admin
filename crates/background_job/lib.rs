@@ -17,7 +17,7 @@ use std::{str::FromStr as _, sync::Arc, time::Duration};
 pub type JobStorage<T> = SqliteStorage<T>;
 pub type SteppedJobStorage = SqliteStorage<StepRequest<String>>;
 pub type SteppedJobBuilder<T> =
-    StepBuilder<SqlContext, String, <T as SteppedJob>::Params, (), JsonCodec<String>, usize>;
+    StepBuilder<SqlContext, String, <T as SteppedJob>::Begin, (), JsonCodec<String>, usize>;
 
 pub struct BackgroundJobManager {
     pool: sqlx::SqlitePool,
@@ -126,7 +126,7 @@ pub trait Job: Clone + Send + Sync + Unpin + 'static {
 }
 
 pub trait SteppedJob: Clone + Send + Sync + Unpin + 'static {
-    type Params: JobParams;
+    type Begin: JobParams;
     const NAME: &'static str;
     const CONCURRENCY: usize;
 
