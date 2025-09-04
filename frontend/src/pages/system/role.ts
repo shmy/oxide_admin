@@ -30,7 +30,7 @@ const buildDrawer = (isAdd = true) => {
     disabledOn: "this.privileged",
     drawer: {
       title: title,
-      size: "lg",
+      size: "md",
       body: {
         type: "form",
         canAccessSuperData: false,
@@ -55,7 +55,7 @@ const buildDrawer = (isAdd = true) => {
           {
             type: "tree-select",
             name: "permission_ids",
-            label: "权限列表",
+            label: "角色权限",
             source: "/options/permissions",
             labelField: "label",
             valueField: "key",
@@ -92,35 +92,30 @@ const schema = {
   body: buildCrudTable({
     endpoint,
     filter: [
-      [
-        {
-          type: "input-text",
-          name: "name",
-          label: "角色名称",
-          placeholder: "请输入角色名称",
-          clearable: true,
-        },
-        {
-          type: "select",
-          name: "enabled",
-          label: "角色状态",
-          placeholder: "请选择角色状态",
-          clearable: true,
-          options: enabledStatuses,
-        },
-        {
-          type: "tree-select",
-          name: "permission_id",
-          label: "角色权限",
-          source: permissionEndpoint,
-          placeholder: "请选择权限",
-          labelField: "label",
-          valueField: "key",
-        },
-        {
-          type: "hidden",
-        },
-      ],
+      {
+        type: "input-text",
+        name: "name",
+        label: "角色名称",
+        placeholder: "请输入角色名称",
+        clearable: true,
+      },
+      {
+        type: "select",
+        name: "enabled",
+        label: "角色状态",
+        placeholder: "请选择角色状态",
+        clearable: true,
+        options: enabledStatuses,
+      },
+      {
+        type: "tree-select",
+        name: "permission_id",
+        label: "角色权限",
+        source: permissionEndpoint,
+        placeholder: "请选择权限",
+        labelField: "label",
+        valueField: "key",
+      },
     ],
     headerToolbar: [buildDrawer()],
     bulkActions: [
@@ -166,7 +161,7 @@ const schema = {
       {
         type: "tree-select",
         name: "permission_ids",
-        label: "权限列表",
+        label: "角色权限",
         static: true,
         source: permissionEndpoint,
         labelField: "label",

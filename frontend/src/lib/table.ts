@@ -1,10 +1,13 @@
-const buildFilter = (items?: any[][]) => {
+import { chunk } from "es-toolkit";
+
+const buildFilter = (items?: any[]) => {
   if (!items || items.length === 0) {
     return null;
   }
+  let chunks = chunk(items, 4);
   return {
     title: "",
-    body: items.map((body) => {
+    body: chunks.map((body) => {
       return {
         type: "group",
         mode: "horizontal",
@@ -15,7 +18,7 @@ const buildFilter = (items?: any[][]) => {
         body: body.map((item) => {
           return {
             ...item,
-            columnRatio: 12 / body.length,
+            columnRatio: 3,
           };
         }),
       };
@@ -28,7 +31,7 @@ const buildFilter = (items?: any[][]) => {
         label: "查询",
       },
       {
-        icon: "fas fa-arrow-right-arrow-left",
+        icon: "fas fa-broom",
         type: "reset",
         label: "重置",
       },
@@ -40,7 +43,7 @@ type buildCrudTableProps = {
   endpoint: string;
   deleteEndpoint?: string;
   componentId?: string;
-  filter?: any[][];
+  filter?: any[];
   headerToolbar?: any[];
   bulkActions?: any[];
   operations?: any[];
