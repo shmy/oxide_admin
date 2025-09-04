@@ -2,8 +2,13 @@ import { logoUrl } from "../../lib/constant";
 import { enabledStatuses } from "../../lib/options";
 import { buildCrudTable } from "../../lib/table";
 
-export { };
+export {};
 const endpoint = "/users";
+const roleEndpoint = {
+  method: "get",
+  url: "/options/roles",
+  cache: 10000,
+};
 
 const buildDrawer = (isAdd = true) => {
   const label = isAdd ? "创建用户" : null;
@@ -177,11 +182,7 @@ const schema = {
           searchable: true,
           clearable: true,
           placeholder: "请选择角色",
-          source: {
-            method: "get",
-            url: "/options/roles",
-            cache: 10000,
-          },
+          source: roleEndpoint,
         },
         ,
       ],

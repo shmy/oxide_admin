@@ -30,7 +30,7 @@ const buildDropdown = () => {
   return {
     type: "dropdown-button",
     style: {
-      "--portrait-url": `url(\${user.portrait}), url('${logoUrl}')`,
+      "--portrait-url": `url('\${user.portrait}'), url('${logoUrl}')`,
     },
     className: "header-dropdown",
     label: "${user.name}(${user.account})",
@@ -79,11 +79,9 @@ const schemas = {
   logo: assetPrefix + "/static/image/logo.png",
   api: "/profile/current",
   asideBefore: {
-    "type": "container",
-    "className": "text-center my-2 hidden m:block",
-    "body": [
-      buildDropdown()
-    ]
+    type: "container",
+    className: "text-center my-2 hidden m:block",
+    body: [buildDropdown()],
   },
   header: {
     type: "container",

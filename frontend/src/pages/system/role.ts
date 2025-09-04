@@ -3,6 +3,11 @@ import { buildCrudTable } from "../../lib/table";
 
 export {};
 const endpoint = "/roles";
+const permissionEndpoint = {
+  method: "get",
+  url: "/options/permissions",
+  cache: 10000,
+};
 
 const buildDrawer = (isAdd = true) => {
   const label = isAdd ? "创建角色" : null;
@@ -107,11 +112,7 @@ const schema = {
           type: "tree-select",
           name: "permission_id",
           label: "角色权限",
-          source: {
-            method: "get",
-            url: "/options/permissions",
-            cache: 10000,
-          },
+          source: permissionEndpoint,
           placeholder: "请选择权限",
           labelField: "label",
           valueField: "key",
@@ -167,11 +168,7 @@ const schema = {
         name: "permission_ids",
         label: "权限列表",
         static: true,
-        source: {
-          method: "get",
-          url: "/options/permissions",
-          cache: 10000,
-        },
+        source: permissionEndpoint,
         labelField: "label",
         valueField: "key",
       },
