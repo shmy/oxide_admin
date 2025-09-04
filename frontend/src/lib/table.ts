@@ -115,6 +115,8 @@ export const buildCrudTable = (props: buildCrudTableProps) => {
     perPage: 20,
     syncLocation: true,
     autoGenerateFilter: false,
+    rowClassNameExpr: "${index % 2 ? 'bg-gray-50' : null}",
+
     filter: buildFilter(props.filter),
     headerToolbar: [
       "bulkActions",
