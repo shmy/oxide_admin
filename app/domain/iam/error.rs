@@ -43,6 +43,6 @@ pub enum IamError {
     #[error("{0}")]
     Password(#[from] PasswordError),
 
-    #[error("数据库错误: {0}")]
+    #[error("{0}")]
     DatabaseError(#[from] sqlx::Error),
 }

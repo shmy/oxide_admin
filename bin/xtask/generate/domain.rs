@@ -63,7 +63,7 @@ fn append_error(path: &Path, module: &str, entity: &str) -> Result<()> {
         &format!("{}NotFound", entity.to_pascal_case()),
         Span::call_site(),
     );
-    let notfound_error_message = format!("{} 不存在", entity.to_pascal_case());
+    let notfound_error_message = format!("{}不存在", entity.to_pascal_case());
 
     for item in &mut syntax.items {
         if let Item::Enum(ItemEnum {
