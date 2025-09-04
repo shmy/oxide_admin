@@ -56,9 +56,15 @@ const buildDrawer = (isAdd = true) => {
           {
             type: "input-text",
             name: "account",
-            label: "用户账号",
+            label: "登录账号",
             required: true,
             disabledOn: "this.privileged",
+          },
+          {
+            type: isAdd ? "input-password" : "hidden",
+            name: "password",
+            label: "登录密码",
+            required: isAdd,
           },
           {
             type: "input-image",
@@ -71,12 +77,6 @@ const buildDrawer = (isAdd = true) => {
               width: 180,
               height: 180,
             },
-          },
-          {
-            type: isAdd ? "input-password" : "hidden",
-            name: "password",
-            label: "用户密码",
-            required: isAdd,
           },
           {
             type: "select",
@@ -161,8 +161,8 @@ const schema = {
         {
           type: "input-text",
           name: "account",
-          label: "用户账号",
-          placeholder: "请输入用户账号",
+          label: "登录账号",
+          placeholder: "请输入登录账号",
           clearable: true,
         },
         {
@@ -240,7 +240,7 @@ const schema = {
       },
       {
         name: "account",
-        label: "用户账号",
+        label: "登录账号",
       },
       {
         name: "role_names",
