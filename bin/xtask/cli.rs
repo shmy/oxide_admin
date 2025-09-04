@@ -21,6 +21,8 @@ pub enum SubCommands {
     Domain(SubCommandArgs),
     /// Generate repository only
     Repository(SubCommandArgs),
+    /// Generate frontend only
+    Frontend(SubCommandArgs),
     /// Generate command and command handler
     Command,
     /// Generate query and query handler

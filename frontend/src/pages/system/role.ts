@@ -91,7 +91,7 @@ const schema = {
   type: "page",
   body: buildCrudTable({
     endpoint,
-    filter: [
+    filters: [
       {
         type: "input-text",
         name: "name",

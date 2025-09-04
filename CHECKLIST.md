@@ -34,8 +34,8 @@
 [x] Command code generation
 [x] Query code generation
 [ ] Frontend code generation
-[ ] 单元测试
-[ ] l10n
+[-] 单元测试
+[-] l10n
 [-] 审计 现在只是log
 [x] data目录
 [x] 定时任务

@@ -15,7 +15,7 @@ use crate::{
     database::{TableInfoTrait, postgres::Postgres},
     generate::{
         api::generate_api, application::generate_application, domain::generate_domain,
-        repository::generate_repository,
+        frontend::generate_frontend, repository::generate_repository,
     },
     template::TemplateEngine,
 };
@@ -58,6 +58,9 @@ async fn main() -> Result<()> {
         }
         SubCommands::Repository(sub_command_args) => {
             generate_module(sub_command_args, GenerateModuleType::Repository, db).await
+        }
+        SubCommands::Frontend(sub_command_args) => {
+            generate_module(sub_command_args, GenerateModuleType::Frontend, db).await
         }
         SubCommands::Command => {
             generate_application_partials(APP_DIR.join("application"), "command").await
@@ -123,6 +126,7 @@ enum GenerateModuleType {
     Repository,
     Api,
     Application,
+    Frontend,
 }
 
 async fn generate_module(
@@ -164,8 +168,10 @@ async fn generate_module(
         GenerateModuleType::Application => generate_application(context).await?,
         GenerateModuleType::Domain => generate_domain(context).await?,
         GenerateModuleType::Repository => generate_repository(context).await?,
+        GenerateModuleType::Frontend => generate_frontend(context).await?,
         GenerateModuleType::Scaffold => {
             tokio::try_join!(
+                generate_frontend(context.clone()),
                 generate_api(context.clone()),
                 generate_application(context.clone()),
                 generate_domain(context.clone()),

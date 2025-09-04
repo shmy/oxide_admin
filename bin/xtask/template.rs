@@ -86,6 +86,7 @@ impl TemplateEngine {
         env.add_filter("pascal_case", |s: String| s.to_pascal_case());
         env.add_filter("uppercase", |s: String| s.to_uppercase());
         env.add_filter("pluralize", |s: String| s.to_plural());
+        env.add_filter("singular", |s: String| s.to_singular());
         env.add_filter("is_copy_type", |ty: String| -> bool { is_copy_type(&ty) });
         env.add_filter("strip_raw_ident", |s: String| strip_raw_ident(&s));
 

@@ -43,7 +43,7 @@ type buildCrudTableProps = {
   endpoint: string;
   deleteEndpoint?: string;
   componentId?: string;
-  filter?: any[];
+  filters?: any[];
   headerToolbar?: any[];
   bulkActions?: any[];
   operations?: any[];
@@ -117,7 +117,7 @@ export const buildCrudTable = (props: buildCrudTableProps) => {
     autoGenerateFilter: false,
     rowClassNameExpr: "${index % 2 ? 'bg-gray-50' : null}",
 
-    filter: buildFilter(props.filter),
+    filter: buildFilter(props.filters),
     headerToolbar: [
       "bulkActions",
       {
