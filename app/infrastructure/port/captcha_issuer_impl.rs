@@ -26,12 +26,12 @@ impl CaptchaIssuerTrait for CaptchaIssuerImpl {
         let math = captcha_generator::math::MathCaptcha::new(100, 140, 40);
         let captcha_data = math
             .generate()
-            .map_err(|_| IamError::CaptchaFailedGenerate)?;
+            .map_err(|_| IamError::CaptchaGenerationFailed)?;
         let key = IdGenerator::random();
         let full_key = Self::fill_captcha_key(&key);
         self.kv
             .set_with_ex(&full_key, captcha_data.value, ttl)
-            .map_err(|_| IamError::CaptchaFailedGenerate)?;
+            .map_err(|_| IamError::CaptchaGenerationFailed)?;
         Ok(Captcha {
             bytes: captcha_data.bytes,
             key,

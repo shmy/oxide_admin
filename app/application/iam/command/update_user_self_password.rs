@@ -37,10 +37,10 @@ impl CommandHandler for UpdateUserSelfPasswordCommandHandler {
         let new_password = cmd.new_password.trim();
         let confirm_new_password = cmd.confirm_new_password.trim();
         if new_password != confirm_new_password {
-            return Err(IamError::TwoPasswordsInconsistent);
+            return Err(IamError::PasswordMismatch);
         }
         if new_password == password {
-            return Err(IamError::CannotSameOriginalPassword);
+            return Err(IamError::PasswordUnchanged);
         }
         let mut user = self.user_repository.by_id(&cmd.id).await?;
         let before = user.clone();

@@ -9,15 +9,11 @@ pub enum IamError {
     #[error("用户已存在")]
     UserDuplicated,
     #[error("两次密码不一致")]
-    TwoPasswordsInconsistent,
-    #[error("头像保存失败")]
-    PortraitSaveFailed,
-
+    PasswordMismatch,
     #[error("新密码不能与原密码相同")]
-    CannotSameOriginalPassword,
-
+    PasswordUnchanged,
     #[error("无法修改特权用户")]
-    CannotPrivilegedUserPassword,
+    UserPrivilegedImmutable,
 
     #[error("角色不存在")]
     RoleNotFound,
@@ -25,23 +21,23 @@ pub enum IamError {
     RoleDisabled,
     #[error("角色已存在")]
     RoleDuplicated,
+    #[error("无法修改特权角色")]
+    RolePrivilegedImmutable,
 
     #[error("验证码生成失败")]
-    CaptchaFailedGenerate,
-
+    CaptchaGenerationFailed,
     #[error("验证码无效")]
     CaptchaInvalid,
-
     #[error("验证码错误")]
     CaptchaIncorrect,
 
-    #[error("Token 签名错误")]
-    AccessTokenFailedGenerate,
-    #[error("Token 解析错误")]
-    AccessTokenFailedVerify,
-    #[error("Token 保存错误")]
-    AccessTokenFailedSave,
-    #[error("Refresh token 已过期")]
+    #[error("访问 Token 签名错误")]
+    AccessTokenSignFailed,
+    #[error("访问 Token 解析错误")]
+    AccessTokenVerifyFailed,
+    #[error("访问 Token 保存错误")]
+    AccessTokenSaveFailed,
+    #[error("Refresh Token 已过期")]
     RefreshTokenExpired,
 
     #[error("{0}")]

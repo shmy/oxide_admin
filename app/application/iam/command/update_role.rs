@@ -37,6 +37,9 @@ impl CommandHandler for UpdateRoleCommandHandler {
     ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
         let id = cmd.id;
         let mut role = self.role_repo.by_id(&id).await?;
+        if role.privileged {
+            return Err(IamError::RolePrivilegedImmutable);
+        }
         let before = role.clone();
         if let Some(name) = cmd.name {
             role.update_name(name);

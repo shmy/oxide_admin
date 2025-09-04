@@ -20,7 +20,7 @@ impl TokenStoreTrait for TokenStoreImpl {
         let key = Self::fill_key(&key);
         self.kv
             .set_with_ex_at(&key, token, ex_at.timestamp())
-            .map_err(|_| IamError::AccessTokenFailedSave)?;
+            .map_err(|_| IamError::AccessTokenSaveFailed)?;
         Ok(())
     }
     async fn retrieve(&self, key: String) -> Option<String> {

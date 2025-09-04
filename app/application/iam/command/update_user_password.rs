@@ -35,16 +35,16 @@ impl CommandHandler for UpdateUserPasswordCommandHandler {
         let new_password = cmd.new_password.trim();
         let confirm_new_password = cmd.confirm_new_password.trim();
         if new_password != confirm_new_password {
-            return Err(IamError::TwoPasswordsInconsistent);
+            return Err(IamError::PasswordMismatch);
         }
         let mut user = self.user_repository.by_id(&cmd.id).await?;
-        let before = user.clone();
         if user.privileged {
-            return Err(IamError::CannotPrivilegedUserPassword);
+            return Err(IamError::UserPrivilegedImmutable);
         }
+        let before = user.clone();
         user.assert_activated()?;
         if user.password.verify(new_password).is_ok() {
-            return Err(IamError::CannotSameOriginalPassword);
+            return Err(IamError::PasswordUnchanged);
         }
         user.update_password(new_password.to_string())?;
 

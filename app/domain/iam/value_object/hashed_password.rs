@@ -20,9 +20,9 @@ pub enum PasswordError {
     #[error("密码太长")]
     TooLong,
     #[error("密码加密失败")]
-    FailedEncode,
+    EncodeFailed,
     #[error("密码解密失败")]
-    DecodeError,
+    DecodeFailed,
     #[error("密码错误")]
     Incorrect,
 }
@@ -54,12 +54,12 @@ impl HashedPassword {
         let salt = SaltString::generate(&mut password_hash::rand_core::OsRng);
         let hash = ARGON2
             .hash_password(password.as_bytes(), &salt)
-            .map_err(|_| PasswordError::FailedEncode)?; // 处理 JoinError
+            .map_err(|_| PasswordError::EncodeFailed)?; // 处理 JoinError
         Ok(hash.to_string())
     }
 
     pub fn verify(&self, password: &str) -> Result<(), PasswordError> {
-        let parsed_hash = PasswordHash::new(&self.0).map_err(|_| PasswordError::DecodeError)?;
+        let parsed_hash = PasswordHash::new(&self.0).map_err(|_| PasswordError::DecodeFailed)?;
         if ARGON2
             .verify_password(password.as_bytes(), &parsed_hash)
             .is_err()

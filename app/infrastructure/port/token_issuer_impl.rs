@@ -27,7 +27,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
     ) -> anyhow::Result<String, Self::Error> {
         let header = Header::new(ALGORITHM);
         let token = jsonwebtoken::encode(&header, claims, &EncodingKey::from_secret(secret))
-            .map_err(|_| IamError::AccessTokenFailedGenerate)?;
+            .map_err(|_| IamError::AccessTokenSignFailed)?;
         Ok(token)
     }
 
@@ -57,7 +57,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
         };
         let access_token = self
             .generate_access_token(&claims, secret)
-            .map_err(|_| IamError::AccessTokenFailedGenerate)?;
+            .map_err(|_| IamError::AccessTokenSignFailed)?;
         let refresh_token = self.generate_refresh_token();
         Ok(TokenIssuerOutput {
             access_token,
@@ -77,7 +77,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
         validation.leeway = 0;
         let token_data =
             jsonwebtoken::decode::<T>(access_token, &DecodingKey::from_secret(secret), &validation)
-                .map_err(|_| IamError::AccessTokenFailedVerify)?;
+                .map_err(|_| IamError::AccessTokenVerifyFailed)?;
         Ok(token_data.claims)
     }
 
@@ -91,7 +91,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
         validation.leeway = 0;
         let tokendata =
             jsonwebtoken::decode(access_token, &DecodingKey::from_secret(&[]), &validation)
-                .map_err(|_| IamError::AccessTokenFailedVerify)?;
+                .map_err(|_| IamError::AccessTokenVerifyFailed)?;
         Ok(tokendata.claims)
     }
 }

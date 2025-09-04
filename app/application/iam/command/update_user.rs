@@ -42,6 +42,9 @@ impl CommandHandler for UpdateUserCommandHandler {
     ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
         let id = cmd.id;
         let mut user = self.user_repository.by_id(&id).await?;
+        if user.privileged {
+            return Err(IamError::UserPrivilegedImmutable);
+        }
         let before = user.clone();
         if let Some(account) = cmd.account {
             user.update_account(account);
