@@ -7,5 +7,5 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-singleflight-async = { workspace = true }
 single_flight_macros = { workspace = true }
+singleflight-async = { workspace = true }

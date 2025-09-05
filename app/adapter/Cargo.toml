@@ -7,20 +7,20 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-axum = { workspace = true, features = ["http1", "tokio", "json", "query"] }
-axum_typed_multipart = { workspace = true, features = ["tempfile_3"] }
-tower-http = { workspace = true, features = ["fs"] }
-tower_governor = { workspace = true, features = ["axum", "tracing"] }
-governor = { workspace = true }
-tempfile = { workspace = true }
-tracing = { workspace = true }
-tokio = { workspace = true, features = ["full"] }
-serde = { workspace = true, features = ["derive"] }
-serde_urlencoded = { workspace = true }
-include_dir = { workspace = true }
-mime_guess = { workspace = true }
 anyhow = { workspace = true }
-nject = { workspace = true, features = ["macro"] }
 
 application = { workspace = true }
+axum = { workspace = true, features = ["http1", "tokio", "json", "query"] }
+axum_typed_multipart = { workspace = true, features = ["tempfile_3"] }
 domain = { workspace = true }
+governor = { workspace = true }
+include_dir = { workspace = true }
+mime_guess = { workspace = true }
+nject = { workspace = true, features = ["macro"] }
+serde = { workspace = true, features = ["derive"] }
+serde_urlencoded = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tower-http = { workspace = true, features = ["fs"] }
+tower_governor = { workspace = true, features = ["axum", "tracing"] }
+tracing = { workspace = true }

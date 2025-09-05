@@ -7,15 +7,27 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-axum = { workspace = true }
 anyhow = { workspace = true }
-tracing = { workspace = true }
-tracing-appender = { workspace = true }
-tokio = { workspace = true, features = ["full"] }
+axum = { workspace = true }
+bon = { workspace = true }
+captcha_generator = { workspace = true }
+chrono = { workspace = true }
+chrono-tz = { workspace = true, features = ["std"] }
+const_format = { workspace = true }
+
+domain = { workspace = true }
+hex = { workspace = true, features = ["alloc"] }
+hmac-sha256 = { workspace = true }
+jsonwebtoken = { workspace = true }
+moka = { workspace = true, features = ["future"] }
+nject = { workspace = true, features = ["macro"] }
+readonly = { workspace = true }
+redb = { workspace = true }
+rmp-serde = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
 serde_urlencoded = { workspace = true }
-rmp-serde = { workspace = true }
+single_flight = { workspace = true }
 sqlx = { workspace = true, features = [
     "runtime-tokio",
     "postgres",
@@ -24,19 +36,7 @@ sqlx = { workspace = true, features = [
     "json",
     "derive",
 ] }
-redb = { workspace = true }
-moka = { workspace = true, features = ["future"] }
 tempoid = { workspace = true }
-jsonwebtoken = { workspace = true }
-nject = { workspace = true, features = ["macro"] }
-bon = { workspace = true }
-chrono = { workspace = true }
-chrono-tz = { workspace = true, features = ["std"] }
-const_format = { workspace = true }
-readonly = { workspace = true }
-hmac-sha256 = { workspace = true }
-hex = { workspace = true, features = ["alloc"] }
-
-domain = { workspace = true }
-single_flight = { workspace = true }
-captcha_generator = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+tracing-appender = { workspace = true }

@@ -7,35 +7,34 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-tokio = { workspace = true, features = ["full"] }
-tokio-stream = { workspace = true }
-futures-util = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
-serde_with = { workspace = true, features = ["alloc", "macros", "chrono_0_4"] }
-tracing = { workspace = true }
 anyhow = { workspace = true }
+background_job = { workspace = true }
 bon = { workspace = true }
-moka = { workspace = true }
-tempfile = { workspace = true }
-imageformat = { workspace = true }
-twox-hash = { workspace = true, features = ["xxhash64"] }
-sqlx = { workspace = true }
-nject = { workspace = true, features = ["macro"] }
-sysinfo = { workspace = true, features = ["system"] }
-image = { workspace = true, features = ["png", "webp", "jpeg"] }
 
 domain = { workspace = true }
+futures-util = { workspace = true }
+image = { workspace = true, features = ["png", "webp", "jpeg"] }
+imageformat = { workspace = true }
 infrastructure = { workspace = true }
-background_job = { workspace = true }
+moka = { workspace = true }
+nject = { workspace = true, features = ["macro"] }
+serde = { workspace = true, features = ["derive"] }
+serde_with = { workspace = true, features = ["alloc", "macros", "chrono_0_4"] }
 single_flight = { workspace = true }
-
+sqlx = { workspace = true }
+sysinfo = { workspace = true, features = ["system"] }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tokio-stream = { workspace = true }
+tracing = { workspace = true }
+twox-hash = { workspace = true, features = ["xxhash64"] }
 
 [build-dependencies]
 anyhow = { workspace = true }
 cruet = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
 minijinja = { version = "2.11", default-features = false, features = [
     "serde",
     "loader",
     "builtins",
 ] }
+serde = { workspace = true, features = ["derive"] }

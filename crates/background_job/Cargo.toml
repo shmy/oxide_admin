@@ -8,14 +8,11 @@ path = "lib.rs"
 
 [dependencies]
 anyhow = { workspace = true }
-tracing = { workspace = true }
-tokio = { workspace = true, features = ["time"] }
 apalis = { version = "0.7", default-features = false, features = [
     "limit",
     "tracing",
     "retry",
 ] }
-english-to-cron = { version = "0.1", default-features = false }
 apalis-core = { version = "0.7", default-features = false }
 apalis-cron = { version = "0.7", default-features = false }
 apalis-sql = { version = "0.7", default-features = false, features = [
@@ -23,4 +20,7 @@ apalis-sql = { version = "0.7", default-features = false, features = [
     "migrate",
     "tokio-comp",
 ] }
+english-to-cron = { version = "0.1", default-features = false }
 serde = { workspace = true, default-features = false, features = ["derive"] }
+tokio = { workspace = true, features = ["time"] }
+tracing = { workspace = true }
