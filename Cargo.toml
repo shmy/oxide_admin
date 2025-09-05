@@ -69,7 +69,6 @@ const_format = { version = "0.2", default-features = false }
 
 syn = { version = "2.0" }
 quote = { version = "1.0" }
-proc-macro2 = { version = "1.0" }
 
 adapter = { path = "app/adapter" }
 application = { path = "app/application" }
@@ -81,25 +80,26 @@ single_flight = { path = "crates/single_flight" }
 single_flight_macros = { path = "crates/single_flight_macros" }
 
 [profile.dev]
-debug = "line-tables-only" # 生成调试信息，便于调试
-opt-level = 0              # 不做任何优化，快速编译
-incremental = true         # 启用增量编译，加速编译过程
-overflow-checks = true     # 启用溢出检查，方便调试
-panic = "unwind"           # 保留 panic 时的栈信息，方便调试
-codegen-units = 8          # 多单元代码生成，加速编译（注意：过多可能降低优化效果）
-lto = "off"                # 关闭全局优化，减少编译时间
-strip = false              # 保留符号表，方便调试
+debug = "line-tables-only"      # 生成调试信息，便于调试
+split-debuginfo = "unpacked"    # 加速MacOS上的编译速度
+opt-level = 0                   # 不做任何优化，快速编译
+incremental = true              # 启用增量编译，加速编译过程
+overflow-checks = true          # 启用溢出检查，方便调试
+panic = "unwind"                # 保留 panic 时的栈信息，方便调试
+codegen-units = 8               # 多单元代码生成，加速编译（注意：过多可能降低优化效果）
+lto = "off"                     # 关闭全局优化，减少编译时间
+strip = false                   # 保留符号表，方便调试
 
 [profile.dev.package."*"]
 opt-level = 0
 
 [profile.release]
-debug = 0               # 不生成调试信息，减小体积
-rpath = false           # 不生成运行时库路径
-incremental = false     # 禁用增量编译，release 不需要
-overflow-checks = false # 禁用溢出检查，性能更好
-panic = "abort"         # panic 直接中止，节省代码体积
-codegen-units = 1       # 更长编译时间换取更好优化
-lto = "fat"             # 跨 crate 全局优化，性能极佳
-opt-level = 3           # 最高性能优化
-strip = true            # 去除符号表，最小体积
+debug = 0                       # 不生成调试信息，减小体积
+rpath = false                   # 不生成运行时库路径
+incremental = false             # 禁用增量编译，release 不需要
+overflow-checks = false         # 禁用溢出检查，性能更好
+panic = "abort"                 # panic 直接中止，节省代码体积
+codegen-units = 1               # 更长编译时间换取更好优化
+lto = "fat"                     # 跨 crate 全局优化，性能极佳
+opt-level = 3                   # 最高性能优化
+strip = true                    # 去除符号表，最小体积
