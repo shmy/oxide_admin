@@ -44,11 +44,13 @@ pub enum IamError {
     Password(#[from] PasswordError),
 
     #[error("{0}")]
-    Custom(String),
+    Sqlx(String),
 }
 
 impl From<sqlx::Error> for IamError {
-    fn from(value: sqlx::Error) -> Self {
-        Self::Custom(value.to_string())
+    fn from(err: sqlx::Error) -> Self {
+        tracing::error!(%err, "sqlx error");
+        let message = err.to_string();
+        Self::Sqlx(message)
     }
 }

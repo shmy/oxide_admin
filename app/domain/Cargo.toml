@@ -14,3 +14,4 @@ serde = { workspace = true, features = ["derive"] }
 sqlx = { workspace = true }
 tempoid = { workspace = true }
 thiserror = { workspace = true }
+tracing = { workspace = true }

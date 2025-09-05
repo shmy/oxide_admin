@@ -884,6 +884,7 @@ dependencies = [
  "sqlx",
  "tempoid",
  "thiserror 2.0.16",
+ "tracing",
 ]
 
 [[package]]
