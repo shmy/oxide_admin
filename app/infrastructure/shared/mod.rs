@@ -1,5 +1,4 @@
 pub mod chrono_tz;
-pub mod cloneable_error;
 pub mod config;
 pub mod error_util;
 pub mod event_bus;

@@ -3,7 +3,7 @@ use bon::Builder;
 use domain::iam::error::IamError;
 use domain::iam::value_object::permission_code::PermissionCode;
 use domain::iam::value_object::role_id::RoleId;
-use infrastructure::shared::{cloneable_error::CloneableError, pg_pool::PgPool};
+use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
 use serde::Deserialize;
 use single_flight::single_flight;
@@ -20,7 +20,7 @@ pub struct RetrieveRoleQueryHandler {
 
 impl RetrieveRoleQueryHandler {
     #[single_flight]
-    pub async fn query(&self, query: RetrieveRoleQuery) -> Result<RoleDto, CloneableError> {
+    pub async fn query(&self, query: RetrieveRoleQuery) -> Result<RoleDto, IamError> {
         let row_opt = sqlx::query_as!(
             RoleDto,
             r#"
@@ -33,8 +33,6 @@ impl RetrieveRoleQueryHandler {
         )
         .fetch_optional(&self.pool)
         .await?;
-        row_opt.ok_or(CloneableError::from(anyhow::anyhow!(
-            IamError::RoleNotFound
-        )))
+        row_opt.ok_or(IamError::RoleNotFound)
     }
 }

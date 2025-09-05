@@ -1,4 +1,5 @@
 use anyhow::Result;
+use domain::iam::error::IamError;
 use domain::iam::value_object::permission_code::{ALL_PERMISSIONS, PermissionCode};
 use domain::iam::value_object::permission_group::PermissionGroup;
 use domain::iam::value_object::role_id::RoleId;
@@ -13,7 +14,6 @@ use std::collections::HashSet;
 use std::sync::LazyLock;
 use std::time::Duration;
 
-use crate::shared::cloneable_error::CloneableError;
 use crate::shared::pg_pool::PgPool;
 
 static PERMISSION_MAP: LazyLock<Cache<UserId, PermissionGroup>> = LazyLock::new(|| {
@@ -58,7 +58,7 @@ impl PermissionResolver for PermissionResolverImpl {
 
 impl PermissionResolverImpl {
     #[single_flight]
-    pub async fn find_from_db(&self, id: UserId) -> Result<PermissionGroup, CloneableError> {
+    pub async fn find_from_db(&self, id: UserId) -> Result<PermissionGroup, IamError> {
         let user_record = sqlx::query!(
             r#"SELECT privileged, role_ids as "role_ids: Vec<RoleId>" from _users WHERE id = $1"#,
             &id

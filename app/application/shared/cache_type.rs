@@ -1,14 +1,13 @@
-use infrastructure::shared::cloneable_error::CloneableError;
 use moka::future::Cache;
 use std::hash::{Hash, Hasher as _};
 use twox_hash::XxHash64;
 
-pub type CacheType<T> = Cache<u64, Result<T, CloneableError>>;
+pub type CacheType<T, E> = Cache<u64, Result<T, E>>;
 
 #[macro_export]
 macro_rules! impl_static_cache {
-    ($name: ident, $ty: ty, $capacity: expr, $time_to_live: expr) => {
-        static $name: std::sync::LazyLock<CacheType<$ty>> = std::sync::LazyLock::new(|| {
+    ($name: ident, $ty: ty, $err: ty, $capacity: expr, $time_to_live: expr) => {
+        static $name: std::sync::LazyLock<CacheType<$ty, $err>> = std::sync::LazyLock::new(|| {
             moka::future::Cache::builder()
                 .max_capacity($capacity)
                 .time_to_live($time_to_live)

@@ -42,7 +42,7 @@ impl DomainRepository for UserRepositoryImpl {
             id
         )
         .fetch_optional(&self.pool)
-        .await.map_err(IamError::DatabaseError)?;
+        .await?;
         row_opt.map(Into::into).ok_or(IamError::UserNotFound)
     }
 
@@ -82,7 +82,7 @@ impl DomainRepository for UserRepositoryImpl {
             if is_unique_constraint_error(&e, "_users", "account") {
                 return IamError::UserDuplicated;
             }
-            IamError::DatabaseError(e)
+            IamError::from(e)
         })?;
         Ok(entity)
     }
@@ -103,8 +103,7 @@ impl DomainRepository for UserRepositoryImpl {
             &ids.inner_vec()
         )
         .fetch_all(&self.pool)
-        .await
-        .map_err(IamError::DatabaseError)?;
+        .await?;
         let items = items.into_iter().map(Into::into).collect();
         Ok(items)
     }
@@ -121,7 +120,7 @@ impl UserRepository for UserRepositoryImpl {
             account
         )
         .fetch_optional(&self.pool)
-        .await.map_err(IamError::DatabaseError)?;
+        .await?;
         row_opt.map(Into::into).ok_or(IamError::UserNotFound)
     }
 
@@ -135,7 +134,7 @@ impl UserRepository for UserRepositoryImpl {
             refresh_token
         )
         .fetch_optional(&self.pool)
-        .await.map_err(IamError::DatabaseError)?;
+        .await?;
         row_opt.map(Into::into).ok_or(IamError::UserNotFound)
     }
 
@@ -167,8 +166,7 @@ impl UserRepository for UserRepositoryImpl {
             enabled,
         )
         .fetch_all(&self.pool)
-        .await
-        .map_err(IamError::DatabaseError)?;
+        .await?;
         let items = items
             .into_iter()
             .map(|row| UpdatedEvent {

@@ -37,8 +37,7 @@ impl DomainRepository for RoleRepositoryImpl {
             id
         )
         .fetch_optional(&self.pool)
-        .await
-        .map_err(IamError::DatabaseError)?;
+        .await?;
         row_opt.map(Into::into).ok_or(IamError::RoleNotFound)
     }
 
@@ -69,7 +68,7 @@ impl DomainRepository for RoleRepositoryImpl {
             if is_unique_constraint_error(&e, "_roles", "name") {
                 return IamError::RoleDuplicated;
             }
-            IamError::DatabaseError(e)
+            IamError::from(e)
         })?;
         Ok(entity)
     }
@@ -86,8 +85,7 @@ impl DomainRepository for RoleRepositoryImpl {
             &ids.inner_vec()
         )
         .fetch_all(&self.pool)
-        .await
-        .map_err(IamError::DatabaseError)?;
+        .await?;
         let items = items.into_iter().map(Into::into).collect();
         Ok(items)
     }
@@ -122,8 +120,7 @@ impl RoleRepository for RoleRepositoryImpl {
             enabled,
         )
         .fetch_all(&self.pool)
-        .await
-        .map_err(IamError::DatabaseError)?;
+        .await?;
         let items = items
             .into_iter()
             .map(|row| UpdatedEvent {

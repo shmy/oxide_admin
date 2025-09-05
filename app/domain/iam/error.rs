@@ -1,6 +1,6 @@
 use crate::iam::value_object::hashed_password::PasswordError;
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, Clone, thiserror::Error)]
 pub enum IamError {
     #[error("用户不存在")]
     UserNotFound,
@@ -44,5 +44,11 @@ pub enum IamError {
     Password(#[from] PasswordError),
 
     #[error("{0}")]
-    DatabaseError(#[from] sqlx::Error),
+    Custom(String),
+}
+
+impl From<sqlx::Error> for IamError {
+    fn from(value: sqlx::Error) -> Self {
+        Self::Custom(value.to_string())
+    }
 }

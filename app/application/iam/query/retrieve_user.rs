@@ -2,7 +2,7 @@ use crate::iam::dto::user::UserDto;
 use bon::Builder;
 use domain::iam::value_object::user_id::UserId;
 use domain::iam::{error::IamError, value_object::role_id::RoleId};
-use infrastructure::shared::{cloneable_error::CloneableError, pg_pool::PgPool};
+use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
 use serde::Deserialize;
 use single_flight::single_flight;
@@ -19,7 +19,7 @@ pub struct RetrieveUserQueryHandler {
 
 impl RetrieveUserQueryHandler {
     #[single_flight]
-    pub async fn query(&self, query: RetrieveUserQuery) -> Result<UserDto, CloneableError> {
+    pub async fn query(&self, query: RetrieveUserQuery) -> Result<UserDto, IamError> {
         let row_opt = sqlx::query_as!(
             UserDto,
             r#"
@@ -44,8 +44,6 @@ impl RetrieveUserQueryHandler {
         )
         .fetch_optional(&self.pool)
         .await?;
-        row_opt.ok_or(CloneableError::from(anyhow::anyhow!(
-            IamError::UserNotFound
-        )))
+        row_opt.ok_or(IamError::UserNotFound)
     }
 }

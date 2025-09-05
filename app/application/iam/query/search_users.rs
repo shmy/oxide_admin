@@ -1,8 +1,8 @@
 use std::time::Duration;
 
 use bon::Builder;
-use domain::iam::value_object::role_id::RoleId;
-use infrastructure::shared::{cloneable_error::CloneableError, pg_pool::PgPool};
+use domain::iam::{error::IamError, value_object::role_id::RoleId};
+use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
@@ -24,6 +24,7 @@ const CACHE_TTL: Duration = Duration::from_secs(15 * 60);
 impl_static_cache!(
     SEARCH_CACHE,
     PagingResult<UserDto>,
+    IamError,
     CACHE_CAPACITY,
     CACHE_TTL
 );
@@ -51,15 +52,12 @@ pub struct SearchUsersQuery {
 pub struct SearchUsersQueryHandler {
     pool: PgPool,
     #[inject(&SEARCH_CACHE)]
-    cache: &'static CacheType<PagingResult<UserDto>>,
+    cache: &'static CacheType<PagingResult<UserDto>, IamError>,
 }
 
 impl SearchUsersQueryHandler {
     #[single_flight]
-    pub async fn query(
-        &self,
-        query: SearchUsersQuery,
-    ) -> Result<PagingResult<UserDto>, CloneableError> {
+    pub async fn query(&self, query: SearchUsersQuery) -> Result<PagingResult<UserDto>, IamError> {
         let total_future = sqlx::query_scalar!(
             r#"
             SELECT COUNT(*) as "count!"
@@ -126,7 +124,7 @@ impl SearchUsersQueryHandler {
     pub async fn query_cached(
         &self,
         query: SearchUsersQuery,
-    ) -> Result<PagingResult<UserDto>, CloneableError> {
+    ) -> Result<PagingResult<UserDto>, IamError> {
         let key = hash_encode(&query);
         self.cache.get_with(key, self.query(query)).await
     }

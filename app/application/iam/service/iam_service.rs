@@ -51,18 +51,18 @@ impl IamService {
         PAGES.as_ref()
     }
 
-    pub async fn get_available_pages(&self, user_id: UserId) -> Result<[Page; 2]> {
+    pub async fn get_available_pages(&self, user_id: UserId) -> [Page; 2] {
         let group = self.permission_resolver.resolve(&user_id).await;
         let mut pages = Self::get_available_pages_by_group(PAGES.as_ref(), &group);
         pages.extend_from_slice(&*SHARED_PAGES);
-        Ok([
+        [
             Page::builder()
                 .key(NONE)
                 .url("/")
                 .maybe_redirect(Self::find_default_path(&pages))
                 .build(),
             Page::builder().key(NONE).children(pages).build(),
-        ])
+        ]
     }
 
     fn find_default_path(pages: &[Page]) -> Option<&'static str> {

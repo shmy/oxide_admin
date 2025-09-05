@@ -44,7 +44,7 @@ async fn current(
 ) -> JsonResponseType<response::CurrentResponse> {
     let (user, pages) = tokio::try_join!(
         query_handler.query(RetrieveUserQuery::builder().id(id.clone()).build()),
-        async { service.get_available_pages(id).await.map_err(Into::into) }
+        async { Ok(service.get_available_pages(id).await) }
     )?;
     let user = sign_user_portrait(user, &hmac_util);
     JsonResponse::ok(response::CurrentResponse { user, pages })

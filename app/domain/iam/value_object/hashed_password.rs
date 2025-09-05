@@ -13,7 +13,7 @@ static ARGON2: LazyLock<Argon2> = LazyLock::new(|| {
     )
 });
 
-#[derive(Debug, Error)]
+#[derive(Debug, Clone, Error)]
 pub enum PasswordError {
     #[error("密码太短")]
     TooShort,

@@ -1,4 +1,5 @@
-use infrastructure::shared::{cloneable_error::CloneableError, pg_pool::PgPool};
+use domain::iam::error::IamError;
+use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
 use single_flight::single_flight;
 
@@ -11,7 +12,7 @@ pub struct OptionRolesQueryHandler {
 
 impl OptionRolesQueryHandler {
     #[single_flight]
-    pub async fn query(&self) -> Result<Vec<OptionDto>, CloneableError> {
+    pub async fn query(&self) -> Result<Vec<OptionDto>, IamError> {
         let options = sqlx::query_as!(
             OptionDto::<String>,
             r#"

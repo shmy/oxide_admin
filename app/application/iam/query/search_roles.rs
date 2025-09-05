@@ -1,6 +1,6 @@
 use bon::Builder;
-use domain::iam::value_object::permission_code::PermissionCode;
-use infrastructure::shared::{cloneable_error::CloneableError, pg_pool::PgPool};
+use domain::iam::{error::IamError, value_object::permission_code::PermissionCode};
+use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
@@ -23,6 +23,7 @@ const CACHE_TTL: Duration = Duration::from_secs(15 * 60);
 impl_static_cache!(
     SEARCH_CACHE,
     PagingResult<RoleDto>,
+    IamError,
     CACHE_CAPACITY,
     CACHE_TTL
 );
@@ -49,15 +50,12 @@ pub struct SearchRolesQuery {
 pub struct SearchRolesQueryHandler {
     pool: PgPool,
     #[inject(&SEARCH_CACHE)]
-    cache: &'static CacheType<PagingResult<RoleDto>>,
+    cache: &'static CacheType<PagingResult<RoleDto>, IamError>,
 }
 
 impl SearchRolesQueryHandler {
     #[single_flight]
-    pub async fn query(
-        &self,
-        query: SearchRolesQuery,
-    ) -> Result<PagingResult<RoleDto>, CloneableError> {
+    pub async fn query(&self, query: SearchRolesQuery) -> Result<PagingResult<RoleDto>, IamError> {
         let total_future = sqlx::query_scalar!(
             r#"
             SELECT COUNT(*) AS "count!"
@@ -107,7 +105,7 @@ impl SearchRolesQueryHandler {
     pub async fn query_cached(
         &self,
         query: SearchRolesQuery,
-    ) -> Result<PagingResult<RoleDto>, CloneableError> {
+    ) -> Result<PagingResult<RoleDto>, IamError> {
         let key = hash_encode(&query);
         self.cache.get_with(key, self.query(query)).await
     }
