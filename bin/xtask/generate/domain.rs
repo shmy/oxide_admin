@@ -44,13 +44,22 @@ fn append_error(path: &Path, module: &str, entity: &str) -> Result<()> {
     if !fs::exists(path)? {
         let basic = format!(
             r#"
-            #[derive(Debug, thiserror::Error)]
+            #[derive(Debug, Clone, thiserror::Error)]
             pub enum {}Error {{
-                #[error("数据库错误: {{0}}")]
-                DatabaseError(#[from] sqlx::Error),
+                #[error("{{0}}")]
+                Sqlx(String),
+            }}
+
+            impl From<sqlx::Error> for {}Error {{
+                fn from(err: sqlx::Error) -> Self {{
+                    tracing::error!(%err, "sqlx error");
+                    let message = err.to_string();
+                    Self::Sqlx(message)
+                }}
             }}
             "#,
-            module.to_pascal_case()
+            module.to_pascal_case(),
+            module.to_pascal_case(),
         );
         fs::write(path, basic)?;
     }

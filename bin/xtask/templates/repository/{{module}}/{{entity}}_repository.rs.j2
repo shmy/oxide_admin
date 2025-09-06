@@ -32,8 +32,7 @@ impl DomainRepository for {{entity | pascal_case}}RepositoryImpl {
             id
         )
         .fetch_optional(&self.pool)
-        .await
-        .map_err({{module | pascal_case}}Error::DatabaseError)?;
+        .await?;
         row_opt
             .map(Into::into)
             .ok_or({{module | pascal_case}}Error::{{entity | pascal_case}}NotFound)
@@ -64,7 +63,7 @@ impl DomainRepository for {{entity | pascal_case}}RepositoryImpl {
             &now,
         )
         .execute(&self.pool)
-        .await.map_err({{module | pascal_case}}Error::DatabaseError)?;
+        .await?;
         Ok(entity)
     }
 
@@ -80,8 +79,7 @@ impl DomainRepository for {{entity | pascal_case}}RepositoryImpl {
             &ids.inner_vec()
         )
         .fetch_all(&self.pool)
-        .await
-        .map_err({{module | pascal_case}}Error::DatabaseError)?;
+        .await?;
         let items = items
             .into_iter()
             .map(Into::into)

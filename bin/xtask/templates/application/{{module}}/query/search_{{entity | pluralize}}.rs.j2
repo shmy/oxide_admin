@@ -1,5 +1,6 @@
 use bon::Builder;
-use infrastructure::shared::{cloneable_error::CloneableError, pg_pool::PgPool};
+use infrastructure::shared::pg_pool::PgPool;
+use domain::{{module}}::error::{{module | pascal_case}}Error;
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::serde_as;
@@ -22,6 +23,7 @@ const CACHE_TTL: Duration = Duration::from_secs(15 * 60);
 impl_static_cache!(
     SEARCH_CACHE,
     PagingResult<{{entity | pascal_case}}Dto>,
+    {{module | pascal_case}}Error,
     CACHE_CAPACITY,
     CACHE_TTL
 );
@@ -38,7 +40,7 @@ pub struct Search{{entity | pluralize | pascal_case}}Query {
 pub struct Search{{entity | pluralize | pascal_case}}QueryHandler {
     pool: PgPool,
     #[inject(&SEARCH_CACHE)]
-    cache: &'static CacheType<PagingResult<{{entity | pascal_case}}Dto>>,
+    cache: &'static CacheType<PagingResult<{{entity | pascal_case}}Dto>, {{module | pascal_case}}Error>,
 }
 
 impl Search{{entity | pluralize | pascal_case}}QueryHandler {
@@ -46,7 +48,7 @@ impl Search{{entity | pluralize | pascal_case}}QueryHandler {
     pub async fn query(
         &self,
         query: Search{{entity | pluralize | pascal_case}}Query,
-    ) -> Result<PagingResult<{{entity | pascal_case}}Dto>, CloneableError> {
+    ) -> Result<PagingResult<{{entity | pascal_case}}Dto>, {{module | pascal_case}}Error> {
         let total_future = sqlx::query_scalar!(
             r#"
             SELECT COUNT(*) AS "count!"
@@ -79,7 +81,7 @@ impl Search{{entity | pluralize | pascal_case}}QueryHandler {
     pub async fn query_cached(
         &self,
         query: Search{{entity | pluralize | pascal_case}}Query,
-    ) -> Result<PagingResult<{{entity | pascal_case}}Dto>, CloneableError> {
+    ) -> Result<PagingResult<{{entity | pascal_case}}Dto>, {{module | pascal_case}}Error> {
         let key = hash_encode(&query);
         self.cache.get_with(key, self.query(query)).await
     }
