@@ -2,7 +2,7 @@ FROM node:22-alpine AS frontend-build
 WORKDIR /frontend
 RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY frontend/ ./
-RUN pnpm install
+RUN pnpm install --registry=https://mirrors.cloud.tencent.com/npm/
 RUN pnpm run build
 
 FROM rust:latest AS backend-build
