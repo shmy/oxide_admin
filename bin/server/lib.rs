@@ -79,7 +79,7 @@ async fn build_provider(config: Config) -> Result<Provider> {
         pg_pool::try_new(&config.database),
         sqlite_pool::try_new(DATA_DIR.join("data.sqlite")),
         // Kv::try_new(DATA_DIR.join("data.redb"))
-        Kv::try_new("redis://127.0.0.1:6379/1")
+        Kv::try_new(&config.redis)
     )?;
 
     let provider = Provider::builder()

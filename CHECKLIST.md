@@ -33,8 +33,10 @@
 [x] Event code generation
 [x] Command code generation
 [x] Query code generation
-[ ] 接入redis 替代sqlite redb moka
-[ ] 接入opendal
+[x] 接入redis 替代redb
+[ ] 接入redis 替代sqlite
+[ ] 接入redis 替代moka
+[ ] 接入opendal/rustfs/minio
 [ ] Frontend code generation
 [-] 单元测试
 [-] l10n

@@ -7,6 +7,8 @@ use tracing_appender::rolling::Rotation;
 pub struct Config {
     pub log: Log,
     pub database: Database,
+    #[cfg(feature = "redis")]
+    pub redis: Redis,
     pub server: Server,
     pub jwt: Jwt,
     pub upload: Upload,
@@ -30,6 +32,17 @@ pub struct Database {
     pub max_lifetime: Duration,
     pub idle_timeout: Duration,
     pub acquire_timeout: Duration,
+}
+
+#[derive(Debug, Clone, Builder)]
+#[readonly::make]
+pub struct Redis {
+    pub url: String,
+    pub connection_timeout: Duration,
+    pub max_size: u32,
+    pub min_idle: u32,
+    pub max_lifetime: Duration,
+    pub idle_timeout: Duration,
 }
 
 #[derive(Debug, Clone, Builder)]

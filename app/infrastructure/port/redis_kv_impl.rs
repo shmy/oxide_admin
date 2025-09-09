@@ -10,7 +10,7 @@ use chrono::Utc;
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::info;
 
-use crate::shared::{kv::KvTrait, serde_util};
+use crate::shared::{config::Redis, kv::KvTrait, serde_util};
 
 #[derive(Debug, Clone)]
 pub struct RedisKVImpl {
@@ -18,10 +18,14 @@ pub struct RedisKVImpl {
 }
 
 impl RedisKVImpl {
-    pub async fn try_new(url: &str) -> Result<Self> {
-        let manager = RedisConnectionManager::new(url)?;
+    pub async fn try_new(config: &Redis) -> Result<Self> {
+        let manager = RedisConnectionManager::new(&*config.url)?;
         let pool = Pool::builder()
-            .connection_timeout(Duration::from_secs(10))
+            .connection_timeout(config.connection_timeout)
+            .max_size(config.max_size)
+            .min_idle(config.min_idle)
+            .max_lifetime(config.max_lifetime)
+            .idle_timeout(config.idle_timeout)
             .build(manager)
             .await?;
         let instance = Self { pool };

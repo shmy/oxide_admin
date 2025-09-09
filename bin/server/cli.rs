@@ -36,7 +36,7 @@ pub struct Cli {
     #[arg(long, default_value = "1", env = "DATABASE_MIN_CONNECTIONS")]
     pub database_min_connections: u32,
 
-    /// 数据库最大连接时间
+    /// 数据库最大存活时间
     #[arg(long, default_value = "15min", env = "DATABASE_MAX_LIFETIME")]
     pub database_max_lifetime: String,
 
@@ -47,6 +47,36 @@ pub struct Cli {
     /// 数据库最大等待时间
     #[arg(long, default_value = "3s", env = "DATABASE_ACQUIRE_TIMEOUT")]
     pub database_acquire_timeout: String,
+
+    #[cfg(feature = "redis")]
+    /// Redis连接地址
+    #[arg(long, env = "REDIS_URL")]
+    pub redis_url: String,
+
+    #[cfg(feature = "redis")]
+    /// Redis连接超时时间
+    #[arg(long, default_value = "10s", env = "REDIS_CONNECTION_TIMEOUT")]
+    pub redis_connection_timeout: String,
+
+    #[cfg(feature = "redis")]
+    /// Redis最大连接数
+    #[arg(long, default_value = "100", env = "REDIS_MAX_SIZE")]
+    pub redis_max_size: u32,
+
+    #[cfg(feature = "redis")]
+    /// Redis最小空闲连接数
+    #[arg(long, default_value = "1", env = "REDIS_MIN_IDLE")]
+    pub redis_min_idle: u32,
+
+    #[cfg(feature = "redis")]
+    /// Redis最大存活时间
+    #[arg(long, default_value = "15min", env = "REDIS_MAX_LIFETIME")]
+    pub redis_max_lifetime: String,
+
+    #[cfg(feature = "redis")]
+    /// Redis最大空闲时间
+    #[arg(long, default_value = "5min", env = "REDIS_IDLE_TIMEOUT")]
+    pub redis_idle_timeout: String,
 
     /// 绑定的主机地址
     #[arg(long, default_value = "127.0.0.1", env = "SERVER_BIND")]
@@ -81,7 +111,7 @@ impl TryFrom<Cli> for Config {
     type Error = anyhow::Error;
 
     fn try_from(value: Cli) -> Result<Self, Self::Error> {
-        Ok(Self::builder()
+        let builder = Self::builder()
             .log(
                 Log::builder()
                     .level(value.log_level)
@@ -127,7 +157,19 @@ impl TryFrom<Cli> for Config {
                     .hmac_secret(Box::leak(Box::new(value.upload_hmac_secret)).as_bytes())
                     .link_period(parse_duration(&value.upload_link_period)?)
                     .build(),
-            )
-            .build())
+            );
+
+        #[cfg(feature = "redis")]
+        let builder = builder.redis(
+            infrastructure::shared::config::Redis::builder()
+                .url(value.redis_url)
+                .connection_timeout(parse_duration(&value.redis_connection_timeout)?)
+                .idle_timeout(parse_duration(&value.redis_idle_timeout)?)
+                .max_lifetime(parse_duration(&value.redis_max_lifetime)?)
+                .max_size(value.redis_max_size)
+                .min_idle(value.redis_min_idle)
+                .build(),
+        );
+        Ok(builder.build())
     }
 }
