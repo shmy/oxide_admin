@@ -15,6 +15,8 @@ use std::time::Duration;
 use crate::shared::kv::{Kv, KvTrait as _};
 use crate::shared::pg_pool::PgPool;
 
+const KEY_PREFIX: &str = "permission:";
+
 #[derive(Debug, Clone)]
 #[injectable]
 pub struct PermissionResolverImpl {
@@ -57,7 +59,7 @@ impl PermissionResolver for PermissionResolverImpl {
     }
 
     async fn refresh(&self) -> Result<(), Self::Error> {
-        todo!();
+        self.kv.delete_prefix(KEY_PREFIX).await?;
         Ok(())
     }
 }
@@ -95,7 +97,7 @@ impl PermissionResolverImpl {
     }
 
     fn full_key(&self, id: &UserId) -> String {
-        format!("permission:{}", &**id)
+        format!("{}{}", KEY_PREFIX, &**id)
     }
 }
 
