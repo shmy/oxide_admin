@@ -30,7 +30,7 @@ impl TokenStoreTrait for TokenStoreImpl {
     }
     async fn delete(&self, key: String) -> Result<(), Self::Error> {
         let full_key = Self::fill_key(&key);
-        let _ = self.kv.delete(&full_key);
+        let _ = self.kv.delete(&full_key).await;
         Ok(())
     }
 }

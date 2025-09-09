@@ -95,7 +95,7 @@ impl PermissionResolverImpl {
     }
 
     fn full_key(&self, id: &UserId) -> String {
-        format!("permission:{}", id.to_string())
+        format!("permission:{}", &**id)
     }
 }
 

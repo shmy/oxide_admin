@@ -17,7 +17,7 @@ impl CronJob for DeleteExpiredKvCronJob {
 
     async fn execute(&self) -> Result<()> {
         info!("Start delete expired kv job");
-        let _ = self.kv.delete_expired();
+        let _ = self.kv.delete_expired().await;
         Ok(())
     }
 }

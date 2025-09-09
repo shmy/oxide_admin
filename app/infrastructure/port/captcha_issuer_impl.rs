@@ -49,7 +49,7 @@ impl CaptchaIssuerTrait for CaptchaIssuerImpl {
             return Err(IamError::CaptchaIncorrect);
         }
 
-        let _ = self.kv.delete(&full_key);
+        let _ = self.kv.delete(&full_key).await;
         Ok(())
     }
 }
