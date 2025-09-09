@@ -1,8 +1,10 @@
 use std::collections::HashSet;
 
+use serde::{Deserialize, Serialize};
+
 use crate::iam::value_object::permission_code::PermissionCode;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PermissionGroup(HashSet<PermissionCode>);
 
 impl Default for PermissionGroup {

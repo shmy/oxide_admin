@@ -6,27 +6,20 @@ use domain::iam::value_object::role_id::RoleId;
 use domain::iam::value_object::user_id::UserId;
 use domain::shared::port::permission_resolver::PermissionResolver;
 use domain::shared::to_inner_vec::ToInnerVec;
-use moka::future::Cache;
 use nject::injectable;
 use single_flight::single_flight;
 use sqlx::prelude::FromRow;
 use std::collections::HashSet;
-use std::sync::LazyLock;
 use std::time::Duration;
 
+use crate::shared::kv::{Kv, KvTrait as _};
 use crate::shared::pg_pool::PgPool;
-
-static PERMISSION_MAP: LazyLock<Cache<UserId, PermissionGroup>> = LazyLock::new(|| {
-    Cache::<UserId, PermissionGroup>::builder()
-        .max_capacity(100)
-        .time_to_live(Duration::from_secs(60 * 30))
-        .build()
-});
 
 #[derive(Debug, Clone)]
 #[injectable]
 pub struct PermissionResolverImpl {
     pool: PgPool,
+    kv: Kv,
 }
 
 impl PermissionResolverImpl {
@@ -44,14 +37,27 @@ impl PermissionResolverImpl {
 impl PermissionResolver for PermissionResolverImpl {
     type Error = anyhow::Error;
     async fn resolve(&self, id: &UserId) -> PermissionGroup {
-        PERMISSION_MAP
-            .try_get_with_by_ref(id, self.solve(id))
-            .await
-            .unwrap_or_default()
+        match self.kv.get(&self.full_key(id)).await {
+            Some(cache) => cache,
+            None => match self.solve(id).await {
+                Ok(cache) => {
+                    let _ = self
+                        .kv
+                        .set_with_ex(
+                            &self.full_key(id),
+                            cache.clone(),
+                            Duration::from_secs(30 * 60),
+                        )
+                        .await;
+                    cache
+                }
+                Err(_) => Default::default(),
+            },
+        }
     }
 
     async fn refresh(&self) -> Result<(), Self::Error> {
-        PERMISSION_MAP.invalidate_all();
+        todo!();
         Ok(())
     }
 }
@@ -86,6 +92,10 @@ impl PermissionResolverImpl {
             }
         }
         Ok(PermissionGroup::new(permissions))
+    }
+
+    fn full_key(&self, id: &UserId) -> String {
+        format!("permission:{}", id.to_string())
     }
 }
 
