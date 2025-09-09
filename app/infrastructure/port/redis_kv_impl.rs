@@ -35,17 +35,31 @@ impl RedisKVImpl {
         let mut conn = self.pool.get().await?;
         let info: String = cmd("INFO").arg("server").query_async(&mut *conn).await?;
         let mut version = String::new();
+        let mut mode = String::new();
         let mut os = String::new();
+        let mut gcc = String::new();
+        let mut bit = String::new();
         for line in info.lines() {
             if line.starts_with("redis_version:") {
                 version.push_str(line.trim_start_matches("redis_version:"));
             }
-
+            if line.starts_with("redis_mode:") {
+                mode.push_str(line.trim_start_matches("redis_mode:"));
+            }
             if line.starts_with("os:") {
                 os.push_str(line.trim_start_matches("os:"));
             }
+            if line.starts_with("gcc_version:") {
+                gcc.push_str(line.trim_start_matches("gcc_version:"));
+            }
+            if line.starts_with("arch_bits:") {
+                bit.push_str(line.trim_start_matches("arch_bits:"));
+            }
         }
-        info!("Redis {} on {}", version, os);
+        info!(
+            "Redis {} ({}) on {}, compiled by gcc ({}) {}-bit",
+            version, mode, os, gcc, bit
+        );
         Ok(())
     }
 }
