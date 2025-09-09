@@ -75,12 +75,15 @@ async fn build_listener(server: &Server) -> Result<TcpListener> {
 }
 
 async fn build_provider(config: Config) -> Result<Provider> {
-    let (pg_pool, sqlite_pool, kv) = tokio::try_join!(
-        pg_pool::try_new(&config.database),
-        sqlite_pool::try_new(DATA_DIR.join("data.sqlite")),
-        // Kv::try_new(DATA_DIR.join("data.redb"))
-        Kv::try_new(&config.redis)
-    )?;
+    let pg_fut = pg_pool::try_new(&config.database);
+    let sqlite_fut = sqlite_pool::try_new(DATA_DIR.join("data.sqlite"));
+
+    #[cfg(feature = "redb")]
+    let kv_fut = Kv::try_new(DATA_DIR.join("data.redb"));
+    #[cfg(feature = "redis")]
+    let kv_fut = Kv::try_new(&config.redis);
+
+    let (pg_pool, sqlite_pool, kv) = tokio::try_join!(pg_fut, sqlite_fut, kv_fut)?;
 
     let provider = Provider::builder()
         .pg_pool(pg_pool.clone())
