@@ -25,6 +25,8 @@ argon2 = { version = "0.5", default-features = false }
 axum = { version = "0.8", default-features = false }
 axum_typed_multipart = { version = "0.16", default-features = false }
 background_job = { path = "crates/background_job" }
+
+bb8-redis = { version = "0.24", default-features = false }
 bon = { version = "3.7", default-features = false }
 captcha_generator = { path = "crates/captcha_generator" }
 chrono = { version = "0.4", default-features = false }
@@ -33,7 +35,6 @@ clap = { version = "4.5", default-features = false }
 const_format = { version = "0.2", default-features = false }
 cruet = { version = "0.15", default-features = false }
 domain = { path = "app/domain" }
-dotenv = { version = "0.15", default-features = false }
 dotenvy = { version = "0.15", default-features = false }
 futures-util = { version = "0.3", default-features = false }
 governor = { version = "0.10", default-features = false }
@@ -77,8 +78,6 @@ tracing = { version = "0.1", default-features = false }
 tracing-appender = { version = "0.2", default-features = false }
 tracing-subscriber = { version = "0.3", default-features = false }
 twox-hash = { version = "2.1", default-features = false }
-
-bb8-redis = { version = "0.24", default-features = false }
 
 [profile.dev]
 debug = "line-tables-only"      # 生成调试信息，便于调试

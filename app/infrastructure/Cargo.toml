@@ -6,9 +6,14 @@ edition = "2024"
 [lib]
 path = "lib.rs"
 
+[features]
+redb = ["dep:redb"]
+redis = ["dep:bb8-redis"]
+
 [dependencies]
 anyhow = { workspace = true }
 axum = { workspace = true }
+bb8-redis = { workspace = true, optional = true }
 bon = { workspace = true }
 captcha_generator = { workspace = true }
 chrono = { workspace = true }
@@ -40,8 +45,3 @@ tempoid = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
-bb8-redis = { workspace = true, optional = true }
-
-[features]
-redb = ["dep:redb"]
-redis = ["dep:bb8-redis"]

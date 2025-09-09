@@ -40,7 +40,7 @@ static APP_DIR: LazyLock<PathBuf> =
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
     let cli: Cli = Cli::parse();
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL provided");
     let db = database::postgres::Postgres::new(&database_url).await?;
     match &cli.command {
