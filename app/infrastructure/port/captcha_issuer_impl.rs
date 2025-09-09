@@ -31,6 +31,7 @@ impl CaptchaIssuerTrait for CaptchaIssuerImpl {
         let full_key = Self::fill_captcha_key(&key);
         self.kv
             .set_with_ex(&full_key, captcha_data.value, ttl)
+            .await
             .map_err(|_| IamError::CaptchaGenerationFailed)?;
         Ok(Captcha {
             bytes: captcha_data.bytes,
@@ -43,6 +44,7 @@ impl CaptchaIssuerTrait for CaptchaIssuerImpl {
         let existing_value = self
             .kv
             .get::<String>(&full_key)
+            .await
             .map_err(|_| IamError::CaptchaInvalid)?;
         if existing_value != value {
             return Err(IamError::CaptchaIncorrect);

@@ -33,6 +33,7 @@
 [x] Event code generation
 [x] Command code generation
 [x] Query code generation
+[ ] 接入redis 替代sqlite redb moka
 [ ] Frontend code generation
 [-] 单元测试
 [-] l10n

@@ -18,7 +18,6 @@ members = [
 ]
 
 [workspace.dependencies]
-
 adapter = { path = "app/adapter" }
 anyhow = { version = "1", default-features = false }
 application = { path = "app/application" }
@@ -78,6 +77,8 @@ tracing = { version = "0.1", default-features = false }
 tracing-appender = { version = "0.2", default-features = false }
 tracing-subscriber = { version = "0.3", default-features = false }
 twox-hash = { version = "2.1", default-features = false }
+
+bb8-redis = { version = "0.24", default-features = false }
 
 [profile.dev]
 debug = "line-tables-only"      # 生成调试信息，便于调试

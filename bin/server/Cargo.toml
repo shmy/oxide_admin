@@ -38,3 +38,8 @@ background_job = { workspace = true }
 adapter = { workspace = true }
 application = { workspace = true }
 infrastructure = { workspace = true }
+
+[features]
+default = ["redb", "redis"]
+redb = ["infrastructure/redb"]
+redis = ["infrastructure/redis"]
