@@ -14,7 +14,7 @@ pub struct RedbKv {
 }
 
 impl RedbKv {
-    pub fn try_new(path: impl AsRef<Path>) -> Result<Self> {
+    pub async fn try_new(path: impl AsRef<Path>) -> Result<Self> {
         let db_path = path.as_ref();
         let db = Database::create(db_path)?;
         info!("Redb data path: {}", db_path.display());
@@ -39,22 +39,22 @@ pub struct KvValue {
 }
 
 impl KvTrait for RedbKv {
-    async fn get<T: DeserializeOwned + Default>(&self, key: &str) -> Result<T> {
-        let tx = self.db.begin_read()?;
-        let table = tx.open_table(TABLE)?;
-        let value_opt = table.get(key)?;
+    async fn get<T: DeserializeOwned + Default>(&self, key: &str) -> Option<T> {
+        let tx = self.db.begin_read().ok()?;
+        let table = tx.open_table(TABLE).ok()?;
+        let value_opt = table.get(key).ok()?;
         if let Some(value) = value_opt {
-            let kv: KvValue = serde_util::rmp_decode(value.value());
+            let kv: KvValue = serde_util::rmp_decode(value.value()).ok()?;
             if let Some(expires_at) = kv.expires_at {
                 let now = Utc::now().timestamp();
                 if now > expires_at {
-                    anyhow::bail!("Key expired");
+                    return None;
                 }
             }
-            let val: T = serde_util::rmp_decode(&kv.value);
-            return Ok(val);
+            let val: T = serde_util::rmp_decode(&kv.value).ok()?;
+            return Some(val);
         }
-        anyhow::bail!("Key not found");
+        None
     }
 
     async fn set_with_ex<T: Serialize>(
@@ -67,9 +67,9 @@ impl KvTrait for RedbKv {
         let now = Utc::now();
         let expires_at = now + duration;
         let value = serde_util::rmp_encode(&KvValue {
-            value: serde_util::rmp_encode(&value),
+            value: serde_util::rmp_encode(&value)?,
             expires_at: Some(expires_at.timestamp()),
-        });
+        })?;
         {
             let mut table = tx.open_table(TABLE)?;
             table.insert(key, value.as_slice())?;
@@ -86,9 +86,9 @@ impl KvTrait for RedbKv {
     ) -> Result<()> {
         let tx = self.db.begin_write()?;
         let value = serde_util::rmp_encode(&KvValue {
-            value: serde_util::rmp_encode(&value),
+            value: serde_util::rmp_encode(&value)?,
             expires_at: Some(expires_at),
-        });
+        })?;
         {
             let mut table = tx.open_table(TABLE)?;
             table.insert(key, value.as_slice())?;
@@ -100,9 +100,9 @@ impl KvTrait for RedbKv {
     async fn set<T: Serialize>(&self, key: &str, value: T) -> Result<()> {
         let tx = self.db.begin_write()?;
         let value = serde_util::rmp_encode(&KvValue {
-            value: serde_util::rmp_encode(&value),
+            value: serde_util::rmp_encode(&value)?,
             expires_at: None,
-        });
+        })?;
         {
             let mut table = tx.open_table(TABLE)?;
             table.insert(key, value.as_slice())?;
@@ -131,7 +131,7 @@ impl KvTrait for RedbKv {
                 if let Ok((key, value)) = access {
                     let key = key.value().to_string();
                     let value = value.value().to_vec();
-                    let s = serde_util::rmp_decode::<KvValue>(&value);
+                    let s = serde_util::rmp_decode::<KvValue>(&value).ok()?;
                     if let Some(expires_at) = s.expires_at {
                         let now = Utc::now().timestamp();
                         debug!(

@@ -26,7 +26,7 @@ impl TokenStoreTrait for TokenStoreImpl {
     }
     async fn retrieve(&self, key: String) -> Option<String> {
         let full_key = Self::fill_key(&key);
-        self.kv.get::<String>(&full_key).await.ok()
+        self.kv.get::<String>(&full_key).await
     }
     async fn delete(&self, key: String) -> Result<(), Self::Error> {
         let full_key = Self::fill_key(&key);

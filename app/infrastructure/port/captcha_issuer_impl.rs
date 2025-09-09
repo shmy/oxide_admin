@@ -41,11 +41,10 @@ impl CaptchaIssuerTrait for CaptchaIssuerImpl {
 
     async fn verify(&self, key: &str, value: &str) -> Result<(), Self::Error> {
         let full_key = Self::fill_captcha_key(key);
-        let existing_value = self
-            .kv
-            .get::<String>(&full_key)
-            .await
-            .map_err(|_| IamError::CaptchaInvalid)?;
+        let Some(existing_value) = self.kv.get::<String>(&full_key).await else {
+            return Err(IamError::CaptchaInvalid);
+        };
+
         if existing_value != value {
             return Err(IamError::CaptchaIncorrect);
         }

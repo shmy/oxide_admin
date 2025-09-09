@@ -1,11 +1,12 @@
+use anyhow::Result;
 use serde::{Serialize, de::DeserializeOwned};
 
-pub fn rmp_encode<T: Serialize>(value: &T) -> Vec<u8> {
-    rmp_serde::to_vec(value).unwrap_or_default()
+pub fn rmp_encode<T: Serialize>(value: &T) -> Result<Vec<u8>> {
+    Ok(rmp_serde::to_vec(value)?)
 }
 
-pub fn rmp_decode<T: DeserializeOwned + Default>(bytes: &[u8]) -> T {
-    rmp_serde::from_slice(bytes).unwrap_or_default()
+pub fn rmp_decode<T: DeserializeOwned>(bytes: &[u8]) -> Result<T> {
+    Ok(rmp_serde::from_slice(bytes)?)
 }
 
 pub fn json_encode<T: Serialize>(value: &T) -> Vec<u8> {

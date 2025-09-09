@@ -78,7 +78,8 @@ async fn build_provider(config: Config) -> Result<Provider> {
     let (pg_pool, sqlite_pool, kv) = tokio::try_join!(
         pg_pool::try_new(&config.database),
         sqlite_pool::try_new(DATA_DIR.join("data.sqlite")),
-        async { Kv::try_new(DATA_DIR.join("data.redb")) }
+        // Kv::try_new(DATA_DIR.join("data.redb"))
+        Kv::try_new("redis://127.0.0.1:6379/1")
     )?;
 
     let provider = Provider::builder()
