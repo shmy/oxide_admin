@@ -9,7 +9,7 @@ pub type Kv = crate::port::redb_kv_impl::RedbKv;
 pub type Kv = crate::port::redis_kv_impl::RedisKVImpl;
 
 pub trait KvTrait {
-    fn get<T: DeserializeOwned + Default>(&self, key: &str) -> impl Future<Output = Option<T>>;
+    fn get<T: DeserializeOwned>(&self, key: &str) -> impl Future<Output = Option<T>>;
     fn set_with_ex<T: Serialize>(
         &self,
         key: &str,

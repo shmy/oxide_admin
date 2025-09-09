@@ -1,7 +1,11 @@
 use std::time::Duration;
 
 use anyhow::Result;
-use bb8_redis::{RedisConnectionManager, bb8::Pool, redis::AsyncCommands as _};
+use bb8_redis::{
+    RedisConnectionManager,
+    bb8::Pool,
+    redis::{AsyncCommands as _, cmd},
+};
 use chrono::Utc;
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::info;
@@ -20,16 +24,33 @@ impl RedisKVImpl {
             .connection_timeout(Duration::from_secs(10))
             .build(manager)
             .await?;
-        let cloned_pool = pool.clone();
-        let mut conn = cloned_pool.get().await?;
-        let pong: String = conn.ping().await?;
-        info!("Redis PING -> {}", pong);
-        Ok(Self { pool })
+        let instance = Self { pool };
+        instance.print_info().await?;
+        Ok(instance)
     }
 }
 
+impl RedisKVImpl {
+    async fn print_info(&self) -> Result<()> {
+        let mut conn = self.pool.get().await?;
+        let info: String = cmd("INFO").arg("server").query_async(&mut *conn).await?;
+        let mut version = String::new();
+        let mut os = String::new();
+        for line in info.lines() {
+            if line.starts_with("redis_version:") {
+                version.push_str(line.trim_start_matches("redis_version:"));
+            }
+
+            if line.starts_with("os:") {
+                os.push_str(line.trim_start_matches("os:"));
+            }
+        }
+        info!("Redis {} on {}", version, os);
+        Ok(())
+    }
+}
 impl KvTrait for RedisKVImpl {
-    async fn get<T: DeserializeOwned + Default>(&self, key: &str) -> Option<T> {
+    async fn get<T: DeserializeOwned>(&self, key: &str) -> Option<T> {
         let mut conn = self.pool.get().await.ok()?;
         let data: Vec<u8> = conn.get(key).await.ok()?;
         serde_util::rmp_decode::<T>(&data).ok()

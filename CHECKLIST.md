@@ -34,6 +34,7 @@
 [x] Command code generation
 [x] Query code generation
 [ ] 接入redis 替代sqlite redb moka
+[ ] 接入opendal
 [ ] Frontend code generation
 [-] 单元测试
 [-] l10n

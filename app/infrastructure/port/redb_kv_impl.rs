@@ -39,7 +39,7 @@ pub struct KvValue {
 }
 
 impl KvTrait for RedbKv {
-    async fn get<T: DeserializeOwned + Default>(&self, key: &str) -> Option<T> {
+    async fn get<T: DeserializeOwned>(&self, key: &str) -> Option<T> {
         let tx = self.db.begin_read().ok()?;
         let table = tx.open_table(TABLE).ok()?;
         let value_opt = table.get(key).ok()?;
