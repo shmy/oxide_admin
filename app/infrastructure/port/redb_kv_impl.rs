@@ -121,6 +121,35 @@ impl KvTrait for RedbKv {
         Ok(())
     }
 
+    async fn delete_prefix(&self, prefix: &str) -> Result<()> {
+        let tx = self.db.begin_read()?;
+        let table = tx.open_table(TABLE)?;
+        let iter = table.iter()?;
+        let keys = iter
+            .filter_map(|access| {
+                if let Ok((key, _)) = access {
+                    let key = key.value().to_string();
+                    if key.starts_with(prefix) {
+                        return Some(key);
+                    }
+                }
+                None
+            })
+            .collect::<Vec<_>>();
+        drop(tx);
+        if !keys.is_empty() {
+            let tx = self.db.begin_write()?;
+            {
+                let mut table = tx.open_table(TABLE)?;
+                for key in keys {
+                    let _ = table.remove(key.as_str());
+                }
+            }
+            tx.commit()?;
+        }
+        Ok(())
+    }
+
     async fn delete_expired(&self) -> Result<()> {
         debug!("Start delete_expired");
         let tx = self.db.begin_read()?;

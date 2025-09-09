@@ -40,6 +40,6 @@ application = { workspace = true }
 infrastructure = { workspace = true }
 
 [features]
-default = ["redis"]
+default = ["redb"]
 redb = ["infrastructure/redb"]
 redis = ["infrastructure/redis"]
