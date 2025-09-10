@@ -1,8 +1,9 @@
 use std::time::Duration;
 
+use anyhow::Result;
 use bon::Builder;
 use domain::iam::{error::IamError, value_object::role_id::RoleId};
-use infrastructure::shared::pg_pool::PgPool;
+use infrastructure::shared::{kv::Kv, pg_pool::PgPool};
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
@@ -10,24 +11,10 @@ use single_flight::single_flight;
 
 use crate::{
     iam::dto::user::UserDto,
-    impl_static_cache,
     shared::{
-        cache_type::{CacheType, hash_encode},
-        paging_query::PagingQuery,
-        paging_result::PagingResult,
+        cache_provider::CacheProvider, paging_query::PagingQuery, paging_result::PagingResult,
     },
 };
-
-const CACHE_CAPACITY: u64 = 100;
-const CACHE_TTL: Duration = Duration::from_secs(15 * 60);
-
-impl_static_cache!(
-    SEARCH_CACHE,
-    PagingResult<UserDto>,
-    IamError,
-    CACHE_CAPACITY,
-    CACHE_TTL
-);
 
 #[serde_as]
 #[derive(Clone, PartialEq, Eq, Hash, Deserialize, Builder)]
@@ -51,8 +38,8 @@ pub struct SearchUsersQuery {
 #[injectable]
 pub struct SearchUsersQueryHandler {
     pool: PgPool,
-    #[inject(&SEARCH_CACHE)]
-    cache: &'static CacheType<PagingResult<UserDto>, IamError>,
+    #[inject(|kv: Kv| CacheProvider::builder().prefix("search_users:").ttl(Duration::from_secs(15 * 60)).kv(kv).build())]
+    cache_provider: CacheProvider,
 }
 
 impl SearchUsersQueryHandler {
@@ -117,15 +104,14 @@ impl SearchUsersQueryHandler {
         Ok(PagingResult { total, items: rows })
     }
 
-    pub fn clean_cache(&self) {
-        self.cache.invalidate_all();
+    pub async fn clean_cache(&self) -> Result<()> {
+        self.cache_provider.clear().await
     }
 
     pub async fn query_cached(
         &self,
         query: SearchUsersQuery,
     ) -> Result<PagingResult<UserDto>, IamError> {
-        let key = hash_encode(&query);
-        self.cache.get_with(key, self.query(query)).await
+        self.cache_provider.get_with(query, |q| self.query(q)).await
     }
 }

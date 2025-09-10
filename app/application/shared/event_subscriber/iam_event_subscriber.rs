@@ -57,10 +57,10 @@ impl EventSubscriber<Event> for IamEventSubscriber {
                 tracing::error!(?e, error = %err, "权限刷新失败");
             }
             if Self::is_users_changed(&e) {
-                self.search_user_query_handler.clean_cache();
+                let _ = self.search_user_query_handler.clean_cache().await;
             }
             if Self::is_roles_changed(&e) {
-                self.search_role_query_handler.clean_cache();
+                let _ = self.search_role_query_handler.clean_cache().await;
             }
             match e {
                 IamEvent::UsersCreated { items } => {

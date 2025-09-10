@@ -1,5 +1,5 @@
 pub mod background_job;
-pub mod cache_type;
+pub mod cache_provider;
 pub mod command_handler;
 pub mod dto;
 pub mod event;

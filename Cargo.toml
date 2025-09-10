@@ -48,7 +48,6 @@ infrastructure = { path = "app/infrastructure" }
 jsonwebtoken = { version = "9.3", default-features = false }
 mimalloc = { version = "0.1", default-features = false }
 mime_guess = { version = "2.0", default-features = false }
-moka = { version = "0.12", default-features = false }
 nject = { version = "0.4", default-features = false }
 parking_lot = { version = "0.12", default-features = false }
 quote = { version = "1.0" }

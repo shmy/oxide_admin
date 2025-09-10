@@ -1,8 +1,8 @@
 use domain::iam::value_object::role_id::RoleId;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sqlx::{prelude::FromRow, types::chrono::NaiveDateTime};
 
-#[derive(Debug, Clone, Serialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct UserDto {
     pub id: String,
     pub account: String,

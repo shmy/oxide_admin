@@ -24,7 +24,6 @@ domain = { workspace = true }
 hex = { workspace = true, features = ["alloc"] }
 hmac-sha256 = { workspace = true }
 jsonwebtoken = { workspace = true }
-# moka = { workspace = true, features = ["future"] }
 nject = { workspace = true, features = ["macro"] }
 readonly = { workspace = true }
 redb = { workspace = true, optional = true }

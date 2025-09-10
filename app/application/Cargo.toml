@@ -16,7 +16,6 @@ futures-util = { workspace = true }
 image = { workspace = true, features = ["png", "webp", "jpeg"] }
 imageformat = { workspace = true }
 infrastructure = { workspace = true }
-moka = { workspace = true, features = ["future"] }
 nject = { workspace = true, features = ["macro"] }
 serde = { workspace = true, features = ["derive"] }
 serde_with = { workspace = true, features = ["alloc", "macros", "chrono_0_4"] }
