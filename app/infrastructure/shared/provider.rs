@@ -1,5 +1,5 @@
-use background_job::JobPool;
 use bon::Builder;
+use faktory_bg::publisher::Publisher;
 use nject::provider;
 
 use crate::shared::{config::Config, kv::Kv, pg_pool::PgPool};
@@ -9,8 +9,10 @@ use crate::shared::{config::Config, kv::Kv, pg_pool::PgPool};
 pub struct Provider {
     #[provide(PgPool, |dep| dep.clone())]
     pg_pool: PgPool,
-    #[provide(JobPool, |dep| dep.clone())]
-    job_pool: JobPool,
+
+    #[provide(Publisher, |dep| dep.clone())]
+    publisher: Publisher,
+
     #[provide(Kv, |dep| dep.clone())]
     kv: Kv,
     #[provide(Config, |dep| dep.clone())]

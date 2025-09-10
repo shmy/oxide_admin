@@ -1,7 +1,7 @@
 use std::time::{Duration, SystemTime};
 
 use anyhow::Result;
-use background_job::CronJob;
+use faktory_bg::{JobRunner, error::RunnerError};
 use futures_util::StreamExt as _;
 use infrastructure::shared::path::TEMP_DIR;
 use nject::injectable;
@@ -12,12 +12,9 @@ use tracing::warn;
 #[injectable]
 pub struct DeleteOutdateTempDirCronJob;
 
-impl CronJob for DeleteOutdateTempDirCronJob {
-    const NAME: &'static str = "delete_outdate_temp_dir_cron_job";
-    const SCHEDULE: &'static str = "at 01:01 am";
-    const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30);
-
-    async fn execute(&self) -> Result<()> {
+impl JobRunner for DeleteOutdateTempDirCronJob {
+    type Params = ();
+    async fn run(&self, _params: Self::Params) -> Result<(), RunnerError> {
         let now = SystemTime::now();
 
         if let Ok(dir) = fs::read_dir(TEMP_DIR.as_path()).await {

@@ -35,7 +35,7 @@
 [x] Query code generation
 [x] 接入redis 替代redb
 [x] 接入redis 替代moka
-[ ] 接入redis 替代job sqlite backend
+[ ] 接入faktory代替后台任务
 [ ] 接入opendal/rustfs/minio
 [ ] 重构分布式事件系统
 [ ] Frontend code generation

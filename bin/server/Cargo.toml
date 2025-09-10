@@ -34,12 +34,13 @@ tracing-subscriber = { workspace = true, features = [
     "json",
 ] }
 
-background_job = { workspace = true }
 adapter = { workspace = true }
 application = { workspace = true }
 infrastructure = { workspace = true }
+faktory_bg = { workspace = true }
 
 [features]
-default = ["redis"]
+default = ["redis", "faktory"]
 redb = ["infrastructure/redb"]
 redis = ["infrastructure/redis"]
+faktory = ["infrastructure/faktory"]

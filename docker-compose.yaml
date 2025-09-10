@@ -16,9 +16,21 @@ services:
     ports:
       - "6379:6379"
 
-  nats:
-    image: nats:alpine
+  # nats:
+  #   image: nats:alpine
+  #   restart: always
+  #   ports:
+  #     - "4222:4222"
+  #     - "8222:8222"
+
+  faktory:
+    image: contribsys/faktory
     restart: always
     ports:
-      - "4222:4222"
-      - "8222:8222"
+      - "7419:7419"
+      - "7420:7420"
+    environment:
+      - FAKTORY_PASSWORD=123123
+    volumes:
+      - $PWD/containers/faktory:/var/lib/faktory/db
+    command: /faktory -b :7419 -w :7420 -e production

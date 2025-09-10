@@ -1,5 +1,5 @@
 use anyhow::Result;
-use background_job::CronJob;
+use faktory_bg::{JobRunner, error::RunnerError};
 use futures_util::StreamExt;
 use infrastructure::shared::{config::Config, path::LOG_DIR};
 use nject::injectable;
@@ -13,12 +13,9 @@ pub struct DeleteOutdateLogDirCronJob {
     config: Config,
 }
 
-impl CronJob for DeleteOutdateLogDirCronJob {
-    const NAME: &'static str = "delete_outdate_log_dir_cron_job";
-    const SCHEDULE: &'static str = "at 02:01 am";
-    const TIMEOUT: Duration = Duration::from_secs(30);
-
-    async fn execute(&self) -> Result<()> {
+impl JobRunner for DeleteOutdateLogDirCronJob {
+    type Params = ();
+    async fn run(&self, _params: Self::Params) -> Result<(), RunnerError> {
         let config = &self.config;
         let period_secs = config.log.rolling_period.as_secs();
         let now = SystemTime::now();

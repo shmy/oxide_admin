@@ -7,15 +7,15 @@ edition = "2024"
 path = "lib.rs"
 
 [features]
-redb = ["dep:redb", "background_job/sqlite"]
-redis = ["dep:bb8-redis", "background_job/redis"]
+redb = ["dep:redb"]
+redis = ["dep:bb8-redis"]
+faktory = ["dep:faktory_bg"]
 
 [dependencies]
 anyhow = { workspace = true }
 axum = { workspace = true }
 bb8-redis = { workspace = true, optional = true }
 bon = { workspace = true }
-background_job = { workspace = true }
 captcha_generator = { workspace = true }
 chrono = { workspace = true }
 chrono-tz = { workspace = true, features = ["std"] }
@@ -46,3 +46,4 @@ tempoid = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
+faktory_bg = { workspace = true, optional = true }

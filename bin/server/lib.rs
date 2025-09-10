@@ -2,7 +2,7 @@ use adapter::WebState;
 use anyhow::Result;
 use application::shared::{background_job::register_jobs, event_subscriber::register_subscribers};
 use axum::Router;
-use background_job::BackgroundJobManager;
+use faktory_bg::{publisher::Publisher, worker::Worker};
 use infrastructure::shared::{
     config::{Config, Server},
     path::LOG_DIR,
@@ -29,17 +29,15 @@ pub async fn bootstrap(config: Config) -> Result<()> {
     let _guard = init_tracing(&config.log.level, config.log.rolling_kind.clone());
     let listener = build_listener(&config.server).await?;
     let provider = build_provider(config).await?;
-    let job_manager = build_job_manager(&provider).await?;
+    let worker = build_job_worker(&provider).await?;
     let app = adapter::routing(WebState::new(provider.clone()));
     let notify_shutdown = Arc::new(Notify::new());
-    let background_job_handle =
-        tokio::spawn(start_background_job(job_manager, notify_shutdown.clone()));
+    let background_job_handle = tokio::spawn(start_background_job(worker, notify_shutdown.clone()));
     let server_handle = tokio::spawn(start_http_server(listener, app, notify_shutdown.clone()));
     shutdown_signal().await;
     notify_shutdown.notify_waiters();
     let _ = tokio::join!(background_job_handle, server_handle);
     provider.provide::<PgPool>().close().await;
-    // provider.provide::<JobPool>().close().await;
     info!("👋 Goodbye!");
     Ok(())
 }
@@ -75,8 +73,6 @@ async fn build_listener(server: &Server) -> Result<TcpListener> {
 
 async fn build_provider(config: Config) -> Result<Provider> {
     let pg_fut = pg_pool::try_new(&config.database);
-    #[cfg(feature = "redb")]
-    let job_fut = background_job::try_new(DATA_DIR.join("data.sqlite"));
 
     #[cfg(feature = "redb")]
     let kv_fut = Kv::try_new(DATA_DIR.join("data.redb"));
@@ -84,35 +80,38 @@ async fn build_provider(config: Config) -> Result<Provider> {
     let kv_fut = Kv::try_new(&config.redis);
 
     #[cfg(feature = "redb")]
-    let (pg_pool, job_pool, kv) = tokio::try_join!(pg_fut, job_fut, kv_fut)?;
+    let (pg_pool, kv) = tokio::try_join!(pg_fut, kv_fut)?;
 
     #[cfg(feature = "redis")]
-    let (pg_pool, (kv, job_pool)) = tokio::try_join!(pg_fut, kv_fut)?;
+    let (pg_pool, kv) = tokio::try_join!(pg_fut, kv_fut)?;
+
+    let publisher = Publisher::try_new(&config.faktory.url, &config.faktory.queue).await?;
 
     let provider = Provider::builder()
         .pg_pool(pg_pool.clone())
-        .job_pool(job_pool.clone())
         .kv(kv)
+        .publisher(publisher)
         .config(config)
         .build();
     Ok(provider)
 }
 
-async fn build_job_manager(provider: &Provider) -> Result<BackgroundJobManager> {
-    let (_, _, manager) = tokio::try_join!(
+async fn build_job_worker(provider: &Provider) -> Result<Worker> {
+    let config = &provider.provide::<Config>();
+
+    let (_, _, worker) = tokio::try_join!(
         migration::migrate(provider),
         async {
             register_subscribers(provider);
             anyhow::Ok(())
         },
         async {
-            let manager = BackgroundJobManager::new();
-            let manager = manager.migrate().await?;
-            let manager = register_jobs(manager, provider);
-            anyhow::Ok(manager)
-        }
+            let mut worker = Worker::new(&config.faktory.url, &config.faktory.queue);
+            register_jobs(&mut worker, provider);
+            anyhow::Ok(worker)
+        },
     )?;
-    Ok(manager)
+    Ok(worker)
 }
 
 async fn start_http_server(listener: TcpListener, app: Router, notify: Arc<Notify>) -> Result<()> {
@@ -131,13 +130,12 @@ async fn start_http_server(listener: TcpListener, app: Router, notify: Arc<Notif
     Ok(())
 }
 
-async fn start_background_job(manager: BackgroundJobManager, notify: Arc<Notify>) -> Result<()> {
+async fn start_background_job(mut worker: Worker, notify: Arc<Notify>) -> Result<()> {
     let shutdown = async move {
         notify.notified().await;
         info!("Received shutdown signal, shutting down background job...");
-        Ok(())
     };
-    manager.run_with_signal(shutdown).await?;
+    worker.run_with_signal(shutdown).await?;
     info!("Background job shutdown complete");
     Ok(())
 }

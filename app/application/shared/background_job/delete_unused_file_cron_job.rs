@@ -1,5 +1,5 @@
 use anyhow::Result;
-use background_job::CronJob;
+use faktory_bg::{JobRunner, error::RunnerError};
 use futures_util::StreamExt as _;
 use infrastructure::shared::path::UPLOAD_DIR;
 use nject::injectable;
@@ -13,13 +13,9 @@ pub struct DeleteUnusedFileCronJob {
     file_service: FileService,
 }
 
-impl CronJob for DeleteUnusedFileCronJob {
-    const NAME: &'static str = "delete_unused_file_cron_job";
-    const SCHEDULE: &'static str = "at 00:01 am";
-
-    const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30);
-
-    async fn execute(&self) -> Result<()> {
+impl JobRunner for DeleteUnusedFileCronJob {
+    type Params = ();
+    async fn run(&self, _params: Self::Params) -> Result<(), RunnerError> {
         let file_service = &self.file_service;
         let stream = file_service.unused_2days_ago();
         stream

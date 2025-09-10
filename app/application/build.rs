@@ -41,8 +41,6 @@ fn generate_subscribers() -> Result<()> {
 fn generate_jobs() -> Result<()> {
     let entries = read_rs("shared/background_job")?;
     let mut jobs = Vec::new();
-    let mut stepped_jobs = Vec::new();
-    let mut cron_jobs = Vec::new();
     for entry in entries {
         let stem = entry.file_stem().unwrap().to_string_lossy();
         let struct_name = stem.to_pascal_case();
@@ -51,24 +49,11 @@ fn generate_jobs() -> Result<()> {
             continue;
         }
         let stem = stem.to_string();
-        if stem.ends_with("stepped_job") {
-            stepped_jobs.push(stem);
-        } else if stem.ends_with("cron_job") {
-            cron_jobs.push(stem);
-        } else {
-            jobs.push(stem);
-        }
+        jobs.push(stem);
     }
 
     let env = build_env();
-    let code = env.render_str(
-        JOB_TEMPLATE,
-        JobContext {
-            jobs,
-            cron_jobs,
-            stepped_jobs,
-        },
-    )?;
+    let code = env.render_str(JOB_TEMPLATE, JobContext { jobs })?;
     let out_dir = std::env::var("OUT_DIR")?;
     let out_path = Path::new(&out_dir).join("jobs.rs");
 
@@ -124,71 +109,40 @@ pub fn register_subscribers(provider: &Provider) {
 #[derive(Serialize, Deserialize)]
 pub struct JobContext {
     jobs: Vec<String>,
-    stepped_jobs: Vec<String>,
-    cron_jobs: Vec<String>,
 }
 
 const JOB_TEMPLATE: &str = r#"#[allow(unused_imports)]
-use background_job::{BackgroundJobManager, JobStorage, SteppableStorage, SteppedJobStorage};
+use faktory_bg::worker::Worker;
+#[allow(unused_imports)]
+use faktory_bg::publisher::Publisher;
+#[allow(unused_imports)]
+use faktory_bg::JobRunner;
 #[allow(unused_imports)]
 use infrastructure::shared::provider::Provider;
 #[allow(unused_imports)]
-use nject::injectable;
-#[allow(unused_imports)]
-use background_job::{Storage, JobPool};
+use anyhow::Result;
 
-pub fn register_jobs(manager: BackgroundJobManager, provider: &Provider) -> BackgroundJobManager {
+#[allow(unused_imports)]
+use nject::injectable;
+
+pub fn register_jobs(worker: &mut Worker, provider: &Provider) {
     {%- for job in jobs %}
 
-    let storage = JobStorage::new(provider.provide());
-    let manager = manager.register::<{{job}}::{{job | pascal_case}}>(provider.provide(), storage);
+    worker.register("{{job}}", provider.provide::<{{job}}::{{job | pascal_case}}>());
     tracing::info!("Job [{{job | pascal_case}}] has been registered");
     {%- endfor %}
 
-    {%- for job in stepped_jobs %}
-
-    let storage = SteppedJobStorage::new(provider.provide());
-    let manager = manager.register_stepped::<{{job}}::{{job | pascal_case}}>(storage);
-    tracing::info!("Stepped job [{{job | pascal_case}}] has been registered");
-    {%- endfor %}
-
-    {%- for job in cron_jobs %}
-
-    let manager = manager.register_cron::<{{job}}::{{job | pascal_case}}>(provider.provide());
-    tracing::info!("Cron job [{{job | pascal_case}}] has been registered");
-    {%- endfor %}
-    manager
 }
 {%- for item in jobs %}
 
 #[injectable]
-pub struct {{item | pascal_case}}Dispatcher {
-    #[inject(|pool: JobPool| JobStorage::new(pool) )]
-    pub storage: JobStorage<{{item}}::{{item | pascal_case}}Params>,
+pub struct {{item | pascal_case}}Publisher {
+     publisher: Publisher,
 }
 
-impl {{item | pascal_case}}Dispatcher {
-    pub async fn dispatch(&mut self, params: {{item}}::{{item | pascal_case}}Params) {
-        if let Err(err) = self.storage.push(params).await {
-            tracing::error!(%err, "Failed to push [{{item | pascal_case}}]");
-        }
-    }
-}
-{%- endfor %}
-
-{%- for item in stepped_jobs %}
-
-#[injectable]
-pub struct {{item | pascal_case}}Dispatcher {
-    #[inject(|pool: JobPool| SteppedJobStorage::new(pool) )]
-    pub storage: SteppedJobStorage,
-}
-
-impl {{item | pascal_case}}Dispatcher {
-    pub async fn dispatch(&mut self, params: {{item}}::{{item | pascal_case}}Begin) {
-        if let Err(err) = self.storage.start_stepped(params).await {
-            tracing::error!(%err, "Failed to start_stepped [{{item | pascal_case}}]");
-        }
+impl {{item | pascal_case}}Publisher {
+    pub async fn publish(&mut self, params: <{{item}}::{{item | pascal_case}} as JobRunner>::Params) -> Result<()> {
+        self.publisher.publish("{{item}}", params).await
     }
 }
 {%- endfor %}
