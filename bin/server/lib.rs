@@ -74,15 +74,15 @@ async fn build_listener(server: &Server) -> Result<TcpListener> {
 async fn build_provider(config: Config) -> Result<Provider> {
     let pg_fut = pg_pool::try_new(&config.database);
 
-    #[cfg(feature = "redb")]
+    #[cfg(feature = "kv_redb")]
     let kv_fut = Kv::try_new(DATA_DIR.join("data.redb"));
-    #[cfg(feature = "redis")]
+    #[cfg(feature = "kv_redis")]
     let kv_fut = Kv::try_new(&config.redis);
 
-    #[cfg(feature = "redb")]
+    #[cfg(feature = "kv_redb")]
     let (pg_pool, kv) = tokio::try_join!(pg_fut, kv_fut)?;
 
-    #[cfg(feature = "redis")]
+    #[cfg(feature = "kv_redis")]
     let (pg_pool, kv) = tokio::try_join!(pg_fut, kv_fut)?;
 
     let publisher = Publisher::try_new(&config.faktory.url, &config.faktory.queue).await?;

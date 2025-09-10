@@ -7,7 +7,7 @@ use tracing_appender::rolling::Rotation;
 pub struct Config {
     pub log: Log,
     pub database: Database,
-    #[cfg(feature = "redis")]
+    #[cfg(feature = "kv_redis")]
     pub redis: Redis,
     #[cfg(feature = "bg_faktory")]
     pub faktory: Faktory,
@@ -36,7 +36,7 @@ pub struct Database {
     pub acquire_timeout: Duration,
 }
 
-#[cfg(feature = "redis")]
+#[cfg(feature = "kv_redis")]
 #[derive(Debug, Clone, Builder)]
 #[readonly::make]
 pub struct Redis {

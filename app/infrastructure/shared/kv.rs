@@ -3,9 +3,9 @@ use std::time::Duration;
 use anyhow::Result;
 use serde::{Serialize, de::DeserializeOwned};
 
-#[cfg(feature = "redb")]
+#[cfg(feature = "kv_redb")]
 pub type Kv = crate::port::redb_kv_impl::RedbKv;
-#[cfg(feature = "redis")]
+#[cfg(feature = "kv_redis")]
 pub type Kv = crate::port::redis_kv_impl::RedisKVImpl;
 
 pub trait KvTrait {

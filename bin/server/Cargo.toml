@@ -40,7 +40,7 @@ infrastructure = { workspace = true }
 faktory_bg = { workspace = true }
 
 [features]
-default = ["redis", "bg_faktory"]
-redb = ["infrastructure/redb"]
-redis = ["infrastructure/redis"]
+default = ["kv_redis", "bg_faktory"]
+kv_redb = ["infrastructure/kv_redb"]
+kv_redis = ["infrastructure/kv_redis"]
 bg_faktory = ["infrastructure/bg_faktory"]

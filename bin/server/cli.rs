@@ -48,32 +48,32 @@ pub struct Cli {
     #[arg(long, default_value = "3s", env = "DATABASE_ACQUIRE_TIMEOUT")]
     pub database_acquire_timeout: String,
 
-    #[cfg(feature = "redis")]
+    #[cfg(feature = "kv_redis")]
     /// Redis连接地址
     #[arg(long, env = "REDIS_URL")]
     pub redis_url: String,
 
-    #[cfg(feature = "redis")]
+    #[cfg(feature = "kv_redis")]
     /// Redis连接超时时间
     #[arg(long, default_value = "10s", env = "REDIS_CONNECTION_TIMEOUT")]
     pub redis_connection_timeout: String,
 
-    #[cfg(feature = "redis")]
+    #[cfg(feature = "kv_redis")]
     /// Redis最大连接数
     #[arg(long, default_value = "100", env = "REDIS_MAX_SIZE")]
     pub redis_max_size: u32,
 
-    #[cfg(feature = "redis")]
+    #[cfg(feature = "kv_redis")]
     /// Redis最小空闲连接数
     #[arg(long, default_value = "1", env = "REDIS_MIN_IDLE")]
     pub redis_min_idle: u32,
 
-    #[cfg(feature = "redis")]
+    #[cfg(feature = "kv_redis")]
     /// Redis最大存活时间
     #[arg(long, default_value = "15min", env = "REDIS_MAX_LIFETIME")]
     pub redis_max_lifetime: String,
 
-    #[cfg(feature = "redis")]
+    #[cfg(feature = "kv_redis")]
     /// Redis最大空闲时间
     #[arg(long, default_value = "5min", env = "REDIS_IDLE_TIMEOUT")]
     pub redis_idle_timeout: String,
@@ -169,7 +169,7 @@ impl TryFrom<Cli> for Config {
                     .build(),
             );
 
-        #[cfg(feature = "redis")]
+        #[cfg(feature = "kv_redis")]
         let builder = builder.redis(
             infrastructure::shared::config::Redis::builder()
                 .url(value.redis_url)
