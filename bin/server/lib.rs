@@ -116,8 +116,7 @@ async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
     #[cfg(feature = "bg_faktory")]
     let mut worker_manager = {
         let config = &provider.provide::<Config>();
-        let worker_manager = WorkerManager::new(&config.faktory.url, &config.faktory.queue);
-        worker_manager
+        WorkerManager::new(&config.faktory.url, &config.faktory.queue)
     };
     #[cfg(not(feature = "bg_faktory"))]
     let mut worker_manager = WorkerManager::new();
