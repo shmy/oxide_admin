@@ -34,8 +34,8 @@
 [x] Command code generation
 [x] Query code generation
 [x] 接入redis 替代redb
+[x] 接入redis 替代moka
 [ ] 接入redis 替代sqlite
-[ ] 接入redis 替代moka
 [ ] 接入opendal/rustfs/minio
 [ ] Frontend code generation
 [-] 单元测试
