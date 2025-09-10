@@ -9,11 +9,11 @@ use tracing::warn;
 
 #[derive(Clone)]
 #[injectable]
-pub struct DeleteOutdateLogDirCronJob {
+pub struct DeleteOutdateLogDir {
     config: Config,
 }
 
-impl JobRunner for DeleteOutdateLogDirCronJob {
+impl JobRunner for DeleteOutdateLogDir {
     type Params = ();
     async fn run(&self, _params: Self::Params) -> Result<(), RunnerError> {
         let config = &self.config;

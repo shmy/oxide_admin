@@ -9,11 +9,11 @@ use crate::system::service::file_service::FileService;
 
 #[derive(Clone)]
 #[injectable]
-pub struct DeleteUnusedFileCronJob {
+pub struct DeleteUnusedFile {
     file_service: FileService,
 }
 
-impl JobRunner for DeleteUnusedFileCronJob {
+impl JobRunner for DeleteUnusedFile {
     type Params = ();
     async fn run(&self, _params: Self::Params) -> Result<(), RunnerError> {
         let file_service = &self.file_service;

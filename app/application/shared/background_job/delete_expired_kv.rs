@@ -5,11 +5,11 @@ use tracing::info;
 
 #[derive(Clone)]
 #[injectable]
-pub struct DeleteExpiredKvCronJob {
+pub struct DeleteExpiredKv {
     kv: Kv,
 }
 
-impl JobRunner for DeleteExpiredKvCronJob {
+impl JobRunner for DeleteExpiredKv {
     type Params = ();
     async fn run(&self, _params: Self::Params) -> Result<(), RunnerError> {
         info!("Start delete expired kv job");

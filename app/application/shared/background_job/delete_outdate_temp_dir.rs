@@ -10,9 +10,9 @@ use tracing::warn;
 
 #[derive(Clone)]
 #[injectable]
-pub struct DeleteOutdateTempDirCronJob;
+pub struct DeleteOutdateTempDir;
 
-impl JobRunner for DeleteOutdateTempDirCronJob {
+impl JobRunner for DeleteOutdateTempDir {
     type Params = ();
     async fn run(&self, _params: Self::Params) -> Result<(), RunnerError> {
         let now = SystemTime::now();
