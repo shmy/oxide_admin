@@ -1,4 +1,4 @@
-pub mod background_job;
+pub mod background_worker;
 pub mod cache_provider;
 pub mod command_handler;
 pub mod dto;

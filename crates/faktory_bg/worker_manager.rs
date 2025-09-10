@@ -3,13 +3,13 @@ use faktory::{Job, WorkerBuilder};
 
 use crate::{JobRunner, RunnerWrapper, error::RunnerError};
 
-pub struct Worker {
+pub struct WorkerManager {
     addr: String,
     queue: String,
     worker_builder: WorkerBuilder<RunnerError>,
 }
 
-impl Worker {
+impl WorkerManager {
     pub fn new(addr: impl Into<String>, queue: impl Into<String>) -> Self {
         Self {
             addr: addr.into(),

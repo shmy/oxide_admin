@@ -38,6 +38,7 @@
 [ ] 接入faktory代替后台任务
 [ ] 配置日志是否本地轮转
 [ ] 接入opendal/rustfs/minio
+[ ] 重新测试Code generation
 [ ] Frontend code generation
 [-] 接入分布式事件系统
 [-] 单元测试

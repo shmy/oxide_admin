@@ -10,7 +10,8 @@ async fn main() {
         .await
         .unwrap();
 
-    let mut worker = faktory_bg::worker::Worker::new("tcp://:123123@localhost:7419", "my_queue");
+    let mut worker =
+        faktory_bg::worker_manager::WorkerManager::new("tcp://:123123@localhost:7419", "my_queue");
     worker.register_fn("foobar", |job| async move {
         dbg!(&job);
         Ok::<(), RunnerError>(())

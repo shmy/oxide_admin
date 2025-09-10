@@ -1,8 +1,10 @@
 use adapter::WebState;
 use anyhow::Result;
-use application::shared::{background_job::register_jobs, event_subscriber::register_subscribers};
+use application::shared::{
+    background_worker::register_workers, event_subscriber::register_subscribers,
+};
 use axum::Router;
-use faktory_bg::worker::Worker;
+use faktory_bg::worker_manager::WorkerManager;
 use infrastructure::shared::{
     config::{Config, Server},
     path::LOG_DIR,
@@ -29,10 +31,11 @@ pub async fn bootstrap(config: Config) -> Result<()> {
     let _guard = init_tracing(&config.log.level, config.log.rolling_kind.clone());
     let listener = build_listener(&config.server).await?;
     let provider = build_provider(config).await?;
-    let (_, worker) = try_join!(initilize(&provider), build_job_worker(&provider))?;
+    let (_, worker) = try_join!(initilize(&provider), build_worker_manager(&provider))?;
     let app = adapter::routing(WebState::new(provider.clone()));
     let notify_shutdown = Arc::new(Notify::new());
-    let background_job_handle = tokio::spawn(start_background_job(worker, notify_shutdown.clone()));
+    let background_job_handle =
+        tokio::spawn(start_background_worker(worker, notify_shutdown.clone()));
     let server_handle = tokio::spawn(start_http_server(listener, app, notify_shutdown.clone()));
     shutdown_signal().await;
     notify_shutdown.notify_waiters();
@@ -114,11 +117,11 @@ async fn initilize(provider: &Provider) -> Result<()> {
     Ok(())
 }
 
-async fn build_job_worker(provider: &Provider) -> Result<Worker> {
+async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
     let config = &provider.provide::<Config>();
-    let mut worker = Worker::new(&config.faktory.url, &config.faktory.queue);
-    register_jobs(&mut worker, provider);
-    Ok(worker)
+    let mut worker_manager = WorkerManager::new(&config.faktory.url, &config.faktory.queue);
+    register_workers(&mut worker_manager, provider);
+    Ok(worker_manager)
 }
 
 async fn start_http_server(listener: TcpListener, app: Router, notify: Arc<Notify>) -> Result<()> {
@@ -137,13 +140,16 @@ async fn start_http_server(listener: TcpListener, app: Router, notify: Arc<Notif
     Ok(())
 }
 
-async fn start_background_job(mut worker: Worker, notify: Arc<Notify>) -> Result<()> {
+async fn start_background_worker(
+    mut worker_manager: WorkerManager,
+    notify: Arc<Notify>,
+) -> Result<()> {
     let shutdown = async move {
         notify.notified().await;
-        info!("Received shutdown signal, shutting down background job...");
+        info!("Received shutdown signal, shutting down background worker...");
     };
-    worker.run_with_signal(shutdown).await?;
-    info!("Background job shutdown complete");
+    worker_manager.run_with_signal(shutdown).await?;
+    info!("Background worker shutdown complete");
     Ok(())
 }
 

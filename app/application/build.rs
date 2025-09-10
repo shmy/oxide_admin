@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 fn main() -> Result<()> {
     generate_subscribers()?;
-    generate_jobs()?;
+    generate_background_workers()?;
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=shared/event_subscriber");
     println!("cargo:rerun-if-changed=shared/background_job");
@@ -38,8 +38,8 @@ fn generate_subscribers() -> Result<()> {
     Ok(())
 }
 
-fn generate_jobs() -> Result<()> {
-    let entries = read_rs("shared/background_job")?;
+fn generate_background_workers() -> Result<()> {
+    let entries = read_rs("shared/background_worker")?;
     let mut jobs = Vec::new();
     for entry in entries {
         let stem = entry.file_stem().unwrap().to_string_lossy();
@@ -55,7 +55,7 @@ fn generate_jobs() -> Result<()> {
     let env = build_env();
     let code = env.render_str(JOB_TEMPLATE, JobContext { jobs })?;
     let out_dir = std::env::var("OUT_DIR")?;
-    let out_path = Path::new(&out_dir).join("jobs.rs");
+    let out_path = Path::new(&out_dir).join("workers.rs");
 
     fs::write(out_path, code)?;
     Ok(())
@@ -112,7 +112,7 @@ pub struct JobContext {
 }
 
 const JOB_TEMPLATE: &str = r#"#[allow(unused_imports)]
-use faktory_bg::worker::Worker;
+use faktory_bg::worker_manager::WorkerManager;
 #[allow(unused_imports)]
 use faktory_bg::queuer::Queuer;
 #[allow(unused_imports)]
@@ -125,10 +125,10 @@ use anyhow::Result;
 #[allow(unused_imports)]
 use nject::injectable;
 
-pub fn register_jobs(worker: &mut Worker, provider: &Provider) {
+pub fn register_workers(worker_manager: &mut WorkerManager, provider: &Provider) {
     {%- for job in jobs %}
 
-    worker.register("{{job}}", provider.provide::<{{job}}::{{job | pascal_case}}>());
+    worker_manager.register("{{job}}", provider.provide::<{{job}}::{{job | pascal_case}}>());
     tracing::info!("Job [{{job | pascal_case}}] has been registered");
     {%- endfor %}
 
