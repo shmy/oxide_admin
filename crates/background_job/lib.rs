@@ -1,6 +1,3 @@
-use std::path::Path;
-
-use anyhow::Result;
 pub use apalis::prelude::{Data, Error, GoTo, StepBuilder, SteppableStorage, Storage};
 pub use apalis_core::codec::json::JsonCodec;
 pub use apalis_core::step::StepFn;
@@ -22,7 +19,9 @@ pub type JobPool = bb8_redis::bb8::Pool<bb8_redis::RedisConnectionManager>;
 pub type JobPool = apalis_sql::sqlx::Pool<apalis_sql::sqlx::Sqlite>;
 
 #[cfg(feature = "sqlite")]
-pub async fn try_new(path: impl AsRef<Path>) -> Result<apalis_sql::sqlx::SqlitePool> {
+pub async fn try_new(
+    path: impl AsRef<std::path::Path>,
+) -> anyhow::Result<apalis_sql::sqlx::SqlitePool> {
     use apalis_sql::sqlx::ConnectOptions;
     use apalis_sql::sqlx::sqlite::SqliteConnectOptions;
     use apalis_sql::sqlx::sqlite::SqliteJournalMode;

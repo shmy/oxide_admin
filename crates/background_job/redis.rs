@@ -6,7 +6,6 @@ use apalis::{
 use apalis_core::codec::json::JsonCodec;
 use apalis_cron::{CronContext, CronStream, Schedule};
 use apalis_redis::{RedisContext, RedisStorage};
-use bb8_redis::{RedisConnectionManager, bb8::Pool};
 use chrono::Local;
 use serde::{Serialize, de::DeserializeOwned};
 use std::{str::FromStr as _, sync::Arc, time::Duration};
@@ -16,14 +15,18 @@ pub type SteppedJobBuilder<T> =
     StepBuilder<RedisContext, Vec<u8>, <T as SteppedJob>::Begin, (), JsonCodec<Vec<u8>>, usize>;
 
 pub struct BackgroundJobManager {
-    pool: Pool<RedisConnectionManager>,
     monitor: Monitor,
 }
 
+impl Default for BackgroundJobManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BackgroundJobManager {
-    pub fn new(pool: Pool<RedisConnectionManager>) -> Self {
+    pub fn new() -> Self {
         Self {
-            pool,
             monitor: Monitor::new(),
         }
     }

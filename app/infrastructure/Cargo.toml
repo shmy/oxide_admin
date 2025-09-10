@@ -7,8 +7,8 @@ edition = "2024"
 path = "lib.rs"
 
 [features]
-redb = ["dep:redb"]
-redis = ["dep:bb8-redis"]
+redb = ["dep:redb", "background_job/sqlite"]
+redis = ["dep:bb8-redis", "background_job/redis"]
 
 [dependencies]
 anyhow = { workspace = true }
@@ -36,6 +36,7 @@ single_flight = { workspace = true }
 sqlx = { workspace = true, features = [
     "runtime-tokio",
     "postgres",
+    "macros",
     "migrate",
     "chrono",
     "json",

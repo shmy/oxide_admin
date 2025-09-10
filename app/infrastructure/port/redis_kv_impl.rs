@@ -18,7 +18,7 @@ pub struct RedisKVImpl {
 }
 
 impl RedisKVImpl {
-    pub async fn try_new(config: &Redis) -> Result<Self> {
+    pub async fn try_new(config: &Redis) -> Result<(Self, Pool<RedisConnectionManager>)> {
         let manager = RedisConnectionManager::new(&*config.url)?;
         let pool = Pool::builder()
             .connection_timeout(config.connection_timeout)
@@ -28,9 +28,9 @@ impl RedisKVImpl {
             .idle_timeout(config.idle_timeout)
             .build(manager)
             .await?;
-        let instance = Self { pool };
+        let instance = Self { pool: pool.clone() };
         instance.print_info().await?;
-        Ok(instance)
+        Ok((instance, pool))
     }
 }
 

@@ -2,10 +2,10 @@ use adapter::WebState;
 use anyhow::Result;
 use application::shared::{background_job::register_jobs, event_subscriber::register_subscribers};
 use axum::Router;
-use background_job::{BackgroundJobManager, JobPool};
+use background_job::BackgroundJobManager;
 use infrastructure::shared::{
     config::{Config, Server},
-    path::{DATA_DIR, LOG_DIR},
+    path::LOG_DIR,
     pg_pool,
 };
 use infrastructure::{
@@ -39,7 +39,7 @@ pub async fn bootstrap(config: Config) -> Result<()> {
     notify_shutdown.notify_waiters();
     let _ = tokio::join!(background_job_handle, server_handle);
     provider.provide::<PgPool>().close().await;
-    provider.provide::<JobPool>().close().await;
+    // provider.provide::<JobPool>().close().await;
     info!("👋 Goodbye!");
     Ok(())
 }
@@ -75,14 +75,19 @@ async fn build_listener(server: &Server) -> Result<TcpListener> {
 
 async fn build_provider(config: Config) -> Result<Provider> {
     let pg_fut = pg_pool::try_new(&config.database);
-    let sqlite_fut = background_job::try_new(DATA_DIR.join("data.sqlite"));
+    #[cfg(feature = "redb")]
+    let job_fut = background_job::try_new(DATA_DIR.join("data.sqlite"));
 
     #[cfg(feature = "redb")]
     let kv_fut = Kv::try_new(DATA_DIR.join("data.redb"));
     #[cfg(feature = "redis")]
     let kv_fut = Kv::try_new(&config.redis);
 
-    let (pg_pool, job_pool, kv) = tokio::try_join!(pg_fut, sqlite_fut, kv_fut)?;
+    #[cfg(feature = "redb")]
+    let (pg_pool, job_pool, kv) = tokio::try_join!(pg_fut, job_fut, kv_fut)?;
+
+    #[cfg(feature = "redis")]
+    let (pg_pool, (kv, job_pool)) = tokio::try_join!(pg_fut, kv_fut)?;
 
     let provider = Provider::builder()
         .pg_pool(pg_pool.clone())
@@ -101,7 +106,7 @@ async fn build_job_manager(provider: &Provider) -> Result<BackgroundJobManager> 
             anyhow::Ok(())
         },
         async {
-            let manager = BackgroundJobManager::new(provider.provide());
+            let manager = BackgroundJobManager::new();
             let manager = manager.migrate().await?;
             let manager = register_jobs(manager, provider);
             anyhow::Ok(manager)
