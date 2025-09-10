@@ -5,12 +5,12 @@ use faktory::{Client, Job};
 use tokio::sync::Mutex;
 
 #[derive(Clone)]
-pub struct Publisher {
+pub struct Queuer {
     client: Arc<Mutex<Client>>,
     queue: String,
 }
 
-impl Publisher {
+impl Queuer {
     pub async fn try_new(addr: impl Into<String>, queue: impl Into<String>) -> Result<Self> {
         let client = Client::connect_to(&addr.into()).await?;
         Ok(Self {
@@ -19,7 +19,7 @@ impl Publisher {
         })
     }
 
-    pub async fn publish<K, V>(&self, kind: K, args: V) -> Result<()>
+    pub async fn enqueue<K, V>(&self, kind: K, args: V) -> Result<()>
     where
         K: Into<String>,
         V: Into<serde_json::Value>,

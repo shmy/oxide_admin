@@ -1,5 +1,5 @@
 pub mod error;
-pub mod publisher;
+pub mod queuer;
 pub mod worker;
 pub use faktory::Job;
 use serde::{Serialize, de::DeserializeOwned};

@@ -114,7 +114,7 @@ pub struct JobContext {
 const JOB_TEMPLATE: &str = r#"#[allow(unused_imports)]
 use faktory_bg::worker::Worker;
 #[allow(unused_imports)]
-use faktory_bg::publisher::Publisher;
+use faktory_bg::queuer::Queuer;
 #[allow(unused_imports)]
 use faktory_bg::JobRunner;
 #[allow(unused_imports)]
@@ -135,14 +135,15 @@ pub fn register_jobs(worker: &mut Worker, provider: &Provider) {
 }
 {%- for item in jobs %}
 
+#[derive(Clone)]
 #[injectable]
-pub struct {{item | pascal_case}}Publisher {
-     publisher: Publisher,
+pub struct {{item | pascal_case}}Queuer {
+     queuer: Queuer,
 }
 
-impl {{item | pascal_case}}Publisher {
-    pub async fn publish(&mut self, params: <{{item}}::{{item | pascal_case}} as JobRunner>::Params) -> Result<()> {
-        self.publisher.publish("{{item}}", params).await
+impl {{item | pascal_case}}Queuer {
+    pub async fn enqueue(&mut self, params: <{{item}}::{{item | pascal_case}} as JobRunner>::Params) -> Result<()> {
+        self.queuer.enqueue("{{item}}", params).await
     }
 }
 {%- endfor %}

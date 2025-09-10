@@ -2,7 +2,7 @@ use adapter::WebState;
 use anyhow::Result;
 use application::shared::{background_job::register_jobs, event_subscriber::register_subscribers};
 use axum::Router;
-use faktory_bg::{publisher::Publisher, worker::Worker};
+use faktory_bg::worker::Worker;
 use infrastructure::shared::{
     config::{Config, Server},
     path::LOG_DIR,
@@ -16,7 +16,7 @@ use std::{
     str::FromStr as _,
     sync::Arc,
 };
-use tokio::{net::TcpListener, signal, sync::Notify};
+use tokio::{net::TcpListener, signal, sync::Notify, try_join};
 use tracing::{info, warn};
 use tracing_appender::{non_blocking::WorkerGuard, rolling::Rotation};
 use tracing_subscriber::{
@@ -29,7 +29,7 @@ pub async fn bootstrap(config: Config) -> Result<()> {
     let _guard = init_tracing(&config.log.level, config.log.rolling_kind.clone());
     let listener = build_listener(&config.server).await?;
     let provider = build_provider(config).await?;
-    let worker = build_job_worker(&provider).await?;
+    let (_, worker) = try_join!(initilize(&provider), build_job_worker(&provider))?;
     let app = adapter::routing(WebState::new(provider.clone()));
     let notify_shutdown = Arc::new(Notify::new());
     let background_job_handle = tokio::spawn(start_background_job(worker, notify_shutdown.clone()));
@@ -85,32 +85,39 @@ async fn build_provider(config: Config) -> Result<Provider> {
     #[cfg(feature = "kv_redis")]
     let (pg_pool, kv) = tokio::try_join!(pg_fut, kv_fut)?;
 
-    let publisher = Publisher::try_new(&config.faktory.url, &config.faktory.queue).await?;
+    #[cfg(feature = "bg_faktory")]
+    let provider = {
+        let publisher =
+            faktory_bg::queuer::Queuer::try_new(&config.faktory.url, &config.faktory.queue).await?;
+        Provider::builder()
+            .pg_pool(pg_pool.clone())
+            .kv(kv)
+            .config(config)
+            .publisher(publisher)
+            .build()
+    };
 
+    #[cfg(not(feature = "bg_faktory"))]
     let provider = Provider::builder()
         .pg_pool(pg_pool.clone())
         .kv(kv)
-        .publisher(publisher)
         .config(config)
         .build();
     Ok(provider)
 }
 
+async fn initilize(provider: &Provider) -> Result<()> {
+    tokio::try_join!(migration::migrate(provider), async {
+        register_subscribers(provider);
+        anyhow::Ok(())
+    })?;
+    Ok(())
+}
+
 async fn build_job_worker(provider: &Provider) -> Result<Worker> {
     let config = &provider.provide::<Config>();
-
-    let (_, _, worker) = tokio::try_join!(
-        migration::migrate(provider),
-        async {
-            register_subscribers(provider);
-            anyhow::Ok(())
-        },
-        async {
-            let mut worker = Worker::new(&config.faktory.url, &config.faktory.queue);
-            register_jobs(&mut worker, provider);
-            anyhow::Ok(worker)
-        },
-    )?;
+    let mut worker = Worker::new(&config.faktory.url, &config.faktory.queue);
+    register_jobs(&mut worker, provider);
     Ok(worker)
 }
 

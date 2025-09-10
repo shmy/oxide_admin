@@ -36,6 +36,7 @@
 [x] 接入redis 替代redb
 [x] 接入redis 替代moka
 [ ] 接入faktory代替后台任务
+[ ] 配置日志是否本地轮转
 [ ] 接入opendal/rustfs/minio
 [ ] Frontend code generation
 [-] 接入分布式事件系统

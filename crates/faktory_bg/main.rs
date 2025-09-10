@@ -2,12 +2,11 @@ use faktory_bg::error::RunnerError;
 
 #[tokio::main]
 async fn main() {
-    let publisher =
-        faktory_bg::publisher::Publisher::try_new("tcp://:123123@localhost:7419", "my_queue")
-            .await
-            .unwrap();
+    let publisher = faktory_bg::queuer::Queuer::try_new("tcp://:123123@localhost:7419", "my_queue")
+        .await
+        .unwrap();
     publisher
-        .publish("foobar", vec!["hello", "world"])
+        .enqueue("foobar", vec!["hello", "world"])
         .await
         .unwrap();
 
