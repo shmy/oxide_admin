@@ -93,7 +93,7 @@ async fn build_provider(config: Config) -> Result<Provider> {
         #[cfg(feature = "bg_faktory")]
         let queuer = Queuer::try_new(&config.faktory.url, &config.faktory.queue).await?;
         #[cfg(not(feature = "bg_faktory"))]
-        let queuer = Queuer::new();
+        let queuer = Queuer::try_new().await?;
         Provider::builder()
             .pg_pool(pg_pool.clone())
             .kv(kv)

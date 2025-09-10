@@ -8,9 +8,11 @@ path = "lib.rs"
 
 [features]
 faktory = ["dep:faktory"]
+dummy = []
 
 [dependencies]
 anyhow = { workspace = true }
+tracing = { workspace = true }
 async-trait = { version = "0.1", default-features = false }
 faktory = { version = "0.13", default-features = false, optional = true }
 serde = { workspace = true }

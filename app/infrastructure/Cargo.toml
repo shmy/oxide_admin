@@ -10,6 +10,7 @@ path = "lib.rs"
 kv_redb = ["dep:redb"]
 kv_redis = ["dep:bb8-redis"]
 bg_faktory = ["bg_worker/faktory"]
+bg_dummy = ["bg_worker/dummy"]
 
 [dependencies]
 anyhow = { workspace = true }
