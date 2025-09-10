@@ -32,8 +32,8 @@
 - 日志轮转、日志分级：由`tracing` crate进行支持；
 - 内建*single_flight*宏：缓解数据库压力；
 - 文件上传及访问签名：内建单文件上传、图片上传、分片上传等接口，适配`Amis`；
-- KV缓存：支持`ttl`，使用`redis`和`redb`；
-- 定时/后台任务：由`apalis` crate进行支持；
+- KV缓存：支持`ttl`，使用`redis`或`redb`；
+- 后台任务：由`faktory` 使用支持；
 - 优雅关停：严谨地结束服务、释放资源；
 - 多源配置：支持环境变量、`.env`文件，或者使用`cli`参数；
 - Github CI：自动构建`x86_64-unknown-linux-musl`；
@@ -42,6 +42,7 @@
 ### Crate features
 - `redb`: 使用`redb`作为kv缓存，适合单体项目，默认值；
 - `redis`: 使用`redis`作为kv缓存，适合分布式项目；
+- `faktory`: 使用`faktory`作为后台任务；
 
 ## 🎈前端
 - 架构：使用`Amis`低代码，借用其丰富的组件，快速地完成的CRUD相关功能，也可以通过React自定义组件进行补充；

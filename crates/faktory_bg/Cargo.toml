@@ -3,17 +3,17 @@ name = "faktory_bg"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+path = "lib.rs"
+
 [[bin]]
 path = "main.rs"
 name = "faktory_bg"
 
-[lib]
-path = "lib.rs"
-
 [dependencies]
-faktory = { version = "0.13", default-features = false }
-async-trait = { version = "0.1", default-features = false }
 anyhow = { workspace = true }
+async-trait = { version = "0.1", default-features = false }
+faktory = { version = "0.13", default-features = false }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

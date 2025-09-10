@@ -37,8 +37,8 @@
 [x] 接入redis 替代moka
 [ ] 接入faktory代替后台任务
 [ ] 接入opendal/rustfs/minio
-[ ] 重构分布式事件系统
 [ ] Frontend code generation
+[-] 接入分布式事件系统
 [-] 单元测试
 [-] l10n
 [-] 审计 现在只是log

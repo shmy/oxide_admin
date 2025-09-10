@@ -22,6 +22,7 @@ chrono-tz = { workspace = true, features = ["std"] }
 const_format = { workspace = true }
 
 domain = { workspace = true }
+faktory_bg = { workspace = true, optional = true }
 hex = { workspace = true, features = ["alloc"] }
 hmac-sha256 = { workspace = true }
 jsonwebtoken = { workspace = true }
@@ -46,4 +47,3 @@ tempoid = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
-faktory_bg = { workspace = true, optional = true }
