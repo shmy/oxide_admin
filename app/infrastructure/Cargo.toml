@@ -9,7 +9,7 @@ path = "lib.rs"
 [features]
 kv_redb = ["dep:redb"]
 kv_redis = ["dep:bb8-redis"]
-bg_faktory = ["dep:faktory_bg"]
+bg_faktory = ["bg_worker/faktory"]
 
 [dependencies]
 anyhow = { workspace = true }
@@ -22,7 +22,7 @@ chrono-tz = { workspace = true, features = ["std"] }
 const_format = { workspace = true }
 
 domain = { workspace = true }
-faktory_bg = { workspace = true, optional = true }
+bg_worker = { workspace = true }
 hex = { workspace = true, features = ["alloc"] }
 hmac-sha256 = { workspace = true }
 jsonwebtoken = { workspace = true }

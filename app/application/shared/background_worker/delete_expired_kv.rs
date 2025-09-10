@@ -1,4 +1,4 @@
-use faktory_bg::{JobRunner, error::RunnerError};
+use bg_worker::{JobRunner, error::RunnerError};
 use infrastructure::shared::kv::{Kv, KvTrait as _};
 use nject::injectable;
 use tracing::info;

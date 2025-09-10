@@ -1,20 +1,19 @@
 [package]
-name = "faktory_bg"
+name = "bg_worker"
 version = "0.1.0"
 edition = "2024"
 
 [lib]
 path = "lib.rs"
 
-[[bin]]
-path = "main.rs"
-name = "faktory_bg"
-
 [dependencies]
 anyhow = { workspace = true }
 async-trait = { version = "0.1", default-features = false }
-faktory = { version = "0.13", default-features = false }
+faktory = { version = "0.13", default-features = false, optional = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
+
+[features]
+faktory = ["dep:faktory"]

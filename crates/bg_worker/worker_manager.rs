@@ -1,37 +1,34 @@
-use anyhow::Result;
-use faktory::{Job, WorkerBuilder};
-
-use crate::{JobRunner, RunnerWrapper, error::RunnerError};
-
+#[cfg(feature = "faktory")]
 pub struct WorkerManager {
     addr: String,
     queue: String,
-    worker_builder: WorkerBuilder<RunnerError>,
+    worker_builder: faktory::WorkerBuilder<crate::error::RunnerError>,
 }
 
+#[cfg(feature = "faktory")]
 impl WorkerManager {
     pub fn new(addr: impl Into<String>, queue: impl Into<String>) -> Self {
         Self {
             addr: addr.into(),
             queue: queue.into(),
-            worker_builder: WorkerBuilder::default(),
+            worker_builder: faktory::WorkerBuilder::default(),
         }
     }
 
     pub fn register<K, P, H>(&mut self, kind: K, runner: H)
     where
         K: Into<String>,
-        H: JobRunner<Params = P> + Send + Sync + 'static,
+        H: crate::JobRunner<Params = P> + Send + Sync + 'static,
     {
         let old = std::mem::take(&mut self.worker_builder);
-        self.worker_builder = old.register(kind, RunnerWrapper(runner));
+        self.worker_builder = old.register(kind, crate::RunnerWrapper(runner));
     }
 
     pub fn register_fn<K, H, Fut>(&mut self, kind: K, handler: H)
     where
         K: Into<String>,
-        H: Fn(Job) -> Fut + Send + Sync + 'static,
-        Fut: Future<Output = Result<(), RunnerError>> + Send,
+        H: Fn(faktory::Job) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = Result<(), crate::error::RunnerError>> + Send,
     {
         let old = std::mem::take(&mut self.worker_builder);
         self.worker_builder = old.register_fn(kind, handler);
@@ -40,13 +37,13 @@ impl WorkerManager {
     pub fn register_blocking_fn<K, H>(mut self, kind: K, handler: H)
     where
         K: Into<String>,
-        H: Fn(Job) -> Result<(), RunnerError> + Send + Sync + 'static,
+        H: Fn(faktory::Job) -> Result<(), crate::error::RunnerError> + Send + Sync + 'static,
     {
         let old = std::mem::take(&mut self.worker_builder);
         self.worker_builder = old.register_blocking_fn(kind, handler);
     }
 
-    pub async fn run_with_signal<S>(&mut self, signal: S) -> Result<()>
+    pub async fn run_with_signal<S>(&mut self, signal: S) -> anyhow::Result<()>
     where
         S: Future<Output = ()> + 'static + Send,
     {
@@ -56,6 +53,30 @@ impl WorkerManager {
             .connect_to(&self.addr)
             .await?;
         worker.run(&[&self.queue]).await?;
+        Ok(())
+    }
+}
+
+#[cfg(not(feature = "faktory"))]
+pub struct WorkerManager {}
+
+#[cfg(not(feature = "faktory"))]
+impl WorkerManager {
+    pub fn new() -> Self {
+        Self {}
+    }
+
+    pub fn register<K, H>(&mut self, _kind: K, _runner: H) {}
+
+    pub fn register_fn<K, H, Fut>(&mut self, _kind: K, _handler: H) {}
+
+    pub fn register_blocking_fn<K, H>(self, _kind: K, _handler: H) {}
+
+    pub async fn run_with_signal<S>(&mut self, signal: S) -> anyhow::Result<()>
+    where
+        S: Future<Output = ()> + 'static + Send,
+    {
+        signal.await;
         Ok(())
     }
 }

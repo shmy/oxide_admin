@@ -12,7 +12,7 @@ members = [
     "bin/server",
     "bin/xtask",
     "crates/captcha_generator",
-    "crates/faktory_bg",
+    "crates/bg_worker",
     "crates/single_flight",
     "crates/single_flight_macros",
 ]
@@ -35,7 +35,7 @@ const_format = { version = "0.2", default-features = false }
 cruet = { version = "0.15", default-features = false }
 domain = { path = "app/domain" }
 dotenvy = { version = "0.15", default-features = false }
-faktory_bg = { path = "crates/faktory_bg" }
+bg_worker = { path = "crates/bg_worker" }
 futures-util = { version = "0.3", default-features = false }
 governor = { version = "0.10", default-features = false }
 hex = { version = "0.4", default-features = false }

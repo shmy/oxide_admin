@@ -1,5 +1,5 @@
 use anyhow::Result;
-use faktory_bg::{JobRunner, error::RunnerError};
+use bg_worker::{JobRunner, error::RunnerError};
 use futures_util::StreamExt;
 use infrastructure::shared::{config::Config, path::LOG_DIR};
 use nject::injectable;

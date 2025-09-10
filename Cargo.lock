@@ -96,10 +96,10 @@ name = "application"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bg_worker",
  "bon",
  "cruet",
  "domain",
- "faktory_bg",
  "futures-util",
  "image",
  "imageformat",
@@ -342,6 +342,19 @@ checksum = "5143936af5e1eea1a881e3e3d21b6777da6315e5e307bc3d0c2301c44fa37da9"
 dependencies = [
  "bb8",
  "redis",
+]
+
+[[package]]
+name = "bg_worker"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "faktory",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.16",
+ "tokio",
 ]
 
 [[package]]
@@ -974,19 +987,6 @@ dependencies = [
  "tokio",
  "tracing",
  "url",
-]
-
-[[package]]
-name = "faktory_bg"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "faktory",
- "serde",
- "serde_json",
- "thiserror 2.0.16",
- "tokio",
 ]
 
 [[package]]
@@ -1629,13 +1629,13 @@ dependencies = [
  "anyhow",
  "axum",
  "bb8-redis",
+ "bg_worker",
  "bon",
  "captcha_generator",
  "chrono",
  "chrono-tz",
  "const_format",
  "domain",
- "faktory_bg",
  "hex",
  "hmac-sha256",
  "jsonwebtoken",
@@ -2846,10 +2846,10 @@ dependencies = [
  "anyhow",
  "application",
  "axum",
+ "bg_worker",
  "chrono-tz",
  "clap",
  "dotenvy",
- "faktory_bg",
  "humantime",
  "infrastructure",
  "mimalloc",

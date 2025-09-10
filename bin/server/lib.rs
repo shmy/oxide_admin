@@ -4,7 +4,8 @@ use application::shared::{
     background_worker::register_workers, event_subscriber::register_subscribers,
 };
 use axum::Router;
-use faktory_bg::worker_manager::WorkerManager;
+use bg_worker::queuer::Queuer;
+use bg_worker::worker_manager::WorkerManager;
 use infrastructure::shared::{
     config::{Config, Server},
     path::LOG_DIR,
@@ -88,24 +89,18 @@ async fn build_provider(config: Config) -> Result<Provider> {
     #[cfg(feature = "kv_redis")]
     let (pg_pool, kv) = tokio::try_join!(pg_fut, kv_fut)?;
 
-    #[cfg(feature = "bg_faktory")]
     let provider = {
-        let publisher =
-            faktory_bg::queuer::Queuer::try_new(&config.faktory.url, &config.faktory.queue).await?;
+        #[cfg(feature = "bg_faktory")]
+        let queuer = Queuer::try_new(&config.faktory.url, &config.faktory.queue).await?;
+        #[cfg(not(feature = "bg_faktory"))]
+        let queuer = Queuer::new();
         Provider::builder()
             .pg_pool(pg_pool.clone())
             .kv(kv)
             .config(config)
-            .publisher(publisher)
+            .queuer(queuer)
             .build()
     };
-
-    #[cfg(not(feature = "bg_faktory"))]
-    let provider = Provider::builder()
-        .pg_pool(pg_pool.clone())
-        .kv(kv)
-        .config(config)
-        .build();
     Ok(provider)
 }
 
@@ -118,8 +113,14 @@ async fn initilize(provider: &Provider) -> Result<()> {
 }
 
 async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
-    let config = &provider.provide::<Config>();
-    let mut worker_manager = WorkerManager::new(&config.faktory.url, &config.faktory.queue);
+    #[cfg(feature = "bg_faktory")]
+    let mut worker_manager = {
+        let config = &provider.provide::<Config>();
+        let worker_manager = WorkerManager::new(&config.faktory.url, &config.faktory.queue);
+        worker_manager
+    };
+    #[cfg(not(feature = "bg_faktory"))]
+    let mut worker_manager = WorkerManager::new();
     register_workers(&mut worker_manager, provider);
     Ok(worker_manager)
 }

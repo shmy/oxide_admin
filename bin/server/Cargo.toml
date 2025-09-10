@@ -37,10 +37,10 @@ tracing-subscriber = { workspace = true, features = [
 adapter = { workspace = true }
 application = { workspace = true }
 infrastructure = { workspace = true }
-faktory_bg = { workspace = true }
+bg_worker = { workspace = true }
 
 [features]
-default = ["kv_redis", "bg_faktory"]
+default = ["kv_redis"]
 kv_redb = ["infrastructure/kv_redb"]
 kv_redis = ["infrastructure/kv_redis"]
 bg_faktory = ["infrastructure/bg_faktory"]
