@@ -42,7 +42,7 @@
 ### Crate features
 - `redb`: 使用`redb`作为kv缓存，适合单体项目，默认值；
 - `redis`: 使用`redis`作为kv缓存，适合分布式项目；
-- `faktory`: 使用`faktory`作为后台任务；
+- `bg_faktory`: 使用`faktory`作为后台任务；
 
 ## 🎈前端
 - 架构：使用`Amis`低代码，借用其丰富的组件，快速地完成的CRUD相关功能，也可以通过React自定义组件进行补充；

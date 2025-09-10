@@ -9,7 +9,7 @@ path = "lib.rs"
 [features]
 redb = ["dep:redb"]
 redis = ["dep:bb8-redis"]
-faktory = ["dep:faktory_bg"]
+bg_faktory = ["dep:faktory_bg"]
 
 [dependencies]
 anyhow = { workspace = true }

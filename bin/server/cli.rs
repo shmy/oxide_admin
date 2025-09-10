@@ -78,12 +78,12 @@ pub struct Cli {
     #[arg(long, default_value = "5min", env = "REDIS_IDLE_TIMEOUT")]
     pub redis_idle_timeout: String,
 
-    #[cfg(feature = "faktory")]
+    #[cfg(feature = "bg_faktory")]
     /// Faktory 地址
     #[arg(long, env = "FAKTORY_URL")]
     pub faktory_url: String,
 
-    #[cfg(feature = "faktory")]
+    #[cfg(feature = "bg_faktory")]
     /// Faktory 队列名称
     #[arg(long, default_value = "oxide-admin", env = "FAKTORY_QUEUE")]
     pub faktory_queue: String,
@@ -180,7 +180,7 @@ impl TryFrom<Cli> for Config {
                 .min_idle(value.redis_min_idle)
                 .build(),
         );
-        #[cfg(feature = "faktory")]
+        #[cfg(feature = "bg_faktory")]
         let builder = builder.faktory(
             infrastructure::shared::config::Faktory::builder()
                 .url(value.faktory_url)

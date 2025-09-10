@@ -9,7 +9,7 @@ pub struct Config {
     pub database: Database,
     #[cfg(feature = "redis")]
     pub redis: Redis,
-    #[cfg(feature = "faktory")]
+    #[cfg(feature = "bg_faktory")]
     pub faktory: Faktory,
     pub server: Server,
     pub jwt: Jwt,
@@ -48,7 +48,7 @@ pub struct Redis {
     pub idle_timeout: Duration,
 }
 
-#[cfg(feature = "faktory")]
+#[cfg(feature = "bg_faktory")]
 #[derive(Debug, Clone, Builder)]
 #[readonly::make]
 pub struct Faktory {
