@@ -15,6 +15,7 @@ bg_faktory = ["bg_worker/faktory"]
 anyhow = { workspace = true }
 axum = { workspace = true }
 bb8-redis = { workspace = true, optional = true }
+bg_worker = { workspace = true }
 bon = { workspace = true }
 captcha_generator = { workspace = true }
 chrono = { workspace = true }
@@ -22,7 +23,6 @@ chrono-tz = { workspace = true, features = ["std"] }
 const_format = { workspace = true }
 
 domain = { workspace = true }
-bg_worker = { workspace = true }
 hex = { workspace = true, features = ["alloc"] }
 hmac-sha256 = { workspace = true }
 jsonwebtoken = { workspace = true }

@@ -8,10 +8,10 @@ path = "lib.rs"
 
 [dependencies]
 anyhow = { workspace = true }
+bg_worker = { workspace = true }
 bon = { workspace = true }
 
 domain = { workspace = true }
-bg_worker = { workspace = true }
 futures-util = { workspace = true }
 image = { workspace = true, features = ["png", "webp", "jpeg"] }
 imageformat = { workspace = true }

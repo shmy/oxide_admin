@@ -6,6 +6,9 @@ edition = "2024"
 [lib]
 path = "lib.rs"
 
+[features]
+faktory = ["dep:faktory"]
+
 [dependencies]
 anyhow = { workspace = true }
 async-trait = { version = "0.1", default-features = false }
@@ -14,6 +17,3 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
-
-[features]
-faktory = ["dep:faktory"]
