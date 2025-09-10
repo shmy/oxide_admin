@@ -2,12 +2,11 @@ use adapter::WebState;
 use anyhow::Result;
 use application::shared::{background_job::register_jobs, event_subscriber::register_subscribers};
 use axum::Router;
-use background_job::BackgroundJobManager;
+use background_job::{BackgroundJobManager, JobPool};
 use infrastructure::shared::{
     config::{Config, Server},
     path::{DATA_DIR, LOG_DIR},
     pg_pool,
-    sqlite_pool::{self, SqlitePool},
 };
 use infrastructure::{
     migration, shared::kv::Kv, shared::pg_pool::PgPool, shared::provider::Provider,
@@ -40,7 +39,7 @@ pub async fn bootstrap(config: Config) -> Result<()> {
     notify_shutdown.notify_waiters();
     let _ = tokio::join!(background_job_handle, server_handle);
     provider.provide::<PgPool>().close().await;
-    provider.provide::<SqlitePool>().close().await;
+    provider.provide::<JobPool>().close().await;
     info!("👋 Goodbye!");
     Ok(())
 }
@@ -76,18 +75,18 @@ async fn build_listener(server: &Server) -> Result<TcpListener> {
 
 async fn build_provider(config: Config) -> Result<Provider> {
     let pg_fut = pg_pool::try_new(&config.database);
-    let sqlite_fut = sqlite_pool::try_new(DATA_DIR.join("data.sqlite"));
+    let sqlite_fut = background_job::try_new(DATA_DIR.join("data.sqlite"));
 
     #[cfg(feature = "redb")]
     let kv_fut = Kv::try_new(DATA_DIR.join("data.redb"));
     #[cfg(feature = "redis")]
     let kv_fut = Kv::try_new(&config.redis);
 
-    let (pg_pool, sqlite_pool, kv) = tokio::try_join!(pg_fut, sqlite_fut, kv_fut)?;
+    let (pg_pool, job_pool, kv) = tokio::try_join!(pg_fut, sqlite_fut, kv_fut)?;
 
     let provider = Provider::builder()
         .pg_pool(pg_pool.clone())
-        .sqlite_pool(sqlite_pool.clone())
+        .job_pool(job_pool.clone())
         .kv(kv)
         .config(config)
         .build();

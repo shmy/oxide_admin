@@ -133,11 +133,9 @@ use background_job::{BackgroundJobManager, JobStorage, SteppableStorage, Stepped
 #[allow(unused_imports)]
 use infrastructure::shared::provider::Provider;
 #[allow(unused_imports)]
-use infrastructure::shared::sqlite_pool::SqlitePool;
-#[allow(unused_imports)]
 use nject::injectable;
 #[allow(unused_imports)]
-use background_job::Storage;
+use background_job::{Storage, JobPool};
 
 pub fn register_jobs(manager: BackgroundJobManager, provider: &Provider) -> BackgroundJobManager {
     {%- for job in jobs %}
@@ -165,7 +163,7 @@ pub fn register_jobs(manager: BackgroundJobManager, provider: &Provider) -> Back
 
 #[injectable]
 pub struct {{item | pascal_case}}Dispatcher {
-    #[inject(|sqlite_pool: SqlitePool| JobStorage::new(sqlite_pool) )]
+    #[inject(|pool: JobPool| JobStorage::new(pool) )]
     pub storage: JobStorage<{{item}}::{{item | pascal_case}}Params>,
 }
 
@@ -182,7 +180,7 @@ impl {{item | pascal_case}}Dispatcher {
 
 #[injectable]
 pub struct {{item | pascal_case}}Dispatcher {
-    #[inject(|sqlite_pool: SqlitePool| SteppedJobStorage::new(sqlite_pool) )]
+    #[inject(|pool: JobPool| SteppedJobStorage::new(pool) )]
     pub storage: SteppedJobStorage,
 }
 

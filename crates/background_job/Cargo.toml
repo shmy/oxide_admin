@@ -19,11 +19,18 @@ apalis-sql = { version = "0.7", default-features = false, features = [
     "sqlite",
     "migrate",
     "tokio",
-] }
-# apalis-redis = { version = "0.7", default-features = false, features = [
-#     "tokio",
-# ] }
+], optional = true }
+apalis-redis = { version = "0.7", default-features = false, features = [
+    "tokio",
+], optional = true }
+bb8-redis = { workspace = true, optional = true }
+chrono = { workspace = true }
 english-to-cron = { version = "0.1", default-features = false }
 serde = { workspace = true, default-features = false, features = ["derive"] }
 tokio = { workspace = true, features = ["time"] }
 tracing = { workspace = true }
+
+[features]
+default = ["sqlite"]
+sqlite = ["dep:apalis-sql"]
+redis = ["dep:apalis-redis", "dep:bb8-redis"]

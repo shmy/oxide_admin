@@ -8,4 +8,3 @@ pub mod path;
 pub mod pg_pool;
 pub mod provider;
 pub mod serde_util;
-pub mod sqlite_pool;
