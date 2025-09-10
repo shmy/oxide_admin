@@ -40,8 +40,8 @@
 - ...
 
 ### Crate features
-- `redb`: 使用`redb`作为kv缓存，适合单体项目，默认值；
-- `redis`: 使用`redis`作为kv缓存，适合分布式项目；
+- `kv_redb`: 使用`redb`作为kv/缓存，适合单体项目，默认值；
+- `kv_redis`: 使用`redis`作为kv/缓存，适合分布式项目；
 - `bg_faktory`: 使用`faktory`作为后台任务；
 
 ## 🎈前端

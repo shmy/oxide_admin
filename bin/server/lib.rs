@@ -75,7 +75,7 @@ async fn build_provider(config: Config) -> Result<Provider> {
     let pg_fut = pg_pool::try_new(&config.database);
 
     #[cfg(feature = "kv_redb")]
-    let kv_fut = Kv::try_new(DATA_DIR.join("data.redb"));
+    let kv_fut = Kv::try_new(infrastructure::shared::path::DATA_DIR.join("data.redb"));
     #[cfg(feature = "kv_redis")]
     let kv_fut = Kv::try_new(&config.redis);
 
