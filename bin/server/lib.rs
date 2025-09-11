@@ -84,10 +84,6 @@ async fn build_provider(config: Config) -> Result<Provider> {
     #[cfg(feature = "kv_redis")]
     let kv_fut = Kv::try_new(&config.redis);
 
-    #[cfg(feature = "kv_redb")]
-    let (pg_pool, kv) = tokio::try_join!(pg_fut, kv_fut)?;
-
-    #[cfg(feature = "kv_redis")]
     let (pg_pool, kv) = tokio::try_join!(pg_fut, kv_fut)?;
 
     let provider = {
