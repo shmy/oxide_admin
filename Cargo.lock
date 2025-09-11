@@ -96,6 +96,7 @@ name = "application"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "axum",
  "bg_worker",
  "bon",
  "cruet",
@@ -2281,8 +2282,14 @@ name = "object_storage"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "axum",
+ "chrono",
  "futures-util",
+ "hex",
+ "hmac-sha256",
  "opendal",
+ "serde",
+ "serde_urlencoded",
  "tokio",
  "tokio-util",
 ]

@@ -9,8 +9,8 @@ use domain::iam::{
 };
 use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
-use infrastructure::shared::hmac_util::HmacUtil;
 use nject::injectable;
+use object_storage::ObjectStorage;
 use serde::Deserialize;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
@@ -28,7 +28,7 @@ pub struct CreateUserCommand {
 #[injectable]
 pub struct CreateUserCommandHandler {
     user_repository: UserRepositoryImpl,
-    hmac_util: HmacUtil,
+    object_storage: ObjectStorage,
 }
 
 impl CommandHandler for CreateUserCommandHandler {
@@ -45,7 +45,7 @@ impl CommandHandler for CreateUserCommandHandler {
         let user = User::builder()
             .id(UserId::generate())
             .account(cmd.account)
-            .maybe_portrait(self.hmac_util.strip_query_opt(cmd.portrait))
+            .maybe_portrait(self.object_storage.purify_url_opt(cmd.portrait))
             .name(cmd.name)
             .password(password)
             .privileged(false)

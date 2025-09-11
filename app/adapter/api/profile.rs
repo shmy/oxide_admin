@@ -9,7 +9,6 @@ use application::{
         query::retrieve_user::{RetrieveUserQuery, RetrieveUserQueryHandler},
         service::iam_service::IamService,
     },
-    re_export::hmac_util::HmacUtil,
     shared::command_handler::CommandHandler,
 };
 
@@ -20,7 +19,6 @@ use axum::{
 
 use crate::{
     WebState,
-    api::user::sign_user_portrait,
     shared::{
         extractor::{inject::Inject, valid_user::ValidUser},
         response::{JsonResponse, JsonResponseType},
@@ -38,15 +36,13 @@ async fn sign_out(
 
 async fn current(
     ValidUser(id): ValidUser,
-    Inject(service): Inject<IamService>,
-    Inject(hmac_util): Inject<HmacUtil>,
+    Inject(iam_service): Inject<IamService>,
     Inject(query_handler): Inject<RetrieveUserQueryHandler>,
 ) -> JsonResponseType<response::CurrentResponse> {
     let (user, pages) = tokio::try_join!(
         query_handler.query(RetrieveUserQuery::builder().id(id.clone()).build()),
-        async { Ok(service.get_available_pages(id).await) }
+        async { Ok(iam_service.get_available_pages(id).await) }
     )?;
-    let user = sign_user_portrait(user, &hmac_util);
     JsonResponse::ok(response::CurrentResponse { user, pages })
 }
 

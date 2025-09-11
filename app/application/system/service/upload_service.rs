@@ -1,15 +1,15 @@
 use anyhow::{Result, bail};
+use axum::http::Uri;
 use domain::shared::id_generator::IdGenerator;
 use futures_util::{StreamExt, stream};
 use image::{ImageFormat, ImageReader};
 use imageformat::detect_image_format;
 use infrastructure::shared::{
     chrono_tz::{ChronoTz, Datelike as _},
-    hmac_util::HmacUtil,
     path::TEMP_DIR,
 };
 use nject::injectable;
-use object_storage::{ObjectStorage, ObjectStorageTrait};
+use object_storage::{ObjectStorage, ObjectStorageReader, ObjectStorageWriter};
 use serde::{Deserialize, Serialize};
 use std::io::{Cursor, Read};
 use std::{
@@ -23,7 +23,6 @@ use tokio_util::io::ReaderStream;
 
 #[injectable]
 pub struct UploadService {
-    hman_util: HmacUtil,
     ct: ChronoTz,
     object_storage: ObjectStorage,
 }
@@ -38,7 +37,7 @@ impl UploadService {
         let reader = SupportedFormat::convert_to_webp(format, file).await?;
         self.object_storage.write(&relative_path, reader).await?;
         Ok(FinishResponse {
-            value: self.hman_util.sign_path(relative_path),
+            value: self.object_storage.sign_url(&relative_path).await?,
         })
     }
 
@@ -52,7 +51,7 @@ impl UploadService {
         let relative_path = self.build_relative_path(format!("{filename}.{extension}"));
         self.object_storage.write(&relative_path, file).await?;
         Ok(FinishResponse {
-            value: self.hman_util.sign_path(relative_path),
+            value: self.object_storage.sign_url(&relative_path).await?,
         })
     }
 
@@ -99,8 +98,16 @@ impl UploadService {
             .write_stream(&relative_path, pin::pin!(stream))
             .await?;
         Ok(FinishResponse {
-            value: self.hman_util.sign_path(relative_path),
+            value: self.object_storage.sign_url(&relative_path).await?,
         })
+    }
+
+    pub async fn sign_url(&self, relative_path: &str) -> Result<String> {
+        self.object_storage.sign_url(relative_path).await
+    }
+
+    pub fn verify_url(&self, url: Uri) -> bool {
+        self.object_storage.verify_url(url)
     }
 
     fn build_relative_path(&self, filename: String) -> String {

@@ -14,7 +14,6 @@ use application::{
             search_users::{SearchUsersQuery, SearchUsersQueryHandler},
         },
     },
-    re_export::hmac_util::HmacUtil,
     shared::{command_handler::CommandHandler, paging_result::PagingResult},
 };
 use axum::{
@@ -35,33 +34,20 @@ use crate::{
 
 async fn search(
     Inject(query_handler): Inject<SearchUsersQueryHandler>,
-    Inject(hmac_util): Inject<HmacUtil>,
     Query(query): Query<SearchUsersQuery>,
 ) -> JsonResponsePagingType<UserDto> {
     let PagingResult { total, items } = query_handler.query_cached(query).await?;
-    let items = items
-        .into_iter()
-        .map(|user| sign_user_portrait(user, &hmac_util))
-        .collect();
     JsonResponse::ok(PagingResponse { total, items })
 }
 
 async fn retrieve(
     Inject(query_handler): Inject<RetrieveUserQueryHandler>,
-    Inject(hmac_util): Inject<HmacUtil>,
     Path(id): Path<UserId>,
 ) -> JsonResponseType<UserDto> {
     let user = query_handler
         .query(RetrieveUserQuery::builder().id(id).build())
         .await?;
-    JsonResponse::ok(sign_user_portrait(user, &hmac_util))
-}
-
-pub fn sign_user_portrait(user: UserDto, hmac: &HmacUtil) -> UserDto {
-    UserDto {
-        portrait: hmac.sign_path_opt(user.portrait),
-        ..user
-    }
+    JsonResponse::ok(user)
 }
 
 async fn batch_delete(

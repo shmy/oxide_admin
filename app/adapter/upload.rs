@@ -1,7 +1,4 @@
-use application::re_export::{
-    hmac_util::{HmacUtil, UPLOAD_PATH},
-    path::UPLOAD_DIR,
-};
+use application::{re_export::path::UPLOAD_DIR, system::service::upload_service::UploadService};
 use axum::{
     Router,
     extract::{OriginalUri, Request, State},
@@ -12,7 +9,7 @@ use axum::{
 
 use tower_http::services::ServeDir;
 
-use crate::WebState;
+use crate::{UPLOAD_PATH, WebState};
 
 pub fn routing(state: WebState) -> Router {
     let serve_dir = ServeDir::new(UPLOAD_DIR.as_path());
@@ -28,8 +25,8 @@ async fn limited_middleware(
     request: Request,
     next: Next,
 ) -> Response {
-    let hmac_util = state.provider().provide::<HmacUtil>();
-    let verified = hmac_util.verify_path(uri.0);
+    let service = state.provider().provide::<UploadService>();
+    let verified = service.verify_url(uri.0);
     if !verified {
         return StatusCode::UNAUTHORIZED.into_response();
     }

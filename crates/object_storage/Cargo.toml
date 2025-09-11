@@ -12,8 +12,14 @@ fs = ["opendal/services-fs"]
 s3 = ["opendal/services-s3"]
 
 [dependencies]
+serde = { workspace = true, features = ["derive"] }
+axum = { workspace = true }
+serde_urlencoded = { workspace = true }
 tokio-util = { workspace = true }
 anyhow = { workspace = true }
+hmac-sha256 = { workspace = true }
+chrono = { workspace = true }
+hex = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 futures-util = { workspace = true }
 opendal = { version = "0.54", default-features = false, features = [

@@ -9,8 +9,8 @@ use domain::iam::{entity::user::User, value_object::user_id::UserId};
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
-use infrastructure::shared::hmac_util::HmacUtil;
 use nject::injectable;
+use object_storage::ObjectStorage;
 use serde::Deserialize;
 
 #[derive(Deserialize, Builder)]
@@ -27,7 +27,7 @@ pub struct UpdateUserCommand {
 pub struct UpdateUserCommandHandler {
     user_repository: UserRepositoryImpl,
     sign_out_command_handler: SignOutCommandHandler,
-    hmac_util: HmacUtil,
+    object_storage: ObjectStorage,
 }
 
 impl CommandHandler for UpdateUserCommandHandler {
@@ -50,7 +50,7 @@ impl CommandHandler for UpdateUserCommandHandler {
             user.update_account(account);
         }
         if let Some(portrait) = cmd.portrait {
-            let portrait = self.hmac_util.strip_query_opt(portrait);
+            let portrait = self.object_storage.purify_url_opt(portrait);
             user.update_portrait(portrait);
         }
         if let Some(name) = cmd.name {

@@ -4,6 +4,7 @@ mod frontend;
 mod shared;
 mod upload;
 use axum::Router;
+pub use shared::constant::*;
 pub use shared::state::*;
 
 pub fn routing(state: WebState) -> Router {
