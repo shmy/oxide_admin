@@ -12,10 +12,10 @@ redis = ["dep:bb8-redis"]
 
 [dependencies]
 anyhow = { workspace = true }
-bon = { workspace = true }
-tracing = { workspace = true }
-rmp-serde = { workspace = true }
-chrono = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
 bb8-redis = { workspace = true, optional = true }
+bon = { workspace = true }
+chrono = { workspace = true }
 redb = { workspace = true, optional = true }
+rmp-serde = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+tracing = { workspace = true }

@@ -11,7 +11,7 @@ name = "server"
 path = "main.rs"
 
 [features]
-default = ["kv_redb", "bg_faktory", "object_storage_s3"]
+default = ["kv_redis", "bg_faktory", "object_storage_s3"]
 kv_redb = ["infrastructure/kv_redb"]
 kv_redis = ["infrastructure/kv_redis"]
 bg_dummy = ["infrastructure/bg_dummy"]
@@ -20,8 +20,6 @@ object_storage_fs = ["infrastructure/object_storage_fs"]
 object_storage_s3 = ["infrastructure/object_storage_s3"]
 
 [dependencies]
-
-kvdb = { workspace = true }
 adapter = { workspace = true }
 anyhow = { workspace = true }
 application = { workspace = true }
@@ -38,6 +36,8 @@ clap = { workspace = true, features = [
 dotenvy = { workspace = true }
 humantime = { workspace = true }
 infrastructure = { workspace = true }
+
+kvdb = { workspace = true }
 mimalloc = { workspace = true }
 object_storage = { workspace = true }
 tokio = { workspace = true, features = ["full"] }

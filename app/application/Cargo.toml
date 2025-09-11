@@ -10,7 +10,6 @@ path = "lib.rs"
 anyhow = { workspace = true }
 
 axum = { workspace = true }
-kvdb = { workspace = true }
 bg_worker = { workspace = true }
 bon = { workspace = true }
 domain = { workspace = true }
@@ -18,6 +17,7 @@ futures-util = { workspace = true }
 image = { workspace = true, features = ["png", "webp", "jpeg"] }
 imageformat = { workspace = true }
 infrastructure = { workspace = true }
+kvdb = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 object_storage = { workspace = true }
 serde = { workspace = true, features = ["derive"] }

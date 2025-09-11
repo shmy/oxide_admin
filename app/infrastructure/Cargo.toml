@@ -16,7 +16,6 @@ object_storage_s3 = ["object_storage/s3"]
 
 [dependencies]
 anyhow = { workspace = true }
-kvdb = { workspace = true }
 bg_worker = { workspace = true }
 bon = { workspace = true }
 captcha_generator = { workspace = true }
@@ -25,6 +24,7 @@ chrono-tz = { workspace = true, features = ["std"] }
 
 domain = { workspace = true }
 jsonwebtoken = { workspace = true }
+kvdb = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 object_storage = { workspace = true }
 readonly = { workspace = true }
