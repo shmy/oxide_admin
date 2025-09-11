@@ -12,6 +12,8 @@ use infrastructure::shared::{
     pg_pool,
 };
 use infrastructure::{migration, shared::pg_pool::PgPool, shared::provider::Provider};
+#[cfg(feature = "kv_redis")]
+use kvdb::Kvdb;
 #[cfg(feature = "kv_redb")]
 use kvdb::Kvdb;
 use object_storage::ObjectStorage;
@@ -82,7 +84,17 @@ async fn build_provider(config: Config) -> Result<Provider> {
     #[cfg(feature = "kv_redb")]
     let kv_fut = Kvdb::try_new(infrastructure::shared::path::DATA_DIR.join("data.redb"));
     #[cfg(feature = "kv_redis")]
-    let kv_fut = Kv::try_new(&config.redis);
+    let kv_fut = {
+        let config = kvdb::RedisKvdbConfig::builder()
+            .url(config.redis.url.clone())
+            .connection_timeout(config.redis.connection_timeout)
+            .max_size(config.redis.max_size)
+            .min_idle(config.redis.min_idle)
+            .max_lifetime(config.redis.max_lifetime)
+            .idle_timeout(config.redis.idle_timeout)
+            .build();
+        Kvdb::try_new(config)
+    };
 
     let (pg_pool, kvdb) = tokio::try_join!(pg_fut, kv_fut)?;
 

@@ -6,11 +6,22 @@ use bb8_redis::{
     bb8::Pool,
     redis::{AsyncCommands as _, cmd},
 };
+use bon::Builder;
 use chrono::Utc;
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::info;
 
-use crate::KvdbTrait;
+use crate::{KvdbTrait, serde_util};
+
+#[derive(Builder)]
+pub struct RedisKvdbConfig {
+    url: String,
+    connection_timeout: Duration,
+    max_size: u32,
+    min_idle: u32,
+    max_lifetime: Option<Duration>,
+    idle_timeout: Option<Duration>,
+}
 
 #[derive(Debug, Clone)]
 pub struct RedisKvdb {
@@ -18,7 +29,7 @@ pub struct RedisKvdb {
 }
 
 impl RedisKvdb {
-    pub async fn try_new(config: &Redis) -> Result<Self> {
+    pub async fn try_new(config: RedisKvdbConfig) -> Result<Self> {
         let manager = RedisConnectionManager::new(&*config.url)?;
         let pool = Pool::builder()
             .connection_timeout(config.connection_timeout)
@@ -34,7 +45,7 @@ impl RedisKvdb {
     }
 }
 
-impl RedisKVImpl {
+impl RedisKvdb {
     async fn print_info(&self) -> Result<()> {
         let mut conn = self.pool.get().await?;
         let info: String = cmd("INFO").arg("server").query_async(&mut *conn).await?;
@@ -67,7 +78,7 @@ impl RedisKVImpl {
         Ok(())
     }
 }
-impl KvdbTrait for RedisKVImpl {
+impl KvdbTrait for RedisKvdb {
     async fn get<T: DeserializeOwned>(&self, key: &str) -> Option<T> {
         let mut conn = self.pool.get().await.ok()?;
         let data: Vec<u8> = conn.get(key).await.ok()?;

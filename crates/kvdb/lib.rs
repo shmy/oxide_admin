@@ -12,6 +12,8 @@ mod serde_util;
 pub type Kvdb = crate::redb::RedbKvdb;
 #[cfg(feature = "redis")]
 pub type Kvdb = crate::redis::RedisKvdb;
+#[cfg(feature = "redis")]
+pub use redis::RedisKvdbConfig;
 
 pub trait KvdbTrait {
     fn get<T: DeserializeOwned>(&self, key: &str) -> impl Future<Output = Option<T>>;
