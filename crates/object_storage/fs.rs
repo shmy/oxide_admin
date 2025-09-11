@@ -68,17 +68,18 @@ impl ObjectStorageReader for Fs {
         expected == params.sign
     }
 
-    fn purify_url<'a>(&self, signed: &'a str) -> &'a str {
+    fn purify_url(&self, signed: String) -> String {
         signed
             .split('?')
             .next()
             .and_then(|s| s.strip_prefix(&self.basepath))
-            .unwrap_or(signed)
+            .unwrap_or(&signed)
+            .to_string()
     }
 
     fn purify_url_opt(&self, signed: Option<String>) -> Option<String> {
         let signed = signed?;
-        Some(self.purify_url(&signed).to_string())
+        Some(self.purify_url(signed).to_string())
     }
 }
 

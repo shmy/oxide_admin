@@ -9,13 +9,15 @@ use crate::{ObjectStorageReader, ObjectStorageTrait};
 #[derive(Clone)]
 pub struct S3 {
     operator: Operator,
+    bucket: String,
 }
 
 impl S3 {
     pub async fn try_new() -> Result<Self> {
+        let bucket = "oxide-admin".to_string();
         let builder = services::S3::default()
             .endpoint("http://localhost:9000")
-            .bucket("oxide-admin")
+            .bucket(&bucket)
             .access_key_id("nhdfHo5zV4C36G8sJWgy")
             .secret_access_key("YsZwjmy0BxUkcDitv4lf8gA9rXGu7hRFHozJO2nN")
             .region("region");
@@ -23,7 +25,7 @@ impl S3 {
             .layer(LoggingLayer::default())
             .finish();
         operator.check().await?;
-        Ok(Self { operator })
+        Ok(Self { operator, bucket })
     }
 }
 
@@ -45,11 +47,21 @@ impl ObjectStorageReader for S3 {
     fn verify_url(&self, _url: Uri) -> bool {
         true
     }
-    fn purify_url<'a>(&self, signed: &'a str) -> &'a str {
-        signed
+
+    fn purify_url(&self, signed: String) -> String {
+        if let Ok(uri) = signed.parse::<Uri>() {
+            let path = uri.path();
+            let path = path
+                .strip_prefix(&format!("/{}/", self.bucket))
+                .unwrap_or(path)
+                .to_string();
+            return path;
+        }
+        signed.to_string()
     }
     fn purify_url_opt(&self, signed: Option<String>) -> Option<String> {
-        signed
+        let signed = signed?;
+        Some(self.purify_url(signed).to_string())
     }
 }
 
