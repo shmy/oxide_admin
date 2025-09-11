@@ -3,15 +3,30 @@ name = "server"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+path = "lib.rs"
+
 [[bin]]
 name = "server"
 path = "main.rs"
 
-[lib]
-path = "lib.rs"
+[features]
+default = ["kv_redb", "bg_dummy", "object_storage_fs"]
+kv_redb = ["infrastructure/kv_redb"]
+kv_redis = ["infrastructure/kv_redis"]
+bg_dummy = ["infrastructure/bg_dummy"]
+bg_faktory = ["infrastructure/bg_faktory"]
+object_storage_fs = ["infrastructure/object_storage_fs"]
+object_storage_s3 = ["infrastructure/object_storage_s3"]
 
 [dependencies]
+
+adapter = { workspace = true }
 anyhow = { workspace = true }
+application = { workspace = true }
+axum = { workspace = true }
+bg_worker = { workspace = true }
+chrono-tz = { workspace = true }
 clap = { workspace = true, features = [
     "std",
     "help",
@@ -19,12 +34,12 @@ clap = { workspace = true, features = [
     "derive",
     "error-context",
 ] }
-tokio = { workspace = true, features = ["full"] }
-axum = { workspace = true }
 dotenvy = { workspace = true }
-chrono-tz = { workspace = true }
-mimalloc = { workspace = true }
 humantime = { workspace = true }
+infrastructure = { workspace = true }
+mimalloc = { workspace = true }
+object_storage = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
 tracing-subscriber = { workspace = true, features = [
@@ -33,18 +48,3 @@ tracing-subscriber = { workspace = true, features = [
     "env-filter",
     "json",
 ] }
-
-adapter = { workspace = true }
-application = { workspace = true }
-infrastructure = { workspace = true }
-bg_worker = { workspace = true }
-object_storage = { workspace = true }
-
-[features]
-default = ["kv_redb", "bg_dummy", "object_storage_s3"]
-kv_redb = ["infrastructure/kv_redb"]
-kv_redis = ["infrastructure/kv_redis"]
-bg_dummy = ["infrastructure/bg_dummy"]
-bg_faktory = ["infrastructure/bg_faktory"]
-object_storage_fs = ["infrastructure/object_storage_fs"]
-object_storage_s3 = ["infrastructure/object_storage_s3"]

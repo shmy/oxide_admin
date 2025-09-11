@@ -30,6 +30,7 @@ hex = { workspace = true, features = ["alloc"] }
 hmac-sha256 = { workspace = true }
 jsonwebtoken = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
+object_storage = { workspace = true }
 readonly = { workspace = true }
 redb = { workspace = true, optional = true }
 rmp-serde = { workspace = true }
@@ -50,4 +51,3 @@ tempoid = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
-object_storage = { workspace = true }

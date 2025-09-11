@@ -8,16 +8,17 @@ path = "lib.rs"
 
 [dependencies]
 anyhow = { workspace = true }
-bg_worker = { workspace = true }
-bon = { workspace = true }
 
 axum = { workspace = true }
+bg_worker = { workspace = true }
+bon = { workspace = true }
 domain = { workspace = true }
 futures-util = { workspace = true }
 image = { workspace = true, features = ["png", "webp", "jpeg"] }
 imageformat = { workspace = true }
 infrastructure = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
+object_storage = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_with = { workspace = true, features = ["alloc", "macros", "chrono_0_4"] }
 single_flight = { workspace = true }
@@ -28,7 +29,6 @@ tokio = { workspace = true, features = ["full"] }
 tokio-stream = { workspace = true }
 tokio-util = { workspace = true }
 tracing = { workspace = true }
-object_storage = { workspace = true }
 twox-hash = { workspace = true, features = ["xxhash64"] }
 
 [build-dependencies]

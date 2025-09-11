@@ -1,7 +1,7 @@
 use chrono_tz::Tz;
 use clap::Parser;
 use humantime::parse_duration;
-use infrastructure::shared::config::{Config, Database, Jwt, Log, Server, Upload};
+use infrastructure::shared::config::{Config, Database, Jwt, Log, Server};
 use tracing_appender::rolling::Rotation;
 
 #[derive(Debug, Parser)]
@@ -108,13 +108,40 @@ pub struct Cli {
     #[arg(long, default_value = "7d", env = "JWT_REFRESH_TOKEN_PERIOD")]
     pub jwt_refresh_token_period: String,
 
+    #[cfg(feature = "object_storage_fs")]
     /// 上传文件链接签名的密钥
-    #[arg(long, env = "UPLOAD_HMAC_SECRET")]
-    pub upload_hmac_secret: String,
+    #[arg(long, env = "FS_HMAC_SECRET")]
+    pub fs_hmac_secret: String,
 
+    #[cfg(feature = "object_storage_fs")]
     /// 上传文件链接访问有效期
-    #[arg(long, default_value = "1min", env = "UPLOAD_LINK_PERIOD")]
-    pub upload_link_period: String,
+    #[arg(long, default_value = "1min", env = "FS_LINK_PERIOD")]
+    pub fs_link_period: String,
+
+    #[cfg(feature = "object_storage_s3")]
+    /// S3 服务器地址
+    #[arg(long, env = "S3_ENDPOINT")]
+    pub s3_endpoint: String,
+
+    #[cfg(feature = "object_storage_s3")]
+    /// S3 Bucket 名称
+    #[arg(long, env = "S3_BUCKET")]
+    pub s3_bucket: String,
+
+    #[cfg(feature = "object_storage_s3")]
+    /// S3 client id
+    #[arg(long, env = "S3_CLIENT_ID")]
+    pub s3_client_id: String,
+
+    #[cfg(feature = "object_storage_s3")]
+    /// S3 client secret
+    #[arg(long, env = "S3_CLIENT_SECRET")]
+    pub s3_client_secret: String,
+
+    #[cfg(feature = "object_storage_s3")]
+    /// S3 region
+    #[arg(long, env = "S3_REGION")]
+    pub s3_region: String,
 }
 
 impl TryFrom<Cli> for Config {
@@ -161,13 +188,21 @@ impl TryFrom<Cli> for Config {
                     .access_token_period(parse_duration(&value.jwt_access_token_period)?)
                     .refresh_token_period(parse_duration(&value.jwt_refresh_token_period)?)
                     .build(),
-            )
-            .upload(
-                Upload::builder()
-                    .hmac_secret(Box::leak(Box::new(value.upload_hmac_secret)).as_bytes())
-                    .link_period(parse_duration(&value.upload_link_period)?)
-                    .build(),
             );
+        #[cfg(feature = "object_storage_fs")]
+        let builder = builder.fs(infrastructure::shared::config::StorageFs::builder()
+            .hmac_secret(Box::leak(Box::new(value.fs_hmac_secret)).as_bytes())
+            .link_period(parse_duration(&value.fs_link_period)?)
+            .build());
+
+        #[cfg(feature = "object_storage_s3")]
+        let builder = builder.s3(infrastructure::shared::config::StorageS3::builder()
+            .endpoint(value.s3_endpoint)
+            .bucket(value.s3_bucket)
+            .client_id(value.s3_client_id)
+            .client_secret(value.s3_client_secret)
+            .region(value.s3_region)
+            .build());
 
         #[cfg(feature = "kv_redis")]
         let builder = builder.redis(

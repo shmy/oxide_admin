@@ -13,7 +13,10 @@ pub struct Config {
     pub faktory: Faktory,
     pub server: Server,
     pub jwt: Jwt,
-    pub upload: Upload,
+    #[cfg(feature = "object_storage_fs")]
+    pub fs: StorageFs,
+    #[cfg(feature = "object_storage_s3")]
+    pub s3: StorageS3,
 }
 
 #[derive(Debug, Clone, Builder)]
@@ -71,9 +74,21 @@ pub struct Jwt {
     pub refresh_token_period: Duration,
 }
 
+#[cfg(feature = "object_storage_fs")]
 #[derive(Debug, Clone, Builder)]
 #[readonly::make]
-pub struct Upload {
+pub struct StorageFs {
     pub hmac_secret: &'static [u8],
     pub link_period: Duration,
+}
+
+#[cfg(feature = "object_storage_s3")]
+#[derive(Debug, Clone, Builder)]
+#[readonly::make]
+pub struct StorageS3 {
+    pub endpoint: String,
+    pub bucket: String,
+    pub client_id: String,
+    pub client_secret: String,
+    pub region: String,
 }

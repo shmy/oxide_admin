@@ -95,11 +95,20 @@ async fn build_provider(config: Config) -> Result<Provider> {
         let queuer = Queuer::try_new(&config.faktory.url, &config.faktory.queue).await?;
         #[cfg(not(feature = "bg_faktory"))]
         let queuer = Queuer::try_new().await?;
+        #[cfg(feature = "object_storage_fs")]
         let object_storage = ObjectStorage::try_new(
-            // infrastructure::shared::path::UPLOAD_DIR.as_path(),
-            // adapter::UPLOAD_PATH,
-            // config.upload.hmac_secret,
-            // config.upload.link_period,
+            infrastructure::shared::path::UPLOAD_DIR.as_path(),
+            adapter::UPLOAD_PATH,
+            config.fs.hmac_secret,
+            config.fs.link_period,
+        )?;
+        #[cfg(feature = "object_storage_s3")]
+        let object_storage = ObjectStorage::try_new(
+            &config.s3.endpoint,
+            &config.s3.bucket,
+            &config.s3.client_id,
+            &config.s3.client_secret,
+            &config.s3.region,
         )
         .await?;
         Provider::builder()

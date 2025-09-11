@@ -36,8 +36,9 @@
 [x] 接入redis 替代redb
 [x] 接入redis 替代moka
 [x] 接入faktory代替后台任务
+[x] 接入opendal/rustfs/minio
+[ ] 抽离kv到crate
 [ ] 配置日志是否本地轮转
-[ ] 接入opendal/rustfs/minio
 [ ] 重新测试Code generation
 [ ] Frontend code generation
 [-] 接入分布式事件系统

@@ -13,14 +13,20 @@ pub struct S3 {
 }
 
 impl S3 {
-    pub async fn try_new() -> Result<Self> {
-        let bucket = "oxide-admin".to_string();
+    pub async fn try_new(
+        endpoint: &str,
+        bucket: &str,
+        access_key_id: &str,
+        secret_access_key: &str,
+        region: &str,
+    ) -> Result<Self> {
+        let bucket = bucket.to_string();
         let builder = services::S3::default()
-            .endpoint("http://localhost:9000")
+            .endpoint(endpoint)
             .bucket(&bucket)
-            .access_key_id("nhdfHo5zV4C36G8sJWgy")
-            .secret_access_key("YsZwjmy0BxUkcDitv4lf8gA9rXGu7hRFHozJO2nN")
-            .region("region");
+            .access_key_id(access_key_id)
+            .secret_access_key(secret_access_key)
+            .region(region);
         let operator = Operator::new(builder)?
             .layer(LoggingLayer::default())
             .finish();
@@ -62,16 +68,5 @@ impl ObjectStorageReader for S3 {
     fn purify_url_opt(&self, signed: Option<String>) -> Option<String> {
         let signed = signed?;
         Some(self.purify_url(signed).to_string())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[tokio::test]
-    async fn test_s3() -> Result<()> {
-        let s3 = S3::try_new().await?;
-        Ok(())
     }
 }
