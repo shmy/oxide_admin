@@ -2271,6 +2271,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "axum",
+ "bon",
  "chrono",
  "futures-util",
  "hex",

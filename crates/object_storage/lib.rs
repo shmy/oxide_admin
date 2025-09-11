@@ -13,6 +13,9 @@ mod s3;
 #[cfg(feature = "fs")]
 pub type ObjectStorage = fs::Fs;
 
+#[cfg(feature = "fs")]
+pub use fs::FsConfig;
+
 #[cfg(feature = "s3")]
 pub type ObjectStorage = s3::S3;
 

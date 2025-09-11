@@ -12,6 +12,7 @@ s3 = ["opendal/services-s3"]
 
 [dependencies]
 anyhow = { workspace = true }
+bon = { workspace = true }
 axum = { workspace = true }
 chrono = { workspace = true }
 futures-util = { workspace = true }

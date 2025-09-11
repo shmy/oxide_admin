@@ -104,12 +104,19 @@ async fn build_provider(config: Config) -> Result<Provider> {
         #[cfg(not(feature = "bg_faktory"))]
         let queuer = Queuer::try_new().await?;
         #[cfg(feature = "object_storage_fs")]
-        let object_storage = ObjectStorage::try_new(
-            infrastructure::shared::path::UPLOAD_DIR.as_path(),
-            adapter::UPLOAD_PATH,
-            config.fs.hmac_secret,
-            config.fs.link_period,
-        )?;
+        let object_storage = {
+            let config = object_storage::FsConfig::builder()
+                .root(
+                    infrastructure::shared::path::UPLOAD_DIR
+                        .to_string_lossy()
+                        .to_string(),
+                )
+                .basepath(adapter::UPLOAD_PATH.to_string())
+                .hmac_secret(config.fs.hmac_secret)
+                .link_period(config.fs.link_period)
+                .build();
+            ObjectStorage::try_new(config)?
+        };
         #[cfg(feature = "object_storage_s3")]
         let object_storage = ObjectStorage::try_new(
             &config.s3.endpoint,

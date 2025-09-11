@@ -1,12 +1,21 @@
-use std::{path::Path, time::Duration};
+use std::time::Duration;
 
 use anyhow::Result;
 use axum::http::Uri;
+use bon::Builder;
 use chrono::Utc;
 use opendal::{Operator, layers::LoggingLayer, services};
 use serde::Deserialize;
 
 use crate::{ObjectStorageReader, ObjectStorageTrait};
+
+#[derive(Builder)]
+pub struct FsConfig {
+    root: String,
+    basepath: String,
+    hmac_secret: &'static [u8],
+    link_period: Duration,
+}
 
 #[derive(Clone)]
 pub struct Fs {
@@ -17,26 +26,21 @@ pub struct Fs {
 }
 
 impl Fs {
-    pub fn try_new(
-        root: impl AsRef<Path>,
-        basepath: &'static str,
-        hmac_secret: &'static [u8],
-        link_period: Duration,
-    ) -> Result<Self> {
-        let builder = services::Fs::default().root(&root.as_ref().to_string_lossy());
+    pub fn try_new(config: FsConfig) -> Result<Self> {
+        let builder = services::Fs::default().root(&config.root);
         let operator = Operator::new(builder)?
             .layer(LoggingLayer::default())
             .finish();
-        let basepath = if basepath.ends_with("/") {
-            basepath.to_string()
+        let basepath = if config.basepath.ends_with("/") {
+            config.basepath.to_string()
         } else {
-            format!("{}/", basepath)
+            format!("{}/", config.basepath)
         };
         Ok(Self {
             operator,
             basepath,
-            hmac_secret,
-            link_period,
+            hmac_secret: config.hmac_secret,
+            link_period: config.link_period,
         })
     }
 }
