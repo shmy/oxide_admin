@@ -11,7 +11,7 @@ name = "server"
 path = "main.rs"
 
 [features]
-default = ["kv_redis", "bg_faktory", "object_storage_s3"]
+default = ["kv_redb", "bg_dummy", "object_storage_fs"]
 kv_redb = ["infrastructure/kv_redb"]
 kv_redis = ["infrastructure/kv_redis"]
 bg_dummy = ["infrastructure/bg_dummy"]
