@@ -13,6 +13,7 @@ members = [
     "bin/xtask",
     "crates/bg_worker",
     "crates/captcha_generator",
+    "crates/object_storage",
     "crates/single_flight",
     "crates/single_flight_macros",
 ]
@@ -49,6 +50,7 @@ jsonwebtoken = { version = "9.3", default-features = false }
 mimalloc = { version = "0.1", default-features = false }
 mime_guess = { version = "2.0", default-features = false }
 nject = { version = "0.4", default-features = false }
+object_storage = { path = "crates/object_storage" }
 parking_lot = { version = "0.12", default-features = false }
 quote = { version = "1.0" }
 readonly = { version = "0.2", default-features = false }
@@ -71,6 +73,7 @@ tempoid = { version = "0.1", default-features = false }
 thiserror = { version = "2", default-features = false }
 tokio = { version = "1", default-features = false }
 tokio-stream = { version = "0.1", default-features = false }
+tokio-util = { version = "0.7", default-features = false }
 tower-http = { version = "0.6", default-features = false }
 tower_governor = { version = "0.8", default-features = false }
 tracing = { version = "0.1", default-features = false }

@@ -14,6 +14,7 @@ use infrastructure::shared::{
 use infrastructure::{
     migration, shared::kv::Kv, shared::pg_pool::PgPool, shared::provider::Provider,
 };
+use object_storage::ObjectStorage;
 use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     str::FromStr as _,
@@ -94,11 +95,14 @@ async fn build_provider(config: Config) -> Result<Provider> {
         let queuer = Queuer::try_new(&config.faktory.url, &config.faktory.queue).await?;
         #[cfg(not(feature = "bg_faktory"))]
         let queuer = Queuer::try_new().await?;
+        let object_storage =
+            ObjectStorage::try_new("/Users/shmy/code/rust/oxide_admin/containers")?;
         Provider::builder()
             .pg_pool(pg_pool.clone())
             .kv(kv)
             .config(config)
             .queuer(queuer)
+            .object_storage(object_storage)
             .build()
     };
     Ok(provider)

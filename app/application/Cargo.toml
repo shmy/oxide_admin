@@ -25,7 +25,9 @@ sysinfo = { workspace = true, features = ["system"] }
 tempfile = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tokio-stream = { workspace = true }
+tokio-util = { workspace = true }
 tracing = { workspace = true }
+object_storage = { workspace = true }
 twox-hash = { workspace = true, features = ["xxhash64"] }
 
 [build-dependencies]

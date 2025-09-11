@@ -1,6 +1,7 @@
 use bg_worker::queuer::Queuer;
 use bon::Builder;
 use nject::provider;
+use object_storage::ObjectStorage;
 
 use crate::shared::{config::Config, kv::Kv, pg_pool::PgPool};
 
@@ -11,6 +12,8 @@ pub struct Provider {
     pg_pool: PgPool,
     #[provide(Queuer, |dep| dep.clone())]
     queuer: Queuer,
+    #[provide(ObjectStorage, |dep| dep.clone())]
+    object_storage: ObjectStorage,
     #[provide(Kv, |dep| dep.clone())]
     kv: Kv,
     #[provide(Config, |dep| dep.clone())]

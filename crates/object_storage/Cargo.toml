@@ -1,0 +1,21 @@
+[package]
+name = "object_storage"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "lib.rs"
+
+[features]
+default = ["fs"]
+fs = ["opendal/services-fs"]
+s3 = ["opendal/services-s3"]
+
+[dependencies]
+tokio-util = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+futures-util = { workspace = true }
+opendal = { version = "0.54", default-features = false, features = [
+    "executors-tokio",
+] }

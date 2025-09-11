@@ -1,30 +1,31 @@
-use crate::system::service::file_service::FileService;
 use anyhow::{Result, bail};
 use domain::shared::id_generator::IdGenerator;
+use futures_util::{StreamExt, stream};
 use image::{ImageFormat, ImageReader};
 use imageformat::detect_image_format;
 use infrastructure::shared::{
     chrono_tz::{ChronoTz, Datelike as _},
     hmac_util::HmacUtil,
-    path::{TEMP_DIR, UPLOAD_DIR},
+    path::TEMP_DIR,
 };
 use nject::injectable;
+use object_storage::{ObjectStorage, ObjectStorageTrait};
 use serde::{Deserialize, Serialize};
+use std::io::{Cursor, Read};
 use std::{
     io::Seek,
-    path::{Path, PathBuf},
+    path::Path,
+    pin::{self},
 };
 use tempfile::NamedTempFile;
-use tokio::{
-    fs::File,
-    io::{AsyncReadExt as _, AsyncWriteExt as _, BufReader, BufWriter},
-};
+use tokio::fs::File;
+use tokio_util::io::ReaderStream;
 
 #[injectable]
 pub struct UploadService {
-    file_service: FileService,
     hman_util: HmacUtil,
     ct: ChronoTz,
+    object_storage: ObjectStorage,
 }
 
 impl UploadService {
@@ -32,14 +33,10 @@ impl UploadService {
         let Some(format) = SupportedFormat::validate_image_type(&mut file) else {
             bail!("不支持的图片格式");
         };
-        let (path_buf, relative_path) = self.build_paths().await?;
         let filename = IdGenerator::filename().to_lowercase();
-        let relative_path = format!("{}/{}.{}", relative_path, filename, "webp");
-        let filepath = path_buf.join(format!("{}.{}", filename, "webp"));
-        tokio::try_join!(
-            SupportedFormat::convert_to_webp(format, file, filepath),
-            self.file_service.create(&relative_path)
-        )?;
+        let relative_path = self.build_relative_path(format!("{}.{}", filename, "webp"));
+        let reader = SupportedFormat::convert_to_webp(format, file).await?;
+        self.object_storage.write(&relative_path, reader).await?;
         Ok(FinishResponse {
             value: self.hman_util.sign_path(relative_path),
         })
@@ -51,17 +48,9 @@ impl UploadService {
         file: NamedTempFile,
     ) -> Result<FinishResponse> {
         let extension = Self::extract_extension(filename);
-        let (path_buf, relative_path) = self.build_paths().await?;
         let filename = IdGenerator::filename().to_lowercase();
-        let relative_path = format!("{}/{}{}", relative_path, filename, extension);
-        let filepath = path_buf.join(format!("{}{}", filename, extension));
-        tokio::try_join!(
-            async {
-                let _ = file.persist(filepath);
-                Ok(())
-            },
-            self.file_service.create(&relative_path)
-        )?;
+        let relative_path = self.build_relative_path(format!("{filename}.{extension}"));
+        self.object_storage.write(&relative_path, file).await?;
         Ok(FinishResponse {
             value: self.hman_util.sign_path(relative_path),
         })
@@ -97,43 +86,29 @@ impl UploadService {
         part_list: Vec<PartItem>,
     ) -> Result<FinishResponse> {
         let tmp_dir = TEMP_DIR.join(&key);
-        let chunks = part_list
-            .into_iter()
-            .map(|part| tmp_dir.join(part.part_number.to_string()));
-        let (path_buf, relative_path) = self.build_paths().await?;
-        let relative_path = format!("{}/{}", relative_path, upload_id);
-        let filepath = path_buf.join(upload_id);
-
-        let final_file = File::create(&filepath).await?;
-        let mut writer = BufWriter::new(final_file);
-        for chunk_path in chunks {
-            let chunk_file = File::open(&chunk_path).await?;
-            let mut reader = BufReader::new(chunk_file);
-            let mut buffer = vec![0u8; 2 * 1024 * 1024]; // 2M 缓冲
-
-            loop {
-                let n = reader.read(&mut buffer).await?;
-                if n == 0 {
-                    break;
-                }
-                writer.write_all(&buffer[..n]).await?;
+        let relative_path = self.build_relative_path(upload_id);
+        let stream = stream::iter(part_list).then(|part| {
+            let chunk_path = tmp_dir.join(part.part_number.to_string());
+            async move {
+                let file = File::open(chunk_path).await?;
+                let reader = ReaderStream::new(file);
+                Ok::<_, anyhow::Error>(reader)
             }
-        }
-        writer.flush().await?;
-        self.file_service.create(&relative_path).await?;
+        });
+        self.object_storage
+            .write_stream(&relative_path, pin::pin!(stream))
+            .await?;
         Ok(FinishResponse {
             value: self.hman_util.sign_path(relative_path),
         })
     }
 
-    async fn build_paths(&self) -> Result<(PathBuf, String)> {
+    fn build_relative_path(&self, filename: String) -> String {
         let now = self.ct.now();
         let year = now.year().to_string();
         let month = format!("{:02}", now.month());
-        let path_buf = UPLOAD_DIR.join(&year).join(&month);
-        tokio::fs::create_dir_all(&path_buf).await?;
-        let relative_path = format!("{year}/{month}");
-        Ok((path_buf, relative_path))
+        let relative_path = format!("{year}/{month}/{filename}");
+        relative_path
     }
 
     fn extract_extension(path: Option<String>) -> String {
@@ -196,10 +171,10 @@ impl SupportedFormat {
     async fn convert_to_webp(
         format: SupportedFormat,
         mut file: NamedTempFile,
-        filepath: PathBuf,
-    ) -> Result<()> {
+    ) -> Result<impl Read + Seek> {
         if let SupportedFormat::Webp = format {
-            return persist_file(file, filepath.as_path()).await;
+            let data = tokio::fs::read(file.path()).await?;
+            return Ok(Cursor::new(data)); // Cursor 实现了 Read + Seek
         }
         tokio::task::spawn_blocking(move || {
             file.rewind()?;
@@ -213,10 +188,10 @@ impl SupportedFormat {
                 },
             )
             .decode()?;
-            let output_file = std::fs::File::create(filepath)?;
-            let mut buf_writer = std::io::BufWriter::new(output_file);
-            img.write_to(&mut buf_writer, ImageFormat::WebP)?;
-            Ok(())
+            let mut data = Cursor::new(Vec::new());
+            img.write_to(&mut data, ImageFormat::WebP)?;
+
+            Ok(data)
         })
         .await?
     }

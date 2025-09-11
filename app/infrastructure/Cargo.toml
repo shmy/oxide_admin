@@ -11,6 +11,8 @@ kv_redb = ["dep:redb"]
 kv_redis = ["dep:bb8-redis"]
 bg_faktory = ["bg_worker/faktory"]
 bg_dummy = ["bg_worker/dummy"]
+object_storage_fs = ["object_storage/fs"]
+object_storage_s3 = ["object_storage/s3"]
 
 [dependencies]
 anyhow = { workspace = true }
@@ -48,3 +50,4 @@ tempoid = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
+object_storage = { workspace = true }

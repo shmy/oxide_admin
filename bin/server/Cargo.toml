@@ -38,6 +38,7 @@ adapter = { workspace = true }
 application = { workspace = true }
 infrastructure = { workspace = true }
 bg_worker = { workspace = true }
+object_storage = { workspace = true }
 
 [features]
 default = ["kv_redb", "bg_dummy"]
@@ -45,3 +46,5 @@ kv_redb = ["infrastructure/kv_redb"]
 kv_redis = ["infrastructure/kv_redis"]
 bg_dummy = ["infrastructure/bg_dummy"]
 bg_faktory = ["infrastructure/bg_faktory"]
+object_storage_fs = ["infrastructure/object_storage_fs"]
+object_storage_s3 = ["infrastructure/object_storage_s3"]
