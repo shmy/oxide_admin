@@ -13,6 +13,7 @@ use application::{
             retrieve_user::{RetrieveUserQuery, RetrieveUserQueryHandler},
             search_users::{SearchUsersQuery, SearchUsersQueryHandler},
         },
+        service::iam_service::IamService,
     },
     shared::{command_handler::CommandHandler, paging_result::PagingResult},
 };
@@ -34,19 +35,25 @@ use crate::{
 
 async fn search(
     Inject(query_handler): Inject<SearchUsersQueryHandler>,
+    Inject(iam_service): Inject<IamService>,
     Query(query): Query<SearchUsersQuery>,
 ) -> JsonResponsePagingType<UserDto> {
-    let PagingResult { total, items } = query_handler.query_cached(query).await?;
+    let PagingResult { total, mut items } = query_handler.query_cached(query).await?;
+    iam_service.replenish_user_portrait(&mut items).await;
     JsonResponse::ok(PagingResponse { total, items })
 }
 
 async fn retrieve(
     Inject(query_handler): Inject<RetrieveUserQueryHandler>,
+    Inject(iam_service): Inject<IamService>,
     Path(id): Path<UserId>,
 ) -> JsonResponseType<UserDto> {
-    let user = query_handler
+    let mut user = query_handler
         .query(RetrieveUserQuery::builder().id(id).build())
         .await?;
+    iam_service
+        .replenish_user_portrait(std::slice::from_mut(&mut user))
+        .await;
     JsonResponse::ok(user)
 }
 

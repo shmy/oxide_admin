@@ -21,6 +21,7 @@ use tempfile::NamedTempFile;
 use tokio::fs::File;
 use tokio_util::io::ReaderStream;
 
+#[derive(Clone)]
 #[injectable]
 pub struct UploadService {
     ct: ChronoTz,
@@ -37,7 +38,7 @@ impl UploadService {
         let reader = SupportedFormat::convert_to_webp(format, file).await?;
         self.object_storage.write(&relative_path, reader).await?;
         Ok(FinishResponse {
-            value: self.object_storage.sign_url(&relative_path).await?,
+            value: self.object_storage.presign_url(&relative_path).await?,
         })
     }
 
@@ -51,7 +52,7 @@ impl UploadService {
         let relative_path = self.build_relative_path(format!("{filename}.{extension}"));
         self.object_storage.write(&relative_path, file).await?;
         Ok(FinishResponse {
-            value: self.object_storage.sign_url(&relative_path).await?,
+            value: self.object_storage.presign_url(&relative_path).await?,
         })
     }
 
@@ -98,12 +99,12 @@ impl UploadService {
             .write_stream(&relative_path, pin::pin!(stream))
             .await?;
         Ok(FinishResponse {
-            value: self.object_storage.sign_url(&relative_path).await?,
+            value: self.object_storage.presign_url(&relative_path).await?,
         })
     }
 
-    pub async fn sign_url(&self, relative_path: &str) -> Result<String> {
-        self.object_storage.sign_url(relative_path).await
+    pub async fn presign_url(&self, path: impl AsRef<str>) -> Result<String> {
+        self.object_storage.presign_url(path).await
     }
 
     pub fn verify_url(&self, url: Uri) -> bool {

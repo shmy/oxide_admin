@@ -39,10 +39,13 @@ async fn current(
     Inject(iam_service): Inject<IamService>,
     Inject(query_handler): Inject<RetrieveUserQueryHandler>,
 ) -> JsonResponseType<response::CurrentResponse> {
-    let (user, pages) = tokio::try_join!(
+    let (mut user, pages) = tokio::try_join!(
         query_handler.query(RetrieveUserQuery::builder().id(id.clone()).build()),
         async { Ok(iam_service.get_available_pages(id).await) }
     )?;
+    iam_service
+        .replenish_user_portrait(std::slice::from_mut(&mut user))
+        .await;
     JsonResponse::ok(response::CurrentResponse { user, pages })
 }
 

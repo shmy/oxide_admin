@@ -18,7 +18,7 @@ use crate::{ObjectStorageReader, ObjectStorageWriter};
 #[derive(Clone)]
 pub struct Fs {
     operator: Operator,
-    basepath: &'static str,
+    basepath: String,
     hmac_secret: &'static [u8],
     link_period: Duration,
 }
@@ -34,6 +34,11 @@ impl Fs {
         let operator = Operator::new(builder)?
             .layer(LoggingLayer::default())
             .finish();
+        let basepath = if basepath.ends_with("/") {
+            basepath.to_string()
+        } else {
+            format!("{}/", basepath)
+        };
         Ok(Self {
             operator,
             basepath,
@@ -75,14 +80,12 @@ impl ObjectStorageWriter for Fs {
 }
 
 impl ObjectStorageReader for Fs {
-    async fn sign_url(&self, path: impl AsRef<str>) -> Result<String> {
+    async fn presign_url(&self, path: impl AsRef<str>) -> Result<String> {
         Ok(self.sign_path(path.as_ref()))
     }
     fn verify_url(&self, url: Uri) -> bool {
         let path = url.path();
-        let path = path
-            .strip_prefix(&format!("{}/", self.basepath))
-            .unwrap_or(path);
+        let path = path.strip_prefix(&self.basepath).unwrap_or(path);
         let Some(query) = url.query() else {
             return false;
         };
@@ -107,10 +110,7 @@ impl Fs {
     fn sign_path(&self, path: &str) -> String {
         let expired_at = (Utc::now() + self.link_period).timestamp() as u64;
         let sign = self.encode_hmac(&path, expired_at);
-        let url = format!(
-            "{}/{}?sign={}&exp={}",
-            self.basepath, path, sign, expired_at
-        );
+        let url = format!("{}{}?sign={}&exp={}", self.basepath, path, sign, expired_at);
         url
     }
 
@@ -118,7 +118,7 @@ impl Fs {
         signed
             .split('?')
             .next()
-            .and_then(|d| d.strip_prefix(self.basepath))
+            .and_then(|d| d.strip_prefix(&self.basepath))
             .unwrap_or(signed)
     }
 

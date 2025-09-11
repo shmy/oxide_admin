@@ -24,6 +24,6 @@ pub trait ObjectStorageWriter {
 }
 
 pub trait ObjectStorageReader {
-    fn sign_url(&self, path: impl AsRef<str>) -> impl Future<Output = Result<String>>;
+    fn presign_url(&self, path: impl AsRef<str>) -> impl Future<Output = Result<String>>;
     fn verify_url(&self, url: Uri) -> bool;
 }

@@ -1,4 +1,6 @@
+use crate::iam::dto::user::UserDto;
 use crate::iam::service::page::{PAGES, Page, SHARED_PAGES};
+use crate::system::service::upload_service::UploadService;
 use anyhow::{Result, bail};
 use domain::iam::value_object::permission_code::{ALL_PERMISSIONS, NONE, PermissionCode};
 use domain::iam::value_object::permission_group::PermissionGroup;
@@ -6,6 +8,7 @@ use domain::iam::value_object::user_id::UserId;
 use domain::shared::port::permission_resolver::PermissionResolver;
 use domain::shared::port::token_issuer::{TokenIssuerTrait, UserClaims};
 use domain::shared::port::token_store::TokenStoreTrait;
+use futures_util::{StreamExt, stream};
 use infrastructure::port::permission_resolver_impl::PermissionResolverImpl;
 use infrastructure::port::token_issuer_impl::TokenIssuerImpl;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
@@ -19,6 +22,7 @@ pub struct IamService {
     token_store: TokenStoreImpl,
     permission_resolver: PermissionResolverImpl,
     config: Config,
+    upload_service: UploadService,
 }
 
 impl IamService {
@@ -97,5 +101,21 @@ impl IamService {
                 }
             })
             .collect()
+    }
+
+    pub async fn replenish_user_portrait(&self, dtos: &mut [UserDto]) {
+        stream::iter(dtos)
+            .for_each_concurrent(5, |dto| async move {
+                let upload_service = &self.upload_service;
+
+                if let Some(portrait) = &dto.portrait {
+                    if let Ok(url) = upload_service.presign_url(portrait).await {
+                        dto.portrait = Some(url);
+                    } else {
+                        dto.portrait = None; // 失败设为空
+                    }
+                }
+            })
+            .await;
     }
 }
