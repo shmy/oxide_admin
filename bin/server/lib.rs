@@ -1,4 +1,4 @@
-use adapter::{UPLOAD_PATH, WebState};
+use adapter::WebState;
 use anyhow::Result;
 use application::shared::{
     background_worker::register_workers, event_subscriber::register_subscribers,
@@ -96,11 +96,12 @@ async fn build_provider(config: Config) -> Result<Provider> {
         #[cfg(not(feature = "bg_faktory"))]
         let queuer = Queuer::try_new().await?;
         let object_storage = ObjectStorage::try_new(
-            infrastructure::shared::path::UPLOAD_DIR.as_path(),
-            UPLOAD_PATH,
-            config.upload.hmac_secret,
-            config.upload.link_period,
-        )?;
+            // infrastructure::shared::path::UPLOAD_DIR.as_path(),
+            // adapter::UPLOAD_PATH,
+            // config.upload.hmac_secret,
+            // config.upload.link_period,
+        )
+        .await?;
         Provider::builder()
             .pg_pool(pg_pool.clone())
             .kv(kv)

@@ -10,7 +10,7 @@ use domain::iam::{
 use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
-use object_storage::ObjectStorage;
+use object_storage::{ObjectStorage, ObjectStorageReader as _};
 use serde::Deserialize;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};

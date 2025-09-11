@@ -16,12 +16,15 @@ services:
     ports:
       - "6379:6379"
 
-  # nats:
-  #   image: nats:alpine
-  #   restart: always
-  #   ports:
-  #     - "4222:4222"
-  #     - "8222:8222"
+  rustfs:
+    image: rustfs/rustfs:alpha
+    restart: always
+    ports:
+      - "9000:9000"
+    environment:
+      - FAKTORY_PASSWORD=123123
+    volumes:
+      - $PWD/containers/rustfs:/data
 
   faktory:
     image: contribsys/faktory

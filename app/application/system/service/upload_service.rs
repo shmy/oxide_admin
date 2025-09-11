@@ -38,7 +38,8 @@ impl UploadService {
         let reader = SupportedFormat::convert_to_webp(format, file).await?;
         self.object_storage.write(&relative_path, reader).await?;
         Ok(FinishResponse {
-            value: self.object_storage.presign_url(&relative_path).await?,
+            url: self.object_storage.presign_url(&relative_path).await?,
+            value: relative_path,
         })
     }
 
@@ -52,7 +53,8 @@ impl UploadService {
         let relative_path = self.build_relative_path(format!("{filename}.{extension}"));
         self.object_storage.write(&relative_path, file).await?;
         Ok(FinishResponse {
-            value: self.object_storage.presign_url(&relative_path).await?,
+            url: self.object_storage.presign_url(&relative_path).await?,
+            value: relative_path,
         })
     }
 
@@ -99,7 +101,8 @@ impl UploadService {
             .write_stream(&relative_path, pin::pin!(stream))
             .await?;
         Ok(FinishResponse {
-            value: self.object_storage.presign_url(&relative_path).await?,
+            url: self.object_storage.presign_url(&relative_path).await?,
+            value: relative_path,
         })
     }
 
@@ -150,6 +153,7 @@ pub struct PartItem {
 #[derive(Debug, Serialize)]
 pub struct FinishResponse {
     pub value: String,
+    pub url: String,
 }
 
 enum SupportedFormat {
