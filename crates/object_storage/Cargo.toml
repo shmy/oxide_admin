@@ -7,7 +7,6 @@ edition = "2024"
 path = "lib.rs"
 
 [features]
-default = ["fs"]
 fs = ["opendal/services-fs"]
 s3 = ["opendal/services-s3"]
 

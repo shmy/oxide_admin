@@ -44,6 +44,8 @@
 - `kv_redis`: 使用`redis`作为kv/缓存，适合分布式项目；
 - `bg_dummy`: 禁止使用后台任务，默认值；
 - `bg_faktory`: 使用`faktory`作为后台任务；
+- `object_storage_fs`: 使用本地文件系统作为对象存储，默认值；
+- `object_storage_s3`: 使用S3兼容服务作为对象存储；
 
 ## 🎈前端
 - 架构：使用`Amis`低代码，借用其丰富的组件，快速地完成的CRUD相关功能，也可以通过React自定义组件进行补充；

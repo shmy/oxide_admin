@@ -41,7 +41,7 @@ bg_worker = { workspace = true }
 object_storage = { workspace = true }
 
 [features]
-default = ["kv_redb", "bg_dummy"]
+default = ["kv_redb", "bg_dummy", "object_storage_fs"]
 kv_redb = ["infrastructure/kv_redb"]
 kv_redis = ["infrastructure/kv_redis"]
 bg_dummy = ["infrastructure/bg_dummy"]
