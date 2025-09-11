@@ -104,12 +104,12 @@ impl ObjectStorageReader for Fs {
 impl Fs {
     fn encode_hmac(&self, path: &str, expired_at: u64) -> String {
         let data = format!("{}:{}", path, expired_at);
-        hex::encode(hmac_sha256::HMAC::mac(data.as_bytes(), &self.hmac_secret))
+        hex::encode(hmac_sha256::HMAC::mac(data.as_bytes(), self.hmac_secret))
     }
 
     fn sign_path(&self, path: &str) -> String {
         let expired_at = (Utc::now() + self.link_period).timestamp() as u64;
-        let sign = self.encode_hmac(&path, expired_at);
+        let sign = self.encode_hmac(path, expired_at);
         let url = format!("{}{}?sign={}&exp={}", self.basepath, path, sign, expired_at);
         url
     }
