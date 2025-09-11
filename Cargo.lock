@@ -599,26 +599,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "const_format"
-version = "0.2.34"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "126f97965c8ad46d6d9163268ff28432e8f6a1196a55578867832e3049df63dd"
-dependencies = [
- "const_format_proc_macros",
-]
-
-[[package]]
-name = "const_format_proc_macros"
-version = "0.2.34"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d57c2eccfb16dbac1f4e61e206105db5820c9d26c3c472bc17c774259ef7744"
-dependencies = [
- "proc-macro2",
- "quote",
- "unicode-xid",
-]
-
-[[package]]
 name = "core-foundation-sys"
 version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1724,17 +1704,13 @@ name = "infrastructure"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "axum",
  "bb8-redis",
  "bg_worker",
  "bon",
  "captcha_generator",
  "chrono",
  "chrono-tz",
- "const_format",
  "domain",
- "hex",
- "hmac-sha256",
  "jsonwebtoken",
  "nject",
  "object_storage",
@@ -1743,7 +1719,6 @@ dependencies = [
  "rmp-serde",
  "serde",
  "serde_json",
- "serde_urlencoded",
  "single_flight",
  "sqlx",
  "tempoid",
@@ -1832,6 +1807,10 @@ dependencies = [
  "serde",
  "serde_json",
 ]
+
+[[package]]
+name = "kvdb"
+version = "0.1.0"
 
 [[package]]
 name = "lazy_static"

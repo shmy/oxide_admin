@@ -16,18 +16,14 @@ object_storage_s3 = ["object_storage/s3"]
 
 [dependencies]
 anyhow = { workspace = true }
-axum = { workspace = true }
 bb8-redis = { workspace = true, optional = true }
 bg_worker = { workspace = true }
 bon = { workspace = true }
 captcha_generator = { workspace = true }
 chrono = { workspace = true }
 chrono-tz = { workspace = true, features = ["std"] }
-const_format = { workspace = true }
 
 domain = { workspace = true }
-hex = { workspace = true, features = ["alloc"] }
-hmac-sha256 = { workspace = true }
 jsonwebtoken = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 object_storage = { workspace = true }
@@ -36,7 +32,6 @@ redb = { workspace = true, optional = true }
 rmp-serde = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
-serde_urlencoded = { workspace = true }
 single_flight = { workspace = true }
 sqlx = { workspace = true, features = [
     "runtime-tokio",
