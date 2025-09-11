@@ -19,6 +19,9 @@ pub use fs::FsConfig;
 #[cfg(feature = "s3")]
 pub type ObjectStorage = s3::S3;
 
+#[cfg(feature = "s3")]
+pub use s3::S3Config;
+
 pub trait ObjectStorageTrait {
     fn operator(&self) -> Operator;
 }

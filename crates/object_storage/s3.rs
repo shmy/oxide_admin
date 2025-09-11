@@ -2,9 +2,19 @@ use std::time::Duration;
 
 use anyhow::Result;
 use axum::http::Uri;
+use bon::Builder;
 use opendal::{Operator, layers::LoggingLayer, services};
 
 use crate::{ObjectStorageReader, ObjectStorageTrait};
+
+#[derive(Builder)]
+pub struct S3Config {
+    endpoint: String,
+    bucket: String,
+    access_key_id: String,
+    secret_access_key: String,
+    region: String,
+}
 
 #[derive(Clone)]
 pub struct S3 {
@@ -13,20 +23,14 @@ pub struct S3 {
 }
 
 impl S3 {
-    pub async fn try_new(
-        endpoint: &str,
-        bucket: &str,
-        access_key_id: &str,
-        secret_access_key: &str,
-        region: &str,
-    ) -> Result<Self> {
-        let bucket = bucket.to_string();
+    pub async fn try_new(config: S3Config) -> Result<Self> {
+        let bucket = config.bucket;
         let builder = services::S3::default()
-            .endpoint(endpoint)
+            .endpoint(&config.endpoint)
             .bucket(&bucket)
-            .access_key_id(access_key_id)
-            .secret_access_key(secret_access_key)
-            .region(region);
+            .access_key_id(&config.access_key_id)
+            .secret_access_key(&config.secret_access_key)
+            .region(&config.region);
         let operator = Operator::new(builder)?
             .layer(LoggingLayer::default())
             .finish();

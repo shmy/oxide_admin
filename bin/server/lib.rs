@@ -118,14 +118,16 @@ async fn build_provider(config: Config) -> Result<Provider> {
             ObjectStorage::try_new(config)?
         };
         #[cfg(feature = "object_storage_s3")]
-        let object_storage = ObjectStorage::try_new(
-            &config.s3.endpoint,
-            &config.s3.bucket,
-            &config.s3.client_id,
-            &config.s3.client_secret,
-            &config.s3.region,
-        )
-        .await?;
+        let object_storage = {
+            let config = object_storage::S3Config::builder()
+                .endpoint(config.s3.endpoint.to_string())
+                .bucket(config.s3.bucket.to_string())
+                .access_key_id(config.s3.client_id.to_string())
+                .secret_access_key(config.s3.client_secret.to_string())
+                .region(config.s3.region.to_string())
+                .build();
+            ObjectStorage::try_new(config).await?
+        };
         Provider::builder()
             .pg_pool(pg_pool.clone())
             .kvdb(kvdb)
