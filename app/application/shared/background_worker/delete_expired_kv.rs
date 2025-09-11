@@ -1,19 +1,19 @@
 use bg_worker::{JobRunner, error::RunnerError};
-use infrastructure::shared::kv::{Kv, KvTrait as _};
+use kvdb::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 use tracing::info;
 
 #[derive(Clone)]
 #[injectable]
 pub struct DeleteExpiredKv {
-    kv: Kv,
+    kvdb: Kvdb,
 }
 
 impl JobRunner for DeleteExpiredKv {
     type Params = ();
     async fn run(&self, _params: Self::Params) -> Result<(), RunnerError> {
         info!("Start delete expired kv job");
-        let _ = self.kv.delete_expired().await;
+        let _ = self.kvdb.delete_expired().await;
         Ok(())
     }
 }

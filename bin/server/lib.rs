@@ -11,9 +11,9 @@ use infrastructure::shared::{
     path::LOG_DIR,
     pg_pool,
 };
-use infrastructure::{
-    migration, shared::kv::Kv, shared::pg_pool::PgPool, shared::provider::Provider,
-};
+use infrastructure::{migration, shared::pg_pool::PgPool, shared::provider::Provider};
+#[cfg(feature = "kv_redb")]
+use kvdb::Kvdb;
 use object_storage::ObjectStorage;
 use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
@@ -80,11 +80,11 @@ async fn build_provider(config: Config) -> Result<Provider> {
     let pg_fut = pg_pool::try_new(&config.database);
 
     #[cfg(feature = "kv_redb")]
-    let kv_fut = Kv::try_new(infrastructure::shared::path::DATA_DIR.join("data.redb"));
+    let kv_fut = Kvdb::try_new(infrastructure::shared::path::DATA_DIR.join("data.redb"));
     #[cfg(feature = "kv_redis")]
     let kv_fut = Kv::try_new(&config.redis);
 
-    let (pg_pool, kv) = tokio::try_join!(pg_fut, kv_fut)?;
+    let (pg_pool, kvdb) = tokio::try_join!(pg_fut, kv_fut)?;
 
     let provider = {
         #[cfg(feature = "bg_faktory")]
@@ -109,7 +109,7 @@ async fn build_provider(config: Config) -> Result<Provider> {
         .await?;
         Provider::builder()
             .pg_pool(pg_pool.clone())
-            .kv(kv)
+            .kvdb(kvdb)
             .config(config)
             .queuer(queuer)
             .object_storage(object_storage)

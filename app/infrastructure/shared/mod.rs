@@ -2,7 +2,6 @@ pub mod chrono_tz;
 pub mod config;
 pub mod error_util;
 pub mod event_bus;
-pub mod kv;
 pub mod path;
 pub mod pg_pool;
 pub mod provider;

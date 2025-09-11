@@ -105,6 +105,7 @@ dependencies = [
  "image",
  "imageformat",
  "infrastructure",
+ "kvdb",
  "minijinja",
  "nject",
  "object_storage",
@@ -1704,7 +1705,6 @@ name = "infrastructure"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "bb8-redis",
  "bg_worker",
  "bon",
  "captcha_generator",
@@ -1712,11 +1712,10 @@ dependencies = [
  "chrono-tz",
  "domain",
  "jsonwebtoken",
+ "kvdb",
  "nject",
  "object_storage",
  "readonly",
- "redb",
- "rmp-serde",
  "serde",
  "serde_json",
  "single_flight",
@@ -1811,6 +1810,15 @@ dependencies = [
 [[package]]
 name = "kvdb"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bb8-redis",
+ "chrono",
+ "redb",
+ "rmp-serde",
+ "serde",
+ "tracing",
+]
 
 [[package]]
 name = "lazy_static"
@@ -3094,6 +3102,7 @@ dependencies = [
  "dotenvy",
  "humantime",
  "infrastructure",
+ "kvdb",
  "mimalloc",
  "object_storage",
  "tokio",

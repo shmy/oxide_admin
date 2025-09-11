@@ -1,13 +1,12 @@
 use domain::{iam::error::IamError, shared::port::token_store::TokenStoreTrait};
+use kvdb::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 use sqlx::types::chrono::{DateTime, Utc};
-
-use crate::shared::kv::{Kv, KvTrait};
 
 #[derive(Clone)]
 #[injectable]
 pub struct TokenStoreImpl {
-    kv: Kv,
+    kvdb: Kvdb,
 }
 impl TokenStoreTrait for TokenStoreImpl {
     type Error = IamError;
@@ -18,7 +17,7 @@ impl TokenStoreTrait for TokenStoreImpl {
         ex_at: DateTime<Utc>,
     ) -> Result<(), Self::Error> {
         let key = Self::fill_key(&key);
-        self.kv
+        self.kvdb
             .set_with_ex_at(&key, token, ex_at.timestamp())
             .await
             .map_err(|_| IamError::AccessTokenSaveFailed)?;
@@ -26,11 +25,11 @@ impl TokenStoreTrait for TokenStoreImpl {
     }
     async fn retrieve(&self, key: String) -> Option<String> {
         let full_key = Self::fill_key(&key);
-        self.kv.get::<String>(&full_key).await
+        self.kvdb.get::<String>(&full_key).await
     }
     async fn delete(&self, key: String) -> Result<(), Self::Error> {
         let full_key = Self::fill_key(&key);
-        let _ = self.kv.delete(&full_key).await;
+        let _ = self.kvdb.delete(&full_key).await;
         Ok(())
     }
 }

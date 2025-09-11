@@ -21,6 +21,7 @@ object_storage_s3 = ["infrastructure/object_storage_s3"]
 
 [dependencies]
 
+kvdb = { workspace = true }
 adapter = { workspace = true }
 anyhow = { workspace = true }
 application = { workspace = true }

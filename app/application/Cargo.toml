@@ -10,6 +10,7 @@ path = "lib.rs"
 anyhow = { workspace = true }
 
 axum = { workspace = true }
+kvdb = { workspace = true }
 bg_worker = { workspace = true }
 bon = { workspace = true }
 domain = { workspace = true }

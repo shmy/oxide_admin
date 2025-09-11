@@ -2,13 +2,18 @@ use std::time::Duration;
 
 use anyhow::Result;
 use serde::{Serialize, de::DeserializeOwned};
+#[cfg(feature = "redb")]
+mod redb;
+#[cfg(feature = "redis")]
+mod redis;
+mod serde_util;
 
-#[cfg(feature = "kv_redb")]
-pub type Kv = crate::port::redb_kv_impl::RedbKv;
-#[cfg(feature = "kv_redis")]
-pub type Kv = crate::port::redis_kv_impl::RedisKVImpl;
+#[cfg(feature = "redb")]
+pub type Kvdb = crate::redb::RedbKvdb;
+#[cfg(feature = "redis")]
+pub type Kvdb = crate::redis::RedisKvdb;
 
-pub trait KvTrait {
+pub trait KvdbTrait {
     fn get<T: DeserializeOwned>(&self, key: &str) -> impl Future<Output = Option<T>>;
     fn set_with_ex<T: Serialize>(
         &self,

@@ -1,9 +1,10 @@
 use bg_worker::queuer::Queuer;
 use bon::Builder;
+use kvdb::Kvdb;
 use nject::provider;
 use object_storage::ObjectStorage;
 
-use crate::shared::{config::Config, kv::Kv, pg_pool::PgPool};
+use crate::shared::{config::Config, pg_pool::PgPool};
 
 #[derive(Clone, Builder)]
 #[provider]
@@ -14,8 +15,8 @@ pub struct Provider {
     queuer: Queuer,
     #[provide(ObjectStorage, |dep| dep.clone())]
     object_storage: ObjectStorage,
-    #[provide(Kv, |dep| dep.clone())]
-    kv: Kv,
+    #[provide(Kvdb, |dep| dep.clone())]
+    kvdb: Kvdb,
     #[provide(Config, |dep| dep.clone())]
     config: Config,
 }

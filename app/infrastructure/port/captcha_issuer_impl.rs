@@ -6,13 +6,12 @@ use domain::{
         port::captcha_issuer::{Captcha, CaptchaIssuerTrait},
     },
 };
+use kvdb::{Kvdb, KvdbTrait as _};
 use nject::injectable;
-
-use crate::shared::kv::{Kv, KvTrait as _};
 
 #[injectable]
 pub struct CaptchaIssuerImpl {
-    kv: Kv,
+    kvdb: Kvdb,
 }
 
 impl CaptchaIssuerImpl {
@@ -29,7 +28,7 @@ impl CaptchaIssuerTrait for CaptchaIssuerImpl {
             .map_err(|_| IamError::CaptchaGenerationFailed)?;
         let key = IdGenerator::random();
         let full_key = Self::fill_captcha_key(&key);
-        self.kv
+        self.kvdb
             .set_with_ex(&full_key, captcha_data.value, ttl)
             .await
             .map_err(|_| IamError::CaptchaGenerationFailed)?;
@@ -41,7 +40,7 @@ impl CaptchaIssuerTrait for CaptchaIssuerImpl {
 
     async fn verify(&self, key: &str, value: &str) -> Result<(), Self::Error> {
         let full_key = Self::fill_captcha_key(key);
-        let Some(existing_value) = self.kv.get::<String>(&full_key).await else {
+        let Some(existing_value) = self.kvdb.get::<String>(&full_key).await else {
             return Err(IamError::CaptchaInvalid);
         };
 
@@ -49,7 +48,7 @@ impl CaptchaIssuerTrait for CaptchaIssuerImpl {
             return Err(IamError::CaptchaIncorrect);
         }
 
-        let _ = self.kv.delete(&full_key).await;
+        let _ = self.kvdb.delete(&full_key).await;
         Ok(())
     }
 }

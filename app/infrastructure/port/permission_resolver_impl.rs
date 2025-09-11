@@ -6,13 +6,13 @@ use domain::iam::value_object::role_id::RoleId;
 use domain::iam::value_object::user_id::UserId;
 use domain::shared::port::permission_resolver::PermissionResolver;
 use domain::shared::to_inner_vec::ToInnerVec;
+use kvdb::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 use single_flight::single_flight;
 use sqlx::prelude::FromRow;
 use std::collections::HashSet;
 use std::time::Duration;
 
-use crate::shared::kv::{Kv, KvTrait as _};
 use crate::shared::pg_pool::PgPool;
 
 const KEY_PREFIX: &str = "permission:";
@@ -21,7 +21,7 @@ const KEY_PREFIX: &str = "permission:";
 #[injectable]
 pub struct PermissionResolverImpl {
     pool: PgPool,
-    kv: Kv,
+    kvdb: Kvdb,
 }
 
 impl PermissionResolverImpl {
@@ -39,12 +39,12 @@ impl PermissionResolverImpl {
 impl PermissionResolver for PermissionResolverImpl {
     type Error = anyhow::Error;
     async fn resolve(&self, id: &UserId) -> PermissionGroup {
-        match self.kv.get(&self.full_key(id)).await {
+        match self.kvdb.get(&self.full_key(id)).await {
             Some(cache) => cache,
             None => match self.solve(id).await {
                 Ok(cache) => {
                     let _ = self
-                        .kv
+                        .kvdb
                         .set_with_ex(
                             &self.full_key(id),
                             cache.clone(),
@@ -59,7 +59,7 @@ impl PermissionResolver for PermissionResolverImpl {
     }
 
     async fn refresh(&self) -> Result<(), Self::Error> {
-        self.kv.delete_prefix(KEY_PREFIX).await?;
+        self.kvdb.delete_prefix(KEY_PREFIX).await?;
         Ok(())
     }
 }

@@ -7,8 +7,8 @@ edition = "2024"
 path = "lib.rs"
 
 [features]
-kv_redb = ["dep:redb"]
-kv_redis = ["dep:bb8-redis"]
+kv_redb = ["kvdb/redb"]
+kv_redis = ["kvdb/redis"]
 bg_faktory = ["bg_worker/faktory"]
 bg_dummy = ["bg_worker/dummy"]
 object_storage_fs = ["object_storage/fs"]
@@ -16,7 +16,7 @@ object_storage_s3 = ["object_storage/s3"]
 
 [dependencies]
 anyhow = { workspace = true }
-bb8-redis = { workspace = true, optional = true }
+kvdb = { workspace = true }
 bg_worker = { workspace = true }
 bon = { workspace = true }
 captcha_generator = { workspace = true }
@@ -28,8 +28,6 @@ jsonwebtoken = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 object_storage = { workspace = true }
 readonly = { workspace = true }
-redb = { workspace = true, optional = true }
-rmp-serde = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
 single_flight = { workspace = true }
