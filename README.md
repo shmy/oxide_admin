@@ -40,7 +40,7 @@
 - ...
 
 
-### 内置 features
+### 🎖️ 内置 features
 <table>
     <tr>
         <th>功能</th>
@@ -56,7 +56,7 @@
     </tr>
     <tr>
         <td>kv_redis</td>
-        <td>使用redis作为kv/缓存，适合分布式项目；</td>
+        <td>使用redis作为kv/缓存，适合分布式项目</td>
         <td></td>
     </tr>
     <tr>
@@ -66,7 +66,7 @@
         <td>✅</td>
     </tr>
     <tr>
-        <td>bg_faktory</td><td>使用faktory作为后台任务</td><td></td>
+        <td>bg_faktory</td><td>使用faktory作为后台任务，适合分布式项目</td><td></td>
     </tr>
     <tr>
         <td rowspan="2">对象存储，<b>只能同时选择一个</b></td>
@@ -91,7 +91,7 @@
     </tr>
     <tr>
         <td>trace_otlp</td>
-        <td>接入OpenTelemetry</td>
+        <td>接入OpenTelemetry，适合分布式项目</td>
         <td></td>
     </tr>
 </table>
