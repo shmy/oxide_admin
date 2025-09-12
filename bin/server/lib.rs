@@ -8,7 +8,6 @@ use bg_worker::queuer::Queuer;
 use bg_worker::worker_manager::WorkerManager;
 use infrastructure::shared::{
     config::{Config, Log, Server},
-    path::LOG_DIR,
     pg_pool,
 };
 use infrastructure::{migration, shared::pg_pool::PgPool, shared::provider::Provider};
@@ -23,7 +22,7 @@ use std::{
     sync::Arc,
 };
 use tokio::{net::TcpListener, signal, sync::Notify, try_join};
-use trace_kit::WorkerGuard;
+use trace_kit::TracingGuard;
 use tracing::{info, warn};
 
 pub mod cli;
@@ -46,13 +45,13 @@ pub async fn bootstrap(config: Config) -> Result<()> {
     Ok(())
 }
 
-fn init_tracing(config: &Log) -> WorkerGuard {
-    let config = trace_kit::TracingConfig::builder()
-        .level(&config.level)
+fn init_tracing(config: &Log) -> TracingGuard {
+    let config_builder = trace_kit::TracingConfig::builder().level(&config.level);
+    #[cfg(feature = "trace_rolling")]
+    let config_builder = config_builder
         .rolling_kind(config.rolling_kind.clone())
-        .rolling_dir(LOG_DIR.as_path())
-        .build();
-    trace_kit::init_tracing(config)
+        .rolling_dir(infrastructure::shared::path::LOG_DIR.as_path());
+    trace_kit::init_tracing(config_builder.build())
 }
 
 async fn build_listener(server: &Server) -> Result<TcpListener> {

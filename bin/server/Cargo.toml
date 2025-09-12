@@ -11,13 +11,15 @@ name = "server"
 path = "main.rs"
 
 [features]
-default = ["kv_redb", "bg_dummy", "object_storage_s3"]
+default = ["kv_redb", "bg_dummy", "object_storage_s3", "trace_console"]
 kv_redb = ["infrastructure/kv_redb"]
 kv_redis = ["infrastructure/kv_redis"]
 bg_dummy = ["infrastructure/bg_dummy"]
 bg_faktory = ["infrastructure/bg_faktory"]
 object_storage_fs = ["infrastructure/object_storage_fs"]
 object_storage_s3 = ["infrastructure/object_storage_s3"]
+trace_console = ["trace_kit/console", "infrastructure/trace_console"]
+trace_rolling = ["trace_kit/rolling", "infrastructure/trace_rolling"]
 
 [dependencies]
 adapter = { workspace = true }

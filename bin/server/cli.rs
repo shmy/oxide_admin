@@ -2,7 +2,6 @@ use chrono_tz::Tz;
 use clap::Parser;
 use humantime::parse_duration;
 use infrastructure::shared::config::{Config, Database, Jwt, Log, Server};
-use trace_kit::Rotation;
 
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
@@ -149,20 +148,6 @@ impl TryFrom<Cli> for Config {
 
     fn try_from(value: Cli) -> Result<Self, Self::Error> {
         let builder = Self::builder()
-            .log(
-                Log::builder()
-                    .level(value.log_level)
-                    .rolling_period(parse_duration(&value.log_rolling_period)?)
-                    .rolling_kind({
-                        match value.log_rolling_kind.as_str() {
-                            "minutely" => Rotation::MINUTELY,
-                            "hourly" => Rotation::HOURLY,
-                            "daily" => Rotation::DAILY,
-                            _ => Rotation::NEVER,
-                        }
-                    })
-                    .build(),
-            )
             .database(
                 Database::builder()
                     .url(value.database_url)
@@ -222,6 +207,21 @@ impl TryFrom<Cli> for Config {
                 .queue(value.faktory_queue)
                 .build(),
         );
+        let builder = {
+            let log_builder = Log::builder().level(value.log_level);
+            #[cfg(feature = "trace_rolling")]
+            let log_builder = log_builder
+                .rolling_period(parse_duration(&value.log_rolling_period)?)
+                .rolling_kind({
+                    match value.log_rolling_kind.as_str() {
+                        "minutely" => trace_kit::Rotation::MINUTELY,
+                        "hourly" => trace_kit::Rotation::HOURLY,
+                        "daily" => trace_kit::Rotation::DAILY,
+                        _ => trace_kit::Rotation::NEVER,
+                    }
+                });
+            builder.log(log_builder.build())
+        };
         Ok(builder.build())
     }
 }

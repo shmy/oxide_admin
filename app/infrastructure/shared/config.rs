@@ -1,6 +1,5 @@
 use bon::Builder;
 use std::time::Duration;
-use tracing_appender::rolling::Rotation;
 
 #[derive(Debug, Clone, Builder)]
 #[readonly::make]
@@ -23,8 +22,11 @@ pub struct Config {
 #[readonly::make]
 pub struct Log {
     pub level: String,
+
+    #[cfg(feature = "trace_rolling")]
     pub rolling_period: Duration,
-    pub rolling_kind: Rotation,
+    #[cfg(feature = "trace_rolling")]
+    pub rolling_kind: tracing_appender::rolling::Rotation,
 }
 
 #[derive(Debug, Clone, Builder)]

@@ -8,15 +8,14 @@ path = "lib.rs"
 
 [features]
 console = []
-rolling = []
+rolling = ["dep:tracing-appender", "tracing-subscriber/json"]
 otel = []
 
 [dependencies]
 bon = { workspace = true }
-tracing-appender = { workspace = true }
+tracing-appender = { workspace = true, optional = true }
 tracing-subscriber = { workspace = true, features = [
     "fmt",
     "ansi",
     "env-filter",
-    "json",
 ] }
