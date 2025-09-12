@@ -24,7 +24,7 @@ pub struct Log {
     pub level: String,
 
     #[cfg(feature = "trace_rolling")]
-    pub rolling_kind: tracing_appender::rolling::Rotation,
+    pub rolling_kind: String,
 }
 
 #[derive(Debug, Clone, Builder)]

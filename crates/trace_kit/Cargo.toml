@@ -9,12 +9,13 @@ path = "lib.rs"
 [features]
 console = []
 rolling = ["dep:tracing-appender", "tracing-subscriber/json"]
-otel = []
+otel = ["dep:tracing-opentelemetry"]
 
 [dependencies]
 bon = { workspace = true }
-tracing-appender = { workspace = true, optional = true }
-tracing-subscriber = { workspace = true, features = [
+tracing-appender = { version = "0.2", optional = true }
+tracing-opentelemetry = { version = "0.31", optional = true }
+tracing-subscriber = { version = "0.3", features = [
     "fmt",
     "ansi",
     "env-filter",

@@ -49,7 +49,7 @@ fn init_tracing(config: &Log) -> TracingGuard {
     let config_builder = trace_kit::TracingConfig::builder().level(&config.level);
     #[cfg(feature = "trace_rolling")]
     let config_builder = config_builder
-        .rolling_kind(config.rolling_kind.clone())
+        .rolling_kind(&config.rolling_kind)
         .rolling_dir(infrastructure::shared::path::LOG_DIR.as_path());
     trace_kit::init_tracing(config_builder.build())
 }

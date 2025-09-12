@@ -1,6 +1,4 @@
 use bon::Builder;
-#[cfg(feature = "rolling")]
-pub use tracing_appender::rolling::Rotation;
 use tracing_subscriber::{
     EnvFilter, Layer, layer::SubscriberExt as _, util::SubscriberInitExt as _,
 };
@@ -9,7 +7,7 @@ use tracing_subscriber::{
 pub struct TracingConfig<'a> {
     pub level: &'a str,
     #[cfg(feature = "rolling")]
-    pub rolling_kind: tracing_appender::rolling::Rotation,
+    pub rolling_kind: &'a str,
     #[cfg(feature = "rolling")]
     pub rolling_dir: &'a std::path::Path,
 }
@@ -21,8 +19,16 @@ pub fn init_tracing(config: TracingConfig) -> TracingGuard {
         .with_filter(EnvFilter::new(config.level));
     #[cfg(feature = "rolling")]
     let (rolling_layer, guard) = {
+        use tracing_appender::rolling::Rotation;
+
+        let rolling_kind = match config.rolling_kind {
+            "minutely" => Rotation::MINUTELY,
+            "hourly" => Rotation::HOURLY,
+            "daily" => Rotation::DAILY,
+            _ => Rotation::NEVER,
+        };
         let file_appender = tracing_appender::rolling::RollingFileAppender::new(
-            config.rolling_kind,
+            rolling_kind,
             config.rolling_dir,
             "log",
         );

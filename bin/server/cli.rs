@@ -207,14 +207,7 @@ impl TryFrom<Cli> for Config {
         let builder = {
             let log_builder = Log::builder().level(value.log_level);
             #[cfg(feature = "trace_rolling")]
-            let log_builder = log_builder.rolling_kind({
-                match value.log_rolling_kind.as_str() {
-                    "minutely" => trace_kit::Rotation::MINUTELY,
-                    "hourly" => trace_kit::Rotation::HOURLY,
-                    "daily" => trace_kit::Rotation::DAILY,
-                    _ => trace_kit::Rotation::NEVER,
-                }
-            });
+            let log_builder = log_builder.rolling_kind(value.log_rolling_kind);
             builder.log(log_builder.build())
         };
         Ok(builder.build())

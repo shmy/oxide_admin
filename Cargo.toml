@@ -81,8 +81,6 @@ tower-http = { version = "0.6", default-features = false }
 tower_governor = { version = "0.8", default-features = false }
 trace_kit = { path = "crates/trace_kit" }
 tracing = { version = "0.1", default-features = false }
-tracing-appender = { version = "0.2", default-features = false }
-tracing-subscriber = { version = "0.3", default-features = false }
 twox-hash = { version = "2.1", default-features = false }
 
 [profile.dev]
