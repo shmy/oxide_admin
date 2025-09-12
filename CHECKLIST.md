@@ -38,6 +38,8 @@
 [x] 接入faktory代替后台任务
 [x] 接入opendal/rustfs/minio
 [x] 抽离kv到crate
+[ ] 定时任务
+[ ] 实现单机后台任务
 [ ] 配置日志是否本地轮转
 [ ] 重新测试Code generation
 [ ] Frontend code generation

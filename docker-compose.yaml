@@ -37,3 +37,11 @@ services:
     volumes:
       - $PWD/containers/faktory:/var/lib/faktory/db
     command: /faktory -b :7419 -w :7420 -e production
+
+  jaeger:
+    image: cr.jaegertracing.io/jaegertracing/jaeger:2.10.0
+    restart: always
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
