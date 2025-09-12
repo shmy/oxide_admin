@@ -32,7 +32,6 @@ bb8-redis = { version = "0.24", default-features = false }
 bg_worker = { path = "crates/bg_worker" }
 bon = { version = "3.7", default-features = false }
 captcha_generator = { path = "crates/captcha_generator" }
-trace_kit = { path = "crates/trace_kit" }
 chrono = { version = "0.4", default-features = false }
 chrono-tz = { version = "0.10", default-features = false }
 clap = { version = "4.5", default-features = false }
@@ -80,6 +79,7 @@ tokio-stream = { version = "0.1", default-features = false }
 tokio-util = { version = "0.7", default-features = false }
 tower-http = { version = "0.6", default-features = false }
 tower_governor = { version = "0.8", default-features = false }
+trace_kit = { path = "crates/trace_kit" }
 tracing = { version = "0.1", default-features = false }
 tracing-appender = { version = "0.2", default-features = false }
 tracing-subscriber = { version = "0.3", default-features = false }

@@ -41,5 +41,5 @@ kvdb = { workspace = true }
 mimalloc = { workspace = true }
 object_storage = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
-tracing = { workspace = true }
 trace_kit = { workspace = true }
+tracing = { workspace = true }
