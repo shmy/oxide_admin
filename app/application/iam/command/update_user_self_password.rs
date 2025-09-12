@@ -18,6 +18,7 @@ pub struct UpdateUserSelfPasswordCommand {
     confirm_new_password: String,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct UpdateUserSelfPasswordCommandHandler {
     user_repository: UserRepositoryImpl,

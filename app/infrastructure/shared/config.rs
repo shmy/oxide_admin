@@ -1,7 +1,8 @@
 use bon::Builder;
+use std::fmt::Debug;
 use std::time::Duration;
 
-#[derive(Debug, Clone, Builder)]
+#[derive(Clone, Builder)]
 #[readonly::make]
 pub struct Config {
     pub log: Log,
@@ -18,7 +19,13 @@ pub struct Config {
     pub s3: StorageS3,
 }
 
-#[derive(Debug, Clone, Builder)]
+impl Debug for Config {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Config").finish()
+    }
+}
+
+#[derive(Clone, Builder)]
 #[readonly::make]
 pub struct Log {
     pub level: String,
@@ -30,7 +37,7 @@ pub struct Log {
     pub otlp_endpoint: String,
 }
 
-#[derive(Debug, Clone, Builder)]
+#[derive(Clone, Builder)]
 #[readonly::make]
 pub struct Database {
     pub url: String,
@@ -43,7 +50,7 @@ pub struct Database {
 }
 
 #[cfg(feature = "kv_redis")]
-#[derive(Debug, Clone, Builder)]
+#[derive(Clone, Builder)]
 #[readonly::make]
 pub struct Redis {
     pub url: String,
@@ -55,21 +62,21 @@ pub struct Redis {
 }
 
 #[cfg(feature = "bg_faktory")]
-#[derive(Debug, Clone, Builder)]
+#[derive(Clone, Builder)]
 #[readonly::make]
 pub struct Faktory {
     pub url: String,
     pub queue: String,
 }
 
-#[derive(Debug, Clone, Builder)]
+#[derive(Clone, Builder)]
 #[readonly::make]
 pub struct Server {
     pub bind: String,
     pub port: u16,
 }
 
-#[derive(Debug, Clone, Builder)]
+#[derive(Clone, Builder)]
 #[readonly::make]
 pub struct Jwt {
     pub access_token_secret: &'static [u8],
@@ -78,7 +85,7 @@ pub struct Jwt {
 }
 
 #[cfg(feature = "object_storage_fs")]
-#[derive(Debug, Clone, Builder)]
+#[derive(Clone, Builder)]
 #[readonly::make]
 pub struct StorageFs {
     pub hmac_secret: &'static [u8],
@@ -86,7 +93,7 @@ pub struct StorageFs {
 }
 
 #[cfg(feature = "object_storage_s3")]
-#[derive(Debug, Clone, Builder)]
+#[derive(Clone, Builder)]
 #[readonly::make]
 pub struct StorageS3 {
     pub endpoint: String,

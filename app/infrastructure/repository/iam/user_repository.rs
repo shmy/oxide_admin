@@ -19,6 +19,7 @@ use crate::shared::chrono_tz::ChronoTz;
 use crate::shared::error_util::is_unique_constraint_error;
 use crate::shared::pg_pool::PgPool;
 
+#[derive(Debug)]
 #[injectable]
 pub struct UserRepositoryImpl {
     pool: PgPool,

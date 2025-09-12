@@ -4,7 +4,7 @@ use nject::injectable;
 
 use crate::shared::config::Config;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[injectable]
 pub struct ChronoTz {
     config: Config,

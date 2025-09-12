@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{fmt::Debug, time::Duration};
 
 use anyhow::Result;
 use axum::http::Uri;
@@ -20,6 +20,12 @@ pub struct S3Config {
 pub struct S3 {
     operator: Operator,
     bucket: String,
+}
+
+impl Debug for S3 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("S3").finish()
+    }
 }
 
 impl S3 {

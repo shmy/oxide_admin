@@ -1,6 +1,7 @@
 use anyhow::Result;
 use chrono::Utc;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
+use std::fmt::Debug;
 use std::{path::Path, sync::Arc, time::Duration};
 use tracing::{debug, info};
 
@@ -8,9 +9,14 @@ use redb::{Database, ReadableDatabase as _, ReadableTable as _, TableDefinition}
 
 use crate::{KvdbTrait, serde_util};
 
-#[derive(Debug)]
 pub struct RedbKvdb {
     pub db: Arc<Database>,
+}
+
+impl Debug for RedbKvdb {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RedbKvdb").finish()
+    }
 }
 
 impl RedbKvdb {

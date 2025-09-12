@@ -15,6 +15,7 @@ pub struct SignOutCommand {
     id: UserId,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct SignOutCommandHandler {
     user_repository: UserRepositoryImpl,

@@ -15,7 +15,7 @@ use infrastructure::port::token_store_impl::TokenStoreImpl;
 use infrastructure::shared::config::Config;
 use nject::injectable;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[injectable]
 pub struct IamService {
     token_issuer: TokenIssuerImpl,

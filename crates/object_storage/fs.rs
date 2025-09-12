@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{fmt::Debug, time::Duration};
 
 use anyhow::Result;
 use axum::http::Uri;
@@ -23,6 +23,11 @@ pub struct Fs {
     basepath: String,
     hmac_secret: &'static [u8],
     link_period: Duration,
+}
+impl Debug for Fs {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Fs").finish()
+    }
 }
 
 impl Fs {

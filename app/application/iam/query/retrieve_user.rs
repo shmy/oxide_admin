@@ -12,6 +12,7 @@ pub struct RetrieveUserQuery {
     id: UserId,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct RetrieveUserQueryHandler {
     pool: PgPool,

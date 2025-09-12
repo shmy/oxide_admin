@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use anyhow::Result;
 use sqlx::ConnectOptions as _;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};

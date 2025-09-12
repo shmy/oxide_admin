@@ -25,6 +25,7 @@ use crate::{
     },
 };
 
+#[tracing::instrument]
 async fn sign_out(
     ValidUser(id): ValidUser,
     Inject(command_handler): Inject<SignOutCommandHandler>,
@@ -34,7 +35,7 @@ async fn sign_out(
     JsonResponse::ok(())
 }
 
-#[tracing::instrument(skip(iam_service, query_handler))]
+#[tracing::instrument]
 async fn current(
     ValidUser(id): ValidUser,
     Inject(iam_service): Inject<IamService>,
@@ -50,6 +51,7 @@ async fn current(
     JsonResponse::ok(response::CurrentResponse { user, pages })
 }
 
+#[tracing::instrument(skip(request))]
 async fn password(
     ValidUser(id): ValidUser,
     Inject(command_handler): Inject<UpdateUserSelfPasswordCommandHandler>,

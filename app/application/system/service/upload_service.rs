@@ -21,7 +21,7 @@ use tempfile::NamedTempFile;
 use tokio::fs::File;
 use tokio_util::io::ReaderStream;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[injectable]
 pub struct UploadService {
     ct: ChronoTz,

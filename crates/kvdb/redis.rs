@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use anyhow::Result;
 use bb8_redis::{
     RedisConnectionManager,
@@ -9,6 +7,8 @@ use bb8_redis::{
 use bon::Builder;
 use chrono::Utc;
 use serde::{Serialize, de::DeserializeOwned};
+use std::fmt::Debug;
+use std::time::Duration;
 use tracing::info;
 
 use crate::{KvdbTrait, serde_util};
@@ -23,9 +23,14 @@ pub struct RedisKvdbConfig {
     idle_timeout: Option<Duration>,
 }
 
-#[derive(Debug, Clone)]
 pub struct RedisKvdb {
     pool: Pool<RedisConnectionManager>,
+}
+
+impl Debug for RedisKvdb {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RedisKvdb").finish()
+    }
 }
 
 impl RedisKvdb {

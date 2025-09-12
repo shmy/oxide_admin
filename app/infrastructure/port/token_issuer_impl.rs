@@ -10,7 +10,7 @@ use crate::shared::{chrono_tz::ChronoTz, config::Config};
 
 const ALGORITHM: Algorithm = Algorithm::HS256;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[injectable]
 pub struct TokenIssuerImpl {
     config: Config,

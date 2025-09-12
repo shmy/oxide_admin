@@ -3,7 +3,7 @@ use kvdb::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 use sqlx::types::chrono::{DateTime, Utc};
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[injectable]
 pub struct TokenStoreImpl {
     kvdb: Kvdb,
