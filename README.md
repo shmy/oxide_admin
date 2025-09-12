@@ -43,46 +43,56 @@
 ### 内置 features
 <table>
     <tr>
-        <th>功能</th><th>名称</th><th>备注</th><th>默认启用</th>
+        <th>功能</th>
+        <th>名称</th>
+        <th>备注</th>
+        <th>默认启用</th>
     </tr>
     <tr>
         <td rowspan="2">Kv存储，<b>只能同时选择一个</b></td>
         <td>kv_redb</td>
         <td>使用redb作为kv/缓存，适合单体项目</td>
-        <td>☑️</td>
+        <td>✅</td>
     </tr>
     <tr>
-        <td>kv_redis</td><td>使用redis作为kv/缓存，适合分布式项目；</td>
+        <td>kv_redis</td>
+        <td>使用redis作为kv/缓存，适合分布式项目；</td>
+        <td></td>
     </tr>
     <tr>
         <td rowspan="2">后台任务，<b>只能同时选择一个</b></td>
         <td>bg_dummy</td>
         <td>不使用后台任务</td>
-        <td>☑️</td>
+        <td>✅</td>
     </tr>
     <tr>
-        <td>bg_faktory</td><td>使用faktory作为后台任务</td>
+        <td>bg_faktory</td><td>使用faktory作为后台任务</td><td></td>
     </tr>
     <tr>
         <td rowspan="2">对象存储，<b>只能同时选择一个</b></td>
         <td>object_storage_fs</td>
         <td>使用本地文件系统</td>
-        <td>☑️</td>
+        <td>✅</td>
     </tr>
     <tr>
-        <td>object_storage_s3</td><td>使用S3兼容服务作为对象存储</td>
+        <td>object_storage_s3</td>
+        <td>使用S3兼容服务作为对象存储</td>
     </tr>
     <tr>
         <td rowspan="3">日志与trace，<b>可以同时选择多个</b></td>
         <td>trace_console</td>
         <td>使用控制台输出日志</td>
-        <td>☑️</td>
+        <td>✅</td>
     </tr>
     <tr>
-        <td>trace_rolling</td><td>使用滚动日志保存json格式</td>
+        <td>trace_rolling</td>
+        <td>使用滚动日志保存json格式</td>
+        <td></td>
     </tr>
     <tr>
-        <td>trace_otlp</td><td>接入OpenTelemetry</td>
+        <td>trace_otlp</td>
+        <td>接入OpenTelemetry</td>
+        <td></td>
     </tr>
 </table>
 
