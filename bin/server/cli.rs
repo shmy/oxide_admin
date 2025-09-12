@@ -2,7 +2,7 @@ use chrono_tz::Tz;
 use clap::Parser;
 use humantime::parse_duration;
 use infrastructure::shared::config::{Config, Database, Jwt, Log, Server};
-use tracing_appender::rolling::Rotation;
+use trace_kit::Rotation;
 
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]

@@ -17,6 +17,7 @@ members = [
     "crates/object_storage",
     "crates/single_flight",
     "crates/single_flight_macros",
+    "crates/trace_kit",
 ]
 
 [workspace.dependencies]
@@ -31,6 +32,7 @@ bb8-redis = { version = "0.24", default-features = false }
 bg_worker = { path = "crates/bg_worker" }
 bon = { version = "3.7", default-features = false }
 captcha_generator = { path = "crates/captcha_generator" }
+trace_kit = { path = "crates/trace_kit" }
 chrono = { version = "0.4", default-features = false }
 chrono-tz = { version = "0.10", default-features = false }
 clap = { version = "4.5", default-features = false }
@@ -42,7 +44,7 @@ futures-util = { version = "0.3", default-features = false }
 governor = { version = "0.10", default-features = false }
 hex = { version = "0.4", default-features = false }
 hmac-sha256 = { version = "1.1", default-features = false }
-humantime = { version = "2.2", default-features = false }
+humantime = { version = "2.3", default-features = false }
 image = { version = "0.25", default-features = false }
 imageformat = { version = "0.3", default-features = false }
 include_dir = { version = "0.7", default-features = false }

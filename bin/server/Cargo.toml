@@ -42,10 +42,4 @@ mimalloc = { workspace = true }
 object_storage = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
-tracing-appender = { workspace = true }
-tracing-subscriber = { workspace = true, features = [
-    "fmt",
-    "ansi",
-    "env-filter",
-    "json",
-] }
+trace_kit = { workspace = true }

@@ -1,0 +1,23 @@
+[package]
+name = "trace_kit"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "lib.rs"
+
+[features]
+console = []
+rolling = []
+otel = []
+
+[dependencies]
+bon = { workspace = true }
+tracing = { workspace = true }
+tracing-appender = { workspace = true }
+tracing-subscriber = { workspace = true, features = [
+    "fmt",
+    "ansi",
+    "env-filter",
+    "json",
+] }

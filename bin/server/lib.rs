@@ -7,7 +7,7 @@ use axum::Router;
 use bg_worker::queuer::Queuer;
 use bg_worker::worker_manager::WorkerManager;
 use infrastructure::shared::{
-    config::{Config, Server},
+    config::{Config, Log, Server},
     path::LOG_DIR,
     pg_pool,
 };
@@ -23,16 +23,13 @@ use std::{
     sync::Arc,
 };
 use tokio::{net::TcpListener, signal, sync::Notify, try_join};
+use trace_kit::WorkerGuard;
 use tracing::{info, warn};
-use tracing_appender::{non_blocking::WorkerGuard, rolling::Rotation};
-use tracing_subscriber::{
-    EnvFilter, Layer, layer::SubscriberExt as _, util::SubscriberInitExt as _,
-};
 
 pub mod cli;
 
 pub async fn bootstrap(config: Config) -> Result<()> {
-    let _guard = init_tracing(&config.log.level, config.log.rolling_kind.clone());
+    let _guard = init_tracing(&config.log);
     let listener = build_listener(&config.server).await?;
     let provider = build_provider(config).await?;
     let (_, worker) = try_join!(initilize(&provider), build_worker_manager(&provider))?;
@@ -49,26 +46,13 @@ pub async fn bootstrap(config: Config) -> Result<()> {
     Ok(())
 }
 
-fn init_tracing(level: &str, rotation: Rotation) -> WorkerGuard {
-    let directive = level;
-    let file_appender =
-        tracing_appender::rolling::RollingFileAppender::new(rotation, LOG_DIR.as_path(), "log");
-    let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
-    let terminal_layer = tracing_subscriber::fmt::layer()
-        .with_ansi(true)
-        .with_filter(EnvFilter::new(directive));
-    let rolling_layer = tracing_subscriber::fmt::layer()
-        .json()
-        .with_writer(non_blocking)
-        .with_line_number(true)
-        .with_file(true)
-        .with_ansi(false)
-        .with_filter(EnvFilter::new(directive));
-    tracing_subscriber::registry()
-        .with(terminal_layer)
-        .with(rolling_layer)
-        .init();
-    guard
+fn init_tracing(config: &Log) -> WorkerGuard {
+    let config = trace_kit::TracingConfig::builder()
+        .level(&config.level)
+        .rolling_kind(config.rolling_kind.clone())
+        .rolling_dir(LOG_DIR.as_path())
+        .build();
+    trace_kit::init_tracing(config)
 }
 
 async fn build_listener(server: &Server) -> Result<TcpListener> {
