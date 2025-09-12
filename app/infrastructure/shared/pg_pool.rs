@@ -37,7 +37,7 @@ pub async fn try_new(db: &Database) -> Result<PgPool> {
     )
     .fetch_one(&pool)
     .await?;
-    info!("{}", row.version);
+    info!("{} connected", row.version);
     info!("Database timezone: {}", row.timezone);
     Ok(pool)
 }

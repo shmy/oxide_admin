@@ -11,7 +11,9 @@ pub struct Queuer {
 }
 impl Queuer {
     pub async fn try_new(addr: impl Into<String>, queue: impl Into<String>) -> Result<Self> {
-        let client = Client::connect_to(&addr.into()).await?;
+        let mut client = Client::connect_to(&addr.into()).await?;
+        let info = client.current_info().await?;
+        tracing::info!("Faktory version: {} connected", info.server.version);
         Ok(Self {
             client: Arc::new(Mutex::new(client)),
             queue: queue.into(),

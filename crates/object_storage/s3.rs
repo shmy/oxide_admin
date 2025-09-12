@@ -41,6 +41,7 @@ impl S3 {
             .layer(LoggingLayer::default())
             .finish();
         operator.check().await?;
+        tracing::info!("S3 bucket: {} connected", bucket);
         Ok(Self { operator, bucket })
     }
 }

@@ -78,7 +78,7 @@ impl RedisKvdb {
             }
         }
         info!(
-            "Redis {} ({}) on {}, compiled by gcc ({}) {}-bit",
+            "Redis {} ({}) on {}, compiled by gcc ({}) {}-bit connected",
             version, mode, os, gcc, bit
         );
         Ok(())
