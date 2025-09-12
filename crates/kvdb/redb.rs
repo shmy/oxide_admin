@@ -23,7 +23,7 @@ impl RedbKvdb {
     pub async fn try_new(path: impl AsRef<Path>) -> Result<Self> {
         let db_path = path.as_ref();
         let db = Database::create(db_path)?;
-        info!("Redb data path: {}", db_path.display());
+        info!("Redb {} connected", db_path.display());
         Ok(Self { db: Arc::new(db) })
     }
 }
