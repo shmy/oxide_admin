@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::iam::error::IamError;
@@ -14,12 +16,23 @@ use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize, Builder)]
+#[derive(Deserialize, Builder)]
 pub struct SignInCommand {
     account: String,
     password: String,
     captcha_key: String,
     captcha_value: String,
+}
+
+impl Debug for SignInCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("SignInCommand")
+            .field("account", &self.account)
+            .field("password", &"<RESERVED>")
+            .field("captcha_key", &self.captcha_key)
+            .field("captcha_value", &self.captcha_value)
+            .finish()
+    }
 }
 
 #[derive(Debug)]
