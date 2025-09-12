@@ -13,8 +13,8 @@ bg_faktory = ["bg_worker/faktory"]
 bg_dummy = ["bg_worker/dummy"]
 object_storage_fs = ["object_storage/fs"]
 object_storage_s3 = ["object_storage/s3"]
-trace_console = []
 trace_rolling = []
+trace_otlp = []
 
 [dependencies]
 anyhow = { workspace = true }

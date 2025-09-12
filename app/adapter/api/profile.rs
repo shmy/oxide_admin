@@ -34,6 +34,7 @@ async fn sign_out(
     JsonResponse::ok(())
 }
 
+#[tracing::instrument(skip(iam_service, query_handler))]
 async fn current(
     ValidUser(id): ValidUser,
     Inject(iam_service): Inject<IamService>,

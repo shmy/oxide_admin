@@ -16,6 +16,20 @@ pub struct Cli {
     #[arg(long, default_value = "daily", env = "LOG_ROLLING_KIND")]
     pub log_rolling_kind: String,
 
+    #[cfg(feature = "trace_otlp")]
+    /// OpenTelemetry 服务名称
+    #[arg(long, default_value = "oxide_admin", env = "LOG_OTLP_SERVICE_NAME")]
+    pub log_otlp_service_name: String,
+
+    #[cfg(feature = "trace_otlp")]
+    /// OpenTelemetry http 导出端点
+    #[arg(
+        long,
+        default_value = "http://localhost:4318/v1/traces",
+        env = "LOG_OTLP_ENDPOINT"
+    )]
+    pub log_otlp_endpoint: String,
+
     /// 数据库连接地址
     #[arg(long, env = "DATABASE_URL")]
     pub database_url: String,
@@ -208,6 +222,10 @@ impl TryFrom<Cli> for Config {
             let log_builder = Log::builder().level(value.log_level);
             #[cfg(feature = "trace_rolling")]
             let log_builder = log_builder.rolling_kind(value.log_rolling_kind);
+            #[cfg(feature = "trace_otlp")]
+            let log_builder = log_builder
+                .otlp_service_name(value.log_otlp_service_name)
+                .otlp_endpoint(value.log_otlp_endpoint);
             builder.log(log_builder.build())
         };
         Ok(builder.build())

@@ -22,9 +22,12 @@ pub struct Config {
 #[readonly::make]
 pub struct Log {
     pub level: String,
-
     #[cfg(feature = "trace_rolling")]
     pub rolling_kind: String,
+    #[cfg(feature = "trace_otlp")]
+    pub otlp_service_name: String,
+    #[cfg(feature = "trace_otlp")]
+    pub otlp_endpoint: String,
 }
 
 #[derive(Debug, Clone, Builder)]

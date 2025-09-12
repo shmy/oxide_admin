@@ -51,6 +51,10 @@ fn init_tracing(config: &Log) -> TracingGuard {
     let config_builder = config_builder
         .rolling_kind(&config.rolling_kind)
         .rolling_dir(infrastructure::shared::path::LOG_DIR.as_path());
+    #[cfg(feature = "trace_otlp")]
+    let config_builder = config_builder
+        .otlp_service_name(&config.otlp_service_name)
+        .otlp_endpoint(&config.otlp_endpoint);
     trace_kit::init_tracing(config_builder.build())
 }
 
