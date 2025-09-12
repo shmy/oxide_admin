@@ -8,11 +8,12 @@ use futures_util::StreamExt as _;
 use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct BatchDisableUsersCommand {
     ids: Vec<UserId>,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct BatchDisableUsersCommandHandler {
     user_repository: UserRepositoryImpl,
@@ -25,6 +26,7 @@ impl CommandHandler for BatchDisableUsersCommandHandler {
     type Event = IamEvent;
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

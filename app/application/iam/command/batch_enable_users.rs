@@ -8,11 +8,12 @@ use serde::Deserialize;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct BatchEnableUsersCommand {
     ids: Vec<UserId>,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct BatchEnableUsersCommandHandler {
     user_repository: UserRepositoryImpl,
@@ -24,6 +25,7 @@ impl CommandHandler for BatchEnableUsersCommandHandler {
     type Event = IamEvent;
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

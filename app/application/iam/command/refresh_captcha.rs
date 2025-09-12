@@ -8,9 +8,10 @@ use domain::shared::port::captcha_issuer::{Captcha, CaptchaIssuerTrait as _};
 use infrastructure::port::captcha_issuer_impl::CaptchaIssuerImpl;
 use nject::injectable;
 use serde::Deserialize;
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct RefreshCaptchaCommand {}
 
+#[derive(Debug)]
 #[injectable]
 pub struct RefreshCaptchaCommandHandler {
     captcha_issuer: CaptchaIssuerImpl,
@@ -21,6 +22,7 @@ impl CommandHandler for RefreshCaptchaCommandHandler {
     type Output = Captcha;
     type Event = IamEvent;
     type Error = IamError;
+    #[tracing::instrument]
     async fn execute(
         &self,
         _cmd: Self::Command,

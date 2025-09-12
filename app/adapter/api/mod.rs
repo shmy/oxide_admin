@@ -22,7 +22,7 @@ pub fn routing(state: WebState) -> Router<WebState> {
             state.clone(),
             user_authn_required,
         ))
+        .nest("/auth", auth::routing())
         .layer(axum_tracing_opentelemetry::middleware::OtelInResponseLayer)
         .layer(axum_tracing_opentelemetry::middleware::OtelAxumLayer::default())
-        .nest("/auth", auth::routing())
 }

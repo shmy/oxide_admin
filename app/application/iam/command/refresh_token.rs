@@ -12,11 +12,12 @@ use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct RefreshTokenCommand {
     refresh_token: String,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct RefreshTokenCommandHandler {
     user_repository: UserRepositoryImpl,
@@ -29,6 +30,7 @@ impl CommandHandler for RefreshTokenCommandHandler {
     type Output = TokenIssuerOutput;
     type Event = IamEvent;
     type Error = IamError;
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

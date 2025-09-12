@@ -13,7 +13,7 @@ use nject::injectable;
 use object_storage::{ObjectStorage, ObjectStorageReader as _};
 use serde::Deserialize;
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct UpdateUserCommand {
     id: UserId,
     account: Option<String>,
@@ -23,6 +23,7 @@ pub struct UpdateUserCommand {
     enabled: Option<bool>,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct UpdateUserCommandHandler {
     user_repository: UserRepositoryImpl,
@@ -36,6 +37,7 @@ impl CommandHandler for UpdateUserCommandHandler {
     type Event = IamEvent;
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

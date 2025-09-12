@@ -20,6 +20,7 @@ pub struct RetrieveUserQueryHandler {
 
 impl RetrieveUserQueryHandler {
     #[single_flight]
+    #[tracing::instrument]
     pub async fn query(&self, query: RetrieveUserQuery) -> Result<UserDto, IamError> {
         let row_opt = sqlx::query_as!(
             UserDto,

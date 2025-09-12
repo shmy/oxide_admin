@@ -5,7 +5,6 @@ use application::{
         refresh_captcha::{RefreshCaptchaCommand, RefreshCaptchaCommandHandler},
         refresh_token::{RefreshTokenCommand, RefreshTokenCommandHandler},
         sign_in::{SignInCommand, SignInCommandHandler},
-        sign_out::{SignOutCommand, SignOutCommandHandler},
     },
     shared::command_handler::CommandHandler,
 };
@@ -32,6 +31,7 @@ use crate::{
 const CAPTCHA_HEADER_NAME: HeaderName = HeaderName::from_static("x-captcha-id");
 const CAPTCHA_CONTENT_TYPE: HeaderValue = HeaderValue::from_static("image/png");
 
+#[tracing::instrument]
 async fn sign_in(
     Inject(command_handler): Inject<SignInCommandHandler>,
     Json(command): Json<SignInCommand>,
@@ -43,14 +43,7 @@ async fn sign_in(
     })
 }
 
-async fn sign_out(
-    Inject(command_handler): Inject<SignOutCommandHandler>,
-    Json(command): Json<SignOutCommand>,
-) -> JsonResponseType<()> {
-    command_handler.handle(command).await?;
-    JsonResponse::ok(())
-}
-
+#[tracing::instrument]
 async fn refresh_token(
     Inject(command_handler): Inject<RefreshTokenCommandHandler>,
     Json(command): Json<RefreshTokenCommand>,
@@ -62,6 +55,7 @@ async fn refresh_token(
     })
 }
 
+#[tracing::instrument]
 async fn refresh_captcha(
     Inject(command_handler): Inject<RefreshCaptchaCommandHandler>,
 ) -> anyhow::Result<impl IntoResponse, WebError> {
@@ -91,7 +85,6 @@ pub fn routing() -> Router<WebState> {
             "/sign_in",
             post(sign_in).rate_limit_layer(Duration::from_secs(3), 1),
         )
-        .route("/sign_out", post(sign_out))
         .route(
             "/refresh_token",
             post(refresh_token).rate_limit_layer(Duration::from_secs(1), 1),

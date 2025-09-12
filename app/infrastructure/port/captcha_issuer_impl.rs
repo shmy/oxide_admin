@@ -9,6 +9,7 @@ use domain::{
 use kvdb::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 
+#[derive(Debug)]
 #[injectable]
 pub struct CaptchaIssuerImpl {
     kvdb: Kvdb,
@@ -21,6 +22,7 @@ impl CaptchaIssuerImpl {
 }
 impl CaptchaIssuerTrait for CaptchaIssuerImpl {
     type Error = IamError;
+    #[tracing::instrument]
     async fn generate_with_ttl(&self, ttl: std::time::Duration) -> Result<Captcha, Self::Error> {
         let math = captcha_generator::math::MathCaptcha::new(100, 140, 40);
         let captcha_data = math
@@ -38,6 +40,7 @@ impl CaptchaIssuerTrait for CaptchaIssuerImpl {
         })
     }
 
+    #[tracing::instrument]
     async fn verify(&self, key: &str, value: &str) -> Result<(), Self::Error> {
         let full_key = Self::fill_captcha_key(key);
         let Some(existing_value) = self.kvdb.get::<String>(&full_key).await else {

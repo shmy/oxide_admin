@@ -9,14 +9,17 @@ use crate::system::dto::{
 
 static SNAPSHOT: LazyLock<SystemSnapshot> = LazyLock::new(SystemService::build_snapshot);
 
+#[derive(Debug)]
 #[injectable]
 pub struct SystemService;
 
 impl SystemService {
+    #[tracing::instrument]
     pub async fn info(&self) -> Result<&'static SystemSnapshot> {
         Ok(&SNAPSHOT)
     }
 
+    #[tracing::instrument]
     fn build_snapshot() -> SystemSnapshot {
         let mut sys = System::new();
         sys.refresh_cpu_all();

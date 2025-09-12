@@ -18,7 +18,7 @@ use crate::{
 };
 
 #[serde_as]
-#[derive(Clone, PartialEq, Eq, Hash, Deserialize, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Builder)]
 pub struct SearchUsersQuery {
     #[serde(flatten)]
     paging: PagingQuery,
@@ -35,7 +35,7 @@ pub struct SearchUsersQuery {
     role_id: Option<String>,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[injectable]
 pub struct SearchUsersQueryHandler {
     pool: PgPool,
@@ -45,6 +45,7 @@ pub struct SearchUsersQueryHandler {
 
 impl SearchUsersQueryHandler {
     #[single_flight]
+    #[tracing::instrument]
     pub async fn query(&self, query: SearchUsersQuery) -> Result<PagingResult<UserDto>, IamError> {
         let total_future = sqlx::query_scalar!(
             r#"
@@ -105,10 +106,12 @@ impl SearchUsersQueryHandler {
         Ok(PagingResult { total, items: rows })
     }
 
+    #[tracing::instrument]
     pub async fn clean_cache(&self) -> Result<()> {
         self.cache_provider.clear().await
     }
 
+    #[tracing::instrument]
     pub async fn query_cached(
         &self,
         query: SearchUsersQuery,

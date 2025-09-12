@@ -12,7 +12,7 @@ use serde::Deserialize;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct UpdateRoleCommand {
     id: RoleId,
     name: Option<String>,
@@ -20,6 +20,7 @@ pub struct UpdateRoleCommand {
     enabled: Option<bool>,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct UpdateRoleCommandHandler {
     role_repo: RoleRepositoryImpl,
@@ -31,6 +32,7 @@ impl CommandHandler for UpdateRoleCommandHandler {
     type Event = IamEvent;
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

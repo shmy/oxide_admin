@@ -33,6 +33,7 @@ impl DomainRepository for UserRepositoryImpl {
 
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, Self::Error> {
         let row_opt = sqlx::query_as!(
             UserDto,
@@ -47,6 +48,7 @@ impl DomainRepository for UserRepositoryImpl {
         row_opt.map(Into::into).ok_or(IamError::UserNotFound)
     }
 
+    #[tracing::instrument]
     async fn save(&self, entity: Self::Entity) -> Result<Self::Entity, Self::Error> {
         let now = self.ct.now();
         sqlx::query!(
@@ -88,6 +90,7 @@ impl DomainRepository for UserRepositoryImpl {
         Ok(entity)
     }
 
+    #[tracing::instrument]
     async fn batch_delete(
         &self,
         ids: &[Self::EntityId],
@@ -111,6 +114,7 @@ impl DomainRepository for UserRepositoryImpl {
 }
 
 impl UserRepository for UserRepositoryImpl {
+    #[tracing::instrument]
     async fn by_account(&self, account: String) -> Result<Self::Entity, Self::Error> {
         let row_opt = sqlx::query_as!(
             UserDto,
@@ -125,6 +129,7 @@ impl UserRepository for UserRepositoryImpl {
         row_opt.map(Into::into).ok_or(IamError::UserNotFound)
     }
 
+    #[tracing::instrument]
     async fn by_refresh_token(&self, refresh_token: String) -> Result<Self::Entity, Self::Error> {
         let row_opt = sqlx::query_as!(
             UserDto,
@@ -139,6 +144,7 @@ impl UserRepository for UserRepositoryImpl {
         row_opt.map(Into::into).ok_or(IamError::UserNotFound)
     }
 
+    #[tracing::instrument]
     async fn toggle_enabled(
         &self,
         ids: &[UserId],

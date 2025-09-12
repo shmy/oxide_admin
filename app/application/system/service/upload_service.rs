@@ -29,6 +29,7 @@ pub struct UploadService {
 }
 
 impl UploadService {
+    #[tracing::instrument(skip(file))]
     pub async fn image(&self, mut file: NamedTempFile) -> Result<FinishResponse> {
         let Some(format) = SupportedFormat::validate_image_type(&mut file) else {
             bail!("不支持的图片格式");
@@ -43,6 +44,7 @@ impl UploadService {
         })
     }
 
+    #[tracing::instrument(skip(file))]
     pub async fn single(
         &self,
         filename: Option<String>,
@@ -58,6 +60,7 @@ impl UploadService {
         })
     }
 
+    #[tracing::instrument]
     pub async fn start_chunk(&self, filename: String) -> Result<StartChunkResponse> {
         let extension = Self::extract_extension(Some(filename));
         let key = IdGenerator::filename().to_lowercase();
@@ -67,6 +70,7 @@ impl UploadService {
         Ok(StartChunkResponse { key, upload_id })
     }
 
+    #[tracing::instrument(skip(file))]
     pub async fn chunk(
         &self,
         key: String,
@@ -81,6 +85,7 @@ impl UploadService {
         })
     }
 
+    #[tracing::instrument]
     pub async fn finish_chunk(
         &self,
         key: String,
@@ -106,14 +111,17 @@ impl UploadService {
         })
     }
 
+    #[tracing::instrument(skip(path))]
     pub async fn presign_url(&self, path: impl AsRef<str>) -> Result<String> {
         self.object_storage.presign_url(path).await
     }
 
+    #[tracing::instrument]
     pub fn verify_url(&self, url: Uri) -> bool {
         self.object_storage.verify_url(url)
     }
 
+    #[tracing::instrument]
     fn build_relative_path(&self, filename: String) -> String {
         let now = self.ct.now();
         let year = now.year().to_string();
@@ -122,6 +130,7 @@ impl UploadService {
         relative_path
     }
 
+    #[tracing::instrument]
     fn extract_extension(path: Option<String>) -> String {
         path.as_ref()
             .and_then(|f| Path::new(f).extension())

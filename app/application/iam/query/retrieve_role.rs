@@ -8,11 +8,12 @@ use nject::injectable;
 use serde::Deserialize;
 use single_flight::single_flight;
 
-#[derive(Clone, PartialEq, Eq, Hash, Deserialize, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Builder)]
 pub struct RetrieveRoleQuery {
     id: RoleId,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct RetrieveRoleQueryHandler {
     pool: PgPool,

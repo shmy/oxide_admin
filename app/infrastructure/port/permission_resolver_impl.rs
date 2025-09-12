@@ -25,6 +25,7 @@ pub struct PermissionResolverImpl {
 }
 
 impl PermissionResolverImpl {
+    #[tracing::instrument]
     async fn solve(&self, id: &UserId) -> Result<PermissionGroup> {
         let res = async move {
             if let Ok(permission_group) = self.find_from_db(id.clone()).await {
@@ -38,6 +39,8 @@ impl PermissionResolverImpl {
 }
 impl PermissionResolver for PermissionResolverImpl {
     type Error = anyhow::Error;
+
+    #[tracing::instrument]
     async fn resolve(&self, id: &UserId) -> PermissionGroup {
         match self.kvdb.get(&self.full_key(id)).await {
             Some(cache) => cache,
@@ -58,6 +61,7 @@ impl PermissionResolver for PermissionResolverImpl {
         }
     }
 
+    #[tracing::instrument]
     async fn refresh(&self) -> Result<(), Self::Error> {
         self.kvdb.delete_prefix(KEY_PREFIX).await?;
         Ok(())

@@ -14,6 +14,7 @@ use crate::shared::chrono_tz::ChronoTz;
 use crate::shared::error_util::is_unique_constraint_error;
 use crate::shared::pg_pool::PgPool;
 
+#[derive(Debug)]
 #[injectable]
 pub struct RoleRepositoryImpl {
     pool: PgPool,
@@ -27,6 +28,7 @@ impl DomainRepository for RoleRepositoryImpl {
 
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, Self::Error> {
         let row_opt = sqlx::query_as!(
             RoleDto,
@@ -41,6 +43,7 @@ impl DomainRepository for RoleRepositoryImpl {
         row_opt.map(Into::into).ok_or(IamError::RoleNotFound)
     }
 
+    #[tracing::instrument]
     async fn save(&self, entity: Self::Entity) -> Result<Self::Entity, Self::Error> {
         let now = self.ct.now();
 
@@ -73,6 +76,7 @@ impl DomainRepository for RoleRepositoryImpl {
         Ok(entity)
     }
 
+    #[tracing::instrument]
     async fn batch_delete(&self, ids: &[Self::EntityId]) -> Result<Vec<Self::Entity>, Self::Error> {
         if ids.is_empty() {
             return Ok(Vec::with_capacity(0));
@@ -92,6 +96,7 @@ impl DomainRepository for RoleRepositoryImpl {
 }
 
 impl RoleRepository for RoleRepositoryImpl {
+    #[tracing::instrument]
     async fn toggle_enabled(
         &self,
         ids: &[RoleId],

@@ -10,11 +10,12 @@ use serde::Deserialize;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct BatchDeleteRolesCommand {
     ids: Vec<RoleId>,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct BatchDeleteRolesCommandHandler {
     role_repo: RoleRepositoryImpl,
@@ -26,6 +27,7 @@ impl CommandHandler for BatchDeleteRolesCommandHandler {
     type Event = IamEvent;
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

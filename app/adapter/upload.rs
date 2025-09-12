@@ -15,7 +15,9 @@ pub fn routing(state: WebState) -> Router {
     let serve_dir = ServeDir::new(UPLOAD_DIR.as_path());
     let router = Router::new()
         .fallback_service(serve_dir)
-        .layer(middleware::from_fn_with_state(state, limited_middleware));
+        .layer(middleware::from_fn_with_state(state, limited_middleware))
+        .layer(axum_tracing_opentelemetry::middleware::OtelInResponseLayer)
+        .layer(axum_tracing_opentelemetry::middleware::OtelAxumLayer::default());
     Router::new().nest(UPLOAD_PATH, router)
 }
 

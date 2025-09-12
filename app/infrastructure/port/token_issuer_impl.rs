@@ -20,6 +20,7 @@ pub struct TokenIssuerImpl {
 impl TokenIssuerTrait for TokenIssuerImpl {
     type Error = IamError;
 
+    #[tracing::instrument(skip(claims, secret))]
     fn generate_access_token<T: Serialize>(
         &self,
         claims: &T,
@@ -31,6 +32,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
         Ok(token)
     }
 
+    #[tracing::instrument]
     fn generate_refresh_token(&self) -> String {
         tempoid::TempoId::generate_custom(::tempoid::TempoIdOptions {
             time_length: 8,
@@ -40,6 +42,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
         .to_string()
     }
 
+    #[tracing::instrument]
     fn generate(&self, sub: String) -> Result<TokenIssuerOutput, Self::Error> {
         let now = self.tz.now_utc();
         let iat = now.timestamp();
@@ -67,6 +70,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
         })
     }
 
+    #[tracing::instrument(skip(access_token, secret))]
     fn verify<T: DeserializeOwned>(
         &self,
         access_token: &str,
@@ -81,6 +85,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
         Ok(token_data.claims)
     }
 
+    #[tracing::instrument(skip(access_token))]
     fn decode_without_validation<T: DeserializeOwned>(
         &self,
         access_token: &str,

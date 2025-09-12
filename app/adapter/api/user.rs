@@ -33,6 +33,7 @@ use crate::{
     },
 };
 
+#[tracing::instrument]
 async fn search(
     Inject(query_handler): Inject<SearchUsersQueryHandler>,
     Inject(iam_service): Inject<IamService>,
@@ -43,6 +44,7 @@ async fn search(
     JsonResponse::ok(PagingResponse { total, items })
 }
 
+#[tracing::instrument]
 async fn retrieve(
     Inject(query_handler): Inject<RetrieveUserQueryHandler>,
     Inject(iam_service): Inject<IamService>,
@@ -57,6 +59,7 @@ async fn retrieve(
     JsonResponse::ok(user)
 }
 
+#[tracing::instrument]
 async fn batch_delete(
     Inject(command_handler): Inject<BatchDeleteUsersCommandHandler>,
     Json(command): Json<BatchDeleteUsersCommand>,
@@ -65,6 +68,7 @@ async fn batch_delete(
     JsonResponse::ok(())
 }
 
+#[tracing::instrument]
 async fn batch_enable(
     Inject(command_handler): Inject<BatchEnableUsersCommandHandler>,
     Json(command): Json<BatchEnableUsersCommand>,
@@ -73,6 +77,7 @@ async fn batch_enable(
     JsonResponse::ok(())
 }
 
+#[tracing::instrument]
 async fn batch_disable(
     Inject(command_handler): Inject<BatchDisableUsersCommandHandler>,
     Json(command): Json<BatchDisableUsersCommand>,
@@ -81,6 +86,7 @@ async fn batch_disable(
     JsonResponse::ok(())
 }
 
+#[tracing::instrument]
 async fn create(
     Inject(command_handler): Inject<CreateUserCommandHandler>,
     Json(command): Json<CreateUserCommand>,
@@ -89,6 +95,7 @@ async fn create(
     JsonResponse::ok(())
 }
 
+#[tracing::instrument]
 async fn update(
     Inject(command_handler): Inject<UpdateUserCommandHandler>,
     Path(_id): Path<UserId>,
@@ -98,6 +105,7 @@ async fn update(
     JsonResponse::ok(())
 }
 
+#[tracing::instrument(skip(request))]
 async fn update_password(
     Inject(command_handler): Inject<UpdateUserPasswordCommandHandler>,
     Path(id): Path<UserId>,

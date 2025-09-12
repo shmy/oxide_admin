@@ -11,13 +11,14 @@ use serde::Deserialize;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct CreateRoleCommand {
     name: String,
     permission_ids: Vec<PermissionCode>,
     enabled: bool,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct CreateRoleCommandHandler {
     role_repo: RoleRepositoryImpl,
@@ -29,6 +30,7 @@ impl CommandHandler for CreateRoleCommandHandler {
     type Event = IamEvent;
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

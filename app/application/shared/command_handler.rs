@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::shared::event::{EVENT_BUS, Event};
 
 pub struct CommandResult<T, E> {
@@ -28,7 +30,7 @@ impl<T, E> CommandResult<T, E> {
     }
 }
 
-pub trait CommandHandler {
+pub trait CommandHandler: Debug {
     type Command;
     type Output;
     type Event: Into<Event>;

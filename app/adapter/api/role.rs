@@ -31,6 +31,7 @@ use crate::{
     },
 };
 
+#[tracing::instrument]
 async fn search(
     Inject(query_handler): Inject<SearchRolesQueryHandler>,
     Query(query): Query<SearchRolesQuery>,
@@ -39,6 +40,7 @@ async fn search(
     JsonResponse::ok(PagingResponse { total, items })
 }
 
+#[tracing::instrument]
 async fn retrieve(
     Inject(query_handler): Inject<RetrieveRoleQueryHandler>,
     Path(id): Path<RoleId>,
@@ -49,6 +51,7 @@ async fn retrieve(
     JsonResponse::ok(role)
 }
 
+#[tracing::instrument]
 async fn batch_delete(
     Inject(command_handler): Inject<BatchDeleteRolesCommandHandler>,
     Json(command): Json<BatchDeleteRolesCommand>,
@@ -57,6 +60,7 @@ async fn batch_delete(
     JsonResponse::ok(())
 }
 
+#[tracing::instrument]
 async fn batch_enable(
     Inject(command_handler): Inject<BatchEnableRolesCommandHandler>,
     Json(command): Json<BatchEnableRolesCommand>,
@@ -65,6 +69,7 @@ async fn batch_enable(
     JsonResponse::ok(())
 }
 
+#[tracing::instrument]
 async fn batch_disable(
     Inject(command_handler): Inject<BatchDisableRolesCommandHandler>,
     Json(command): Json<BatchDisableRolesCommand>,
@@ -73,6 +78,7 @@ async fn batch_disable(
     JsonResponse::ok(())
 }
 
+#[tracing::instrument]
 async fn create(
     Inject(command_handler): Inject<CreateRoleCommandHandler>,
     Json(command): Json<CreateRoleCommand>,
@@ -81,6 +87,7 @@ async fn create(
     JsonResponse::ok(())
 }
 
+#[tracing::instrument]
 async fn update(
     Inject(command_handler): Inject<UpdateRoleCommandHandler>,
     Path(_id): Path<RoleId>,

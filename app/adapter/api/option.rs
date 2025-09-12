@@ -15,6 +15,7 @@ use crate::{
     },
 };
 
+#[tracing::instrument]
 async fn roles(
     Inject(query_handler): Inject<OptionRolesQueryHandler>,
 ) -> JsonResponseType<Vec<OptionDto>> {
@@ -22,6 +23,7 @@ async fn roles(
     JsonResponse::ok(items)
 }
 
+#[tracing::instrument]
 async fn permissions(Inject(service): Inject<IamService>) -> JsonResponseType<&'static [Page]> {
     let pages = service.get_all_pages();
     JsonResponse::ok(pages)

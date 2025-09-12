@@ -26,6 +26,7 @@ pub struct IamService {
 }
 
 impl IamService {
+    #[tracing::instrument]
     pub async fn verify_token(&self, token: &str) -> Result<UserId> {
         let secret = &self.config.jwt.access_token_secret;
         let claims = self.token_issuer.verify::<UserClaims>(token, secret)?;
@@ -39,6 +40,7 @@ impl IamService {
         Ok(UserId::new_unchecked(id))
     }
 
+    #[tracing::instrument]
     pub async fn check_permission(&self, id: &UserId, group: &PermissionGroup) -> Result<()> {
         let existing_group = self.permission_resolver.resolve(id).await;
         if !existing_group.permits_all(group) {
@@ -47,14 +49,17 @@ impl IamService {
         Ok(())
     }
 
+    #[tracing::instrument]
     pub fn get_all_permissions(&self) -> &'static [PermissionCode] {
         ALL_PERMISSIONS
     }
 
+    #[tracing::instrument]
     pub fn get_all_pages(&self) -> &'static [Page] {
         PAGES.as_ref()
     }
 
+    #[tracing::instrument]
     pub async fn get_available_pages(&self, user_id: UserId) -> [Page; 2] {
         let group = self.permission_resolver.resolve(&user_id).await;
         let mut pages = Self::get_available_pages_by_group(PAGES.as_ref(), &group);
@@ -69,6 +74,7 @@ impl IamService {
         ]
     }
 
+    #[tracing::instrument]
     fn find_default_path(pages: &[Page]) -> Option<&'static str> {
         if pages.is_empty() {
             return None;
@@ -81,6 +87,7 @@ impl IamService {
         })
     }
 
+    #[tracing::instrument]
     fn get_available_pages_by_group(pages: &[Page], group: &PermissionGroup) -> Vec<Page> {
         pages
             .iter()
@@ -103,6 +110,7 @@ impl IamService {
             .collect()
     }
 
+    #[tracing::instrument]
     pub async fn replenish_user_portrait(&self, dtos: &mut [UserDto]) {
         stream::iter(dtos)
             .for_each_concurrent(5, |dto| async move {

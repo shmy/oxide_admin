@@ -15,7 +15,7 @@ use serde::Deserialize;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct CreateUserCommand {
     account: String,
     password: String,
@@ -25,6 +25,7 @@ pub struct CreateUserCommand {
     enabled: bool,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct CreateUserCommandHandler {
     user_repository: UserRepositoryImpl,
@@ -37,6 +38,7 @@ impl CommandHandler for CreateUserCommandHandler {
     type Event = IamEvent;
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

@@ -10,13 +10,14 @@ use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct UpdateUserPasswordCommand {
     id: UserId,
     new_password: String,
     confirm_new_password: String,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct UpdateUserPasswordCommandHandler {
     user_repository: UserRepositoryImpl,
@@ -28,6 +29,7 @@ impl CommandHandler for UpdateUserPasswordCommandHandler {
     type Event = IamEvent;
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

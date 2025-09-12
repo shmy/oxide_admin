@@ -16,7 +16,7 @@ fn hash_encode(query: &impl Hash) -> u64 {
     hasher.finish()
 }
 
-#[derive(Clone, Builder)]
+#[derive(Debug, Clone, Builder)]
 pub struct CacheProvider {
     prefix: &'static str,
     ttl: Duration,
@@ -24,11 +24,13 @@ pub struct CacheProvider {
 }
 
 impl CacheProvider {
+    #[tracing::instrument]
     pub async fn clear(&self) -> Result<()> {
         self.kvdb.delete_prefix(self.prefix).await?;
         Ok(())
     }
 
+    #[tracing::instrument(skip(key, resolve))]
     pub async fn get_with<K, V, E, F, Fut>(&self, key: K, resolve: F) -> Result<V, E>
     where
         K: Clone + Hash + Eq,

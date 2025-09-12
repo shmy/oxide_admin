@@ -13,6 +13,7 @@ use crate::{
     },
 };
 
+#[tracing::instrument]
 pub async fn system_info(
     Inject(service): Inject<SystemService>,
 ) -> JsonResponseType<&'static SystemSnapshot> {

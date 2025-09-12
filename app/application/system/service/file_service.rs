@@ -8,7 +8,7 @@ use infrastructure::{
 use nject::injectable;
 use sqlx::prelude::FromRow;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[injectable]
 pub struct FileService {
     ct: ChronoTz,
@@ -16,6 +16,7 @@ pub struct FileService {
 }
 
 impl FileService {
+    #[tracing::instrument]
     pub fn unused_2days_ago(&self) -> BoxStream<'_, Result<File, sqlx::Error>> {
         let now = self.ct.now();
         let two_days_ago = now - Duration::days(2);
@@ -28,6 +29,7 @@ impl FileService {
         .fetch(&self.pool)) as _
     }
 
+    #[tracing::instrument]
     pub async fn create(&self, relative_path: &str) -> Result<()> {
         let now = self.ct.now();
         let id = IdGenerator::primary_id();
@@ -44,14 +46,17 @@ impl FileService {
         Ok(())
     }
 
+    #[tracing::instrument]
     pub async fn set_files_unused(&self, relative_paths: &[String]) -> Result<()> {
         self.set_files_status(relative_paths, false).await
     }
 
+    #[tracing::instrument]
     pub async fn set_files_used(&self, relative_paths: &[String]) -> Result<()> {
         self.set_files_status(relative_paths, true).await
     }
 
+    #[tracing::instrument]
     async fn set_files_status(&self, relative_paths: &[String], used: bool) -> Result<()> {
         if relative_paths.is_empty() {
             return Ok(());
@@ -70,6 +75,7 @@ impl FileService {
         Ok(())
     }
 
+    #[tracing::instrument]
     pub async fn delete_files(&self, relative_paths: &[String]) -> Result<()> {
         if relative_paths.is_empty() {
             return Ok(());

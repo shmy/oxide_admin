@@ -11,12 +11,14 @@ pub struct ChronoTz {
 }
 
 impl ChronoTz {
+    #[tracing::instrument]
     pub fn now(&self) -> NaiveDateTime {
         self.now_utc()
             .with_timezone(&self.config.database.timezone)
             .naive_local()
     }
 
+    #[tracing::instrument]
     pub fn now_utc(&self) -> DateTime<Utc> {
         Utc::now()
     }

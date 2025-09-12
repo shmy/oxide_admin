@@ -8,11 +8,12 @@ use infrastructure::repository::iam::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct BatchDisableRolesCommand {
     ids: Vec<RoleId>,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct BatchDisableRolesCommandHandler {
     role_repository: RoleRepositoryImpl,
@@ -24,6 +25,7 @@ impl CommandHandler for BatchDisableRolesCommandHandler {
     type Event = IamEvent;
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

@@ -14,7 +14,7 @@ use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct SignInCommand {
     account: String,
     password: String,
@@ -22,6 +22,7 @@ pub struct SignInCommand {
     captcha_value: String,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct SignInCommandHandler {
     captcha_issuer: CaptchaIssuerImpl,
@@ -36,6 +37,7 @@ impl CommandHandler for SignInCommandHandler {
     type Event = IamEvent;
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

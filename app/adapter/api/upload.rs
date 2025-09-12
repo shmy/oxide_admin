@@ -12,6 +12,7 @@ use crate::{
     },
 };
 
+#[tracing::instrument]
 async fn single(
     Inject(service): Inject<UploadService>,
     TypedMultipart(request): TypedMultipart<request::UploadRequest>,
@@ -22,6 +23,7 @@ async fn single(
     JsonResponse::ok(resp)
 }
 
+#[tracing::instrument]
 async fn image(
     Inject(service): Inject<UploadService>,
     TypedMultipart(request): TypedMultipart<request::UploadRequest>,
@@ -30,6 +32,7 @@ async fn image(
     JsonResponse::ok(resp)
 }
 
+#[tracing::instrument]
 async fn start_chunk(
     Inject(service): Inject<UploadService>,
     Json(request): Json<request::StartChunkRequest>,
@@ -38,6 +41,7 @@ async fn start_chunk(
     JsonResponse::ok(resp)
 }
 
+#[tracing::instrument]
 async fn chunk(
     Inject(service): Inject<UploadService>,
     TypedMultipart(request): TypedMultipart<request::ChunkRequest>,
@@ -48,6 +52,7 @@ async fn chunk(
     JsonResponse::ok(resp)
 }
 
+#[tracing::instrument]
 async fn finish_chunk(
     Inject(service): Inject<UploadService>,
     Json(request): Json<request::FinishChunkRequest>,

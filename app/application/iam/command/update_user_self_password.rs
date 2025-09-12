@@ -10,7 +10,7 @@ use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct UpdateUserSelfPasswordCommand {
     id: UserId,
     password: String,
@@ -30,6 +30,7 @@ impl CommandHandler for UpdateUserSelfPasswordCommandHandler {
     type Event = IamEvent;
     type Error = IamError;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

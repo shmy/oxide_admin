@@ -10,6 +10,8 @@ pub struct TokenStoreImpl {
 }
 impl TokenStoreTrait for TokenStoreImpl {
     type Error = IamError;
+
+    #[tracing::instrument]
     async fn store(
         &self,
         key: String,
@@ -23,10 +25,14 @@ impl TokenStoreTrait for TokenStoreImpl {
             .map_err(|_| IamError::AccessTokenSaveFailed)?;
         Ok(())
     }
+
+    #[tracing::instrument]
     async fn retrieve(&self, key: String) -> Option<String> {
         let full_key = Self::fill_key(&key);
         self.kvdb.get::<String>(&full_key).await
     }
+
+    #[tracing::instrument]
     async fn delete(&self, key: String) -> Result<(), Self::Error> {
         let full_key = Self::fill_key(&key);
         let _ = self.kvdb.delete(&full_key).await;
