@@ -16,6 +16,7 @@ default = [
     "bg_dummy",
     "object_storage_fs",
     "trace_console",
+    "trace_rolling",
     "trace_otlp",
 ]
 kv_redb = ["infrastructure/kv_redb"]

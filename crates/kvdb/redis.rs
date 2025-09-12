@@ -23,6 +23,7 @@ pub struct RedisKvdbConfig {
     idle_timeout: Option<Duration>,
 }
 
+#[derive(Clone)]
 pub struct RedisKvdb {
     pool: Pool<RedisConnectionManager>,
 }

@@ -40,9 +40,9 @@
 [x] 抽离kv到crate
 [ ] 定时任务
 [ ] 实现单机后台任务
-[ ] 配置日志是否本地轮转
 [ ] 重新测试Code generation 补充#[tracing::instrument]
 [ ] _files表如何处理
+[ ] 表格展示feature oneof mutli
 [ ] Frontend code generation
 [-] 接入分布式事件系统
 [-] 单元测试
