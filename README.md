@@ -39,13 +39,54 @@
 - Github CI：自动构建`x86_64-unknown-linux-musl`；
 - ...
 
-### Crate features
-- `kv_redb`: 使用`redb`作为kv/缓存，适合单体项目，默认值；
-- `kv_redis`: 使用`redis`作为kv/缓存，适合分布式项目；
-- `bg_dummy`: 禁止使用后台任务，默认值；
-- `bg_faktory`: 使用`faktory`作为后台任务；
-- `object_storage_fs`: 使用本地文件系统作为对象存储，默认值；
-- `object_storage_s3`: 使用S3兼容服务作为对象存储；
+
+### 内置 features
+<table>
+    <tr>
+        <th>功能</th><th>名称</th><th>备注</th><th>默认启用</th>
+    </tr>
+    <tr>
+        <td rowspan="2">Kv存储，<b>只能同时选择一个</b></td>
+        <td>kv_redb</td>
+        <td>使用redb作为kv/缓存，适合单体项目</td>
+        <td>☑️</td>
+    </tr>
+    <tr>
+        <td>kv_redis</td><td>使用redis作为kv/缓存，适合分布式项目；</td>
+    </tr>
+    <tr>
+        <td rowspan="2">后台任务，<b>只能同时选择一个</b></td>
+        <td>bg_dummy</td>
+        <td>不使用后台任务</td>
+        <td>☑️</td>
+    </tr>
+    <tr>
+        <td>bg_faktory</td><td>使用faktory作为后台任务</td>
+    </tr>
+    <tr>
+        <td rowspan="2">对象存储，<b>只能同时选择一个</b></td>
+        <td>object_storage_fs</td>
+        <td>使用本地文件系统</td>
+        <td>☑️</td>
+    </tr>
+    <tr>
+        <td>object_storage_s3</td><td>使用S3兼容服务作为对象存储</td>
+    </tr>
+    <tr>
+        <td rowspan="3">日志与trace，<b>可以同时选择多个</b></td>
+        <td>trace_console</td>
+        <td>使用控制台输出日志</td>
+        <td>☑️</td>
+    </tr>
+    <tr>
+        <td>trace_rolling</td><td>使用滚动日志保存json格式</td>
+    </tr>
+    <tr>
+        <td>trace_otlp</td><td>接入OpenTelemetry</td>
+    </tr>
+</table>
+
+> `bin/server/Cargo.toml`处修改
 
 ## 🎈前端
 - 架构：使用`Amis`低代码，借用其丰富的组件，快速地完成的CRUD相关功能，也可以通过React自定义组件进行补充；
