@@ -11,10 +11,7 @@ pub struct Cli {
     #[arg(long, default_value = "info", env = "LOG_LEVEL")]
     pub log_level: String,
 
-    /// 日志文件有效期
-    #[arg(long, default_value = "30d", env = "LOG_ROLLING_PERIOD")]
-    pub log_rolling_period: String,
-
+    #[cfg(feature = "trace_rolling")]
     /// 日志文件滚动周期: minutely hourly daily never
     #[arg(long, default_value = "daily", env = "LOG_ROLLING_KIND")]
     pub log_rolling_kind: String,
@@ -210,16 +207,14 @@ impl TryFrom<Cli> for Config {
         let builder = {
             let log_builder = Log::builder().level(value.log_level);
             #[cfg(feature = "trace_rolling")]
-            let log_builder = log_builder
-                .rolling_period(parse_duration(&value.log_rolling_period)?)
-                .rolling_kind({
-                    match value.log_rolling_kind.as_str() {
-                        "minutely" => trace_kit::Rotation::MINUTELY,
-                        "hourly" => trace_kit::Rotation::HOURLY,
-                        "daily" => trace_kit::Rotation::DAILY,
-                        _ => trace_kit::Rotation::NEVER,
-                    }
-                });
+            let log_builder = log_builder.rolling_kind({
+                match value.log_rolling_kind.as_str() {
+                    "minutely" => trace_kit::Rotation::MINUTELY,
+                    "hourly" => trace_kit::Rotation::HOURLY,
+                    "daily" => trace_kit::Rotation::DAILY,
+                    _ => trace_kit::Rotation::NEVER,
+                }
+            });
             builder.log(log_builder.build())
         };
         Ok(builder.build())
