@@ -11,7 +11,7 @@ mod upload;
 mod user;
 
 pub fn routing(state: WebState) -> Router<WebState> {
-    Router::new()
+    let router = Router::new()
         .nest("/profile", profile::routing())
         .nest("/users", user::routing())
         .nest("/roles", role::routing())
@@ -22,7 +22,10 @@ pub fn routing(state: WebState) -> Router<WebState> {
             state.clone(),
             user_authn_required,
         ))
-        .nest("/auth", auth::routing())
+        .nest("/auth", auth::routing());
+    #[cfg(feature = "trace_otlp")]
+    let router = router
         .layer(axum_tracing_opentelemetry::middleware::OtelInResponseLayer)
-        .layer(axum_tracing_opentelemetry::middleware::OtelAxumLayer::default())
+        .layer(axum_tracing_opentelemetry::middleware::OtelAxumLayer::default());
+    router
 }

@@ -26,7 +26,11 @@ object_storage_fs = ["infrastructure/object_storage_fs"]
 object_storage_s3 = ["infrastructure/object_storage_s3"]
 trace_console = ["trace_kit/console"]
 trace_rolling = ["trace_kit/rolling", "infrastructure/trace_rolling"]
-trace_otlp = ["trace_kit/otlp", "infrastructure/trace_otlp"]
+trace_otlp = [
+    "trace_kit/otlp",
+    "adapter/trace_otlp",
+    "infrastructure/trace_otlp",
+]
 
 [dependencies]
 adapter = { workspace = true }
