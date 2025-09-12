@@ -11,5 +11,9 @@ async fn main() -> Result<()> {
     dotenvy::dotenv_override().ok();
     let cli: Cli = Cli::parse();
     let config: Config = cli.try_into()?;
-    server::bootstrap(config).await
+    if let Err(e) = server::bootstrap(config).await {
+        eprintln!("❌ Bootstrap error: {:?}", e);
+        std::process::exit(1);
+    }
+    Ok(())
 }
