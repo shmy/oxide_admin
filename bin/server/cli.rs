@@ -22,13 +22,14 @@ pub struct Cli {
     pub otlp_service_name: String,
 
     #[cfg(feature = "trace_otlp")]
-    /// OpenTelemetry http 导出端点
-    #[arg(
-        long,
-        default_value = "http://localhost:4318/v1/traces",
-        env = "OTLP_ENDPOINT"
-    )]
+    /// OpenTelemetry grpc 导出端点
+    #[arg(long, default_value = "http://localhost:4317", env = "OTLP_ENDPOINT")]
     pub otlp_endpoint: String,
+
+    #[cfg(feature = "trace_otlp")]
+    /// OpenTelemetry grpc metadata
+    #[arg(long, default_value = "{}", env = "OTLP_METADATA")]
+    pub otlp_metadata: String,
 
     /// 数据库连接地址
     #[arg(long, env = "DATABASE_URL")]
@@ -225,7 +226,8 @@ impl TryFrom<Cli> for Config {
             #[cfg(feature = "trace_otlp")]
             let log_builder = log_builder
                 .otlp_service_name(value.otlp_service_name)
-                .otlp_endpoint(value.otlp_endpoint);
+                .otlp_endpoint(value.otlp_endpoint)
+                .otlp_metadata(value.otlp_metadata);
             builder.log(log_builder.build())
         };
         Ok(builder.build())

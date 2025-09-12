@@ -35,6 +35,8 @@ pub struct Log {
     pub otlp_service_name: String,
     #[cfg(feature = "trace_otlp")]
     pub otlp_endpoint: String,
+    #[cfg(feature = "trace_otlp")]
+    pub otlp_metadata: String,
 }
 
 #[derive(Clone, Builder)]

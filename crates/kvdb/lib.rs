@@ -33,4 +33,5 @@ pub trait KvdbTrait {
     fn delete(&self, key: &str) -> impl Future<Output = Result<()>>;
     fn delete_prefix(&self, prefix: &str) -> impl Future<Output = Result<()>>;
     fn delete_expired(&self) -> impl Future<Output = Result<()>>;
+    fn close(&self) -> impl Future<Output = Result<()>>;
 }

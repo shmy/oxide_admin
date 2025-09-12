@@ -14,6 +14,7 @@ pub struct TracingConfig<'a> {
     otlp_service_name: &'a str,
     #[cfg(feature = "otlp")]
     otlp_endpoint: &'a str,
+    otlp_metadata: &'a str,
 }
 
 pub fn init_tracing(config: TracingConfig) -> TracingGuard {
@@ -50,23 +51,34 @@ pub fn init_tracing(config: TracingConfig) -> TracingGuard {
 
     #[cfg(feature = "otlp")]
     let (otlp_layer, otlp_guard) = {
+        use std::collections::HashMap;
+
         use opentelemetry::{KeyValue, trace::TracerProvider as _};
-        use opentelemetry_otlp::WithExportConfig as _;
+        use opentelemetry_otlp::{
+            WithExportConfig as _, WithTonicConfig as _,
+            tonic_types::{metadata::MetadataMap, transport::ClientTlsConfig},
+        };
         use opentelemetry_sdk::{
             Resource,
             trace::{RandomIdGenerator, Sampler, SdkTracerProvider},
         };
-        use opentelemetry_semantic_conventions::{SCHEMA_URL, resource::SERVICE_VERSION};
+        use opentelemetry_semantic_conventions::resource::SERVICE_VERSION;
         let resource = Resource::builder()
             .with_service_name(config.otlp_service_name.to_string())
-            .with_schema_url(
-                [KeyValue::new(SERVICE_VERSION, env!("CARGO_PKG_VERSION"))],
-                SCHEMA_URL,
-            )
+            .with_attributes([KeyValue::new(SERVICE_VERSION, env!("CARGO_PKG_VERSION"))])
             .build();
+        let map: HashMap<String, String> =
+            serde_json::from_str(config.otlp_metadata).expect("parse otlp_metadata");
+        let mut metadata = MetadataMap::new();
+        for (key, value) in map {
+            let key = Box::leak(Box::new(key));
+            metadata.insert(&**key, value.parse().expect("parse metadata value"));
+        }
         let exporter = opentelemetry_otlp::SpanExporter::builder()
-            .with_http()
+            .with_tonic()
+            .with_tls_config(ClientTlsConfig::new().with_native_roots())
             .with_endpoint(config.otlp_endpoint)
+            .with_metadata(metadata)
             .build()
             .expect("build otlp exporter");
 

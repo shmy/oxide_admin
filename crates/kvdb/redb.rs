@@ -195,4 +195,8 @@ impl KvdbTrait for RedbKvdb {
         }
         Ok(())
     }
+
+    async fn close(&self) -> Result<()> {
+        todo!()
+    }
 }

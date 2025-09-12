@@ -52,7 +52,8 @@ fn init_tracing(config: &Log) -> TracingGuard {
     #[cfg(feature = "trace_otlp")]
     let config_builder = config_builder
         .otlp_service_name(&config.otlp_service_name)
-        .otlp_endpoint(&config.otlp_endpoint);
+        .otlp_endpoint(&config.otlp_endpoint)
+        .otlp_metadata(&config.otlp_metadata);
     trace_kit::init_tracing(config_builder.build())
 }
 
