@@ -79,7 +79,7 @@
         <td>使用S3兼容服务作为对象存储</td>
     </tr>
     <tr>
-        <td rowspan="3">日志与trace，<b>可以同时选择多个</b></td>
+        <td rowspan="4">日志与trace，<b>可以同时选择多个</b></td>
         <td>trace_console</td>
         <td>使用控制台输出日志</td>
         <td>✅</td>
@@ -92,6 +92,11 @@
     <tr>
         <td>trace_otlp</td>
         <td>接入OpenTelemetry，适合分布式项目</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>trace_otlp_tls</td>
+        <td>依赖trace_otlp，启用tls</td>
         <td></td>
     </tr>
 </table>

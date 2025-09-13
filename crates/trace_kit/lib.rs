@@ -14,6 +14,7 @@ pub struct TracingConfig<'a> {
     otlp_service_name: &'a str,
     #[cfg(feature = "otlp")]
     otlp_endpoint: &'a str,
+    #[cfg(feature = "otlp")]
     otlp_metadata: &'a str,
 }
 
@@ -55,8 +56,7 @@ pub fn init_tracing(config: TracingConfig) -> TracingGuard {
 
         use opentelemetry::{KeyValue, trace::TracerProvider as _};
         use opentelemetry_otlp::{
-            WithExportConfig as _, WithTonicConfig as _,
-            tonic_types::{metadata::MetadataMap, transport::ClientTlsConfig},
+            WithExportConfig as _, WithTonicConfig as _, tonic_types::metadata::MetadataMap,
         };
         use opentelemetry_sdk::{
             Resource,
@@ -74,9 +74,12 @@ pub fn init_tracing(config: TracingConfig) -> TracingGuard {
             let key = Box::leak(Box::new(key));
             metadata.insert(&**key, value.parse().expect("parse metadata value"));
         }
-        let exporter = opentelemetry_otlp::SpanExporter::builder()
-            .with_tonic()
-            .with_tls_config(ClientTlsConfig::new().with_native_roots())
+        let budiler = opentelemetry_otlp::SpanExporter::builder().with_tonic();
+        #[cfg(feature = "otlp_tls")]
+        let budiler = budiler.with_tls_config(
+            opentelemetry_otlp::transport::ClientTlsConfig::new().with_native_roots(),
+        );
+        let exporter = budiler
             .with_endpoint(config.otlp_endpoint)
             .with_metadata(metadata)
             .build()

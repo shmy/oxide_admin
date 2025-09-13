@@ -17,13 +17,13 @@ otlp = [
     "dep:opentelemetry-semantic-conventions",
     "dep:serde_json",
 ]
+otlp_tls = ["opentelemetry-otlp/tls-roots"]
 
 [dependencies]
 bon = { workspace = true }
 opentelemetry = { version = "0.30", default-features = false, optional = true }
 opentelemetry-otlp = { version = "0.30", default-features = false, features = [
     "trace",
-    "tls-roots",
     "grpc-tonic",
 ], optional = true }
 

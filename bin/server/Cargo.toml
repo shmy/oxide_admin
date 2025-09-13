@@ -11,14 +11,7 @@ name = "server"
 path = "main.rs"
 
 [features]
-default = [
-    "kv_redb",
-    "bg_dummy",
-    "object_storage_fs",
-    "trace_console",
-    "trace_rolling",
-    "trace_otlp",
-]
+default = ["kv_redb", "bg_dummy", "object_storage_fs", "trace_console"]
 kv_redb = ["infrastructure/kv_redb"]
 kv_redis = ["infrastructure/kv_redis"]
 bg_dummy = ["infrastructure/bg_dummy"]
@@ -32,6 +25,7 @@ trace_otlp = [
     "adapter/trace_otlp",
     "infrastructure/trace_otlp",
 ]
+trace_otlp_tls = ["trace_kit/otlp_tls"]
 
 [dependencies]
 adapter = { workspace = true }
