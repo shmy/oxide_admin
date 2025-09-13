@@ -35,8 +35,8 @@ impl RedbKvdb {
         };
         let cloned_instance = instance.clone();
         tokio::spawn(async move {
-            if let Err(e) = cloned_instance.start_scheduler().await {
-                eprintln!("scheduler failed: {:?}", e);
+            if let Err(err) = cloned_instance.start_scheduler().await {
+                error!(%err, "Start scheduler failed");
             }
         });
         Ok(instance)
@@ -61,8 +61,8 @@ impl RedbKvdb {
             .add(Job::new_async("0 0 * * * *", move |_uuid, _l| {
                 let self_inner = self_clone.clone();
                 Box::pin(async move {
-                    if let Err(e) = self_inner.delete_expired().await {
-                        eprintln!("Delete_expired failed: {:?}", e);
+                    if let Err(err) = self_inner.delete_expired().await {
+                        error!(%err, "Delete expired failed");
                     }
                 })
             })?)
