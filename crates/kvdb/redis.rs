@@ -160,7 +160,5 @@ impl KvdbTrait for RedisKvdb {
         Ok(())
     }
 
-    async fn delete_expired(&self) -> Result<()> {
-        Ok(())
-    }
+    async fn close(&self) -> () {}
 }
