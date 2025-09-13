@@ -11,7 +11,7 @@ use infrastructure::shared::{
     pg_pool,
 };
 use infrastructure::{migration, shared::pg_pool::PgPool, shared::provider::Provider};
-use kvdb::Kvdb;
+use kvdb::{Kvdb, KvdbTrait as _};
 use object_storage::ObjectStorage;
 use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
@@ -30,6 +30,7 @@ pub async fn bootstrap(config: Config) -> Result<()> {
     let provider = build_provider(config).await?;
     let ((), worker) = try_join!(initilize(&provider), build_worker_manager(&provider))?;
     let pg_pool = provider.provide::<PgPool>();
+    let kvdb = provider.provide::<Kvdb>();
     let app = adapter::routing(WebState::new(provider));
     let notify_shutdown = Arc::new(Notify::new());
     let background_job_handle =
@@ -38,7 +39,7 @@ pub async fn bootstrap(config: Config) -> Result<()> {
     shutdown_signal().await;
     notify_shutdown.notify_waiters();
     let _ = tokio::join!(background_job_handle, server_handle);
-    pg_pool.close().await;
+    tokio::join!(pg_pool.close(), kvdb.close());
     info!("👋 Goodbye!");
     Ok(())
 }

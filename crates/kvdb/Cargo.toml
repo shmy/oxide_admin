@@ -7,7 +7,7 @@ edition = "2024"
 path = "lib.rs"
 
 [features]
-redb = ["dep:redb"]
+redb = ["dep:redb", "dep:tokio", "dep:tokio-cron-scheduler"]
 redis = ["dep:bb8-redis"]
 
 [dependencies]
@@ -16,6 +16,8 @@ bb8-redis = { workspace = true, optional = true }
 bon = { workspace = true }
 chrono = { workspace = true }
 redb = { workspace = true, optional = true }
+tokio = { workspace = true, features = ["full"], optional = true }
+tokio-cron-scheduler = { workspace = true, optional = true }
 rmp-serde = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 tracing = { workspace = true }

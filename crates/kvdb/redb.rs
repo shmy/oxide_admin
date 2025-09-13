@@ -3,14 +3,17 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::fmt::Debug;
 use std::{path::Path, sync::Arc, time::Duration};
-use tracing::{debug, info};
+use tokio::sync::Mutex;
+use tokio_cron_scheduler::{Job, JobScheduler};
+use tracing::{debug, error, info};
 
 use redb::{Database, ReadableDatabase as _, ReadableTable as _, TableDefinition};
 
 use crate::{KvdbTrait, serde_util};
 
 pub struct RedbKvdb {
-    pub db: Arc<Database>,
+    db: Arc<Database>,
+    sched: Arc<Mutex<JobScheduler>>,
 }
 
 impl Debug for RedbKvdb {
@@ -24,7 +27,19 @@ impl RedbKvdb {
         let db_path = path.as_ref();
         let db = Database::create(db_path)?;
         info!("Redb {} connected", db_path.display());
-        Ok(Self { db: Arc::new(db) })
+        let sched = JobScheduler::new().await?;
+
+        let instance = Self {
+            db: Arc::new(db),
+            sched: Arc::new(Mutex::new(sched)),
+        };
+        let cloned_instance = instance.clone();
+        tokio::spawn(async move {
+            if let Err(e) = cloned_instance.start_scheduler().await {
+                eprintln!("scheduler failed: {:?}", e);
+            }
+        });
+        Ok(instance)
     }
 }
 
@@ -32,7 +47,68 @@ impl Clone for RedbKvdb {
     fn clone(&self) -> Self {
         Self {
             db: self.db.clone(),
+            sched: self.sched.clone(),
         }
+    }
+}
+
+impl RedbKvdb {
+    async fn start_scheduler(&self) -> Result<()> {
+        let guard = self.sched.lock().await;
+        let self_clone = self.clone();
+        // every hour
+        guard
+            .add(Job::new_async("0 0 * * * *", move |_uuid, _l| {
+                let self_inner = self_clone.clone();
+                Box::pin(async move {
+                    if let Err(e) = self_inner.delete_expired().await {
+                        eprintln!("Delete_expired failed: {:?}", e);
+                    }
+                })
+            })?)
+            .await?;
+        guard.start().await?;
+        Ok(())
+    }
+
+    async fn delete_expired(&self) -> Result<()> {
+        debug!("Start delete_expired");
+        let tx = self.db.begin_read()?;
+        let table = tx.open_table(TABLE)?;
+        let iter = table.iter()?;
+        let keys = iter
+            .filter_map(|access| {
+                if let Ok((key, value)) = access {
+                    let key = key.value().to_string();
+                    let value = value.value().to_vec();
+                    let s = serde_util::rmp_decode::<KvValue>(&value).ok()?;
+                    if let Some(expires_at) = s.expires_at {
+                        let now = Utc::now().timestamp();
+                        debug!(
+                            "Found key: {}, now: {}, expires_at: {}",
+                            key, now, expires_at
+                        );
+                        if now > expires_at {
+                            return Some(key);
+                        }
+                    }
+                }
+                None
+            })
+            .collect::<Vec<_>>();
+        drop(tx);
+        if !keys.is_empty() {
+            let tx = self.db.begin_write()?;
+            {
+                let mut table = tx.open_table(TABLE)?;
+                for key in keys {
+                    info!("Delete expired key: {}", key);
+                    let _ = table.remove(key.as_str());
+                }
+            }
+            tx.commit()?;
+        }
+        Ok(())
     }
 }
 
@@ -156,47 +232,10 @@ impl KvdbTrait for RedbKvdb {
         Ok(())
     }
 
-    async fn delete_expired(&self) -> Result<()> {
-        debug!("Start delete_expired");
-        let tx = self.db.begin_read()?;
-        let table = tx.open_table(TABLE)?;
-        let iter = table.iter()?;
-        let keys = iter
-            .filter_map(|access| {
-                if let Ok((key, value)) = access {
-                    let key = key.value().to_string();
-                    let value = value.value().to_vec();
-                    let s = serde_util::rmp_decode::<KvValue>(&value).ok()?;
-                    if let Some(expires_at) = s.expires_at {
-                        let now = Utc::now().timestamp();
-                        debug!(
-                            "Found key: {}, now: {}, expires_at: {}",
-                            key, now, expires_at
-                        );
-                        if now > expires_at {
-                            return Some(key);
-                        }
-                    }
-                }
-                None
-            })
-            .collect::<Vec<_>>();
-        drop(tx);
-        if !keys.is_empty() {
-            let tx = self.db.begin_write()?;
-            {
-                let mut table = tx.open_table(TABLE)?;
-                for key in keys {
-                    info!("Delete expired key: {}", key);
-                    let _ = table.remove(key.as_str());
-                }
-            }
-            tx.commit()?;
+    async fn close(&self) {
+        let mut guard = self.sched.lock().await;
+        if let Err(err) = guard.shutdown().await {
+            error!(%err, "Failed to shutdown scheduler");
         }
-        Ok(())
-    }
-
-    async fn close(&self) -> Result<()> {
-        todo!()
     }
 }

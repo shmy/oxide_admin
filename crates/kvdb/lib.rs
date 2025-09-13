@@ -32,6 +32,5 @@ pub trait KvdbTrait {
     fn set<T: Serialize>(&self, key: &str, value: T) -> impl Future<Output = Result<()>>;
     fn delete(&self, key: &str) -> impl Future<Output = Result<()>>;
     fn delete_prefix(&self, prefix: &str) -> impl Future<Output = Result<()>>;
-    fn delete_expired(&self) -> impl Future<Output = Result<()>>;
-    fn close(&self) -> impl Future<Output = Result<()>>;
+    fn close(&self) -> impl Future<Output = ()>;
 }
