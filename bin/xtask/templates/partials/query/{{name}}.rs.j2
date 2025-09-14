@@ -1,10 +1,11 @@
-use anyhow::Result;
-use crate::iam::dto::user::UserDto;
 use bon::Builder;
 use nject::injectable;
 use serde::Deserialize;
+use domain::{{module}}::error::{{module | pascal_case}}Error;
+use crate::shared::query_handler::QueryHandler;
+use single_flight::single_flight;
 
-#[derive(Debug, Deserialize, Builder)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Builder)]
 pub struct {{name | pascal_case}}Query {
 }
 
@@ -13,8 +14,14 @@ pub struct {{name | pascal_case}}Query {
 pub struct {{name | pascal_case}}QueryHandler {
 }
 
-impl {{name | pascal_case}}QueryHandler {
-    pub async fn query(&self, _query: {{name | pascal_case}}Query) -> Result<UserDto> {
+impl QueryHandler for {{name | pascal_case}}QueryHandler {
+    type Query = {{name | pascal_case}}Query;
+    type Output = ();
+    type Error = {{module | pascal_case}}Error;
+
+    #[single_flight]
+    #[tracing::instrument]
+    async fn query(&self, _query: {{name | pascal_case}}Query) -> Result<(), {{module | pascal_case}}Error> {
 
         todo!()
     }
