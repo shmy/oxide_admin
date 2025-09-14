@@ -8,7 +8,8 @@ path = "lib.rs"
 
 [features]
 fs = ["opendal/services-fs"]
-s3 = ["opendal/services-s3"]
+s3 = ["opendal/executors-tokio", "opendal/services-s3"]
+s3_tls = ["opendal/default"]
 
 [dependencies]
 anyhow = { workspace = true }
@@ -18,9 +19,7 @@ chrono = { workspace = true }
 futures-util = { workspace = true }
 hex = { workspace = true }
 hmac-sha256 = { workspace = true }
-opendal = { version = "0.54", default-features = false, features = [
-    "executors-tokio",
-] }
+opendal = { version = "0.54", default-features = false }
 serde = { workspace = true, features = ["derive"] }
 serde_urlencoded = { workspace = true }
 tokio = { workspace = true, features = ["full"] }

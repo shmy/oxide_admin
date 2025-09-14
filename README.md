@@ -76,7 +76,7 @@
         <td></td>
     </tr>
     <tr>
-        <td rowspan="2">对象存储，<b>只能同时选择一个</b></td>
+        <td rowspan="3">对象存储，<b>只能同时选择一个</b></td>
         <td>object_storage_fs</td>
         <td>使用本地文件系统</td>
         <td>✅</td>
@@ -84,6 +84,10 @@
     <tr>
         <td>object_storage_s3</td>
         <td>使用S3兼容服务作为对象存储</td>
+    </tr>
+    <tr>
+        <td>object_storage_s3_tls</td>
+        <td>使用S3兼容服务作为对象存储，启用tls</td>
     </tr>
     <tr>
         <td rowspan="4">日志与trace，<b>可以同时选择多个</b></td>

@@ -11,7 +11,7 @@ name = "server"
 path = "main.rs"
 
 [features]
-default = ["kv_redb", "bg_dummy", "object_storage_fs", "trace_console"]
+default = ["kv_redb", "bg_dummy", "object_storage_s3_tls", "trace_console"]
 kv_redb = ["infrastructure/kv_redb"]
 kv_redis = ["infrastructure/kv_redis"]
 bg_dummy = ["infrastructure/bg_dummy"]
@@ -19,6 +19,10 @@ bg_faktory = ["infrastructure/bg_faktory"]
 bg_faktory_tls = ["bg_faktory", "infrastructure/bg_faktory_tls"]
 object_storage_fs = ["infrastructure/object_storage_fs"]
 object_storage_s3 = ["infrastructure/object_storage_s3"]
+object_storage_s3_tls = [
+    "object_storage_s3",
+    "infrastructure/object_storage_s3_tls",
+]
 trace_console = ["trace_kit/console"]
 trace_rolling = ["trace_kit/rolling", "infrastructure/trace_rolling"]
 trace_otlp = [

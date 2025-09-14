@@ -43,8 +43,8 @@
 [ ] 重新测试Code generation 补充#[tracing::instrument]
 [ ] _files表如何处理
 [ ] Frontend code generation
-[ ] S3 支持 Tls
-[ ] Faktory 支持 Tls
+[x] S3 支持 Tls
+[x] Faktory 支持 Tls
 [ ] Redis 支持 Tls
 [ ] Postgresql 支持 Tls
 [ ] 实现单机后台任务
