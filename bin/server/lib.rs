@@ -45,7 +45,7 @@ pub async fn bootstrap(config: Config) -> Result<()> {
 }
 
 fn init_tracing(config: &Log) -> TracingGuard {
-    let config_builder = trace_kit::TracingConfig::builder().level(&config.level);
+    let config_builder = trace_kit::TraceConfig::builder().level(&config.level);
     #[cfg(feature = "trace_rolling")]
     let config_builder = config_builder
         .rolling_kind(&config.rolling_kind)

@@ -4,7 +4,7 @@ use tracing_subscriber::{
 };
 
 #[derive(Builder)]
-pub struct TracingConfig<'a> {
+pub struct TraceConfig<'a> {
     level: &'a str,
     #[cfg(feature = "rolling")]
     rolling_kind: &'a str,
@@ -18,7 +18,7 @@ pub struct TracingConfig<'a> {
     otlp_metadata: &'a str,
 }
 
-pub fn init_tracing(config: TracingConfig) -> TracingGuard {
+pub fn init_tracing(config: TraceConfig) -> TracingGuard {
     #[cfg(feature = "console")]
     let console_layer = tracing_subscriber::fmt::layer()
         .with_ansi(true)
@@ -113,7 +113,6 @@ pub fn init_tracing(config: TracingConfig) -> TracingGuard {
     #[cfg(feature = "otlp")]
     #[allow(unreachable_code)]
     return TracingGuard::Otlp(otlp_guard);
-    #[cfg(not(feature = "rolling"))]
     #[allow(unreachable_code)]
     TracingGuard::None
 }
