@@ -30,6 +30,7 @@ use crate::{
     },
 };
 
+#[tracing::instrument]
 async fn search(
     Inject(query_handler): Inject<Search{{entity | pascal_case}}sQueryHandler>,
     Query(query): Query<Search{{entity | pascal_case}}sQuery>,
@@ -38,6 +39,7 @@ async fn search(
     JsonResponse::ok(PagingResponse { total, items })
 }
 
+#[tracing::instrument]
 async fn retrieve(
     Inject(query_handler): Inject<Retrieve{{entity | pascal_case}}QueryHandler>,
     Path(id): Path<{{entity | pascal_case}}Id>,
@@ -48,6 +50,7 @@ async fn retrieve(
     JsonResponse::ok({{entity}})
 }
 
+#[tracing::instrument]
 async fn batch_delete(
     Inject(command_handler): Inject<BatchDelete{{entity | pascal_case}}sCommandHandler>,
     Json(command): Json<BatchDelete{{entity | pascal_case}}sCommand>,
@@ -56,6 +59,7 @@ async fn batch_delete(
     JsonResponse::ok(())
 }
 
+#[tracing::instrument]
 async fn create(
     Inject(command_handler): Inject<Create{{entity | pascal_case}}CommandHandler>,
     Json(command): Json<Create{{entity | pascal_case}}Command>,
@@ -64,6 +68,7 @@ async fn create(
     JsonResponse::ok(())
 }
 
+#[tracing::instrument]
 async fn update(
     Inject(command_handler): Inject<Update{{entity | pascal_case}}CommandHandler>,
     Path(_id): Path<{{entity | pascal_case}}Id>,

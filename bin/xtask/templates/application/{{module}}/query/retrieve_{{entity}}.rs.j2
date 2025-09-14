@@ -7,11 +7,12 @@ use nject::injectable;
 use serde::Deserialize;
 use single_flight::single_flight;
 
-#[derive(Clone, PartialEq, Eq, Hash, Deserialize, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Builder)]
 pub struct Retrieve{{entity | pascal_case}}Query {
     id: {{entity | pascal_case}}Id,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct Retrieve{{entity | pascal_case}}QueryHandler {
     pool: PgPool,
