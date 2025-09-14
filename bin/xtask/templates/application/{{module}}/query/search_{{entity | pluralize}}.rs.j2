@@ -16,6 +16,7 @@ use crate::{
     },
 };
 use kvdb::Kvdb;
+use crate::shared::query_handler::QueryHandler;
 
 #[serde_as]
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Builder)]
@@ -32,10 +33,14 @@ pub struct Search{{entity | pluralize | pascal_case}}QueryHandler {
     cache_provider: CacheProvider,
 }
 
-impl Search{{entity | pluralize | pascal_case}}QueryHandler {
+impl QueryHandler for Search{{entity | pluralize | pascal_case}}QueryHandler {
+    type Query = Search{{entity | pluralize | pascal_case}}Query;
+    type Output = PagingResult<{{entity | pascal_case}}Dto>;
+    type Error = {{module | pascal_case}}Error;
+
     #[single_flight]
     #[tracing::instrument]
-    pub async fn query(
+    async fn query(
         &self,
         query: Search{{entity | pluralize | pascal_case}}Query,
     ) -> Result<PagingResult<{{entity | pascal_case}}Dto>, {{module | pascal_case}}Error> {
@@ -63,6 +68,10 @@ impl Search{{entity | pluralize | pascal_case}}QueryHandler {
         let (total, rows) = tokio::try_join!(total_future, rows_future)?;
         Ok(PagingResult { total, items: rows })
     }
+}
+
+
+impl Search{{entity | pluralize | pascal_case}}QueryHandler {
 
     #[tracing::instrument]
     pub async fn clean_cache(&self) -> Result<()> {
