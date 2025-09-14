@@ -116,8 +116,8 @@ async fn build_object_storage(config: &Config) -> Result<ObjectStorage> {
         let config = object_storage::S3Config::builder()
             .endpoint(config.s3.endpoint.to_string())
             .bucket(config.s3.bucket.to_string())
-            .access_key_id(config.s3.client_id.to_string())
-            .secret_access_key(config.s3.client_secret.to_string())
+            .access_key_id(config.s3.access_key_id.to_string())
+            .secret_access_key(config.s3.secret_access_key.to_string())
             .region(config.s3.region.to_string())
             .build();
         ObjectStorage::try_new(config).await

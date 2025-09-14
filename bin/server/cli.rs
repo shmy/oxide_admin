@@ -140,14 +140,14 @@ pub struct Cli {
     pub s3_bucket: String,
 
     #[cfg(feature = "object_storage_s3")]
-    /// S3 client id
-    #[arg(long, env = "S3_CLIENT_ID")]
-    pub s3_client_id: String,
+    /// S3 access key id
+    #[arg(long, env = "S3_ACCESS_KEY_ID")]
+    pub s3_access_key_id: String,
 
     #[cfg(feature = "object_storage_s3")]
-    /// S3 client secret
-    #[arg(long, env = "S3_CLIENT_SECRET")]
-    pub s3_client_secret: String,
+    /// S3 secret access key
+    #[arg(long, env = "S3_SECRET_ACCESS_KEY")]
+    pub s3_secret_access_key: String,
 
     #[cfg(feature = "object_storage_s3")]
     /// S3 region
@@ -196,8 +196,8 @@ impl TryFrom<Cli> for Config {
         let builder = builder.s3(infrastructure::shared::config::StorageS3::builder()
             .endpoint(value.s3_endpoint)
             .bucket(value.s3_bucket)
-            .client_id(value.s3_client_id)
-            .client_secret(value.s3_client_secret)
+            .access_key_id(value.s3_access_key_id)
+            .secret_access_key(value.s3_secret_access_key)
             .region(value.s3_region)
             .build());
 

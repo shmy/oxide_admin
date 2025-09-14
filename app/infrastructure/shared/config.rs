@@ -100,7 +100,7 @@ pub struct StorageFs {
 pub struct StorageS3 {
     pub endpoint: String,
     pub bucket: String,
-    pub client_id: String,
-    pub client_secret: String,
+    pub access_key_id: String,
+    pub secret_access_key: String,
     pub region: String,
 }
