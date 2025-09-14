@@ -40,7 +40,7 @@
 [x] 接入OpenTelemetry/Tls
 [x] 抽离kv到crate
 [x] Kv redb 内部定时删除过期数据
-[ ] 重新测试Code generation 补充#[tracing::instrument]
+[x] 重新测试Code generation 补充#[tracing::instrument]
 [ ] 添加scheduler
 [ ] _files表集成，上传成功crate，使用文件后设为used 否则设为unused
 [ ] 实现单机后台任务

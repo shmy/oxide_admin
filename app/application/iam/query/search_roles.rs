@@ -36,7 +36,7 @@ pub struct SearchRolesQuery {
 #[injectable]
 pub struct SearchRolesQueryHandler {
     pool: PgPool,
-    #[inject(|kvdb: Kvdb| CacheProvider::builder().prefix("search_roles:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
+    #[inject(|kvdb: Kvdb| CacheProvider::builder().prefix("iam_search_roles:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
     cache_provider: CacheProvider,
 }
 
