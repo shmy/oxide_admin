@@ -14,6 +14,7 @@ use crate::{
     iam::dto::user::UserDto,
     shared::{
         cache_provider::CacheProvider, paging_query::PagingQuery, paging_result::PagingResult,
+        query_handler::QueryHandler,
     },
 };
 
@@ -43,10 +44,14 @@ pub struct SearchUsersQueryHandler {
     cache_provider: CacheProvider,
 }
 
-impl SearchUsersQueryHandler {
+impl QueryHandler for SearchUsersQueryHandler {
+    type Query = SearchUsersQuery;
+    type Output = PagingResult<UserDto>;
+    type Error = IamError;
+
     #[single_flight]
     #[tracing::instrument]
-    pub async fn query(&self, query: SearchUsersQuery) -> Result<PagingResult<UserDto>, IamError> {
+    async fn query(&self, query: SearchUsersQuery) -> Result<PagingResult<UserDto>, IamError> {
         let total_future = sqlx::query_scalar!(
             r#"
             SELECT COUNT(*) as "count!"
@@ -105,7 +110,9 @@ impl SearchUsersQueryHandler {
         let (total, rows) = tokio::try_join!(total_future, rows_future)?;
         Ok(PagingResult { total, items: rows })
     }
+}
 
+impl SearchUsersQueryHandler {
     #[tracing::instrument]
     pub async fn clean_cache(&self) -> Result<()> {
         self.cache_provider.clear().await

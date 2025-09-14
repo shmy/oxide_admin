@@ -1,4 +1,5 @@
 use crate::iam::dto::user::UserDto;
+use crate::shared::query_handler::QueryHandler;
 use bon::Builder;
 use domain::iam::value_object::user_id::UserId;
 use domain::iam::{error::IamError, value_object::role_id::RoleId};
@@ -18,10 +19,14 @@ pub struct RetrieveUserQueryHandler {
     pool: PgPool,
 }
 
-impl RetrieveUserQueryHandler {
+impl QueryHandler for RetrieveUserQueryHandler {
+    type Query = RetrieveUserQuery;
+    type Output = UserDto;
+    type Error = IamError;
+
     #[single_flight]
     #[tracing::instrument]
-    pub async fn query(&self, query: RetrieveUserQuery) -> Result<UserDto, IamError> {
+    async fn query(&self, query: RetrieveUserQuery) -> Result<UserDto, IamError> {
         let row_opt = sqlx::query_as!(
             UserDto,
             r#"

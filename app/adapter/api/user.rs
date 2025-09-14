@@ -15,7 +15,10 @@ use application::{
         },
         service::iam_service::IamService,
     },
-    shared::{command_handler::CommandHandler, paging_result::PagingResult},
+    shared::{
+        command_handler::CommandHandler, paging_result::PagingResult,
+        query_handler::QueryHandler as _,
+    },
 };
 use axum::{
     Json, Router,

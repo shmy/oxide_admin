@@ -12,6 +12,7 @@ use crate::{
     iam::dto::role::RoleDto,
     shared::{
         cache_provider::CacheProvider, paging_query::PagingQuery, paging_result::PagingResult,
+        query_handler::QueryHandler,
     },
 };
 
@@ -40,10 +41,14 @@ pub struct SearchRolesQueryHandler {
     cache_provider: CacheProvider,
 }
 
-impl SearchRolesQueryHandler {
+impl QueryHandler for SearchRolesQueryHandler {
+    type Query = SearchRolesQuery;
+    type Output = PagingResult<RoleDto>;
+    type Error = IamError;
+
     #[single_flight]
     #[tracing::instrument]
-    pub async fn query(&self, query: SearchRolesQuery) -> Result<PagingResult<RoleDto>, IamError> {
+    async fn query(&self, query: SearchRolesQuery) -> Result<PagingResult<RoleDto>, IamError> {
         let total_future = sqlx::query_scalar!(
             r#"
             SELECT COUNT(*) AS "count!"
@@ -85,7 +90,9 @@ impl SearchRolesQueryHandler {
         let (total, rows) = tokio::try_join!(total_future, rows_future)?;
         Ok(PagingResult { total, items: rows })
     }
+}
 
+impl SearchRolesQueryHandler {
     #[tracing::instrument]
     pub async fn clean_cache(&self) -> anyhow::Result<()> {
         self.cache_provider.clear().await

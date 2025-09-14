@@ -13,7 +13,10 @@ use application::{
             search_roles::{SearchRolesQuery, SearchRolesQueryHandler},
         },
     },
-    shared::{command_handler::CommandHandler, paging_result::PagingResult},
+    shared::{
+        command_handler::CommandHandler, paging_result::PagingResult,
+        query_handler::QueryHandler as _,
+    },
 };
 use axum::{
     Json, Router,

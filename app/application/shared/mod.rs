@@ -6,3 +6,4 @@ pub mod event;
 pub mod event_subscriber;
 pub mod paging_query;
 pub mod paging_result;
+pub mod query_handler;

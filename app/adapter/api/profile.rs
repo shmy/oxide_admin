@@ -9,7 +9,7 @@ use application::{
         query::retrieve_user::{RetrieveUserQuery, RetrieveUserQueryHandler},
         service::iam_service::IamService,
     },
-    shared::command_handler::CommandHandler,
+    shared::{command_handler::CommandHandler, query_handler::QueryHandler as _},
 };
 
 use axum::{

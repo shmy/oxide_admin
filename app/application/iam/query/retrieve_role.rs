@@ -1,4 +1,5 @@
 use crate::iam::dto::role::RoleDto;
+use crate::shared::query_handler::QueryHandler;
 use bon::Builder;
 use domain::iam::error::IamError;
 use domain::iam::value_object::permission_code::PermissionCode;
@@ -19,9 +20,13 @@ pub struct RetrieveRoleQueryHandler {
     pool: PgPool,
 }
 
-impl RetrieveRoleQueryHandler {
+impl QueryHandler for RetrieveRoleQueryHandler {
+    type Query = RetrieveRoleQuery;
+    type Output = RoleDto;
+    type Error = IamError;
+
     #[single_flight]
-    pub async fn query(&self, query: RetrieveRoleQuery) -> Result<RoleDto, IamError> {
+    async fn query(&self, query: RetrieveRoleQuery) -> Result<RoleDto, IamError> {
         let row_opt = sqlx::query_as!(
             RoleDto,
             r#"

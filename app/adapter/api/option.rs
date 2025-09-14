@@ -3,7 +3,7 @@ use application::{
         query::option_roles::OptionRolesQueryHandler,
         service::{iam_service::IamService, page::Page},
     },
-    shared::dto::OptionDto,
+    shared::{dto::OptionDto, query_handler::QueryHandler as _},
 };
 use axum::{Router, routing::get};
 
@@ -19,7 +19,7 @@ use crate::{
 async fn roles(
     Inject(query_handler): Inject<OptionRolesQueryHandler>,
 ) -> JsonResponseType<Vec<OptionDto>> {
-    let items = query_handler.query().await?;
+    let items = query_handler.query(()).await?;
     JsonResponse::ok(items)
 }
 
