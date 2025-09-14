@@ -11,13 +11,14 @@ use serde::Deserialize;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct Create{{entity | pascal_case}}Command {
     {%- for field in domain_fields %}
     {{field.name}}: {{field.type}},
     {%- endfor %}
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct Create{{entity | pascal_case}}CommandHandler {
     {{entity}}_repo: {{entity | pascal_case}}RepositoryImpl,
@@ -29,6 +30,7 @@ impl CommandHandler for Create{{entity | pascal_case}}CommandHandler {
     type Event = {{module | pascal_case }}Event;
     type Error = {{module | pascal_case }}Error;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

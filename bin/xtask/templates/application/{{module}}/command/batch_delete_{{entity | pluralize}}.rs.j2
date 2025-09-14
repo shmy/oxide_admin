@@ -10,11 +10,12 @@ use serde::Deserialize;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct BatchDelete{{entity | pluralize | pascal_case}}Command {
     ids: Vec<{{entity | pascal_case}}Id>,
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct BatchDelete{{entity | pluralize | pascal_case}}CommandHandler {
     {{entity}}_repo: {{entity | pascal_case}}RepositoryImpl,
@@ -26,6 +27,7 @@ impl CommandHandler for BatchDelete{{entity | pluralize | pascal_case}}CommandHa
     type Event = {{module | pascal_case }}Event;
     type Error = {{module | pascal_case }}Error;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

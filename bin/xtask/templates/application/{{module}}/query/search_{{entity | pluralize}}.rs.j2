@@ -1,3 +1,4 @@
+use anyhow::Result;
 use bon::Builder;
 use infrastructure::shared::pg_pool::PgPool;
 use domain::{{module}}::error::{{module | pascal_case}}Error;
@@ -6,45 +7,34 @@ use serde::Deserialize;
 use serde_with::serde_as;
 use std::time::Duration;
 use single_flight::single_flight;
-
 use crate::{
     {{module}}::dto::{{entity}}::{{entity | pascal_case}}Dto,
-    impl_static_cache,
     shared::{
-        cache_type::{CacheType, hash_encode},
+        cache_provider::CacheProvider,
         paging_query::PagingQuery,
         paging_result::PagingResult,
     },
 };
-
-const CACHE_CAPACITY: u64 = 100;
-const CACHE_TTL: Duration = Duration::from_secs(15 * 60);
-
-impl_static_cache!(
-    SEARCH_CACHE,
-    PagingResult<{{entity | pascal_case}}Dto>,
-    {{module | pascal_case}}Error,
-    CACHE_CAPACITY,
-    CACHE_TTL
-);
+use kvdb::Kvdb;
 
 #[serde_as]
-#[derive(Clone, Eq, PartialEq, Hash, Deserialize, Builder)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Builder)]
 pub struct Search{{entity | pluralize | pascal_case}}Query {
     #[serde(flatten)]
     paging: PagingQuery,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[injectable]
 pub struct Search{{entity | pluralize | pascal_case}}QueryHandler {
     pool: PgPool,
-    #[inject(&SEARCH_CACHE)]
-    cache: &'static CacheType<PagingResult<{{entity | pascal_case}}Dto>, {{module | pascal_case}}Error>,
+    #[inject(|kvdb: Kvdb| CacheProvider::builder().prefix("search_{{module}}_{{entity | pluralize}}:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
+    cache_provider: CacheProvider,
 }
 
 impl Search{{entity | pluralize | pascal_case}}QueryHandler {
     #[single_flight]
+    #[tracing::instrument]
     pub async fn query(
         &self,
         query: Search{{entity | pluralize | pascal_case}}Query,
@@ -74,15 +64,16 @@ impl Search{{entity | pluralize | pascal_case}}QueryHandler {
         Ok(PagingResult { total, items: rows })
     }
 
-    pub fn clean_cache(&self) {
-        self.cache.invalidate_all();
+    #[tracing::instrument]
+    pub async fn clean_cache(&self) -> Result<()> {
+        self.cache_provider.clear().await
     }
 
+    #[tracing::instrument]
     pub async fn query_cached(
         &self,
         query: Search{{entity | pluralize | pascal_case}}Query,
     ) -> Result<PagingResult<{{entity | pascal_case}}Dto>, {{module | pascal_case}}Error> {
-        let key = hash_encode(&query);
-        self.cache.get_with(key, self.query(query)).await
+        self.cache_provider.get_with(query, |q| self.query(q)).await
     }
 }

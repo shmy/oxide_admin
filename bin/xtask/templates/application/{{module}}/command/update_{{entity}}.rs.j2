@@ -11,7 +11,7 @@ use serde::Deserialize;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct Update{{entity | pascal_case}}Command {
     id: {{entity | pascal_case}}Id,
     {%- for field in domain_fields %}
@@ -19,6 +19,7 @@ pub struct Update{{entity | pascal_case}}Command {
     {%- endfor %}
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct Update{{entity | pascal_case}}CommandHandler {
     {{entity}}_repo: {{entity | pascal_case}}RepositoryImpl,
@@ -30,6 +31,7 @@ impl CommandHandler for Update{{entity | pascal_case}}CommandHandler {
     type Event = {{module | pascal_case }}Event;
     type Error = {{module | pascal_case }}Error;
 
+    #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,

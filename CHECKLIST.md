@@ -41,13 +41,14 @@
 [x] 抽离kv到crate
 [x] Kv redb 内部定时删除过期数据
 [ ] 重新测试Code generation 补充#[tracing::instrument]
-[ ] _files表如何处理
+[ ] 添加scheduler
+[ ] _files表集成，上传成功crate，使用文件后设为used 否则设为unused
+[ ] 实现单机后台任务
 [ ] Frontend code generation
 [x] S3 支持 Tls
 [x] Faktory 支持 Tls
-[ ] Redis 支持 Tls
-[ ] Postgresql 支持 Tls
-[ ] 实现单机后台任务
+[-] Redis 支持 Tls
+[-] Postgresql 支持 Tls
 [-] 定时任务
 [-] 接入分布式事件系统
 [-] 单元测试
