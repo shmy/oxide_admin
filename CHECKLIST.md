@@ -40,16 +40,15 @@
 [x] 接入OpenTelemetry/Tls
 [x] 抽离kv到crate
 [x] Kv redb 内部定时删除过期数据
-[ ] 定时任务
-[ ] 实现单机后台任务
 [ ] 重新测试Code generation 补充#[tracing::instrument]
 [ ] _files表如何处理
-[ ] 表格展示feature oneof mutli
 [ ] Frontend code generation
 [ ] S3 支持 Tls
 [ ] Faktory 支持 Tls
 [ ] Redis 支持 Tls
 [ ] Postgresql 支持 Tls
+[ ] 实现单机后台任务
+[-] 定时任务
 [-] 接入分布式事件系统
 [-] 单元测试
 [-] l10n

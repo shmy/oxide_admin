@@ -92,7 +92,7 @@ async fn initilize(provider: &Provider) -> Result<()> {
 async fn build_queuer(config: &Config) -> Result<Queuer> {
     #[cfg(feature = "bg_faktory")]
     return Queuer::try_new(&config.faktory.url, &config.faktory.queue).await;
-    #[cfg(not(feature = "bg_faktory"))]
+    #[cfg(feature = "bg_dummy")]
     return Queuer::try_new().await;
 }
 
@@ -148,7 +148,7 @@ async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
         let config = &provider.provide::<Config>();
         WorkerManager::new(&config.faktory.url, &config.faktory.queue)
     };
-    #[cfg(not(feature = "bg_faktory"))]
+    #[cfg(feature = "bg_dummy")]
     let mut worker_manager = WorkerManager::new();
     register_workers(&mut worker_manager, provider);
     Ok(worker_manager)

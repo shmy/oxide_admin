@@ -16,6 +16,7 @@ kv_redb = ["infrastructure/kv_redb"]
 kv_redis = ["infrastructure/kv_redis"]
 bg_dummy = ["infrastructure/bg_dummy"]
 bg_faktory = ["infrastructure/bg_faktory"]
+bg_faktory_tls = ["bg_faktory", "infrastructure/bg_faktory_tls"]
 object_storage_fs = ["infrastructure/object_storage_fs"]
 object_storage_s3 = ["infrastructure/object_storage_s3"]
 trace_console = ["trace_kit/console"]
@@ -25,7 +26,7 @@ trace_otlp = [
     "adapter/trace_otlp",
     "infrastructure/trace_otlp",
 ]
-trace_otlp_tls = ["trace_kit/otlp_tls"]
+trace_otlp_tls = ["trace_otlp", "trace_kit/otlp_tls"]
 
 [dependencies]
 adapter = { workspace = true }

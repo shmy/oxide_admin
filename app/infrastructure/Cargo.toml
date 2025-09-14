@@ -10,6 +10,7 @@ path = "lib.rs"
 kv_redb = ["kvdb/redb"]
 kv_redis = ["kvdb/redis"]
 bg_faktory = ["bg_worker/faktory"]
+bg_faktory_tls = ["bg_worker/faktory_tls"]
 bg_dummy = ["bg_worker/dummy"]
 object_storage_fs = ["object_storage/fs"]
 object_storage_s3 = ["object_storage/s3"]

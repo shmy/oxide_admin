@@ -77,7 +77,7 @@ pub fn init_tracing(config: TraceConfig) -> TracingGuard {
         let budiler = opentelemetry_otlp::SpanExporter::builder().with_tonic();
         #[cfg(feature = "otlp_tls")]
         let budiler = budiler.with_tls_config(
-            opentelemetry_otlp::transport::ClientTlsConfig::new().with_native_roots(),
+            opentelemetry_otlp::tonic_types::transport::ClientTlsConfig::new().with_enabled_roots(),
         );
         let exporter = budiler
             .with_endpoint(config.otlp_endpoint)

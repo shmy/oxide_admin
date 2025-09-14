@@ -8,6 +8,7 @@ path = "lib.rs"
 
 [features]
 faktory = ["dep:faktory"]
+faktory_tls = ["faktory/rustls"]
 dummy = []
 
 [dependencies]
