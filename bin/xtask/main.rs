@@ -73,19 +73,16 @@ async fn main() -> Result<()> {
                 .with_validator(ValueRequiredValidator::default())
                 .prompt()?
                 .to_snake_case();
-            let job_types: Vec<&str> = vec!["job", "cron_job", "stepped_job"];
-            let r#type = Select::new("What's your job type choice?", job_types).prompt()?;
             let context = context! {
                 name => name,
             };
-            let template =
-                TemplateEngine::from(&format!("partials/{}", r#type)).with_context(context);
+            let template = TemplateEngine::from("partials/job").with_context(context);
             template
                 .render_to(
                     APP_DIR
                         .join("application")
                         .join("shared")
-                        .join("background_job"),
+                        .join("background_worker"),
                 )
                 .await?;
             Ok(())

@@ -4,10 +4,11 @@ use bon::Builder;
 use nject::injectable;
 use serde::Deserialize;
 
-#[derive(Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder)]
 pub struct {{name | pascal_case}}Query {
 }
 
+#[derive(Debug)]
 #[injectable]
 pub struct {{name | pascal_case}}QueryHandler {
 }

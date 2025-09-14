@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use faktory::{Client, Job};
+use serde::Serialize;
 use tokio::sync::Mutex;
 
 #[derive(Clone)]
@@ -23,14 +24,14 @@ impl Queuer {
     pub async fn enqueue<K, V>(&self, kind: K, args: V) -> Result<()>
     where
         K: Into<String>,
-        V: Into<serde_json::Value>,
+        V: Serialize,
     {
         let mut guard = self.client.lock().await;
         guard
             .enqueue(
                 Job::builder(kind.into())
                     .queue(&self.queue)
-                    .args(vec![args])
+                    .args(vec![serde_json::to_value(args)?])
                     .build(),
             )
             .await?;

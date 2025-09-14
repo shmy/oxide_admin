@@ -1,4 +1,5 @@
 use anyhow::Result;
+use serde::Serialize;
 use tracing::warn;
 
 #[derive(Clone)]
@@ -11,7 +12,7 @@ impl Queuer {
     pub async fn enqueue<K, V>(&self, _kind: K, _args: V) -> Result<()>
     where
         K: Into<String>,
-        V: Into<serde_json::Value>,
+        V: Serialize,
     {
         warn!("Dummy queuer is used, this is not a real queuer");
         Ok(())
