@@ -66,7 +66,7 @@ impl Queuer {
         V: Serialize,
     {
         let id =sqlx::query(r#"
-        INSERT INTO _jobs (kind, args, status, created_at, updated_at) VALUES (?1, ?2, 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO _jobs (kind, args, status, created_at, updated_at) VALUES (?, ?, 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         "#)
             .bind(kind.into())
             .bind(serde_json::to_string(&args)?)
