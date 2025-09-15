@@ -111,6 +111,7 @@ dependencies = [
  "minijinja",
  "nject",
  "object_storage_kit",
+ "sched_kit",
  "serde",
  "serde_with",
  "single_flight",
@@ -1017,6 +1018,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "75030f3c4f45dafd7586dd6780965a8c7e8e285a5ecb86713e63a79c5b2766f3"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "english-to-cron"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e26fb7377cbec9a94f60428e6e6afbe10c699a14639b4d3d4b67b25c0bbe0806"
+dependencies = [
+ "regex",
 ]
 
 [[package]]
@@ -3370,6 +3380,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "sched_kit"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "tokio-cron-scheduler",
+ "tracing",
+]
+
+[[package]]
 name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3538,6 +3557,7 @@ dependencies = [
  "kvdb_kit",
  "mimalloc",
  "object_storage_kit",
+ "sched_kit",
  "tokio",
  "trace_kit",
  "tracing",
@@ -4204,6 +4224,7 @@ checksum = "5c71ce8f810abc9fabebccc30302a952f9e89c6cf246fafaf170fef164063141"
 dependencies = [
  "chrono",
  "croner",
+ "english-to-cron",
  "num-derive",
  "num-traits",
  "tokio",

@@ -1,0 +1,18 @@
+[package]
+name = "sched_kit"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "lib.rs"
+
+[features]
+default = ["tokio_cron"]
+tokio_cron = ["dep:tokio-cron-scheduler"]
+
+[dependencies]
+anyhow = { workspace = true }
+tokio-cron-scheduler = { workspace = true, features = [
+    "english",
+], optional = true }
+tracing = { workspace = true }

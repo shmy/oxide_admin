@@ -81,6 +81,12 @@
         <td></td>
     </tr>
     <tr>
+        <td>定时任务</td>
+        <td>sched_tokio_cron</td>
+        <td>使用tokio_cron作为定时任务，适合单机项目</td>
+        <td></td>
+    </tr>
+    <tr>
         <td rowspan="3">对象存储，<b>只能同时选择一个</b></td>
         <td>object_storage_fs</td>
         <td>使用本地文件系统</td>

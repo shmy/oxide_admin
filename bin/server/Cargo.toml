@@ -20,7 +20,10 @@ bg_sqlite = ["infrastructure/bg_sqlite"]
 bg_faktory_tls = ["bg_faktory", "infrastructure/bg_faktory_tls"]
 object_storage_fs = ["infrastructure/object_storage_fs"]
 object_storage_s3 = ["infrastructure/object_storage_s3"]
-object_storage_s3_tls = ["object_storage_s3", "infrastructure/object_storage_s3_tls"]
+object_storage_s3_tls = [
+    "object_storage_s3",
+    "infrastructure/object_storage_s3_tls",
+]
 trace_console = ["trace_kit/console"]
 trace_rolling = ["trace_kit/rolling", "infrastructure/trace_rolling"]
 trace_otlp = [
@@ -29,6 +32,7 @@ trace_otlp = [
     "infrastructure/trace_otlp",
 ]
 trace_otlp_tls = ["trace_otlp", "trace_kit/otlp_tls"]
+sched_tokio_cron = ["dep:sched_kit", "application/sched_tokio_cron"]
 
 [dependencies]
 adapter = { workspace = true }
@@ -51,6 +55,7 @@ infrastructure = { workspace = true }
 kvdb_kit = { workspace = true }
 mimalloc = { workspace = true }
 object_storage_kit = { workspace = true }
+sched_kit = { workspace = true, optional = true }
 tokio = { workspace = true, features = ["full"] }
 trace_kit = { workspace = true }
 tracing = { workspace = true }

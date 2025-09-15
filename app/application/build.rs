@@ -11,9 +11,11 @@ use serde::{Deserialize, Serialize};
 fn main() -> Result<()> {
     generate_subscribers()?;
     generate_background_workers()?;
+    generate_scheduler_jobs()?;
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=shared/event_subscriber");
     println!("cargo:rerun-if-changed=shared/background_job");
+    println!("cargo:rerun-if-changed=shared/scheduler_job");
     Ok(())
 }
 
@@ -53,9 +55,32 @@ fn generate_background_workers() -> Result<()> {
     }
 
     let env = build_env();
-    let code = env.render_str(JOB_TEMPLATE, JobContext { jobs })?;
+    let code = env.render_str(WORKER_TEMPLATE, JobContext { jobs })?;
     let out_dir = std::env::var("OUT_DIR")?;
     let out_path = Path::new(&out_dir).join("workers.rs");
+
+    fs::write(out_path, code)?;
+    Ok(())
+}
+
+fn generate_scheduler_jobs() -> Result<()> {
+    let entries = read_rs("shared/scheduler_job")?;
+    let mut jobs = Vec::new();
+    for entry in entries {
+        let stem = entry.file_stem().unwrap().to_string_lossy();
+        let struct_name = stem.to_pascal_case();
+        let file_content = fs::read_to_string(&entry)?;
+        if !file_content.contains(&format!("struct {}", struct_name)) {
+            continue;
+        }
+        let stem = stem.to_string();
+        jobs.push(stem);
+    }
+
+    let env = build_env();
+    let code = env.render_str(JOB_TEMPLATE, JobContext { jobs })?;
+    let out_dir = std::env::var("OUT_DIR")?;
+    let out_path = Path::new(&out_dir).join("jobs.rs");
 
     fs::write(out_path, code)?;
     Ok(())
@@ -111,7 +136,7 @@ pub struct JobContext {
     jobs: Vec<String>,
 }
 
-const JOB_TEMPLATE: &str = r#"#[allow(unused_imports)]
+const WORKER_TEMPLATE: &str = r#"#[allow(unused_imports)]
 use bg_worker_kit::worker_manager::WorkerManager;
 #[allow(unused_imports)]
 use bg_worker_kit::queuer::Queuer;
@@ -129,7 +154,7 @@ pub fn register_workers(worker_manager: &mut WorkerManager, provider: &Provider)
     {%- for job in jobs %}
 
     worker_manager.register("{{job}}", provider.provide::<{{job}}::{{job | pascal_case}}>());
-    tracing::info!("Job [{{job | pascal_case}}] has been registered");
+    tracing::info!("Worker [{{job | pascal_case}}] has been registered");
     {%- endfor %}
 
 }
@@ -147,4 +172,22 @@ impl {{item | pascal_case}}Queuer {
     }
 }
 {%- endfor %}
+"#;
+
+const JOB_TEMPLATE: &str = r#"use anyhow::Result;
+use infrastructure::shared::provider::Provider;
+use sched_kit::tokio_cron::TokioCronScheduler;
+use sched_kit::ScheduledJob;
+pub async fn register_scheduled_jobs(
+    scheduler_job: &TokioCronScheduler,
+    provider: &Provider,
+) -> Result<()> {
+    {%- for job in jobs %}
+
+    let job = provider.provide::<{{job}}::{{job | pascal_case}}>();
+    scheduler_job.add(job).await?;
+    tracing::info!("Scheduled job [{{job | pascal_case}}]({}) has been registered", {{job}}::{{job | pascal_case}}::SCHEDULER);
+    {%- endfor %}
+    Ok(())
+}
 "#;

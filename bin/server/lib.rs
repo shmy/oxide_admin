@@ -28,17 +28,37 @@ pub async fn bootstrap(config: Config) -> Result<()> {
     let _guard = init_tracing(&config.log);
     let listener = build_listener(&config.server).await?;
     let provider = build_provider(config).await?;
-    let ((), worker) = try_join!(initilize(&provider), build_worker_manager(&provider))?;
+    #[cfg(feature = "sched_tokio_cron")]
+    let initialization = try_join!(
+        initilize(&provider),
+        build_worker_manager(&provider),
+        #[cfg(feature = "sched_tokio_cron")]
+        build_scheduler_job(&provider)
+    )?;
+    #[cfg(not(feature = "sched_tokio_cron"))]
+    let initialization = try_join!(initilize(&provider), build_worker_manager(&provider))?;
     let pg_pool = provider.provide::<PgPool>();
     let kvdb = provider.provide::<Kvdb>();
     let app = adapter::routing(WebState::new(provider));
     let notify_shutdown = Arc::new(Notify::new());
-    let background_job_handle =
-        tokio::spawn(start_background_worker(worker, notify_shutdown.clone()));
-    let server_handle = tokio::spawn(start_http_server(listener, app, notify_shutdown.clone()));
+
+    let bgwork_fut = tokio::spawn(start_background_worker(
+        initialization.1,
+        notify_shutdown.clone(),
+    ));
+    #[cfg(feature = "sched_tokio_cron")]
+    let sched_fut = tokio::spawn(start_scheduler_job(
+        initialization.2,
+        notify_shutdown.clone(),
+    ));
+    let server_fut = tokio::spawn(start_http_server(listener, app, notify_shutdown.clone()));
+
     shutdown_signal().await;
     notify_shutdown.notify_waiters();
-    let _ = tokio::join!(background_job_handle, server_handle);
+    #[cfg(feature = "sched_tokio_cron")]
+    let _ = tokio::join!(bgwork_fut, sched_fut, server_fut,);
+    #[cfg(not(feature = "sched_tokio_cron"))]
+    let _ = tokio::join!(bgwork_fut, server_fut,);
     tokio::join!(pg_pool.close(), kvdb.close());
     info!("👋 Goodbye!");
     Ok(())
@@ -166,6 +186,17 @@ async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
     Ok(worker_manager)
 }
 
+#[cfg(feature = "sched_tokio_cron")]
+async fn build_scheduler_job(
+    provider: &Provider,
+) -> Result<sched_kit::tokio_cron::TokioCronScheduler> {
+    use application::shared::scheduler_job::register_scheduled_jobs;
+
+    let scheduler = sched_kit::tokio_cron::TokioCronScheduler::try_new().await?;
+    register_scheduled_jobs(&scheduler, provider).await?;
+    Ok(scheduler)
+}
+
 async fn start_http_server(listener: TcpListener, app: Router, notify: Arc<Notify>) -> Result<()> {
     let shutdown = async move {
         notify.notified().await;
@@ -179,6 +210,20 @@ async fn start_http_server(listener: TcpListener, app: Router, notify: Arc<Notif
     .with_graceful_shutdown(shutdown)
     .await?;
     info!("Server shutdown complete");
+    Ok(())
+}
+
+#[cfg(feature = "sched_tokio_cron")]
+async fn start_scheduler_job(
+    mut scheduler_job: sched_kit::tokio_cron::TokioCronScheduler,
+    notify: Arc<Notify>,
+) -> Result<()> {
+    let shutdown = async move {
+        notify.notified().await;
+        info!("Received shutdown signal, shutting down scheduled job...");
+    };
+    scheduler_job.run_with_signal(shutdown).await?;
+    info!("Scheduler job shutdown complete");
     Ok(())
 }
 
