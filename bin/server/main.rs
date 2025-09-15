@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::Parser as _;
 use infrastructure::shared::config::Config;
-use server::cli::Cli;
+use server::cli::{Cli, Commands};
 
 #[global_allocator]
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
@@ -10,10 +10,21 @@ static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 async fn main() -> Result<()> {
     dotenvy::dotenv_override().ok();
     let cli: Cli = Cli::parse();
+    let command = cli.command.clone();
     let config: Config = cli.try_into()?;
-    if let Err(e) = server::bootstrap(config).await {
-        eprintln!("❌ Bootstrap error: {:?}", e);
-        std::process::exit(1);
+    match command {
+        Commands::Serve => {
+            if let Err(e) = server::serve(config).await {
+                eprintln!("❌ Serve error: {:?}", e);
+                std::process::exit(1);
+            }
+        }
+        Commands::Sched => {
+            if let Err(e) = server::sched(config).await {
+                eprintln!("❌ Sched error: {:?}", e);
+                std::process::exit(1);
+            }
+        }
     }
     Ok(())
 }

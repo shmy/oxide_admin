@@ -1,5 +1,5 @@
 dev:
-    cargo watch -q -c -x "run --package server" -w app -w crates -w bin
+    cargo watch -q -c -x "run --package server serve" -w app -w crates -w bin
 
 check:
     cargo watch -q -c -x "check --workspace" -w app -w crates -w bin

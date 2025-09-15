@@ -6,9 +6,6 @@ edition = "2024"
 [lib]
 path = "lib.rs"
 
-[features]
-sched_tokio_cron = ["sched_kit/tokio_cron"]
-
 [dependencies]
 anyhow = { workspace = true }
 axum = { workspace = true }
@@ -22,7 +19,7 @@ infrastructure = { workspace = true }
 kvdb_kit = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 object_storage_kit = { workspace = true }
-sched_kit = { workspace = true, optional = true }
+sched_kit = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_with = { workspace = true, features = ["alloc", "macros", "chrono_0_4"] }
 single_flight = { workspace = true }

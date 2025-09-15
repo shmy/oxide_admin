@@ -1,5 +1,5 @@
 use chrono_tz::Tz;
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use humantime::parse_duration;
 use infrastructure::shared::config::{Config, Database, Jwt, Log, Server};
 
@@ -7,6 +7,8 @@ use infrastructure::shared::config::{Config, Database, Jwt, Log, Server};
 #[command(version, about, long_about = None)]
 /// 启动 Web 服务器
 pub struct Cli {
+    #[command(subcommand)]
+    pub command: Commands,
     /// 日志级别: trace debug info warn error
     #[arg(long, default_value = "info", env = "LOG_LEVEL")]
     pub log_level: String,
@@ -153,6 +155,14 @@ pub struct Cli {
     /// S3 region
     #[arg(long, env = "S3_REGION")]
     pub s3_region: String,
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum Commands {
+    /// Start web server
+    Serve,
+    /// Start sched server
+    Sched,
 }
 
 impl TryFrom<Cli> for Config {
