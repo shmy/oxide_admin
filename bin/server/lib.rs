@@ -157,8 +157,8 @@ async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
     };
     #[cfg(feature = "bg_sqlite")]
     let mut worker_manager = {
-        let queuer = &provider.provide::<Queuer>();
-        WorkerManager::new(queuer.pool(), queuer.subscribe())
+        let queuer = provider.provide::<Queuer>();
+        WorkerManager::new(queuer)
     };
     #[cfg(feature = "bg_dummy")]
     let mut worker_manager = WorkerManager::new();

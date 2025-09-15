@@ -2,6 +2,7 @@ use std::fmt::Debug;
 
 use anyhow::Result;
 use serde::Serialize;
+use sqlx::FromRow;
 use tokio::sync::broadcast::{self, Receiver, Sender};
 
 #[derive(Clone)]
@@ -19,15 +20,44 @@ impl Debug for Queuer {
 impl Queuer {
     pub fn new(pool: sqlx::SqlitePool) -> Self {
         let (sender, _) = broadcast::channel(16);
-        Self { pool, sender }
+
+        let instance = Self { pool, sender };
+        instance.resume();
+        instance
     }
 
-    pub fn subscribe(&self) -> Receiver<i64> {
+    pub(crate) fn subscribe(&self) -> Receiver<i64> {
         self.sender.subscribe()
     }
 
-    pub fn pool(&self) -> sqlx::SqlitePool {
+    pub(crate) fn pool(&self) -> sqlx::SqlitePool {
         self.pool.clone()
+    }
+
+    pub(crate) fn resume(&self) {
+        let pool = self.pool.clone();
+        let sender = self.sender.clone();
+        tokio::spawn(async move {
+            let pending_job_rows: Vec<PendingJobRow> =
+                sqlx::query_as("SELECT rowid as rowid FROM _jobs WHERE status = 'pending'")
+                    .fetch_all(&pool)
+                    .await?;
+            for ele in pending_job_rows {
+                let id = ele.rowid;
+                sender.send(id)?;
+            }
+            anyhow::Ok(())
+        });
+    }
+
+    pub(crate) fn delete_outdated(&self) {
+        let pool = self.pool.clone();
+        tokio::spawn(async move {
+            sqlx::query("DELETE FROM _jobs WHERE status = 'done'")
+                .execute(&pool)
+                .await?;
+            anyhow::Ok(())
+        });
     }
 
     pub async fn enqueue<K, V>(&self, kind: K, args: V) -> Result<()>
@@ -46,4 +76,9 @@ impl Queuer {
         self.sender.send(id)?;
         Ok(())
     }
+}
+
+#[derive(Debug, FromRow)]
+struct PendingJobRow {
+    rowid: i64,
 }

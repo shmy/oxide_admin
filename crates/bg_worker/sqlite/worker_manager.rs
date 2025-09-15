@@ -1,10 +1,10 @@
 use std::{collections::HashMap, sync::Arc};
 
-use crate::{JobRunner, error::RunnerError};
+use crate::{JobRunner, error::RunnerError, queuer::Queuer};
 use anyhow::Result;
 use futures_util::{FutureExt, future::BoxFuture};
 use sqlx::FromRow;
-use tokio::sync::broadcast::Receiver;
+use tracing::{error, info};
 
 struct RunnerWrapper<T>(pub T)
 where
@@ -29,17 +29,25 @@ where
         let inner = self.0.clone();
         async move {
             let params: T::Params = serde_json::from_str(&row.args)?;
-            let (status, reason) = match inner.run(params).await {
-                Ok(_) => ("done".to_string(), None),
-                Err(err) => ("error".to_string(), Some(err.to_string())),
-            };
-            sqlx::query("UPDATE _jobs SET status = ?1, reason = ?2, updated_at = CURRENT_TIMESTAMP WHERE id = ?3")
-                .bind(status)
-                .bind(reason)
-                .bind(row.id)
-                .execute(&pool)
-                .await
-                .map_err(|e| RunnerError::Custom(e.to_string()))?;
+            match inner.run(params).await {
+                Ok(_) => {
+                    info!("Job {} run successfully", row.kind);
+                    sqlx::query("DELETE FROM _jobs WHERE id = ?")
+                        .bind(row.id)
+                        .execute(&pool)
+                        .await
+                        .map_err(|e| RunnerError::Custom(e.to_string()))?;
+                },
+                Err(err) => {
+                    error!("Job {} run failed: {}", row.kind, err);
+                    sqlx::query("UPDATE _jobs SET status = 'error', reason = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+                        .bind(err.to_string())
+                        .bind(row.id)
+                        .execute(&pool)
+                        .await
+                        .map_err(|e| RunnerError::Custom(e.to_string()))?;
+                },
+            }
             Ok(())
         }
         .boxed()
@@ -47,16 +55,14 @@ where
 }
 
 pub struct WorkerManager {
-    pool: sqlx::SqlitePool,
-    receiver: Receiver<i64>,
+    queuer: Queuer,
     runners: HashMap<String, Arc<dyn JobRunnerDyn + Send + Sync + 'static>>,
 }
 
 impl WorkerManager {
-    pub fn new(pool: sqlx::SqlitePool, receiver: Receiver<i64>) -> Self {
+    pub fn new(queuer: Queuer) -> Self {
         Self {
-            pool,
-            receiver,
+            queuer,
             runners: HashMap::new(),
         }
     }
@@ -75,15 +81,20 @@ impl WorkerManager {
         S: Future<Output = ()> + 'static + Send,
     {
         tokio::pin!(signal);
+        let mut receiver = self.queuer.subscribe();
+        self.queuer.resume();
+        self.queuer.delete_outdated();
         loop {
             tokio::select! {
-                maybe_id = self.receiver.recv() => {
-                    let pool = self.pool.clone();
+                maybe_id = receiver.recv() => {
+                    let pool = self.queuer.pool();
                     if let Ok(id) = maybe_id {
+                        info!("Job received: {}", id);
                         let job_row: JobRow = sqlx::query_as("SELECT id, kind, args FROM _jobs WHERE rowid = ?").bind(id)
                             .fetch_one(&pool)
                             .await?;
                          if let Some(runner) = self.runners.get(&job_row.kind) {
+                            info!("Job handle found: {}", job_row.kind);
                             tokio::spawn(runner.run(job_row, pool));
                         }
                     } else {
@@ -96,7 +107,7 @@ impl WorkerManager {
             }
         }
 
-        self.pool.close().await;
+        self.queuer.pool().close().await;
         Ok(())
     }
 }
