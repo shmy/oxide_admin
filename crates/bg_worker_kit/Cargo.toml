@@ -16,6 +16,7 @@ sqlite = ["dep:sqlx"]
 anyhow = { workspace = true }
 async-trait = { version = "0.1", default-features = false }
 faktory = { version = "0.13", default-features = false, optional = true }
+futures-util = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["std"] }
 sqlx = { workspace = true, features = [
@@ -27,4 +28,3 @@ sqlx = { workspace = true, features = [
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
-futures-util = { workspace = true }

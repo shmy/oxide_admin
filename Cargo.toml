@@ -53,6 +53,7 @@ jsonwebtoken = { version = "9.3", default-features = false }
 kvdb_kit = { path = "crates/kvdb_kit" }
 mimalloc = { version = "0.1", default-features = false }
 mime_guess = { version = "2.0", default-features = false }
+minijinja = { version = "2.11", default-features = false }
 nject = { version = "0.4", default-features = false }
 object_storage_kit = { path = "crates/object_storage_kit" }
 parking_lot = { version = "0.12", default-features = false }
@@ -85,7 +86,6 @@ tower_governor = { version = "0.8", default-features = false }
 trace_kit = { path = "crates/trace_kit" }
 tracing = { version = "0.1", default-features = false }
 twox-hash = { version = "2.1", default-features = false }
-minijinja = { version = "2.11", default-features = false }
 
 [profile.dev]
 debug = "line-tables-only"   # 生成调试信息，便于调试
