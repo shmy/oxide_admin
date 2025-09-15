@@ -11,7 +11,7 @@ use infrastructure::shared::{
     pg_pool,
 };
 use infrastructure::{migration, shared::pg_pool::PgPool, shared::provider::Provider};
-use kvdb::{Kvdb, KvdbTrait as _};
+use kvdb_kit::{Kvdb, KvdbTrait as _};
 use object_storage_kit::ObjectStorage;
 use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
@@ -137,7 +137,7 @@ async fn build_kvdb(config: &Config) -> Result<Kvdb> {
     return Kvdb::try_new(infrastructure::shared::path::DATA_DIR.join("data.redb")).await;
     #[cfg(feature = "kv_redis")]
     return {
-        let config = kvdb::RedisKvdbConfig::builder()
+        let config = kvdb_kit::RedisKvdbConfig::builder()
             .url(config.redis.url.clone())
             .connection_timeout(config.redis.connection_timeout)
             .max_size(config.redis.max_size)

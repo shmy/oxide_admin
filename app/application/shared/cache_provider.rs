@@ -5,7 +5,7 @@ use std::{
 
 use anyhow::Result;
 use bon::Builder;
-use kvdb::{Kvdb, KvdbTrait as _};
+use kvdb_kit::{Kvdb, KvdbTrait as _};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::warn;
 use twox_hash::XxHash64;

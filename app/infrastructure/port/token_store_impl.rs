@@ -1,5 +1,5 @@
 use domain::{iam::error::IamError, shared::port::token_store::TokenStoreTrait};
-use kvdb::{Kvdb, KvdbTrait as _};
+use kvdb_kit::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 use sqlx::types::chrono::{DateTime, Utc};
 

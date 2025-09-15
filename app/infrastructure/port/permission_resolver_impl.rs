@@ -6,7 +6,7 @@ use domain::iam::value_object::role_id::RoleId;
 use domain::iam::value_object::user_id::UserId;
 use domain::shared::port::permission_resolver::PermissionResolver;
 use domain::shared::to_inner_vec::ToInnerVec;
-use kvdb::{Kvdb, KvdbTrait as _};
+use kvdb_kit::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 use single_flight::single_flight;
 use sqlx::prelude::FromRow;

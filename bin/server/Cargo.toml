@@ -51,7 +51,7 @@ dotenvy = { workspace = true }
 humantime = { workspace = true }
 infrastructure = { workspace = true }
 
-kvdb = { workspace = true }
+kvdb_kit = { workspace = true }
 mimalloc = { workspace = true }
 object_storage_kit = { workspace = true }
 tokio = { workspace = true, features = ["full"] }

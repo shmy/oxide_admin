@@ -1,6 +1,6 @@
 use bg_worker::queuer::Queuer;
 use bon::Builder;
-use kvdb::Kvdb;
+use kvdb_kit::Kvdb;
 use nject::provider;
 use object_storage_kit::ObjectStorage;
 

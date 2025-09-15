@@ -7,8 +7,8 @@ edition = "2024"
 path = "lib.rs"
 
 [features]
-kv_redb = ["kvdb/redb"]
-kv_redis = ["kvdb/redis"]
+kv_redb = ["kvdb_kit/redb"]
+kv_redis = ["kvdb_kit/redis"]
 bg_faktory = ["bg_worker/faktory"]
 bg_faktory_tls = ["bg_worker/faktory_tls"]
 bg_sqlite = ["bg_worker/sqlite"]
@@ -29,7 +29,7 @@ chrono-tz = { workspace = true, features = ["std"] }
 
 domain = { workspace = true }
 jsonwebtoken = { workspace = true }
-kvdb = { workspace = true }
+kvdb_kit = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 object_storage_kit = { workspace = true }
 readonly = { workspace = true }

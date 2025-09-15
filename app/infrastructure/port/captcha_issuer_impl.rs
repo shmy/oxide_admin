@@ -6,7 +6,7 @@ use domain::{
         port::captcha_issuer::{Captcha, CaptchaIssuerTrait},
     },
 };
-use kvdb::{Kvdb, KvdbTrait as _};
+use kvdb_kit::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 
 #[derive(Debug)]

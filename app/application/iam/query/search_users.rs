@@ -4,7 +4,7 @@ use anyhow::Result;
 use bon::Builder;
 use domain::iam::{error::IamError, value_object::role_id::RoleId};
 use infrastructure::shared::pg_pool::PgPool;
-use kvdb::Kvdb;
+use kvdb_kit::Kvdb;
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};

@@ -16,7 +16,7 @@ futures-util = { workspace = true }
 image = { workspace = true, features = ["png", "webp", "jpeg"] }
 imageformat = { workspace = true }
 infrastructure = { workspace = true }
-kvdb = { workspace = true }
+kvdb_kit = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 object_storage_kit = { workspace = true }
 serde = { workspace = true, features = ["derive"] }

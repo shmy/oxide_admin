@@ -107,7 +107,7 @@ dependencies = [
  "image",
  "imageformat",
  "infrastructure",
- "kvdb",
+ "kvdb_kit",
  "minijinja",
  "nject",
  "object_storage_kit",
@@ -1822,7 +1822,7 @@ dependencies = [
  "chrono-tz",
  "domain",
  "jsonwebtoken",
- "kvdb",
+ "kvdb_kit",
  "nject",
  "object_storage_kit",
  "readonly",
@@ -1926,7 +1926,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "kvdb"
+name = "kvdb_kit"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -3554,7 +3554,7 @@ dependencies = [
  "dotenvy",
  "humantime",
  "infrastructure",
- "kvdb",
+ "kvdb_kit",
  "mimalloc",
  "object_storage_kit",
  "tokio",

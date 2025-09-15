@@ -13,7 +13,7 @@ members = [
     "bin/xtask",
     "crates/bg_worker",
     "crates/captcha_generator",
-    "crates/kvdb",
+    "crates/kvdb_kit",
     "crates/object_storage_kit",
     "crates/single_flight",
     "crates/single_flight_macros",
@@ -50,7 +50,7 @@ imageformat = { version = "0.3", default-features = false }
 include_dir = { version = "0.7", default-features = false }
 infrastructure = { path = "app/infrastructure" }
 jsonwebtoken = { version = "9.3", default-features = false }
-kvdb = { path = "crates/kvdb" }
+kvdb_kit = { path = "crates/kvdb_kit" }
 mimalloc = { version = "0.1", default-features = false }
 mime_guess = { version = "2.0", default-features = false }
 nject = { version = "0.4", default-features = false }
