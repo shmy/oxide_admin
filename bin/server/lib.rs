@@ -4,8 +4,8 @@ use application::shared::{
     background_worker::register_workers, event_subscriber::register_subscribers,
 };
 use axum::Router;
-use bg_worker::queuer::Queuer;
-use bg_worker::worker_manager::WorkerManager;
+use bg_worker_kit::queuer::Queuer;
+use bg_worker_kit::worker_manager::WorkerManager;
 use infrastructure::shared::{
     config::{Config, Log, Server},
     pg_pool,
@@ -94,7 +94,7 @@ async fn build_queuer(config: &Config) -> Result<Queuer> {
     return Queuer::try_new(&config.faktory.url, &config.faktory.queue).await;
     #[cfg(feature = "bg_sqlite")]
     return {
-        use bg_worker::helper::connect_sqlite;
+        use bg_worker_kit::helper::connect_sqlite;
         use infrastructure::shared::path::DATA_DIR;
         let pool = connect_sqlite(DATA_DIR.join("job.sqlite")).await?;
         Ok(Queuer::new(pool))

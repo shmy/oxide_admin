@@ -38,7 +38,7 @@ adapter = { workspace = true }
 anyhow = { workspace = true }
 application = { workspace = true }
 axum = { workspace = true }
-bg_worker = { workspace = true }
+bg_worker_kit = { workspace = true }
 chrono-tz = { workspace = true }
 clap = { workspace = true, features = [
     "std",

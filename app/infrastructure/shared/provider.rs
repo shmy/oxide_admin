@@ -1,4 +1,4 @@
-use bg_worker::queuer::Queuer;
+use bg_worker_kit::queuer::Queuer;
 use bon::Builder;
 use kvdb_kit::Kvdb;
 use nject::provider;

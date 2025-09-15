@@ -9,7 +9,7 @@ path = "lib.rs"
 [dependencies]
 anyhow = { workspace = true }
 axum = { workspace = true }
-bg_worker = { workspace = true }
+bg_worker_kit = { workspace = true }
 bon = { workspace = true }
 domain = { workspace = true }
 futures-util = { workspace = true }

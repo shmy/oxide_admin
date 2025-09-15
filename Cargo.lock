@@ -99,7 +99,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "axum",
- "bg_worker",
+ "bg_worker_kit",
  "bon",
  "cruet",
  "domain",
@@ -380,7 +380,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "bg_worker"
+name = "bg_worker_kit"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -1815,7 +1815,7 @@ name = "infrastructure"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "bg_worker",
+ "bg_worker_kit",
  "bon",
  "captcha_generator",
  "chrono",
@@ -3548,7 +3548,7 @@ dependencies = [
  "anyhow",
  "application",
  "axum",
- "bg_worker",
+ "bg_worker_kit",
  "chrono-tz",
  "clap",
  "dotenvy",

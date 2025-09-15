@@ -9,10 +9,10 @@ path = "lib.rs"
 [features]
 kv_redb = ["kvdb_kit/redb"]
 kv_redis = ["kvdb_kit/redis"]
-bg_faktory = ["bg_worker/faktory"]
-bg_faktory_tls = ["bg_worker/faktory_tls"]
-bg_sqlite = ["bg_worker/sqlite"]
-bg_dummy = ["bg_worker/dummy"]
+bg_faktory = ["bg_worker_kit/faktory"]
+bg_faktory_tls = ["bg_worker_kit/faktory_tls"]
+bg_sqlite = ["bg_worker_kit/sqlite"]
+bg_dummy = ["bg_worker_kit/dummy"]
 object_storage_fs = ["object_storage_kit/fs"]
 object_storage_s3 = ["object_storage_kit/s3"]
 object_storage_s3_tls = ["object_storage_kit/s3_tls"]
@@ -21,7 +21,7 @@ trace_otlp = []
 
 [dependencies]
 anyhow = { workspace = true }
-bg_worker = { workspace = true }
+bg_worker_kit = { workspace = true }
 bon = { workspace = true }
 captcha_generator = { workspace = true }
 chrono = { workspace = true }

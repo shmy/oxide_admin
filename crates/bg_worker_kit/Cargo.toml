@@ -1,5 +1,5 @@
 [package]
-name = "bg_worker"
+name = "bg_worker_kit"
 version = "0.1.0"
 edition = "2024"
 

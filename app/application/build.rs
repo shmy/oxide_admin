@@ -112,11 +112,11 @@ pub struct JobContext {
 }
 
 const JOB_TEMPLATE: &str = r#"#[allow(unused_imports)]
-use bg_worker::worker_manager::WorkerManager;
+use bg_worker_kit::worker_manager::WorkerManager;
 #[allow(unused_imports)]
-use bg_worker::queuer::Queuer;
+use bg_worker_kit::queuer::Queuer;
 #[allow(unused_imports)]
-use bg_worker::JobRunner;
+use bg_worker_kit::JobRunner;
 #[allow(unused_imports)]
 use infrastructure::shared::provider::Provider;
 #[allow(unused_imports)]
