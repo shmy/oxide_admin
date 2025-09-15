@@ -12,7 +12,7 @@ members = [
     "bin/server",
     "bin/xtask",
     "crates/bg_worker_kit",
-    "crates/captcha_generator",
+    "crates/captcha_kit",
     "crates/kvdb_kit",
     "crates/object_storage_kit",
     "crates/single_flight",
@@ -32,7 +32,7 @@ axum_typed_multipart = { version = "0.16", default-features = false }
 bb8-redis = { version = "0.24", default-features = false }
 bg_worker_kit = { path = "crates/bg_worker_kit" }
 bon = { version = "3.7", default-features = false }
-captcha_generator = { path = "crates/captcha_generator" }
+captcha_kit = { path = "crates/captcha_kit" }
 chrono = { version = "0.4", default-features = false }
 chrono-tz = { version = "0.10", default-features = false }
 clap = { version = "4.5", default-features = false }

@@ -1,4 +1,4 @@
-use captcha_generator::CaptchaTrait as _;
+use captcha_kit::CaptchaTrait as _;
 use domain::{
     iam::error::IamError,
     shared::{
@@ -24,7 +24,7 @@ impl CaptchaIssuerTrait for CaptchaIssuerImpl {
     type Error = IamError;
     #[tracing::instrument]
     async fn generate_with_ttl(&self, ttl: std::time::Duration) -> Result<Captcha, Self::Error> {
-        let math = captcha_generator::math::MathCaptcha::new(100, 140, 40);
+        let math = captcha_kit::math::MathCaptcha::new(100, 140, 40);
         let captcha_data = math
             .generate()
             .map_err(|_| IamError::CaptchaGenerationFailed)?;

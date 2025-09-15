@@ -23,7 +23,7 @@ trace_otlp = []
 anyhow = { workspace = true }
 bg_worker_kit = { workspace = true }
 bon = { workspace = true }
-captcha_generator = { workspace = true }
+captcha_kit = { workspace = true }
 chrono = { workspace = true }
 chrono-tz = { workspace = true, features = ["std"] }
 

@@ -484,7 +484,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d71b6127be86fdcfddb610f7182ac57211d4b18a3e9c82eb2d17662f2227ad6a"
 
 [[package]]
-name = "captcha_generator"
+name = "captcha_kit"
 version = "0.1.0"
 dependencies = [
  "ab_glyph",
@@ -1817,7 +1817,7 @@ dependencies = [
  "anyhow",
  "bg_worker_kit",
  "bon",
- "captcha_generator",
+ "captcha_kit",
  "chrono",
  "chrono-tz",
  "domain",
