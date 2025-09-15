@@ -29,12 +29,13 @@ where
         let inner = self.0.clone();
         async move {
             let params: T::Params = serde_json::from_str(&row.args)?;
-            let status = match inner.run(params).await {
-                Ok(_) => "done".to_string(),
-                Err(_) => "error".to_string(),
+            let (status, reason) = match inner.run(params).await {
+                Ok(_) => ("done".to_string(), None),
+                Err(err) => ("error".to_string(), Some(err.to_string())),
             };
-            sqlx::query("UPDATE _jobs SET status = ? WHERE id = ?")
+            sqlx::query("UPDATE _jobs SET status = ?1, reason = ?2, updated_at = CURRENT_TIMESTAMP WHERE id = ?3")
                 .bind(status)
+                .bind(reason)
                 .bind(row.id)
                 .execute(&pool)
                 .await

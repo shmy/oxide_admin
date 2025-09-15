@@ -51,7 +51,6 @@ impl JobRunner for DeleteOutdateTempDir {
                 .await;
         }
 
-        println!("Cleanup done");
         Ok(())
     }
 }
