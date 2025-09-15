@@ -15,7 +15,7 @@ use crate::shared::provider::Provider;
 
 pub async fn migrate(provider: &Provider) -> Result<()> {
     let pool = provider.provide::<PgPool>();
-    sqlx::migrate!("./migration/sql").run(&pool).await?;
+    sqlx::migrate!("migration/sql").run(&pool).await?;
     insert_user_role(&pool, provider).await?;
     Ok(())
 }

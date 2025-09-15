@@ -8,7 +8,6 @@ path = "lib.rs"
 
 [dependencies]
 anyhow = { workspace = true }
-
 axum = { workspace = true }
 bg_worker = { workspace = true }
 bon = { workspace = true }
@@ -23,6 +22,7 @@ object_storage = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_with = { workspace = true, features = ["alloc", "macros", "chrono_0_4"] }
 single_flight = { workspace = true }
+
 sqlx = { workspace = true }
 sysinfo = { workspace = true, features = ["system"] }
 tempfile = { workspace = true }

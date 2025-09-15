@@ -92,6 +92,13 @@ async fn initilize(provider: &Provider) -> Result<()> {
 async fn build_queuer(config: &Config) -> Result<Queuer> {
     #[cfg(feature = "bg_faktory")]
     return Queuer::try_new(&config.faktory.url, &config.faktory.queue).await;
+    #[cfg(feature = "bg_sqlite")]
+    return {
+        use bg_worker::helper::connect_sqlite;
+        use infrastructure::shared::path::DATA_DIR;
+        let pool = connect_sqlite(DATA_DIR.join("job.sqlite")).await?;
+        Ok(Queuer::new(pool))
+    };
     #[cfg(feature = "bg_dummy")]
     return Queuer::try_new().await;
 }
@@ -147,6 +154,11 @@ async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
     let mut worker_manager = {
         let config = &provider.provide::<Config>();
         WorkerManager::new(&config.faktory.url, &config.faktory.queue)
+    };
+    #[cfg(feature = "bg_sqlite")]
+    let mut worker_manager = {
+        let queuer = &provider.provide::<Queuer>();
+        WorkerManager::new(queuer.pool())
     };
     #[cfg(feature = "bg_dummy")]
     let mut worker_manager = WorkerManager::new();

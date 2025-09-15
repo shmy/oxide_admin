@@ -10,13 +10,19 @@ path = "lib.rs"
 faktory = ["dep:faktory"]
 faktory_tls = ["faktory/rustls"]
 dummy = []
+sqlite = ["dep:sqlx"]
 
 [dependencies]
 anyhow = { workspace = true }
 async-trait = { version = "0.1", default-features = false }
 faktory = { version = "0.13", default-features = false, optional = true }
 serde = { workspace = true }
-serde_json = { workspace = true }
+serde_json = { workspace = true, features = ["std"] }
+sqlx = { workspace = true, features = [
+    "runtime-tokio",
+    "sqlite",
+    "migrate",
+], optional = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
