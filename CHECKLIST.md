@@ -41,7 +41,7 @@
 [x] 抽离kv到crate
 [x] Kv redb 内部定时删除过期数据
 [x] 重新测试Code generation 补充#[tracing::instrument]
-[ ] 实现单机后台任务
+[x] 实现单机后台任务Sqlite
 [ ] 添加scheduler
 [ ] _files表集成，上传成功crate，使用文件后设为used 否则设为unused
 [ ] Frontend code generation
