@@ -1,7 +1,6 @@
-use serde::{Serialize, de::DeserializeOwned};
 use tracing::warn;
 
-use crate::{JobRunner, error::RunnerError};
+use crate::JobRunner;
 
 pub struct WorkerManager {}
 

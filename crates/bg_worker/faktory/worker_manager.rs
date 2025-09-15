@@ -1,9 +1,25 @@
-use std::sync::Arc;
-
-use crate::{JobRunner, RunnerWrapper, error::RunnerError};
+use crate::{JobRunner, error::RunnerError};
 use anyhow::Result;
 use faktory::WorkerBuilder;
-use serde::{Serialize, de::DeserializeOwned};
+
+struct RunnerWrapper<T>(pub T)
+where
+    T: JobRunner;
+
+#[async_trait::async_trait]
+impl<T> ::faktory::JobRunner for RunnerWrapper<T>
+where
+    T: JobRunner + Send + Sync + 'static,
+{
+    type Error = RunnerError;
+    async fn run(&self, job: ::faktory::Job) -> Result<(), Self::Error> {
+        if let Some(arg) = job.args().first() {
+            let params: T::Params = serde_json::from_value(arg.clone())?;
+            return self.0.run(params).await;
+        }
+        Err(RunnerError::Custom("No params".to_string()))
+    }
+}
 
 pub struct WorkerManager {
     addr: String,

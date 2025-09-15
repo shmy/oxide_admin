@@ -53,8 +53,7 @@ impl QueryHandler for RetrieveUserQueryHandler {
         )
         .fetch_optional(&self.pool)
         .await?;
-        let r = self.queuer.enqueue(()).await;
-        dbg!(r);
+        let _ = self.queuer.enqueue(()).await;
         row_opt.ok_or(IamError::UserNotFound)
     }
 }
