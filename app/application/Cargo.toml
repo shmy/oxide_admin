@@ -18,7 +18,7 @@ imageformat = { workspace = true }
 infrastructure = { workspace = true }
 kvdb = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
-object_storage = { workspace = true }
+object_storage_kit = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_with = { workspace = true, features = ["alloc", "macros", "chrono_0_4"] }
 single_flight = { workspace = true }

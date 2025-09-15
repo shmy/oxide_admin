@@ -2,7 +2,7 @@ use bg_worker::queuer::Queuer;
 use bon::Builder;
 use kvdb::Kvdb;
 use nject::provider;
-use object_storage::ObjectStorage;
+use object_storage_kit::ObjectStorage;
 
 use crate::shared::{config::Config, pg_pool::PgPool};
 

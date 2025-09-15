@@ -13,9 +13,9 @@ bg_faktory = ["bg_worker/faktory"]
 bg_faktory_tls = ["bg_worker/faktory_tls"]
 bg_sqlite = ["bg_worker/sqlite"]
 bg_dummy = ["bg_worker/dummy"]
-object_storage_fs = ["object_storage/fs"]
-object_storage_s3 = ["object_storage/s3"]
-object_storage_s3_tls = ["object_storage/s3_tls"]
+object_storage_fs = ["object_storage_kit/fs"]
+object_storage_s3 = ["object_storage_kit/s3"]
+object_storage_s3_tls = ["object_storage_kit/s3_tls"]
 trace_rolling = []
 trace_otlp = []
 
@@ -31,7 +31,7 @@ domain = { workspace = true }
 jsonwebtoken = { workspace = true }
 kvdb = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
-object_storage = { workspace = true }
+object_storage_kit = { workspace = true }
 readonly = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }

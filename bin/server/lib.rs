@@ -12,7 +12,7 @@ use infrastructure::shared::{
 };
 use infrastructure::{migration, shared::pg_pool::PgPool, shared::provider::Provider};
 use kvdb::{Kvdb, KvdbTrait as _};
-use object_storage::ObjectStorage;
+use object_storage_kit::ObjectStorage;
 use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     str::FromStr as _,
@@ -106,7 +106,7 @@ async fn build_queuer(config: &Config) -> Result<Queuer> {
 async fn build_object_storage(config: &Config) -> Result<ObjectStorage> {
     #[cfg(feature = "object_storage_fs")]
     return {
-        let config = object_storage::FsConfig::builder()
+        let config = object_storage_kit::FsConfig::builder()
             .root(
                 infrastructure::shared::path::UPLOAD_DIR
                     .to_string_lossy()
@@ -120,7 +120,7 @@ async fn build_object_storage(config: &Config) -> Result<ObjectStorage> {
     };
     #[cfg(feature = "object_storage_s3")]
     return {
-        let config = object_storage::S3Config::builder()
+        let config = object_storage_kit::S3Config::builder()
             .endpoint(config.s3.endpoint.to_string())
             .bucket(config.s3.bucket.to_string())
             .access_key_id(config.s3.access_key_id.to_string())

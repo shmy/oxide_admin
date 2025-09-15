@@ -10,7 +10,7 @@ use domain::shared::event_util::UpdatedEvent;
 use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
-use object_storage::{ObjectStorage, ObjectStorageReader as _};
+use object_storage_kit::{ObjectStorage, ObjectStorageReader as _};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Builder)]

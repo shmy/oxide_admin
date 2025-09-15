@@ -53,7 +53,7 @@ infrastructure = { workspace = true }
 
 kvdb = { workspace = true }
 mimalloc = { workspace = true }
-object_storage = { workspace = true }
+object_storage_kit = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 trace_kit = { workspace = true }
 tracing = { workspace = true }

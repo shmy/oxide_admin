@@ -9,7 +9,7 @@ use infrastructure::shared::{
     path::TEMP_DIR,
 };
 use nject::injectable;
-use object_storage::{ObjectStorage, ObjectStorageReader, ObjectStorageWriter};
+use object_storage_kit::{ObjectStorage, ObjectStorageReader, ObjectStorageWriter};
 use serde::{Deserialize, Serialize};
 use std::io::{Cursor, Read};
 use std::{

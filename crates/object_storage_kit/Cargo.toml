@@ -1,5 +1,5 @@
 [package]
-name = "object_storage"
+name = "object_storage_kit"
 version = "0.1.0"
 edition = "2024"
 

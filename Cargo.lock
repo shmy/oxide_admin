@@ -110,7 +110,7 @@ dependencies = [
  "kvdb",
  "minijinja",
  "nject",
- "object_storage",
+ "object_storage_kit",
  "serde",
  "serde_with",
  "single_flight",
@@ -1824,7 +1824,7 @@ dependencies = [
  "jsonwebtoken",
  "kvdb",
  "nject",
- "object_storage",
+ "object_storage_kit",
  "readonly",
  "serde",
  "serde_json",
@@ -2404,7 +2404,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "object_storage"
+name = "object_storage_kit"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -3556,7 +3556,7 @@ dependencies = [
  "infrastructure",
  "kvdb",
  "mimalloc",
- "object_storage",
+ "object_storage_kit",
  "tokio",
  "trace_kit",
  "tracing",

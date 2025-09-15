@@ -14,7 +14,7 @@ members = [
     "crates/bg_worker",
     "crates/captcha_generator",
     "crates/kvdb",
-    "crates/object_storage",
+    "crates/object_storage_kit",
     "crates/single_flight",
     "crates/single_flight_macros",
     "crates/trace_kit",
@@ -54,7 +54,7 @@ kvdb = { path = "crates/kvdb" }
 mimalloc = { version = "0.1", default-features = false }
 mime_guess = { version = "2.0", default-features = false }
 nject = { version = "0.4", default-features = false }
-object_storage = { path = "crates/object_storage" }
+object_storage_kit = { path = "crates/object_storage_kit" }
 parking_lot = { version = "0.12", default-features = false }
 quote = { version = "1.0" }
 readonly = { version = "0.2", default-features = false }
