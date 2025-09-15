@@ -18,7 +18,7 @@ clap = { workspace = true, features = [
 ] }
 cruet = { version = "0.15", default-features = false }
 dotenvy = { workspace = true }
-inquire = { version = "0.7", default-features = false, features = [
+inquire = { version = "0.8", default-features = false, features = [
     "crossterm",
 ] }
 minijinja = { version = "2.11", default-features = false, features = [
