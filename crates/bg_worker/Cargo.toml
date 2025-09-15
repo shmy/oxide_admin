@@ -26,3 +26,4 @@ sqlx = { workspace = true, features = [
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
+futures-util = { workspace = true }

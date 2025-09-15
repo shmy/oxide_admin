@@ -2,7 +2,7 @@ use anyhow::Result;
 use serde::Serialize;
 use tracing::warn;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Queuer {}
 impl Queuer {
     pub async fn try_new() -> Result<Self> {

@@ -1,4 +1,5 @@
 use crate::iam::dto::user::UserDto;
+use crate::shared::background_worker::DeleteOutdateTempDirQueuer;
 use crate::shared::query_handler::QueryHandler;
 use bon::Builder;
 use domain::iam::value_object::user_id::UserId;
@@ -17,6 +18,7 @@ pub struct RetrieveUserQuery {
 #[injectable]
 pub struct RetrieveUserQueryHandler {
     pool: PgPool,
+    queuer: DeleteOutdateTempDirQueuer,
 }
 
 impl QueryHandler for RetrieveUserQueryHandler {
@@ -51,6 +53,8 @@ impl QueryHandler for RetrieveUserQueryHandler {
         )
         .fetch_optional(&self.pool)
         .await?;
+        let r = self.queuer.enqueue(()).await;
+        dbg!(r);
         row_opt.ok_or(IamError::UserNotFound)
     }
 }

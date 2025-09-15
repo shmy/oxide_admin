@@ -135,14 +135,14 @@ pub fn register_workers(worker_manager: &mut WorkerManager, provider: &Provider)
 }
 {%- for item in jobs %}
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[injectable]
 pub struct {{item | pascal_case}}Queuer {
      queuer: Queuer,
 }
 
 impl {{item | pascal_case}}Queuer {
-    pub async fn enqueue(&mut self, params: <{{item}}::{{item | pascal_case}} as JobRunner>::Params) -> Result<()> {
+    pub async fn enqueue(&self, params: <{{item}}::{{item | pascal_case}} as JobRunner>::Params) -> Result<()> {
         self.queuer.enqueue("{{item}}", params).await
     }
 }

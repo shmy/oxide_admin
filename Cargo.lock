@@ -386,6 +386,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "faktory",
+ "futures-util",
  "serde",
  "serde_json",
  "sqlx",

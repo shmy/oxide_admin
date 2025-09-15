@@ -1,56 +1,108 @@
+use std::{collections::HashMap, sync::Arc};
+
 use crate::{JobRunner, error::RunnerError};
 use anyhow::Result;
-use serde::{Serialize, de::DeserializeOwned};
+use futures_util::{FutureExt, future::BoxFuture};
+use sqlx::FromRow;
+use tokio::sync::broadcast::Receiver;
+
+struct RunnerWrapper<T>(pub T)
+where
+    T: JobRunner + Clone + Send + Sync + 'static;
+trait JobRunnerDyn {
+    fn run(
+        &self,
+        row: JobRow,
+        pool: sqlx::SqlitePool,
+    ) -> BoxFuture<'static, Result<(), RunnerError>>;
+}
+
+impl<T> JobRunnerDyn for RunnerWrapper<T>
+where
+    T: JobRunner + Clone + Send + Sync + 'static,
+{
+    fn run(
+        &self,
+        row: JobRow,
+        pool: sqlx::SqlitePool,
+    ) -> BoxFuture<'static, Result<(), RunnerError>> {
+        let inner = self.0.clone();
+        async move {
+            let params: T::Params = serde_json::from_str(&row.args)?;
+            let status = match inner.run(params).await {
+                Ok(_) => "done".to_string(),
+                Err(_) => "error".to_string(),
+            };
+            sqlx::query("UPDATE _jobs SET status = ? WHERE id = ?")
+                .bind(status)
+                .bind(row.id)
+                .execute(&pool)
+                .await
+                .map_err(|e| RunnerError::Custom(e.to_string()))?;
+            Ok(())
+        }
+        .boxed()
+    }
+}
 
 pub struct WorkerManager {
     pool: sqlx::SqlitePool,
+    receiver: Receiver<i64>,
+    runners: HashMap<String, Arc<dyn JobRunnerDyn + Send + Sync + 'static>>,
 }
 
 impl WorkerManager {
-    pub fn new(pool: sqlx::SqlitePool) -> Self {
-        Self { pool }
+    pub fn new(pool: sqlx::SqlitePool, receiver: Receiver<i64>) -> Self {
+        Self {
+            pool,
+            receiver,
+            runners: HashMap::new(),
+        }
     }
 
-    pub fn register<K, P, H>(&mut self, kind: K, runner: H)
+    pub fn register<K, R>(&mut self, kind: K, runner: R)
     where
         K: Into<String>,
-        H: JobRunner<Params = P> + Send + Sync + 'static,
+        R: JobRunner + Clone + Send + Sync + 'static,
     {
-    }
-
-    pub fn register_fn<K, H, P, Fut>(&mut self, kind: K, handler: H)
-    where
-        K: Into<String>,
-        H: Fn(P) -> Fut + Send + Sync + 'static,
-        P: Serialize + DeserializeOwned,
-        Fut: Future<Output = Result<(), RunnerError>> + Send,
-    {
-    }
-
-    pub fn register_blocking_fn<K, H, P>(mut self, kind: K, handler: H)
-    where
-        K: Into<String>,
-        H: Fn(P) -> Result<(), RunnerError> + Send + Sync + 'static,
-        P: Serialize + DeserializeOwned,
-    {
+        let kind = kind.into();
+        self.runners.insert(kind, Arc::new(RunnerWrapper(runner)));
     }
 
     pub async fn run_with_signal<S>(&mut self, signal: S) -> Result<()>
     where
         S: Future<Output = ()> + 'static + Send,
     {
-        let mut conn = self.pool.acquire().await?;
-        let mut handle = conn.lock_handle().await?;
-        handle.set_update_hook(|s| {
-            println!("update hook: {:?}", s.database);
-            println!("update hook: {:?}", s.table);
-            println!("update hook: {:?}", s.operation);
-            println!("update hook: {:?}", s.rowid);
-        });
-        signal.await;
-        drop(handle);
-        drop(conn);
+        tokio::pin!(signal);
+        loop {
+            tokio::select! {
+                maybe_id = self.receiver.recv() => {
+                    let pool = self.pool.clone();
+                    if let Ok(id) = maybe_id {
+                        let job_row: JobRow = sqlx::query_as("SELECT id, kind, args FROM _jobs WHERE rowid = ?").bind(id)
+                            .fetch_one(&pool)
+                            .await?;
+                         if let Some(runner) = self.runners.get(&job_row.kind) {
+                            tokio::spawn(runner.run(job_row, pool));
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                _ = &mut signal => {
+                    break;
+                }
+            }
+        }
+
         self.pool.close().await;
         Ok(())
     }
+}
+
+#[derive(FromRow)]
+struct JobRow {
+    id: i64,
+    kind: String,
+    args: String,
 }

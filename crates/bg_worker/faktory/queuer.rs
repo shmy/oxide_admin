@@ -1,8 +1,8 @@
-use std::sync::Arc;
-
 use anyhow::Result;
 use faktory::{Client, Job};
 use serde::Serialize;
+use std::fmt::Debug;
+use std::sync::Arc;
 use tokio::sync::Mutex;
 
 #[derive(Clone)]
@@ -10,6 +10,13 @@ pub struct Queuer {
     client: Arc<Mutex<Client>>,
     queue: String,
 }
+
+impl Debug for Queuer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Queuer").finish()
+    }
+}
+
 impl Queuer {
     pub async fn try_new(addr: impl Into<String>, queue: impl Into<String>) -> Result<Self> {
         let mut client = Client::connect_to(&addr.into()).await?;
