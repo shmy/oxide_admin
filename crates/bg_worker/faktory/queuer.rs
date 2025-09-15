@@ -28,7 +28,7 @@ impl Queuer {
         })
     }
 
-    pub async fn enqueue<K, V>(&self, kind: K, args: V) -> Result<()>
+    pub async fn enqueue<K, V>(&self, kind: K, params: V) -> Result<()>
     where
         K: Into<String>,
         V: Serialize,
@@ -38,7 +38,7 @@ impl Queuer {
             .enqueue(
                 Job::builder(kind.into())
                     .queue(&self.queue)
-                    .args(vec![serde_json::to_value(args)?])
+                    .args(vec![serde_json::to_value(params)?])
                     .build(),
             )
             .await?;

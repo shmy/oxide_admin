@@ -28,10 +28,10 @@ where
     ) -> BoxFuture<'static, Result<(), RunnerError>> {
         let inner = self.0.clone();
         async move {
-            let params: T::Params = serde_json::from_str(&row.args)?;
+            let params: T::Params = serde_json::from_str(&row.params)?;
             match inner.run(params).await {
                 Ok(_) => {
-                    info!("Job {} run successfully", row.kind);
+                    info!("Job {} run with {} successfully", row.kind, &row.params);
                     sqlx::query("DELETE FROM _jobs WHERE id = ?")
                         .bind(row.id)
                         .execute(&pool)
@@ -39,7 +39,7 @@ where
                         .map_err(|e| RunnerError::Custom(e.to_string()))?;
                 },
                 Err(err) => {
-                    error!("Job {} run failed: {}", row.kind, err);
+                    error!("Job {} run with {} failed: {}", row.kind, &row.params, err);
                     sqlx::query("UPDATE _jobs SET status = 'error', reason = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
                         .bind(err.to_string())
                         .bind(row.id)
@@ -89,8 +89,8 @@ impl WorkerManager {
                 maybe_id = receiver.recv() => {
                     let pool = self.queuer.pool();
                     if let Ok(id) = maybe_id {
-                        info!("Job received: {}", id);
-                        let job_row: JobRow = sqlx::query_as("SELECT id, kind, args FROM _jobs WHERE rowid = ?").bind(id)
+                        info!("Job received rowid: {}", id);
+                        let job_row: JobRow = sqlx::query_as("SELECT id, kind, params FROM _jobs WHERE rowid = ?").bind(id)
                             .fetch_one(&pool)
                             .await?;
                          if let Some(runner) = self.runners.get(&job_row.kind) {
@@ -116,5 +116,5 @@ impl WorkerManager {
 struct JobRow {
     id: i64,
     kind: String,
-    args: String,
+    params: String,
 }

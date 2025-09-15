@@ -9,7 +9,7 @@ impl Queuer {
         Ok(Self {})
     }
 
-    pub async fn enqueue<K, V>(&self, _kind: K, _args: V) -> Result<()>
+    pub async fn enqueue<K, V>(&self, _kind: K, _params: V) -> Result<()>
     where
         K: Into<String>,
         V: Serialize,

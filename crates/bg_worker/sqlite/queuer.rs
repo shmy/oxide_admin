@@ -60,16 +60,16 @@ impl Queuer {
         });
     }
 
-    pub async fn enqueue<K, V>(&self, kind: K, args: V) -> Result<()>
+    pub async fn enqueue<K, V>(&self, kind: K, params: V) -> Result<()>
     where
         K: Into<String>,
         V: Serialize,
     {
         let id =sqlx::query(r#"
-        INSERT INTO _jobs (kind, args, status, created_at, updated_at) VALUES (?, ?, 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO _jobs (kind, params, status, created_at, updated_at) VALUES (?, ?, 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         "#)
             .bind(kind.into())
-            .bind(serde_json::to_string(&args)?)
+            .bind(serde_json::to_string(&params)?)
             .execute(&self.pool)
             .await?
             .last_insert_rowid();
