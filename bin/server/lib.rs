@@ -28,6 +28,13 @@ pub async fn serve(config: Config) -> Result<()> {
     let _guard = init_tracing(&config.log);
     let listener = build_listener(&config.server).await?;
     let provider = build_provider(config).await?;
+    #[cfg(feature = "serve_with_sched")]
+    let (_, worker_manager, sched) = try_join!(
+        migration::migrate(&provider),
+        build_worker_manager(&provider),
+        build_scheduler_job(&provider),
+    )?;
+    #[cfg(not(feature = "serve_with_sched"))]
     let (_, worker_manager) = try_join!(
         migration::migrate(&provider),
         build_worker_manager(&provider),
@@ -41,10 +48,15 @@ pub async fn serve(config: Config) -> Result<()> {
         worker_manager,
         notify_shutdown.clone(),
     ));
+    #[cfg(feature = "serve_with_sched")]
+    let sched_fut = tokio::spawn(start_scheduler_job(sched, notify_shutdown.clone()));
     let server_fut = tokio::spawn(start_http_server(listener, app, notify_shutdown.clone()));
 
     shutdown_signal().await;
     notify_shutdown.notify_waiters();
+    #[cfg(feature = "serve_with_sched")]
+    let _ = tokio::join!(bgwork_fut, sched_fut, server_fut);
+    #[cfg(not(feature = "serve_with_sched"))]
     let _ = tokio::join!(bgwork_fut, server_fut);
     tokio::join!(pg_pool.close(), kvdb.close());
     info!("👋 Goodbye!");

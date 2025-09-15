@@ -82,9 +82,9 @@
     </tr>
     <tr>
         <td>定时任务</td>
-        <td>sched_tokio_cron</td>
-        <td>使用tokio_cron作为定时任务，适合单机项目</td>
-        <td></td>
+        <td>serve_with_sched</td>
+        <td>将定时任务嵌入web服务进程，适合单机项目；禁用后可以通过`server sched`进行启动，适合分布式项目</td>
+        <td>✅</td>
     </tr>
     <tr>
         <td rowspan="3">对象存储，<b>只能同时选择一个</b></td>

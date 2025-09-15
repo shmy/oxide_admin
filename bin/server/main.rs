@@ -19,6 +19,7 @@ async fn main() -> Result<()> {
                 std::process::exit(1);
             }
         }
+        #[cfg(not(feature = "serve_with_sched"))]
         Commands::Sched => {
             if let Err(e) = server::sched(config).await {
                 eprintln!("❌ Sched error: {:?}", e);

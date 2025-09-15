@@ -161,6 +161,7 @@ pub struct Cli {
 pub enum Commands {
     /// Start web server
     Serve,
+    #[cfg(not(feature = "serve_with_sched"))]
     /// Start sched server
     Sched,
 }
