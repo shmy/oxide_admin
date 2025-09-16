@@ -24,7 +24,7 @@ impl ScheduledJob for CleanupTempDir {
             let stream = tokio_stream::wrappers::ReadDirStream::new(dir);
 
             stream
-                .for_each_concurrent(8, |entry| async {
+                .for_each_concurrent(4, |entry| async {
                     match entry {
                         Ok(entry) => {
                             let path = entry.path();

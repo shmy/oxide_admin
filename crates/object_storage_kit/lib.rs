@@ -3,7 +3,7 @@ use std::io::{Read, Seek};
 
 use anyhow::Result;
 use axum::http::Uri;
-use opendal::Operator;
+use opendal::{DeleteInput, IntoDeleteInput, Operator};
 use tokio::fs::File;
 use tokio_util::io::ReaderStream;
 #[cfg(feature = "fs")]
@@ -67,6 +67,17 @@ pub trait ObjectStorageWriter: ObjectStorageTrait {
     fn delete(&self, path: impl AsRef<str>) -> impl Future<Output = Result<()>> {
         async move {
             self.operator().delete(path.as_ref()).await?;
+            Ok(())
+        }
+    }
+
+    fn delete_many(&self, paths: Vec<String>) -> impl Future<Output = Result<()>> {
+        async move {
+            let items: Vec<DeleteInput> = paths
+                .into_iter()
+                .map(IntoDeleteInput::into_delete_input)
+                .collect();
+            self.operator().delete_iter(items).await?;
             Ok(())
         }
     }

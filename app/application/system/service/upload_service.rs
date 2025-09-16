@@ -121,6 +121,16 @@ impl UploadService {
         self.object_storage.verify_url(url)
     }
 
+    #[tracing::instrument(skip_all)]
+    pub async fn delete(&self, path: impl AsRef<str>) -> Result<()> {
+        self.object_storage.delete(path).await
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn delete_many(&self, paths: Vec<String>) -> Result<()> {
+        self.object_storage.delete_many(paths).await
+    }
+
     #[tracing::instrument]
     fn build_relative_path(&self, filename: String) -> String {
         let now = self.ct.now();
