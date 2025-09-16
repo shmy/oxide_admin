@@ -5,7 +5,7 @@ use infrastructure::shared::config::{Config, Database, Jwt, Log, Server};
 
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
-/// 启动 Web 服务器
+/// The web server
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,

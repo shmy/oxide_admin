@@ -18,4 +18,4 @@ FROM gcr.io/distroless/static-debian12:latest
 WORKDIR /opt
 ARG BIN_NAME="server"
 COPY --from=backend-build "/_/target/x86_64-unknown-linux-musl/release/${BIN_NAME}" app
-ENTRYPOINT ["./app serve"]
+ENTRYPOINT ["./app", "serve"]
