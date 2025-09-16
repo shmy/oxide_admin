@@ -36,6 +36,7 @@
 - 后台任务：支持单机`sqlite`，分布式`faktory`；
 - 优雅关停：严谨地结束服务、释放资源；
 - 多源配置：支持环境变量、`.env`文件，或者使用`cli`参数；
+- Feature Flag：支持`flipt`；
 - Github CI：自动构建`x86_64-unknown-linux-musl`；
 - ...
 
