@@ -108,7 +108,7 @@ async fn build_listener(server: &Server) -> Result<TcpListener> {
 
 async fn build_provider(config: Config) -> Result<Provider> {
     let (pg_pool, kvdb, queuer, object_storage, feature_flag) = tokio::try_join!(
-        pg_pool::try_new(&config.database),
+        pg_pool::try_new(config.timezone, &config.database),
         build_kvdb(&config),
         build_queuer(&config),
         build_object_storage(&config),

@@ -1,20 +1,22 @@
 use std::time::{Duration, SystemTime};
 
 use anyhow::Result;
-use bg_worker_kit::{JobRunner, error::RunnerError};
 use futures_util::StreamExt as _;
 use infrastructure::shared::path::TEMP_DIR;
 use nject::injectable;
+use sched_kit::ScheduledJob;
 use tokio::fs;
 use tracing::warn;
 
 #[derive(Clone)]
 #[injectable]
-pub struct DeleteOutdateTempDir;
+pub struct CleanupTempDir {}
 
-impl JobRunner for DeleteOutdateTempDir {
-    type Params = ();
-    async fn run(&self, _params: Self::Params) -> Result<(), RunnerError> {
+/// 每日凌晨0点删除两天前的临时目录
+impl ScheduledJob for CleanupTempDir {
+    const SCHEDULER: &'static str = "at 00:01 every day";
+
+    async fn run(&self) -> Result<()> {
         let now = SystemTime::now();
 
         if let Ok(dir) = fs::read_dir(TEMP_DIR.as_path()).await {

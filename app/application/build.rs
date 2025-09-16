@@ -150,7 +150,11 @@ use anyhow::Result;
 #[allow(unused_imports)]
 use nject::injectable;
 
-pub fn register_workers(worker_manager: &mut WorkerManager, provider: &Provider) {
+pub fn register_workers(
+    #[allow(unused)]
+    worker_manager: &mut WorkerManager,
+    #[allow(unused)]
+    provider: &Provider) {
     {%- for job in jobs %}
 
     worker_manager.register("{{job}}", provider.provide::<{{job}}::{{job | pascal_case}}>());
@@ -182,16 +186,21 @@ use infrastructure::shared::provider::Provider;
 use sched_kit::tokio_cron::TokioCronScheduler;
 #[allow(unused_imports)]
 use sched_kit::ScheduledJob;
+#[allow(unused_imports)]
+use infrastructure::shared::config::Config;
+
 pub async fn register_scheduled_jobs(
     #[allow(unused)]
     scheduler_job: &TokioCronScheduler,
     #[allow(unused)]
     provider: &Provider,
 ) -> Result<()> {
+    let config = provider.provide::<Config>();
+
     {%- for job in jobs %}
 
     let job = provider.provide::<{{job}}::{{job | pascal_case}}>();
-    scheduler_job.add(job).await?;
+    scheduler_job.add(job, config.timezone).await?;
     tracing::info!("Scheduled job [{{job | pascal_case}}]({}) has been registered", {{job}}::{{job | pascal_case}}::SCHEDULER);
     {%- endfor %}
     Ok(())

@@ -8,11 +8,12 @@ path = "lib.rs"
 
 [features]
 default = ["tokio_cron"]
-tokio_cron = ["dep:tokio-cron-scheduler"]
+tokio_cron = ["dep:tokio-cron-scheduler", "dep:chrono-tz"]
 
 [dependencies]
 anyhow = { workspace = true }
 tokio-cron-scheduler = { workspace = true, features = [
     "english",
 ], optional = true }
+chrono-tz = { workspace = true, optional = true }
 tracing = { workspace = true }

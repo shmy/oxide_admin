@@ -14,7 +14,7 @@ impl ChronoTz {
     #[tracing::instrument]
     pub fn now(&self) -> NaiveDateTime {
         self.now_utc()
-            .with_timezone(&self.config.database.timezone)
+            .with_timezone(&self.config.timezone)
             .naive_local()
     }
 

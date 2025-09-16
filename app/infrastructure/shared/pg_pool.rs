@@ -10,11 +10,10 @@ use crate::shared::config::Database;
 
 pub type PgPool = sqlx::PgPool;
 
-pub async fn try_new(db: &Database) -> Result<PgPool> {
+pub async fn try_new(timezone: chrono_tz::Tz, db: &Database) -> Result<PgPool> {
     let pool_connection_options: PgConnectOptions = db.url.parse()?;
     let pool_connection_options = pool_connection_options.log_statements(LevelFilter::Debug);
 
-    let timezone = db.timezone;
     let pool = PgPoolOptions::new()
         .max_connections(db.max_connections)
         .min_connections(db.min_connections)

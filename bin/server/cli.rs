@@ -33,13 +33,13 @@ pub struct Cli {
     #[arg(long, default_value = "{}", env = "OTLP_METADATA")]
     pub otlp_metadata: String,
 
+    /// 时区
+    #[arg(long, default_value = "Asia/Shanghai", env = "TIMEZONE")]
+    pub timezone: Tz,
+
     /// 数据库连接地址
     #[arg(long, env = "DATABASE_URL")]
     pub database_url: String,
-
-    /// 数据库时区
-    #[arg(long, default_value = "Asia/Shanghai", env = "DATABASE_TIMEZONE")]
-    pub database_timezone: Tz,
 
     /// 数据库最大连接数
     #[arg(long, default_value = "100", env = "DATABASE_MAX_CONNECTIONS")]
@@ -183,10 +183,10 @@ impl TryFrom<Cli> for Config {
 
     fn try_from(value: Cli) -> Result<Self, Self::Error> {
         let builder = Self::builder()
+            .timezone(value.timezone)
             .database(
                 Database::builder()
                     .url(value.database_url)
-                    .timezone(value.database_timezone)
                     .max_connections(value.database_max_connections)
                     .min_connections(value.database_min_connections)
                     .max_lifetime(parse_duration(&value.database_max_lifetime)?)

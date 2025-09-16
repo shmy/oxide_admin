@@ -14,16 +14,20 @@ impl TokioCronScheduler {
         Ok(Self { sched })
     }
 
-    pub async fn add<T: ScheduledJob>(&self, job: T) -> Result<()> {
+    pub async fn add<T: ScheduledJob>(&self, job: T, timezone: chrono_tz::Tz) -> Result<()> {
         self.sched
-            .add(Job::new_async(T::SCHEDULER, move |_uuid, _l| {
-                let job = job.clone();
-                Box::pin(async move {
-                    if let Err(err) = job.run().await {
-                        error!(%err, "Failed to run job");
-                    }
-                })
-            })?)
+            .add(Job::new_async_tz(
+                T::SCHEDULER,
+                timezone,
+                move |_uuid, _l| {
+                    let job = job.clone();
+                    Box::pin(async move {
+                        if let Err(err) = job.run().await {
+                            error!(%err, "Failed to run job");
+                        }
+                    })
+                },
+            )?)
             .await?;
         Ok(())
     }

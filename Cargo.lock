@@ -3489,6 +3489,7 @@ name = "sched_kit"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "chrono-tz",
  "tokio-cron-scheduler",
  "tracing",
 ]

@@ -6,6 +6,8 @@ use std::time::Duration;
 #[readonly::make]
 pub struct Config {
     pub log: Log,
+    pub timezone: chrono_tz::Tz,
+
     pub database: Database,
     #[cfg(feature = "kv_redis")]
     pub redis: Redis,
@@ -45,7 +47,6 @@ pub struct Log {
 #[readonly::make]
 pub struct Database {
     pub url: String,
-    pub timezone: chrono_tz::Tz,
     pub max_connections: u32,
     pub min_connections: u32,
     pub max_lifetime: Duration,
