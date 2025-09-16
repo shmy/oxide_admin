@@ -30,7 +30,7 @@ pub enum SubCommands {
     /// Generate background worker
     Worker,
     /// Generate scheduled job
-    // Job,
+    Job,
     /// Generate event subscriber
     Event,
 }

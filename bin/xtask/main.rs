@@ -87,6 +87,25 @@ async fn main() -> Result<()> {
                 .await?;
             Ok(())
         }
+        SubCommands::Job => {
+            let name = Text::new("What's name?")
+                .with_validator(ValueRequiredValidator::default())
+                .prompt()?
+                .to_snake_case();
+            let context = context! {
+                name => name,
+            };
+            let template = TemplateEngine::from("partials/job").with_context(context);
+            template
+                .render_to(
+                    APP_DIR
+                        .join("application")
+                        .join("shared")
+                        .join("scheduler_job"),
+                )
+                .await?;
+            Ok(())
+        }
         SubCommands::Event => {
             let name = Text::new("What's name?")
                 .with_validator(ValueRequiredValidator::default())

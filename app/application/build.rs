@@ -174,12 +174,18 @@ impl {{item | pascal_case}}Queuer {
 {%- endfor %}
 "#;
 
-const JOB_TEMPLATE: &str = r#"use anyhow::Result;
+const JOB_TEMPLATE: &str = r#"#[allow(unused_imports)]
+use anyhow::Result;
+#[allow(unused_imports)]
 use infrastructure::shared::provider::Provider;
+#[allow(unused_imports)]
 use sched_kit::tokio_cron::TokioCronScheduler;
+#[allow(unused_imports)]
 use sched_kit::ScheduledJob;
 pub async fn register_scheduled_jobs(
+    #[allow(unused)]
     scheduler_job: &TokioCronScheduler,
+    #[allow(unused)]
     provider: &Provider,
 ) -> Result<()> {
     {%- for job in jobs %}
