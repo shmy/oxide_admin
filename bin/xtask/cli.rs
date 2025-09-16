@@ -27,8 +27,10 @@ pub enum SubCommands {
     Command,
     /// Generate query and query handler
     Query,
-    /// Generate job
-    Job,
+    /// Generate background worker
+    Worker,
+    /// Generate scheduled job
+    // Job,
     /// Generate event subscriber
     Event,
 }

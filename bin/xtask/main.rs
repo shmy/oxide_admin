@@ -68,7 +68,7 @@ async fn main() -> Result<()> {
         SubCommands::Query => {
             generate_application_partials(APP_DIR.join("application"), "query").await
         }
-        SubCommands::Job => {
+        SubCommands::Worker => {
             let name = Text::new("What's name?")
                 .with_validator(ValueRequiredValidator::default())
                 .prompt()?
@@ -76,7 +76,7 @@ async fn main() -> Result<()> {
             let context = context! {
                 name => name,
             };
-            let template = TemplateEngine::from("partials/job").with_context(context);
+            let template = TemplateEngine::from("partials/worker").with_context(context);
             template
                 .render_to(
                     APP_DIR
