@@ -14,7 +14,7 @@ pub struct CleanupUnusedFile {
 
 /// 每日凌晨1点删除未使用的文件
 impl ScheduledJob for CleanupUnusedFile {
-    const SCHEDULER: &'static str = "at 12:44 every day";
+    const SCHEDULER: &'static str = "at 01:01 every day";
 
     async fn run(&self) -> Result<()> {
         let file_service = &self.file_service;

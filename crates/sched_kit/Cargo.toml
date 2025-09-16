@@ -12,8 +12,8 @@ tokio_cron = ["dep:tokio-cron-scheduler", "dep:chrono-tz"]
 
 [dependencies]
 anyhow = { workspace = true }
+chrono-tz = { workspace = true, optional = true }
 tokio-cron-scheduler = { workspace = true, features = [
     "english",
 ], optional = true }
-chrono-tz = { workspace = true, optional = true }
 tracing = { workspace = true }

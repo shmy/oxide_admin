@@ -21,10 +21,13 @@ use tempfile::NamedTempFile;
 use tokio::fs::File;
 use tokio_util::io::ReaderStream;
 
+use crate::system::service::file_service::FileService;
+
 #[derive(Debug, Clone)]
 #[injectable]
 pub struct UploadService {
     ct: ChronoTz,
+    file_service: FileService,
     object_storage: ObjectStorage,
 }
 
@@ -37,7 +40,10 @@ impl UploadService {
         let filename = IdGenerator::filename().to_lowercase();
         let relative_path = self.build_relative_path(format!("{}.{}", filename, "webp"));
         let reader = SupportedFormat::convert_to_webp(format, file).await?;
-        self.object_storage.write(&relative_path, reader).await?;
+        tokio::try_join!(
+            self.object_storage.write(&relative_path, reader),
+            self.file_service.create(&relative_path)
+        )?;
         Ok(FinishResponse {
             url: self.object_storage.presign_url(&relative_path).await?,
             value: relative_path,
@@ -53,7 +59,10 @@ impl UploadService {
         let extension = Self::extract_extension(filename);
         let filename = IdGenerator::filename().to_lowercase();
         let relative_path = self.build_relative_path(format!("{filename}.{extension}"));
-        self.object_storage.write(&relative_path, file).await?;
+        tokio::try_join!(
+            self.object_storage.write(&relative_path, file),
+            self.file_service.create(&relative_path)
+        )?;
         Ok(FinishResponse {
             url: self.object_storage.presign_url(&relative_path).await?,
             value: relative_path,
@@ -102,9 +111,14 @@ impl UploadService {
                 Ok::<_, anyhow::Error>(reader)
             }
         });
-        self.object_storage
-            .write_stream(&relative_path, pin::pin!(stream))
-            .await?;
+        tokio::try_join!(
+            async {
+                self.object_storage
+                    .write_stream(&relative_path, pin::pin!(stream))
+                    .await
+            },
+            self.file_service.create(&relative_path)
+        )?;
         Ok(FinishResponse {
             url: self.object_storage.presign_url(&relative_path).await?,
             value: relative_path,
