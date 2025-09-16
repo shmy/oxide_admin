@@ -61,7 +61,7 @@
         <td></td>
     </tr>
     <tr>
-        <td rowspan="2">后台任务，<b>只能同时选择一个</b></td>
+        <td rowspan="3">后台任务，<b>只能同时选择一个</b></td>
          <td>bg_sqlite</td>
         <td>使用sqlite作为后台任务，适合单体项目</td>
         <td>✅</td>
