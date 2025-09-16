@@ -63,7 +63,16 @@ pub trait ObjectStorageWriter: ObjectStorageTrait {
             Ok(())
         }
     }
+
+    fn delete(&self, path: impl AsRef<str>) -> impl Future<Output = Result<()>> {
+        async move {
+            self.operator().delete(path.as_ref()).await?;
+            Ok(())
+        }
+    }
 }
+
+impl<T> ObjectStorageWriter for T where T: ObjectStorageTrait {}
 
 pub trait ObjectStorageReader {
     fn presign_url(&self, path: impl AsRef<str>) -> impl Future<Output = Result<String>>;
@@ -71,5 +80,3 @@ pub trait ObjectStorageReader {
     fn purify_url(&self, signed: String) -> String;
     fn purify_url_opt(&self, signed: Option<String>) -> Option<String>;
 }
-
-impl<T> ObjectStorageWriter for T where T: ObjectStorageTrait {}
