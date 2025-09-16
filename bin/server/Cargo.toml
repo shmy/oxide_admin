@@ -17,7 +17,6 @@ default = [
     "object_storage_fs",
     "trace_console",
     "serve_with_sched",
-    # "flag_flipt",
 ]
 kv_redb = ["infrastructure/kv_redb"]
 kv_redis = ["infrastructure/kv_redis"]

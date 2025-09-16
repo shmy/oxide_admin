@@ -1127,6 +1127,7 @@ name = "flag_kit"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bon",
  "flipt",
  "open-feature",
  "reqwest",

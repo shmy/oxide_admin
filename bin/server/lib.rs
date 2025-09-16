@@ -112,7 +112,7 @@ async fn build_provider(config: Config) -> Result<Provider> {
         build_kvdb(&config),
         build_queuer(&config),
         build_object_storage(&config),
-        FeatureFlag::try_new(),
+        FeatureFlag::try_new(&config),
     )?;
     let provider = Provider::builder()
         .pg_pool(pg_pool)

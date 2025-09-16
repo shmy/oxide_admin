@@ -155,6 +155,18 @@ pub struct Cli {
     /// S3 region
     #[arg(long, env = "S3_REGION")]
     pub s3_region: String,
+    #[cfg(feature = "flag_flipt")]
+    /// Flip 服务器地址
+    #[arg(long, env = "FLIP_ENDPOINT")]
+    pub flip_endpoint: String,
+    #[cfg(feature = "flag_flipt")]
+    /// Flip 环境名称
+    #[arg(long, env = "FLIP_ENVIRONMENT")]
+    pub flip_environment: String,
+    #[cfg(feature = "flag_flipt")]
+    /// Flip 命名空间
+    #[arg(long, env = "FLIP_NAMESPACE")]
+    pub flip_namespace: String,
 }
 
 #[derive(Debug, Clone, Subcommand)]
@@ -241,6 +253,15 @@ impl TryFrom<Cli> for Config {
                 .otlp_metadata(value.otlp_metadata);
             builder.log(log_builder.build())
         };
+
+        #[cfg(feature = "flag_flipt")]
+        let builder = builder.flip(
+            infrastructure::shared::config::Flip::builder()
+                .endpoint(value.flip_endpoint)
+                .environment(value.flip_environment)
+                .namespace(value.flip_namespace)
+                .build(),
+        );
         Ok(builder.build())
     }
 }

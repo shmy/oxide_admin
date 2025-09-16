@@ -17,6 +17,8 @@ pub struct Config {
     pub fs: StorageFs,
     #[cfg(feature = "object_storage_s3")]
     pub s3: StorageS3,
+    #[cfg(feature = "flag_flipt")]
+    pub flip: Flip,
 }
 
 impl Debug for Config {
@@ -103,4 +105,13 @@ pub struct StorageS3 {
     pub access_key_id: String,
     pub secret_access_key: String,
     pub region: String,
+}
+
+#[cfg(feature = "flag_flipt")]
+#[derive(Clone, Builder)]
+#[readonly::make]
+pub struct Flip {
+    pub endpoint: String,
+    pub environment: String,
+    pub namespace: String,
 }

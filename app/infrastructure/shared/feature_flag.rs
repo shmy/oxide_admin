@@ -1,5 +1,6 @@
 use std::{fmt::Debug, ops::Deref, sync::Arc};
 
+use super::config::Config;
 use anyhow::Result;
 use open_feature::{Client, OpenFeature};
 
@@ -23,11 +24,17 @@ impl Debug for FeatureFlag {
 
 impl FeatureFlag {
     #[cfg(feature = "flag_flipt")]
-    pub async fn try_new() -> Result<Self> {
-        use flag_kit::FliptProvider;
+    pub async fn try_new(config: &Config) -> Result<Self> {
+        use flag_kit::{FliptProvider, FliptProviderConfig};
         let mut api = OpenFeature::singleton_mut().await;
-        api.set_provider(FliptProvider::try_new("staging", "oxide-admin")?)
-            .await;
+        api.set_provider(FliptProvider::try_new(
+            FliptProviderConfig::builder()
+                .endpoint(config.flip.endpoint.to_string())
+                .environment(config.flip.environment.to_string())
+                .namespace(config.flip.namespace.to_string())
+                .build(),
+        )?)
+        .await;
         let client = api.create_client();
         Ok(Self {
             client: Arc::new(client),
@@ -35,7 +42,7 @@ impl FeatureFlag {
     }
 
     #[cfg(not(feature = "flag_flipt"))]
-    pub async fn try_new() -> Result<Self> {
+    pub async fn try_new(_config: &Config) -> Result<Self> {
         use open_feature::provider::NoOpProvider;
 
         let mut api = OpenFeature::singleton_mut().await;

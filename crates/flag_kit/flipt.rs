@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::Result;
+use bon::Builder;
 use flipt::{
     Config, ConfigBuilder, NoneAuthentication,
     api::FliptClient,
@@ -17,6 +18,12 @@ use reqwest::header::{HeaderMap, HeaderValue};
 const DEFAULT_ENTITY_ID: &str = "";
 const METADATA: &str = "flipt";
 
+#[derive(Builder)]
+pub struct FliptProviderConfig {
+    endpoint: String,
+    environment: String,
+    namespace: String,
+}
 pub struct FliptProvider {
     client: FliptClient,
     metadata: ProviderMetadata,
@@ -24,14 +31,15 @@ pub struct FliptProvider {
 }
 
 impl FliptProvider {
-    pub fn try_new(environment: impl AsRef<str>, namespace: impl AsRef<str>) -> Result<Self> {
+    pub fn try_new(config: FliptProviderConfig) -> Result<Self> {
         let mut headers = HeaderMap::new();
         headers.insert(
             "X-Flipt-Environment",
-            HeaderValue::from_str(environment.as_ref())?,
+            HeaderValue::from_str(&config.environment)?,
         );
+        let namespace = config.namespace;
         let config: Config<_> = ConfigBuilder::default()
-            .with_endpoint("http://localhost:8081".parse()?)
+            .with_endpoint(config.endpoint.parse()?)
             .with_auth_strategy(NoneAuthentication::new())
             .with_timeout(std::time::Duration::from_secs(10))
             .with_headers(headers)
@@ -39,7 +47,7 @@ impl FliptProvider {
         let client = FliptClient::new(config)?;
         Ok(Self {
             metadata: ProviderMetadata::new(METADATA),
-            namespace: namespace.as_ref().to_string(),
+            namespace,
             client,
         })
     }
