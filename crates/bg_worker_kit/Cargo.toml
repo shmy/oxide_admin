@@ -9,7 +9,6 @@ path = "lib.rs"
 [features]
 faktory = ["dep:faktory"]
 faktory_tls = ["faktory/rustls"]
-dummy = []
 sqlite = ["dep:sqlx"]
 
 [dependencies]

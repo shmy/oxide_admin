@@ -136,8 +136,6 @@ async fn build_queuer(config: &Config) -> Result<Queuer> {
         let pool = connect_sqlite(DATA_DIR.join("job.sqlite")).await?;
         Ok(Queuer::new(pool))
     };
-    #[cfg(feature = "bg_dummy")]
-    return Queuer::try_new().await;
 }
 
 async fn build_object_storage(config: &Config) -> Result<ObjectStorage> {
@@ -197,8 +195,6 @@ async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
         let queuer = provider.provide::<Queuer>();
         WorkerManager::new(queuer)
     };
-    #[cfg(feature = "bg_dummy")]
-    let mut worker_manager = WorkerManager::new();
     register_workers(&mut worker_manager, provider);
     Ok(worker_manager)
 }

@@ -13,14 +13,13 @@ path = "main.rs"
 [features]
 default = [
     "kv_redb",
-    "bg_dummy",
+    "bg_sqlite",
     "object_storage_fs",
     "trace_console",
     "serve_with_sched",
 ]
 kv_redb = ["infrastructure/kv_redb"]
 kv_redis = ["infrastructure/kv_redis"]
-bg_dummy = ["infrastructure/bg_dummy"]
 bg_faktory = ["infrastructure/bg_faktory"]
 bg_sqlite = ["infrastructure/bg_sqlite"]
 bg_faktory_tls = ["bg_faktory", "infrastructure/bg_faktory_tls"]

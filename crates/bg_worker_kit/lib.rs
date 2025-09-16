@@ -8,11 +8,6 @@ mod faktory;
 #[cfg(feature = "faktory")]
 pub use faktory::*;
 
-#[cfg(feature = "dummy")]
-mod dummy;
-#[cfg(feature = "dummy")]
-pub use dummy::*;
-
 #[cfg(feature = "sqlite")]
 mod sqlite;
 #[cfg(feature = "sqlite")]
