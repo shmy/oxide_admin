@@ -18,6 +18,7 @@ object_storage_s3 = ["object_storage_kit/s3"]
 object_storage_s3_tls = ["object_storage_kit/s3_tls"]
 trace_rolling = []
 trace_otlp = []
+flag_flipt = ["flag_kit/flipt"]
 
 [dependencies]
 anyhow = { workspace = true }
@@ -28,10 +29,12 @@ chrono = { workspace = true }
 chrono-tz = { workspace = true, features = ["std"] }
 
 domain = { workspace = true }
+flag_kit = { workspace = true }
 jsonwebtoken = { workspace = true }
 kvdb_kit = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 object_storage_kit = { workspace = true }
+open-feature = { workspace = true }
 readonly = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }

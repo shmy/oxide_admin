@@ -4,7 +4,7 @@ use kvdb_kit::Kvdb;
 use nject::provider;
 use object_storage_kit::ObjectStorage;
 
-use crate::shared::{config::Config, pg_pool::PgPool};
+use crate::shared::{config::Config, feature_flag::FeatureFlag, pg_pool::PgPool};
 
 #[derive(Clone, Builder)]
 #[provider]
@@ -19,4 +19,6 @@ pub struct Provider {
     kvdb: Kvdb,
     #[provide(Config, |dep| dep.clone())]
     config: Config,
+    #[provide(FeatureFlag, |dep| dep.clone())]
+    feature_flag: FeatureFlag,
 }

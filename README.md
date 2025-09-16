@@ -121,6 +121,12 @@
         <td>接入OpenTelemetry，适合分布式项目，启用tls</td>
         <td></td>
     </tr>
+     <tr>
+        <td>特性开关，<b>只能同时选择一个</b></td>
+        <td>flag_flipt</td>
+        <td>使用flipt作为feature flag，适合分布式项目</td>
+        <td></td>
+    </tr>
 </table>
 
 > `bin/server/Cargo.toml`处修改

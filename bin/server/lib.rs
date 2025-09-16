@@ -8,6 +8,7 @@ use bg_worker_kit::queuer::Queuer;
 use bg_worker_kit::worker_manager::WorkerManager;
 use infrastructure::shared::{
     config::{Config, Log, Server},
+    feature_flag::FeatureFlag,
     pg_pool,
 };
 use infrastructure::{migration, shared::pg_pool::PgPool, shared::provider::Provider};
@@ -106,11 +107,12 @@ async fn build_listener(server: &Server) -> Result<TcpListener> {
 }
 
 async fn build_provider(config: Config) -> Result<Provider> {
-    let (pg_pool, kvdb, queuer, object_storage) = tokio::try_join!(
+    let (pg_pool, kvdb, queuer, object_storage, feature_flag) = tokio::try_join!(
         pg_pool::try_new(&config.database),
         build_kvdb(&config),
         build_queuer(&config),
         build_object_storage(&config),
+        FeatureFlag::try_new(),
     )?;
     let provider = Provider::builder()
         .pg_pool(pg_pool)
@@ -118,6 +120,7 @@ async fn build_provider(config: Config) -> Result<Provider> {
         .config(config)
         .queuer(queuer)
         .object_storage(object_storage)
+        .feature_flag(feature_flag)
         .build();
     Ok(provider)
 }

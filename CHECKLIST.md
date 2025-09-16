@@ -43,6 +43,7 @@
 [x] 重新测试Code generation 补充#[tracing::instrument]
 [x] 实现单机后台任务Sqlite
 [x] 添加scheduler
+[ ] 接入Open Flag
 [ ] _files表集成，上传成功crate，使用文件后设为used 否则设为unused
 [ ] Frontend code generation
 [x] S3 支持 Tls
