@@ -13,10 +13,26 @@ fn main() -> Result<()> {
     generate_background_workers()?;
     generate_scheduler_jobs()?;
     println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed=shared/event_subscriber");
-    println!("cargo:rerun-if-changed=shared/background_job");
-    println!("cargo:rerun-if-changed=shared/scheduler_job");
+    rerun_if_changed_except_mod("cargo:rerun-if-changed=shared/event_subscriber");
+    rerun_if_changed_except_mod("cargo:rerun-if-changed=shared/background_job");
+    rerun_if_changed_except_mod("cargo:rerun-if-changed=shared/scheduler_job");
     Ok(())
+}
+
+fn rerun_if_changed_except_mod(path: &str) {
+    let dir = Path::new(path);
+    if let Ok(entries) = fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_file() {
+                if let Some(fname) = path.file_name().and_then(|s| s.to_str()) {
+                    if fname != "mod.rs" {
+                        println!("cargo:rerun-if-changed={}", path.display());
+                    }
+                }
+            }
+        }
+    }
 }
 
 fn generate_subscribers() -> Result<()> {
