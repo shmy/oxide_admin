@@ -19,6 +19,10 @@ jobs:
           target: x86_64-unknown-linux-musl
           toolchain: stable
           override: true
+          components: llvm-tools-preview
+
+      - uses: taiki-e/install-action@cargo-llvm-cov
+      - uses: taiki-e/install-action@nextest
 
       - name: Set up nodejs
         uses: actions/setup-node@v4
@@ -41,6 +45,10 @@ jobs:
             target/
             node_modules/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - name: Backend test
+        run: |
+          cargo llvm-cov nextest --workspace
 
       - name: Build frontend
         run: cd frontend && pnpm install && pnpm run build
