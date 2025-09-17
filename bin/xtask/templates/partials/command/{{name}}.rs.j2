@@ -3,8 +3,9 @@ use crate::shared::command_handler::{CommandHandler, CommandResult};
 use domain::{{module}}::{error::{{module | pascal_case}}Error, event::{{module | pascal_case}}Event};
 use bon::Builder;
 use serde::Deserialize;
+use utoipa::ToSchema;
 
-#[derive(Debug, Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct {{name | pascal_case}}Command {
 }
 

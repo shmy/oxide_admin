@@ -4,8 +4,9 @@ use serde::Deserialize;
 use domain::{{module}}::error::{{module | pascal_case}}Error;
 use crate::shared::query_handler::QueryHandler;
 use single_flight::single_flight;
+use utoipa::IntoParams;
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Builder)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, IntoParams, Builder)]
 pub struct {{name | pascal_case}}Query {
 }
 
