@@ -28,7 +28,7 @@ pub mod cli;
 pub async fn serve(config: Config) -> Result<()> {
     let _guard = init_tracing(&config.log);
     let listener = build_listener(&config.server).await?;
-    let provider = build_provider(config).await?;
+    let provider = build_provider(&config).await?;
     #[cfg(feature = "serve_with_sched")]
     let (_, worker_manager, sched) = try_join!(
         migration::migrate(&provider),
@@ -43,7 +43,7 @@ pub async fn serve(config: Config) -> Result<()> {
     register_subscribers(&provider);
     let pg_pool = provider.provide::<PgPool>();
     let kvdb = provider.provide::<Kvdb>();
-    let app = adapter::routing(WebState::new(provider));
+    let app = adapter::routing(WebState::new(provider), config.openapi.enabled);
     let notify_shutdown = Arc::new(Notify::new());
     let bgwork_fut = tokio::spawn(start_background_worker(
         worker_manager,
@@ -66,7 +66,7 @@ pub async fn serve(config: Config) -> Result<()> {
 
 pub async fn sched(config: Config) -> Result<()> {
     let _guard = init_tracing(&config.log);
-    let provider = build_provider(config).await?;
+    let provider = build_provider(&config).await?;
     let (_, sched) = try_join!(
         migration::migrate(&provider),
         build_scheduler_job(&provider)
@@ -106,18 +106,18 @@ async fn build_listener(server: &Server) -> Result<TcpListener> {
     Ok(listener)
 }
 
-async fn build_provider(config: Config) -> Result<Provider> {
+async fn build_provider(config: &Config) -> Result<Provider> {
     let (pg_pool, kvdb, queuer, object_storage, feature_flag) = tokio::try_join!(
         pg_pool::try_new(config.timezone, &config.database),
-        build_kvdb(&config),
-        build_queuer(&config),
-        build_object_storage(&config),
-        FeatureFlag::try_new(&config),
+        build_kvdb(config),
+        build_queuer(config),
+        build_object_storage(config),
+        FeatureFlag::try_new(config),
     )?;
     let provider = Provider::builder()
         .pg_pool(pg_pool)
         .kvdb(kvdb)
-        .config(config)
+        .config(config.clone())
         .queuer(queuer)
         .object_storage(object_storage)
         .feature_flag(feature_flag)

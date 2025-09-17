@@ -10,7 +10,6 @@ pub use shared::constant::*;
 pub use shared::state::*;
 use utoipa::OpenApi as _;
 use utoipa_axum::router::OpenApiRouter;
-use utoipa_scalar::Servable as _;
 
 #[derive(utoipa::OpenApi)]
 #[openapi(
@@ -36,14 +35,19 @@ impl utoipa::Modify for SecurityAddon {
     }
 }
 
-pub fn routing(state: WebState) -> Router {
-    let (router, open_api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
+pub fn routing(state: WebState, with_openapi: bool) -> Router {
+    let (mut router, open_api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .nest("/api", api::routing(state.clone()))
         .with_state(state.clone())
         .merge(upload::routing(state))
         .route("/health", get(health))
         .split_for_parts();
-    let router = router.merge(utoipa_scalar::Scalar::with_url("/scalar", open_api));
+    if with_openapi {
+        router = {
+            use utoipa_scalar::Servable as _;
+            router.merge(utoipa_scalar::Scalar::with_url("/scalar", open_api))
+        };
+    }
     #[cfg(not(debug_assertions))]
     let router = router.merge(frontend::routing());
     router

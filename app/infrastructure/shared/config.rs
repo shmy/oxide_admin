@@ -7,6 +7,7 @@ use std::time::Duration;
 pub struct Config {
     pub log: Log,
     pub timezone: chrono_tz::Tz,
+    pub openapi: Openapi,
 
     pub database: Database,
     #[cfg(feature = "kv_redis")]
@@ -115,4 +116,10 @@ pub struct Flip {
     pub endpoint: String,
     pub environment: String,
     pub namespace: String,
+}
+
+#[derive(Clone, Builder)]
+#[readonly::make]
+pub struct Openapi {
+    pub enabled: bool,
 }

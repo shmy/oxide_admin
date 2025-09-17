@@ -1,7 +1,7 @@
 use chrono_tz::Tz;
 use clap::{Parser, Subcommand};
 use humantime::parse_duration;
-use infrastructure::shared::config::{Config, Database, Jwt, Log, Server};
+use infrastructure::shared::config::{Config, Database, Jwt, Log, Openapi, Server};
 
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
@@ -36,6 +36,10 @@ pub struct Cli {
     /// 时区
     #[arg(long, default_value = "Asia/Shanghai", env = "TIMEZONE")]
     pub timezone: Tz,
+
+    /// 是否启用 OpenAPI
+    #[arg(long, default_value = "true", env = "OPENAPI_ENABLED")]
+    pub openapi_enabled: bool,
 
     /// 数据库连接地址
     #[arg(long, env = "DATABASE_URL")]
@@ -184,6 +188,7 @@ impl TryFrom<Cli> for Config {
     fn try_from(value: Cli) -> Result<Self, Self::Error> {
         let builder = Self::builder()
             .timezone(value.timezone)
+            .openapi(Openapi::builder().enabled(value.openapi_enabled).build())
             .database(
                 Database::builder()
                     .url(value.database_url)
