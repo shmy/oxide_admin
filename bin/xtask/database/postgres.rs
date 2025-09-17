@@ -14,8 +14,7 @@ impl Postgres {
 
 impl TableInfoTrait for Postgres {
     async fn table_info(&self, table: &str) -> Result<Vec<Field>> {
-        let infos: Vec<PostgresTableInfo> = sqlx::query_as!(
-            PostgresTableInfo,
+        let infos: Vec<PostgresTableInfo> = sqlx::query_as(
             r#"
             SELECT column_name AS "name!",
                     data_type AS "type!",
@@ -24,8 +23,8 @@ impl TableInfoTrait for Postgres {
             WHERE table_name = $1
             ORDER BY ordinal_position
             "#,
-            table,
         )
+        .bind(table)
         .fetch_all(&self.pool)
         .await?;
         if infos.is_empty() {
