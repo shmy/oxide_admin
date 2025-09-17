@@ -19,21 +19,34 @@ use application::{
     },
 };
 use axum::{
-    Json, Router,
+    Json,
     extract::{Path, Query},
-    routing::{get, post, put},
 };
 use domain::iam::value_object::{permission_code::SYSTEM_ROLE, role_id::RoleId};
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     WebState, perms,
     shared::{
         extractor::inject::Inject,
-        middleware::perm_router_ext::PermRouterExt as _,
-        response::{JsonResponse, JsonResponsePagingType, JsonResponseType, PagingResponse},
+        middleware::perm_router_ext::PermissonRouteExt,
+        response::{
+            JsonResponse, JsonResponseEmpty, JsonResponsePagingType, JsonResponseType,
+            PagingResponse,
+        },
     },
 };
 
+#[utoipa::path(
+    get,
+    params(SearchRolesQuery),
+    path = "/",
+    summary = "Search roles",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponse<PagingResponse<RoleDto>>))
+    )
+)]
 #[tracing::instrument]
 async fn search(
     Inject(query_handler): Inject<SearchRolesQueryHandler>,
@@ -43,6 +56,15 @@ async fn search(
     JsonResponse::ok(PagingResponse { total, items })
 }
 
+#[utoipa::path(
+    get,
+    path = "/{id}",
+    summary = "Retrieve role",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponse<RoleDto>))
+    )
+)]
 #[tracing::instrument]
 async fn retrieve(
     Inject(query_handler): Inject<RetrieveRoleQueryHandler>,
@@ -54,6 +76,15 @@ async fn retrieve(
     JsonResponse::ok(role)
 }
 
+#[utoipa::path(
+    post,
+    path = "/batch/delete",
+    summary = "Batch delete roles",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn batch_delete(
     Inject(command_handler): Inject<BatchDeleteRolesCommandHandler>,
@@ -63,6 +94,15 @@ async fn batch_delete(
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    post,
+    path = "/batch/enable",
+    summary = "Batch enable roles",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn batch_enable(
     Inject(command_handler): Inject<BatchEnableRolesCommandHandler>,
@@ -72,6 +112,15 @@ async fn batch_enable(
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    post,
+    path = "/batch/disable",
+    summary = "Batch disable roles",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn batch_disable(
     Inject(command_handler): Inject<BatchDisableRolesCommandHandler>,
@@ -81,6 +130,15 @@ async fn batch_disable(
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    post,
+    path = "/",
+    summary = "Create role",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn create(
     Inject(command_handler): Inject<CreateRoleCommandHandler>,
@@ -90,6 +148,15 @@ async fn create(
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    put,
+    path = "/{id}",
+    summary = "Update role",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn update(
     Inject(command_handler): Inject<UpdateRoleCommandHandler>,
@@ -100,13 +167,13 @@ async fn update(
     JsonResponse::ok(())
 }
 
-pub fn routing() -> Router<WebState> {
-    Router::new()
-        .route_with_permission("/", get(search), perms!(SYSTEM_ROLE))
-        .route_with_permission("/", post(create), perms!(SYSTEM_ROLE))
-        .route_with_permission("/{id}", get(retrieve), perms!(SYSTEM_ROLE))
-        .route_with_permission("/{id}", put(update), perms!(SYSTEM_ROLE))
-        .route_with_permission("/batch/delete", post(batch_delete), perms!(SYSTEM_ROLE))
-        .route_with_permission("/batch/enable", post(batch_enable), perms!(SYSTEM_ROLE))
-        .route_with_permission("/batch/disable", post(batch_disable), perms!(SYSTEM_ROLE))
+pub fn routing() -> OpenApiRouter<WebState> {
+    OpenApiRouter::new()
+        .routes(routes!(search).permit_all(perms!(SYSTEM_ROLE)))
+        .routes(routes!(retrieve).permit_all(perms!(SYSTEM_ROLE)))
+        .routes(routes!(batch_delete).permit_all(perms!(SYSTEM_ROLE)))
+        .routes(routes!(batch_enable).permit_all(perms!(SYSTEM_ROLE)))
+        .routes(routes!(batch_disable).permit_all(perms!(SYSTEM_ROLE)))
+        .routes(routes!(create).permit_all(perms!(SYSTEM_ROLE)))
+        .routes(routes!(update).permit_all(perms!(SYSTEM_ROLE)))
 }

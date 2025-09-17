@@ -3,7 +3,7 @@ use crate::iam::service::page::{PAGES, Page, SHARED_PAGES};
 use crate::system::service::upload_service::UploadService;
 use anyhow::{Result, bail};
 use domain::iam::value_object::permission_code::{ALL_PERMISSIONS, NONE, PermissionCode};
-use domain::iam::value_object::permission_group::PermissionGroup;
+use domain::iam::value_object::permission_group::{PermissionChecker, PermissionGroup};
 use domain::iam::value_object::user_id::UserId;
 use domain::shared::port::permission_resolver::PermissionResolver;
 use domain::shared::port::token_issuer::{TokenIssuerTrait, UserClaims};
@@ -41,9 +41,9 @@ impl IamService {
     }
 
     #[tracing::instrument]
-    pub async fn check_permission(&self, id: &UserId, group: &PermissionGroup) -> Result<()> {
+    pub async fn check_permissions(&self, id: &UserId, checker: PermissionChecker) -> Result<()> {
         let existing_group = self.permission_resolver.resolve(id).await;
-        if !existing_group.permits_all(group) {
+        if !existing_group.permits(checker) {
             anyhow::bail!("权限不足");
         }
         Ok(())

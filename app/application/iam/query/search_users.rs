@@ -9,6 +9,7 @@ use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
 use single_flight::single_flight;
+use utoipa::IntoParams;
 
 use crate::{
     iam::dto::user::UserDto,
@@ -19,9 +20,10 @@ use crate::{
 };
 
 #[serde_as]
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, IntoParams, Builder)]
 pub struct SearchUsersQuery {
     #[serde(flatten)]
+    #[param(inline)]
     paging: PagingQuery,
     account: Option<String>,
     name: Option<String>,

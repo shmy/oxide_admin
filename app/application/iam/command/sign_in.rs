@@ -15,8 +15,9 @@ use infrastructure::port::token_store_impl::TokenStoreImpl;
 use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
+use utoipa::ToSchema;
 
-#[derive(Deserialize, Builder)]
+#[derive(Deserialize, Builder, ToSchema)]
 pub struct SignInCommand {
     account: String,
     password: String,

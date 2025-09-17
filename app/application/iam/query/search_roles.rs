@@ -7,6 +7,7 @@ use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
 use single_flight::single_flight;
 use std::time::Duration;
+use utoipa::IntoParams;
 
 use crate::{
     iam::dto::role::RoleDto,
@@ -17,9 +18,10 @@ use crate::{
 };
 
 #[serde_as]
-#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Builder)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, IntoParams, Builder)]
 pub struct SearchRolesQuery {
     #[serde(flatten)]
+    #[param(inline)]
     paging: PagingQuery,
     name: Option<String>,
     #[serde_as(as = "NoneAsEmptyString")]

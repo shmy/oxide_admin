@@ -20,6 +20,7 @@ use std::{
 use tempfile::NamedTempFile;
 use tokio::fs::File;
 use tokio_util::io::ReaderStream;
+use utoipa::ToSchema;
 
 use crate::system::service::file_service::FileService;
 
@@ -164,26 +165,26 @@ impl UploadService {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct StartChunkResponse {
     pub key: String,
     #[serde(rename = "uploadId")]
     pub upload_id: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct ChunkResponse {
     #[serde(rename = "eTag")]
     pub e_tag: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 pub struct PartItem {
     #[serde(rename = "partNumber")]
     pub part_number: u32,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct FinishResponse {
     pub value: String,
     pub url: String,

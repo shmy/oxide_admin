@@ -7,7 +7,9 @@ macro_rules! id {
 
         use $crate::shared::id_generator::IdGenerator;
 
-        #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, sqlx::Type)]
+        #[derive(
+            Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, utoipa::ToSchema, sqlx::Type,
+        )]
         #[sqlx(transparent)]
         pub struct $name(String);
 

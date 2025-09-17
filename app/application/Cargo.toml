@@ -32,6 +32,7 @@ tokio-stream = { workspace = true }
 tokio-util = { workspace = true }
 tracing = { workspace = true }
 twox-hash = { workspace = true, features = ["xxhash64"] }
+utoipa = { workspace = true }
 
 [build-dependencies]
 anyhow = { workspace = true }

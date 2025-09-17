@@ -1,8 +1,9 @@
 use domain::iam::value_object::permission_code::PermissionCode;
 use serde::{Deserialize, Serialize};
 use sqlx::{prelude::FromRow, types::chrono::NaiveDateTime};
+use utoipa::ToSchema;
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow, ToSchema)]
 pub struct RoleDto {
     pub id: String,
     pub name: String,

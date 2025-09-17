@@ -1,8 +1,12 @@
 use application::system::service::upload_service::{
     ChunkResponse, FinishResponse, StartChunkResponse, UploadService,
 };
-use axum::{Json, Router, extract::DefaultBodyLimit, routing::post};
+use axum::{Json, extract::DefaultBodyLimit};
 use axum_typed_multipart::TypedMultipart;
+use utoipa_axum::{
+    router::{OpenApiRouter, UtoipaMethodRouterExt},
+    routes,
+};
 
 use crate::{
     WebState,
@@ -12,6 +16,19 @@ use crate::{
     },
 };
 
+#[utoipa::path(
+    post,
+    path = "/single",
+    request_body(
+        content = inline(request::UploadRequest),
+        content_type = "multipart/form-data"
+    ),
+    summary = "Upload a file",
+    tag = "Upload",
+    responses(
+        (status = 200, body = inline(JsonResponse<FinishResponse>))
+    )
+)]
 #[tracing::instrument]
 async fn single(
     Inject(service): Inject<UploadService>,
@@ -23,6 +40,19 @@ async fn single(
     JsonResponse::ok(resp)
 }
 
+#[utoipa::path(
+    post,
+    path = "/image",
+    request_body(
+        content = inline(request::UploadRequest),
+        content_type = "multipart/form-data"
+    ),
+    summary = "Upload an image file",
+    tag = "Upload",
+    responses(
+        (status = 200, body = inline(JsonResponse<FinishResponse>))
+    )
+)]
 #[tracing::instrument]
 async fn image(
     Inject(service): Inject<UploadService>,
@@ -32,6 +62,15 @@ async fn image(
     JsonResponse::ok(resp)
 }
 
+#[utoipa::path(
+    post,
+    path = "/start_chunk",
+    summary = "Start upload chunk",
+    tag = "Upload",
+    responses(
+        (status = 200, body = inline(JsonResponse<StartChunkResponse>))
+    )
+)]
 #[tracing::instrument]
 async fn start_chunk(
     Inject(service): Inject<UploadService>,
@@ -41,6 +80,19 @@ async fn start_chunk(
     JsonResponse::ok(resp)
 }
 
+#[utoipa::path(
+    post,
+    path = "/chunk",
+    request_body(
+        content = inline(request::ChunkRequest),
+        content_type = "multipart/form-data"
+    ),
+    summary = "Chunk upload file",
+    tag = "Upload",
+    responses(
+        (status = 200, body = inline(JsonResponse<ChunkResponse>))
+    )
+)]
 #[tracing::instrument]
 async fn chunk(
     Inject(service): Inject<UploadService>,
@@ -52,6 +104,15 @@ async fn chunk(
     JsonResponse::ok(resp)
 }
 
+#[utoipa::path(
+    post,
+    path = "/finish_chunk",
+    summary = "Finish upload chunk",
+    tag = "Upload",
+    responses(
+        (status = 200, body = inline(JsonResponse<FinishResponse>))
+    )
+)]
 #[tracing::instrument]
 async fn finish_chunk(
     Inject(service): Inject<UploadService>,
@@ -68,30 +129,33 @@ mod request {
     use axum_typed_multipart::{FieldData, TryFromMultipart};
     use serde::Deserialize;
     use tempfile::NamedTempFile;
+    use utoipa::ToSchema;
 
-    #[derive(TryFromMultipart, Debug)]
+    #[derive(TryFromMultipart, Debug, ToSchema)]
     pub(crate) struct UploadRequest {
         #[form_data(limit = "2MiB")]
+        #[schema(value_type = Vec<u8>)]
         /// max size: 2MiB
         pub file: FieldData<NamedTempFile>,
     }
 
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, ToSchema)]
     pub(crate) struct StartChunkRequest {
         pub filename: String,
     }
 
-    #[derive(TryFromMultipart, Debug)]
+    #[derive(TryFromMultipart, Debug, ToSchema)]
     pub(crate) struct ChunkRequest {
         pub key: String,
         #[form_data(field_name = "partNumber")]
         pub part_number: u32,
         #[form_data(limit = "2MiB")]
+        #[schema(value_type = Vec<u8>)]
         /// max size: 2MiB
         pub file: FieldData<NamedTempFile>,
     }
 
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, ToSchema)]
     pub(crate) struct FinishChunkRequest {
         pub key: String,
         #[serde(rename = "uploadId")]
@@ -101,20 +165,11 @@ mod request {
     }
 }
 
-pub fn routing() -> Router<WebState> {
-    Router::new()
-        .route(
-            "/single",
-            post(single).route_layer(DefaultBodyLimit::max(3 * 1024 * 1024)),
-        )
-        .route(
-            "/image",
-            post(image).route_layer(DefaultBodyLimit::max(3 * 1024 * 1024)),
-        )
-        .route("/start_chunk", post(start_chunk))
-        .route(
-            "/chunk",
-            post(chunk).route_layer(DefaultBodyLimit::max(3 * 1024 * 1024)),
-        )
-        .route("/finish_chunk", post(finish_chunk))
+pub fn routing() -> OpenApiRouter<WebState> {
+    OpenApiRouter::new()
+        .routes(routes!(single).layer(DefaultBodyLimit::max(3 * 1024 * 1024)))
+        .routes(routes!(image).layer(DefaultBodyLimit::max(3 * 1024 * 1024)))
+        .routes(routes!(chunk).layer(DefaultBodyLimit::max(3 * 1024 * 1024)))
+        .routes(routes!(start_chunk))
+        .routes(routes!(finish_chunk))
 }

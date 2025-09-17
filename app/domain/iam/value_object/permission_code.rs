@@ -2,8 +2,9 @@ use std::collections::HashSet;
 use std::ops::Deref;
 
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, sqlx::Type)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, ToSchema, sqlx::Type)]
 #[sqlx(transparent)]
 pub struct PermissionCode(i32);
 

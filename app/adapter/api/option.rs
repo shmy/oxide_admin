@@ -3,9 +3,9 @@ use application::{
         query::option_roles::OptionRolesQueryHandler,
         service::{iam_service::IamService, page::Page},
     },
-    shared::{dto::OptionDto, query_handler::QueryHandler as _},
+    shared::{dto::OptionStringDto, query_handler::QueryHandler as _},
 };
-use axum::{Router, routing::get};
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     WebState,
@@ -15,22 +15,40 @@ use crate::{
     },
 };
 
+#[utoipa::path(
+    get,
+    path = "/roles",
+    summary = "Roles",
+    tag = "Options",
+    responses(
+        (status = 200, body = inline(JsonResponse<Vec<OptionStringDto>>))
+    )
+)]
 #[tracing::instrument]
 async fn roles(
     Inject(query_handler): Inject<OptionRolesQueryHandler>,
-) -> JsonResponseType<Vec<OptionDto>> {
+) -> JsonResponseType<Vec<OptionStringDto>> {
     let items = query_handler.query(()).await?;
     JsonResponse::ok(items)
 }
 
+#[utoipa::path(
+    get,
+    path = "/permissions",
+    summary = "Permissions",
+    tag = "Options",
+    responses(
+        (status = 200, body = inline(JsonResponse<Vec<Page>>))
+    )
+)]
 #[tracing::instrument]
 async fn permissions(Inject(service): Inject<IamService>) -> JsonResponseType<&'static [Page]> {
     let pages = service.get_all_pages();
     JsonResponse::ok(pages)
 }
 
-pub fn routing() -> Router<WebState> {
-    Router::new()
-        .route("/roles", get(roles))
-        .route("/permissions", get(permissions))
+pub fn routing() -> OpenApiRouter<WebState> {
+    OpenApiRouter::new()
+        .routes(routes!(roles))
+        .routes(routes!(permissions))
 }

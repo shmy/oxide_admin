@@ -2,15 +2,18 @@ use std::hash::Hash;
 
 use serde::Deserialize;
 use serde_with::{DisplayFromStr, PickFirst, serde_as};
+use utoipa::ToSchema;
 
 #[serde_as]
-#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, ToSchema)]
 pub struct PagingQuery {
     #[serde_as(as = "PickFirst<(_, DisplayFromStr)>")]
     #[serde(default = "PagingQuery::default_page")]
+    #[schema(default = 1)]
     page: i64,
     #[serde_as(as = "PickFirst<(_, DisplayFromStr)>")]
     #[serde(default = "PagingQuery::default_page_size")]
+    #[schema(default = 10)]
     page_size: i64,
 }
 

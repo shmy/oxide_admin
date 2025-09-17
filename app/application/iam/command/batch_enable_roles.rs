@@ -7,8 +7,9 @@ use domain::iam::{error::IamError, event::IamEvent};
 use infrastructure::repository::iam::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
+use utoipa::ToSchema;
 
-#[derive(Debug, Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct BatchEnableRolesCommand {
     ids: Vec<RoleId>,
 }

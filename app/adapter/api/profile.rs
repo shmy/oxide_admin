@@ -12,19 +12,26 @@ use application::{
     shared::{command_handler::CommandHandler, query_handler::QueryHandler as _},
 };
 
-use axum::{
-    Json, Router,
-    routing::{get, post, put},
-};
+use axum::Json;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     WebState,
     shared::{
         extractor::{inject::Inject, valid_user::ValidUser},
-        response::{JsonResponse, JsonResponseType},
+        response::{JsonResponse, JsonResponseEmpty, JsonResponseType},
     },
 };
 
+#[utoipa::path(
+    post,
+    path = "/sign_out",
+    summary = "Sign out",
+    tag = "Profile",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn sign_out(
     ValidUser(id): ValidUser,
@@ -35,6 +42,15 @@ async fn sign_out(
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    get,
+    path = "/current",
+    summary = "Current user",
+    tag = "Profile",
+    responses(
+        (status = 200, body = inline(JsonResponse<response::CurrentResponse>))
+    )
+)]
 #[tracing::instrument]
 async fn current(
     ValidUser(id): ValidUser,
@@ -51,6 +67,15 @@ async fn current(
     JsonResponse::ok(response::CurrentResponse { user, pages })
 }
 
+#[utoipa::path(
+    post,
+    path = "/password",
+    summary = "Change self password",
+    tag = "Profile",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument(skip(request))]
 async fn password(
     ValidUser(id): ValidUser,
@@ -69,8 +94,9 @@ async fn password(
 
 mod request {
     use serde::Deserialize;
+    use utoipa::ToSchema;
 
-    #[derive(Deserialize)]
+    #[derive(Deserialize, ToSchema)]
     pub struct UpdateUserPasswordRequest {
         pub password: String,
         pub new_password: String,
@@ -80,17 +106,18 @@ mod request {
 mod response {
     use application::iam::{dto::user::UserDto, service::page::Page};
     use serde::Serialize;
+    use utoipa::ToSchema;
 
-    #[derive(Serialize)]
+    #[derive(Serialize, ToSchema)]
     pub struct CurrentResponse {
         pub user: UserDto,
         pub pages: [Page; 2],
     }
 }
 
-pub fn routing() -> Router<WebState> {
-    Router::new()
-        .route("/sign_out", post(sign_out))
-        .route("/current", get(current))
-        .route("/password", put(password))
+pub fn routing() -> OpenApiRouter<WebState> {
+    OpenApiRouter::new()
+        .routes(routes!(current))
+        .routes(routes!(sign_out))
+        .routes(routes!(password))
 }

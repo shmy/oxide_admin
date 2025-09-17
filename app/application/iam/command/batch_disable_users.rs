@@ -8,7 +8,8 @@ use futures_util::StreamExt as _;
 use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
-#[derive(Debug, Deserialize, Builder)]
+use utoipa::ToSchema;
+#[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct BatchDisableUsersCommand {
     ids: Vec<UserId>,
 }

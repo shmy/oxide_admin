@@ -8,6 +8,7 @@ use tower_governor::{
     GovernorError, GovernorLayer, governor::GovernorConfigBuilder,
     key_extractor::PeerIpKeyExtractor,
 };
+use utoipa_axum::router::{OpenApiRouter, UtoipaMethodRouter, UtoipaMethodRouterExt as _};
 
 use crate::{WebState, shared::response::JsonResponse};
 type AxumGovernorLayer = GovernorLayer<PeerIpKeyExtractor, NoOpMiddleware, Body>;
@@ -32,6 +33,18 @@ impl RateLimitRouterExt for MethodRouter<WebState> {
 }
 
 impl RateLimitRouterExt for Router<WebState> {
+    fn rate_limit_layer(self, period: Duration, burst_size: u32) -> Self {
+        self.layer(build_governor_layer(period, burst_size))
+    }
+}
+
+impl RateLimitRouterExt for UtoipaMethodRouter<WebState> {
+    fn rate_limit_layer(self, period: Duration, burst_size: u32) -> Self {
+        self.layer(build_governor_layer(period, burst_size))
+    }
+}
+
+impl RateLimitRouterExt for OpenApiRouter<WebState> {
     fn rate_limit_layer(self, period: Duration, burst_size: u32) -> Self {
         self.layer(build_governor_layer(period, burst_size))
     }

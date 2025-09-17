@@ -21,12 +21,27 @@ impl PermissionGroup {
         self.0.contains(required)
     }
 
-    pub fn permits_all(&self, required: &Self) -> bool {
-        required.0.iter().all(|p| self.0.contains(p))
+    pub fn permits(&self, checker: PermissionChecker) -> bool {
+        match checker {
+            PermissionChecker::All(group) => group.0.iter().all(|p| self.0.contains(p)),
+            PermissionChecker::Any(group) => group.0.iter().any(|p| self.0.contains(p)),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum PermissionChecker {
+    All(PermissionGroup),
+    Any(PermissionGroup),
+}
+
+impl PermissionChecker {
+    pub fn all(group: PermissionGroup) -> Self {
+        Self::All(group)
     }
 
-    pub fn permits_any(&self, required: &Self) -> bool {
-        required.0.iter().any(|p| self.0.contains(p))
+    pub fn any(group: PermissionGroup) -> Self {
+        Self::Any(group)
     }
 }
 
@@ -59,7 +74,7 @@ mod tests {
         set2.insert(PermissionCode::new(1));
         let group2 = PermissionGroup::new(set2);
 
-        assert!(group1.permits_all(&group2));
+        assert!(group1.permits(PermissionChecker::all(group2)));
     }
 
     #[test]
@@ -73,6 +88,6 @@ mod tests {
         set2.insert(PermissionCode::new(3));
         let group2 = PermissionGroup::new(set2);
 
-        assert!(group1.permits_any(&group2));
+        assert!(group1.permits(PermissionChecker::any(group2)));
     }
 }

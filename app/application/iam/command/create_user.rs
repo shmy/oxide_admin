@@ -12,10 +12,11 @@ use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use object_storage_kit::{ObjectStorage, ObjectStorageReader as _};
 use serde::Deserialize;
+use utoipa::ToSchema;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
-#[derive(Debug, Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct CreateUserCommand {
     account: String,
     password: String,

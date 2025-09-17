@@ -7,8 +7,9 @@ use domain::iam::value_object::permission_code::{
 use serde::Serialize;
 
 use domain::iam::value_object::permission_code::{SYSTEM, SYSTEM_ROLE, SYSTEM_USER};
+use utoipa::ToSchema;
 
-#[derive(Debug, Clone, Serialize, Builder)]
+#[derive(Debug, Clone, Serialize, Builder, ToSchema)]
 pub struct Page {
     pub key: PermissionCode,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -24,6 +25,7 @@ pub struct Page {
     #[serde(rename = "schemaApi", skip_serializing_if = "Option::is_none")]
     pub schema_api: Option<&'static str>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(no_recursion)]
     pub children: Option<Vec<Page>>,
     #[builder(default = true)]
     #[serde(skip_serializing_if = "is_true")]

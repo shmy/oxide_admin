@@ -9,14 +9,14 @@ use application::{
     shared::command_handler::CommandHandler,
 };
 use axum::{
-    Json, Router,
+    Json,
     http::{
         HeaderName, HeaderValue,
         header::{self, CONTENT_TYPE},
     },
     response::IntoResponse,
-    routing::{get, post},
 };
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     WebState,
@@ -31,6 +31,15 @@ use crate::{
 const CAPTCHA_HEADER_NAME: HeaderName = HeaderName::from_static("x-captcha-id");
 const CAPTCHA_CONTENT_TYPE: HeaderValue = HeaderValue::from_static("image/png");
 
+#[utoipa::path(
+    post,
+    path = "/sign_in",
+    summary = "Sign in",
+    tag = "Auth",
+    responses(
+        (status = 200, body = inline(JsonResponse<response::SignInResponse>))
+    )
+)]
 #[tracing::instrument]
 async fn sign_in(
     Inject(command_handler): Inject<SignInCommandHandler>,
@@ -43,6 +52,15 @@ async fn sign_in(
     })
 }
 
+#[utoipa::path(
+    post,
+    path = "/refresh_token",
+    summary = "Refresh Token",
+    tag = "Auth",
+    responses(
+        (status = 200, body = inline(JsonResponse<response::SignInResponse>))
+    )
+)]
 #[tracing::instrument]
 async fn refresh_token(
     Inject(command_handler): Inject<RefreshTokenCommandHandler>,
@@ -55,6 +73,15 @@ async fn refresh_token(
     })
 }
 
+#[utoipa::path(
+    get,
+    path = "/refresh_captcha",
+    summary = "Refresh captcha",
+    tag = "Auth",
+    responses(
+        (status = 200, body = inline(Vec<u8>))
+    )
+)]
 #[tracing::instrument]
 async fn refresh_captcha(
     Inject(command_handler): Inject<RefreshCaptchaCommandHandler>,
@@ -71,23 +98,18 @@ async fn refresh_captcha(
 
 mod response {
     use serde::Serialize;
+    use utoipa::ToSchema;
 
-    #[derive(Serialize)]
+    #[derive(Serialize, ToSchema)]
     pub struct SignInResponse {
         pub access_token: String,
         pub refresh_token: String,
     }
 }
 
-pub fn routing() -> Router<WebState> {
-    Router::new()
-        .route(
-            "/sign_in",
-            post(sign_in).rate_limit_layer(Duration::from_secs(3), 1),
-        )
-        .route(
-            "/refresh_token",
-            post(refresh_token).rate_limit_layer(Duration::from_secs(1), 1),
-        )
-        .route("/refresh_captcha", get(refresh_captcha))
+pub fn routing() -> OpenApiRouter<WebState> {
+    OpenApiRouter::new()
+        .routes(routes!(sign_in).rate_limit_layer(Duration::from_secs(3), 1))
+        .routes(routes!(refresh_token).rate_limit_layer(Duration::from_secs(5), 1))
+        .routes(routes!(refresh_captcha))
 }

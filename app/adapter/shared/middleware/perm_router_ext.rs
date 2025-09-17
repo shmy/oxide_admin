@@ -3,32 +3,29 @@ use crate::shared::error::WebError;
 use crate::shared::extractor::valid_user::ValidUser;
 use application::iam::service::iam_service::IamService;
 use axum::extract::Request;
+use axum::middleware;
 use axum::middleware::Next;
 use axum::response::Response;
-use axum::routing::MethodRouter;
-use axum::{Router, middleware};
-use domain::iam::value_object::permission_group::PermissionGroup;
+use domain::iam::value_object::permission_group::{PermissionChecker, PermissionGroup};
+use utoipa_axum::router::UtoipaMethodRouter;
 
-pub trait PermRouterExt {
-    fn route_with_permission(
-        self,
-        path: &str,
-        method_router: MethodRouter<WebState>,
-        permission_group: PermissionGroup,
-    ) -> Self;
+pub trait PermissonRouteExt {
+    #[allow(unused)]
+    fn permit_all(self, permission_group: PermissionGroup) -> Self;
+    #[allow(unused)]
+    fn permit_any(self, permission_group: PermissionGroup) -> Self;
 }
 
-impl PermRouterExt for Router<WebState> {
-    fn route_with_permission(
-        self,
-        path: &str,
-        method_router: MethodRouter<WebState>,
-        permission_group: PermissionGroup,
-    ) -> Self {
-        self.route(
-            path,
-            method_router.route_layer(middleware::from_fn(move |req: Request, next: Next| {
-                let permission_group = permission_group.clone();
+trait _InternalPermissionExt {
+    fn check(self, checker: PermissionChecker) -> Self;
+}
+
+impl _InternalPermissionExt for UtoipaMethodRouter<WebState> {
+    fn check(mut self, checker: PermissionChecker) -> Self {
+        self.2 = self
+            .2
+            .layer(middleware::from_fn(move |req: Request, next: Next| {
+                let checker = checker.clone();
                 async move {
                     let (Some(valid_user), Some(iam_service)) = (
                         req.extensions().get::<ValidUser>(),
@@ -37,12 +34,22 @@ impl PermRouterExt for Router<WebState> {
                         return Err(anyhow::anyhow!("未找到 ValidUser").into());
                     };
                     iam_service
-                        .check_permission(&valid_user.0, &permission_group)
+                        .check_permissions(&valid_user.0, checker)
                         .await?;
                     Ok::<Response, WebError>(next.run(req).await)
                 }
-            })),
-        )
+            }));
+        self
+    }
+}
+
+impl PermissonRouteExt for UtoipaMethodRouter<WebState> {
+    fn permit_all(self, permission_group: PermissionGroup) -> Self {
+        self.check(PermissionChecker::All(permission_group))
+    }
+
+    fn permit_any(self, permission_group: PermissionGroup) -> Self {
+        self.check(PermissionChecker::Any(permission_group))
     }
 }
 

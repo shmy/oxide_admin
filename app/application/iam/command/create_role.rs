@@ -8,10 +8,11 @@ use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::iam::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
+use utoipa::ToSchema;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
-#[derive(Debug, Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct CreateRoleCommand {
     name: String,
     permission_ids: Vec<PermissionCode>,

@@ -12,8 +12,9 @@ use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use object_storage_kit::{ObjectStorage, ObjectStorageReader as _};
 use serde::Deserialize;
+use utoipa::ToSchema;
 
-#[derive(Debug, Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct UpdateUserCommand {
     id: UserId,
     account: Option<String>,

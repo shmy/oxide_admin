@@ -1,4 +1,4 @@
-use axum::Router;
+use utoipa_axum::router::OpenApiRouter;
 
 use crate::{WebState, shared::middleware::user_authn_required::user_authn_required};
 
@@ -10,8 +10,8 @@ mod system;
 mod upload;
 mod user;
 
-pub fn routing(state: WebState) -> Router<WebState> {
-    let router = Router::new()
+pub fn routing(state: WebState) -> OpenApiRouter<WebState> {
+    let router = OpenApiRouter::new()
         .nest("/profile", profile::routing())
         .nest("/users", user::routing())
         .nest("/roles", role::routing())

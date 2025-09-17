@@ -21,21 +21,34 @@ use application::{
     },
 };
 use axum::{
-    Json, Router,
+    Json,
     extract::{Path, Query},
-    routing::{get, post, put},
 };
 use domain::iam::value_object::{permission_code::SYSTEM_USER, user_id::UserId};
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     WebState, perms,
     shared::{
         extractor::inject::Inject,
-        middleware::perm_router_ext::PermRouterExt as _,
-        response::{JsonResponse, JsonResponsePagingType, JsonResponseType, PagingResponse},
+        middleware::perm_router_ext::PermissonRouteExt as _,
+        response::{
+            JsonResponse, JsonResponseEmpty, JsonResponsePagingType, JsonResponseType,
+            PagingResponse,
+        },
     },
 };
 
+#[utoipa::path(
+    get,
+    params(SearchUsersQuery),
+    path = "/",
+    summary = "Search users",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponse<PagingResponse<UserDto>>))
+    )
+)]
 #[tracing::instrument]
 async fn search(
     Inject(query_handler): Inject<SearchUsersQueryHandler>,
@@ -47,6 +60,15 @@ async fn search(
     JsonResponse::ok(PagingResponse { total, items })
 }
 
+#[utoipa::path(
+    get,
+    path = "/{id}",
+    summary = "Retrieve user",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponse<UserDto>))
+    )
+)]
 #[tracing::instrument]
 async fn retrieve(
     Inject(query_handler): Inject<RetrieveUserQueryHandler>,
@@ -62,6 +84,15 @@ async fn retrieve(
     JsonResponse::ok(user)
 }
 
+#[utoipa::path(
+    post,
+    path = "/batch/delete",
+    summary = "Batch delete users",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn batch_delete(
     Inject(command_handler): Inject<BatchDeleteUsersCommandHandler>,
@@ -71,6 +102,15 @@ async fn batch_delete(
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    post,
+    path = "/batch/enable",
+    summary = "Batch enable users",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn batch_enable(
     Inject(command_handler): Inject<BatchEnableUsersCommandHandler>,
@@ -80,6 +120,15 @@ async fn batch_enable(
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    post,
+    path = "/batch/disable",
+    summary = "Batch disable users",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn batch_disable(
     Inject(command_handler): Inject<BatchDisableUsersCommandHandler>,
@@ -89,6 +138,15 @@ async fn batch_disable(
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    post,
+    path = "/",
+    summary = "Create user",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn create(
     Inject(command_handler): Inject<CreateUserCommandHandler>,
@@ -98,6 +156,15 @@ async fn create(
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    put,
+    path = "/{id}",
+    summary = "Update user",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn update(
     Inject(command_handler): Inject<UpdateUserCommandHandler>,
@@ -108,6 +175,15 @@ async fn update(
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    put,
+    path = "/{id}/password",
+    summary = "Update user password",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument(skip(request))]
 async fn update_password(
     Inject(command_handler): Inject<UpdateUserPasswordCommandHandler>,
@@ -125,22 +201,23 @@ async fn update_password(
 
 mod request {
     use serde::Deserialize;
+    use utoipa::ToSchema;
 
-    #[derive(Deserialize)]
+    #[derive(Deserialize, ToSchema)]
     pub struct UpdateUserPasswordRequest {
         pub new_password: String,
         pub confirm_new_password: String,
     }
 }
 
-pub fn routing() -> Router<WebState> {
-    Router::new()
-        .route_with_permission("/", get(search), perms!(SYSTEM_USER))
-        .route_with_permission("/", post(create), perms!(SYSTEM_USER))
-        .route_with_permission("/{id}", get(retrieve), perms!(SYSTEM_USER))
-        .route_with_permission("/{id}", put(update), perms!(SYSTEM_USER))
-        .route_with_permission("/batch/delete", post(batch_delete), perms!(SYSTEM_USER))
-        .route_with_permission("/batch/enable", post(batch_enable), perms!(SYSTEM_USER))
-        .route_with_permission("/batch/disable", post(batch_disable), perms!(SYSTEM_USER))
-        .route_with_permission("/{id}/password", put(update_password), perms!(SYSTEM_USER))
+pub fn routing() -> OpenApiRouter<WebState> {
+    OpenApiRouter::new()
+        .routes(routes!(search).permit_all(perms!(SYSTEM_USER)))
+        .routes(routes!(retrieve).permit_all(perms!(SYSTEM_USER)))
+        .routes(routes!(batch_delete).permit_all(perms!(SYSTEM_USER)))
+        .routes(routes!(batch_enable).permit_all(perms!(SYSTEM_USER)))
+        .routes(routes!(batch_disable).permit_all(perms!(SYSTEM_USER)))
+        .routes(routes!(create).permit_all(perms!(SYSTEM_USER)))
+        .routes(routes!(update).permit_all(perms!(SYSTEM_USER)))
+        .routes(routes!(update_password).permit_all(perms!(SYSTEM_USER)))
 }

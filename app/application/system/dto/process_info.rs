@@ -1,7 +1,8 @@
 use bon::Builder;
 use serde::Serialize;
+use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Builder)]
+#[derive(Debug, Serialize, Builder, ToSchema)]
 pub struct ProcessInfo {
     pid: u32,
     name: String,

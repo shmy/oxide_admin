@@ -1,8 +1,9 @@
 use serde::Serialize;
+use utoipa::ToSchema;
 
 use crate::system::dto::cpu::Cpu;
 
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, ToSchema)]
 pub struct SystemInfo {
     pub os_name: Option<String>,
     pub long_os_version: Option<String>,

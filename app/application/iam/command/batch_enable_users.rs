@@ -5,10 +5,11 @@ use domain::iam::{error::IamError, event::IamEvent, value_object::user_id::UserI
 use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
+use utoipa::ToSchema;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
-#[derive(Debug, Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct BatchEnableUsersCommand {
     ids: Vec<UserId>,
 }
