@@ -15,8 +15,7 @@ build_frontend:
     #! /bin/sh
     set -e
     cd frontend
-    # pnpm build
-    pnpm build_brotli
+    pnpm build
 
 build: build_frontend
     cargo build --package server --release --locked

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm build_gzip",
+    "build": "pnpm build_brotli",
     "build_gzip": "rsbuild build && gulp gzip",
     "build_brotli": "rsbuild build && gulp brotli",
     "build_zstd": "rsbuild build && gulp zstd",

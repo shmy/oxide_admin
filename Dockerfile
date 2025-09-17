@@ -3,7 +3,7 @@ WORKDIR /frontend
 RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY frontend/ ./
 RUN pnpm install --registry=https://mirrors.cloud.tencent.com/npm/
-RUN pnpm run build
+RUN pnpm build
 
 FROM rust:latest AS backend-build
 WORKDIR /_
