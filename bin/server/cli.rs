@@ -38,7 +38,7 @@ pub struct Cli {
     pub timezone: Tz,
 
     /// 是否启用 OpenAPI
-    #[arg(long, default_value = "true", env = "OPENAPI_ENABLED")]
+    #[arg(long, action = clap::ArgAction::Set, default_value_t = true, env = "OPENAPI_ENABLED")]
     pub openapi_enabled: bool,
 
     /// 数据库连接地址
