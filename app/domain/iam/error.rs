@@ -1,6 +1,6 @@
 use crate::iam::value_object::hashed_password::PasswordError;
 
-#[derive(Debug, Clone, thiserror::Error)]
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum IamError {
     #[error("用户不存在")]
     UserNotFound,

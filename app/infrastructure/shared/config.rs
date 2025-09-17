@@ -8,7 +8,6 @@ pub struct Config {
     pub log: Log,
     pub timezone: chrono_tz::Tz,
     pub openapi: Openapi,
-
     pub database: Database,
     #[cfg(feature = "kv_redis")]
     pub redis: Redis,

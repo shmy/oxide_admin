@@ -11,8 +11,8 @@ argon2 = { workspace = true, features = ["std"] }
 bon = { workspace = true }
 readonly = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-sqlx = { workspace = true }
+sqlx = { workspace = true, features = ["macros", "chrono"] }
 tempoid = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
-utoipa = { workspace = true }
+utoipa = { workspace = true, features = ["macros"] }

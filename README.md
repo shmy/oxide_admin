@@ -208,8 +208,23 @@ just build_windows_x86_64_msvc
 just build_image
 ```
 
+## 🉑 测试
+> 安装以下工具
+```bash
+cargo install cargo-llvm-cov
+cargo install cargo-nextest
+```
+### 运行
+```bash
+just test
+```
+
+### 生成覆盖率报告
+```bash
+just test_coverage
+```
+
 ## 📃 代码生成
-### CRUD 生成
 ```bash
 cargo g scaffold -h
 ```

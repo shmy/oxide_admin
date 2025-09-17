@@ -7,6 +7,12 @@ check:
 setup:
     sqlx migrate run --source app/infrastructure/migration/sql
 
+test:
+    cargo llvm-cov nextest --workspace
+
+test_coverage:
+    cargo llvm-cov nextest --workspace --html
+
 sqlx_prepare:
     cargo clean
     cargo sqlx prepare -- --package server
