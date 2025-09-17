@@ -32,3 +32,20 @@ macro_rules! id {
         }
     };
 }
+
+#[cfg(test)]
+mod tests {
+    id!(UserId);
+    #[test]
+    fn test_generate() {
+        let id = UserId::generate();
+        assert_eq!(id.0.len(), 24);
+    }
+
+    #[test]
+    fn test_new_unchecked() {
+        let id = UserId::new_unchecked("test".to_string());
+        assert_eq!(id.0, "test");
+        assert_eq!(*id, "test".to_string());
+    }
+}

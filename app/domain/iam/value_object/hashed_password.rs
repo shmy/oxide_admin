@@ -26,7 +26,7 @@ pub enum PasswordError {
     #[error("密码错误")]
     Incorrect,
 }
-#[derive(Clone, sqlx::Type)]
+#[derive(Clone, PartialEq, Eq, sqlx::Type)]
 #[sqlx(transparent)]
 pub struct HashedPassword(String);
 
@@ -54,7 +54,7 @@ impl HashedPassword {
         let salt = SaltString::generate(&mut password_hash::rand_core::OsRng);
         let hash = ARGON2
             .hash_password(password.as_bytes(), &salt)
-            .map_err(|_| PasswordError::EncodeFailed)?; // 处理 JoinError
+            .map_err(|_| PasswordError::EncodeFailed)?;
         Ok(hash.to_string())
     }
 
@@ -86,12 +86,6 @@ impl Deref for HashedPassword {
     }
 }
 
-impl From<String> for HashedPassword {
-    fn from(value: String) -> Self {
-        Self::new_unchecked(value)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -104,17 +98,32 @@ mod tests {
     }
 
     #[test]
+    fn test_new_unchecked() {
+        let password = "validpassword123".to_string();
+        let hashed = HashedPassword::new_unchecked(password);
+        assert_eq!(hashed.0, "validpassword123");
+        assert_eq!(*hashed, "validpassword123".to_string());
+    }
+
+    #[test]
+    fn test_debug() {
+        let password = "validpassword123".to_string();
+        let hashed = HashedPassword::new_unchecked(password);
+        assert_eq!(format!("{:?}", hashed), "HashedPassword(\"<RESERVED>\")");
+    }
+
+    #[test]
     fn test_try_new_too_short() {
         let password = "short".to_string();
         let result = HashedPassword::try_new(password);
-        assert!(matches!(result, Err(PasswordError::TooShort)));
+        assert_eq!(result, Err(PasswordError::TooShort));
     }
 
     #[test]
     fn test_try_new_too_long() {
         let password = "thispasswordiswaytoolongandshouldfailvalidationthispasswordiswaytoolongandshouldfailvalidation".to_string();
         let result = HashedPassword::try_new(password);
-        assert!(matches!(result, Err(PasswordError::TooLong)));
+        assert_eq!(result, Err(PasswordError::TooLong));
     }
 
     #[test]
@@ -128,9 +137,9 @@ mod tests {
     fn test_verify_incorrect() {
         let password = "testpassword".to_string();
         let hashed = HashedPassword::try_new(password).unwrap();
-        assert!(matches!(
+        assert_eq!(
             hashed.verify("wrongpassword"),
             Err(PasswordError::Incorrect)
-        ));
+        );
     }
 }

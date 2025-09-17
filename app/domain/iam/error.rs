@@ -54,3 +54,14 @@ impl From<sqlx::Error> for IamError {
         Self::Sqlx(message)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_iam_error() {
+        let err = IamError::from(sqlx::Error::RowNotFound);
+        assert_eq!(err, IamError::Sqlx(sqlx::Error::RowNotFound.to_string()));
+    }
+}

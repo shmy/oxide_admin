@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use std::ops::Deref;
 
 use serde::{Deserialize, Serialize};
@@ -9,12 +8,8 @@ use utoipa::ToSchema;
 pub struct PermissionCode(i32);
 
 impl PermissionCode {
-    pub const fn new(s: i32) -> Self {
-        Self(s)
-    }
-
-    pub fn empty() -> HashSet<Self> {
-        HashSet::with_capacity(0)
+    pub const fn new(code: i32) -> Self {
+        Self(code)
     }
 }
 
@@ -45,4 +40,16 @@ define_permissions! {
     SYSTEM_ROLE = 102,
     SYSTEM_INFO = 103,
     SYSTEM_EXAMPLE = 104,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let permission_code = PermissionCode::new(100);
+        assert_eq!(permission_code.0, 100);
+        assert_eq!(*permission_code, 100);
+    }
 }

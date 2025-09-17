@@ -64,7 +64,15 @@ mod tests {
     }
 
     #[test]
-    fn test_permits() {
+    fn test_permit() {
+        let mut set = HashSet::new();
+        set.insert(PermissionCode::new(1));
+        let group = PermissionGroup::new(set);
+        assert!(group.permit(&PermissionCode::new(1)));
+    }
+
+    #[test]
+    fn test_permits_all() {
         let mut set1 = HashSet::new();
         set1.insert(PermissionCode::new(1));
         set1.insert(PermissionCode::new(2));
