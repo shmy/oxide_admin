@@ -32,7 +32,7 @@ build_windows_x86_64_msvc: build_frontend
     ls -lh target/x86_64-pc-windows-msvc/release
     terminal-notifier -title "构建成功" -message "x86_64-pc-windows-msvc 已完成"
 
-build_container:
+build_image:
     docker buildx build --platform linux/amd64 -t server --pull .
 
 sort:

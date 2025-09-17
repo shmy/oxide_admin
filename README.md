@@ -25,7 +25,7 @@
 - 依赖注入：由[`nject`](https://github.com/nicolascotton/nject)进行支持；
 - 代码生成：一键生成各个模块的代码，诸如`CRUD`、`CommandHandler`、`QueryHandler`等等；
 - 时区配置：配置数据库、定时任务时区；
-- 接口文档：使用`utoipa`生成接口文档，可以在[`/scalar`](https://oxide-admin.onrender.com/scalar)中查看接口文档，支持配置关闭；
+- 接口文档：使用[`utoipa`](https://github.com/juhaku/utoipa)生成接口文档，可以在[`/scalar`](https://oxide-admin.onrender.com/scalar)中查看接口文档，支持配置关闭；
 - 用户认证：使用`JWT`，支持`refresh_token`和`access_token`的签发、验证和刷新；
 - 用户授权：内置`RBAC`，灵活的控制前端菜单权限以及接口权限验证；
 - 数据库自动迁移：部署时无需手动迁移；
@@ -205,7 +205,7 @@ just build_windows_x86_64_msvc
 ```
 - 编译Docker image
 ```bash
-just build_container
+just build_image
 ```
 
 ## 📃 代码生成
