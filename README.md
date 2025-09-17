@@ -130,7 +130,7 @@
 
 ## 🎈前端
 - 架构：使用`Amis`低代码，借用其丰富的组件，快速地完成的CRUD相关功能，也可以通过React自定义组件进行补充；
-- 优化：构建时自动混淆、自动gzip压缩；
+- 优化：构建时自动混淆、自动gzip压缩（可选brolti）
 
 ## ⚙️ 技术栈
 - **后端**: Rust + Axum + SQLx + Nject + Postgres + Redb

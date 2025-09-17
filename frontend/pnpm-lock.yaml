@@ -63,6 +63,9 @@ importers:
       gulp:
         specifier: ^5.0.1
         version: 5.0.1
+      gulp-brotli:
+        specifier: ^3.0.0
+        version: 3.0.0
       gulp-gzip:
         specifier: ^1.4.2
         version: 1.4.2
@@ -730,7 +733,6 @@ packages:
   are-we-there-yet@2.0.0:
     resolution: {integrity: sha512-Ci/qENmwHnsYo9xKIcUJN5LeDKdJ6R1Z1j9V/J5wyq8nh/mYPEpIKJbBZXtZjG04HiK7zV/p6Vs9952MrMeUIw==}
     engines: {node: '>=10'}
-    deprecated: This package is no longer supported.
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -1029,7 +1031,7 @@ packages:
     engines: {node: '>=0.10.0'}
 
   delegates@1.0.0:
-    resolution: {integrity: sha512-bd2L678uiWATM6m5Z1VzNCErI3jiGzt6HGY8OVICs40JQq/HALfbyNJmp0UDakEY4pMMaN0Ly5om/B1VI/+xfQ==}
+    resolution: {integrity: sha1-hMbhWbgZBP3KWaDvRM2HDTElD5o=}
 
   delete@1.1.0:
     resolution: {integrity: sha512-bdhJatRNYsJnOhSRx9Eej3ABBtxQQw/uz2RprpYL5R3jCC2XMYVBcQWwvQLl+iNDk4LCLEKhdIP3uZSqRWi/tw==}
@@ -1044,7 +1046,7 @@ packages:
     engines: {node: '>=0.10.0'}
 
   detect-libc@1.0.3:
-    resolution: {integrity: sha1-+hN8S9aY7fVc1c0CrFWfkaTEups=}
+    resolution: {integrity: sha512-pGjwhsmsp4kL2RTz08wcOlGN83otlqHeD/Z5T8GXZB+/YcpQ/dgo+lbU8ZsGxV0HIvqqxo9l7mqYwyYMD9bKDg==}
     engines: {node: '>=0.10'}
     hasBin: true
 
@@ -1257,7 +1259,6 @@ packages:
   gauge@3.0.2:
     resolution: {integrity: sha512-+5J6MS/5XksCuXq++uFRsnUd7Ovu1XenbeuIuNRJxYWjgQbPuFhT14lAvsWfqfAmnwluf1OwMjz39HjfLPci0Q==}
     engines: {node: '>=10'}
-    deprecated: This package is no longer supported.
 
   get-caller-file@2.0.5:
     resolution: {integrity: sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==}
@@ -1302,6 +1303,10 @@ packages:
 
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
+
+  gulp-brotli@3.0.0:
+    resolution: {integrity: sha512-AkGR+FRn4Nrf9Ocx8/WXgNNX+owk4FN4xU4kRrso41DWWd9v1KXO8EyG1cGcwt4364Ax68b7ANcP9Em+/RM2OQ==}
+    engines: {node: '>=10.17.0'}
 
   gulp-cli@3.1.0:
     resolution: {integrity: sha512-zZzwlmEsTfXcxRKiCHsdyjZZnFvXWM4v1NqBJSYbuApkvVKivjcmOS2qruAJ+PkEHLFavcDKH40DPc1+t12a9Q==}
@@ -2413,7 +2418,6 @@ packages:
 
   rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
-    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   rsbuild-plugin-html-minifier-terser@1.1.2:
@@ -4402,6 +4406,11 @@ snapshots:
       sparkles: 2.1.0
 
   graceful-fs@4.2.11: {}
+
+  gulp-brotli@3.0.0:
+    dependencies:
+      plugin-error: 1.0.1
+      through2: 3.0.2
 
   gulp-cli@3.1.0:
     dependencies:

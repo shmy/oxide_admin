@@ -6,8 +6,10 @@ use axum::response::IntoResponse;
 use axum::routing::get;
 use include_dir::{Dir, File, include_dir};
 
-const CONTENT_ENCODING_EXTENSION: &str = "gz";
-const CONTENT_ENCODING_VALUE: &str = "gzip";
+include!(concat!(env!("OUT_DIR"), "/data.rs"));
+
+const CONTENT_ENCODING_EXTENSION: &str = include_str!("../../frontend/dist/.EXTENSION");
+const CONTENT_ENCODING_VALUE: &str = include_str!("../../frontend/dist/.ENCODING");
 const NO_CONTENT_ENCODING_VALUE: &str = "identity";
 const CACHE_CONTROL_VALUE: &str = "public,max-age=3600";
 
@@ -21,7 +23,7 @@ async fn index() -> impl IntoResponse {
             (CONTENT_ENCODING, CONTENT_ENCODING_VALUE),
             (CACHE_CONTROL, CACHE_CONTROL_VALUE),
         ],
-        include_bytes!("../../frontend/dist/index.html.gz"),
+        INDEX_HTML_DATA,
     )
         .into_response()
 }
@@ -34,29 +36,33 @@ async fn sign_in() -> impl IntoResponse {
             (CONTENT_ENCODING, CONTENT_ENCODING_VALUE),
             (CACHE_CONTROL, CACHE_CONTROL_VALUE),
         ],
-        include_bytes!("../../frontend/dist/sign_in.html.gz"),
+        SIGN_IN_HTML_DATA,
     )
         .into_response()
 }
 
 struct FileResult<'a> {
     file: &'a File<'a>,
-    gzip: bool,
+    compressed: bool,
 }
 
 async fn asset(Path(path): Path<String>) -> impl IntoResponse {
-    let gziped_path = format!("{}.{}", &path, CONTENT_ENCODING_EXTENSION);
+    let compressed_path = format!("{}.{}", &path, CONTENT_ENCODING_EXTENSION);
     if let Some(result) = FRONTEND_STATIC_DIR
-        .get_file(&gziped_path)
-        .map(|file| FileResult { file, gzip: true })
+        .get_file(&compressed_path)
+        .map(|file| FileResult {
+            file,
+            compressed: true,
+        })
         .or_else(|| {
-            FRONTEND_STATIC_DIR
-                .get_file(&path)
-                .map(|file| FileResult { file, gzip: false })
+            FRONTEND_STATIC_DIR.get_file(&path).map(|file| FileResult {
+                file,
+                compressed: false,
+            })
         })
     {
         let guess = mime_guess::from_path(&path).first_or_octet_stream();
-        let content_encoding = if result.gzip {
+        let content_encoding = if result.compressed {
             CONTENT_ENCODING_VALUE
         } else {
             NO_CONTENT_ENCODING_VALUE
