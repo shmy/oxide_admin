@@ -24,13 +24,11 @@ fn rerun_if_changed_except_mod(path: &str) {
     if let Ok(entries) = fs::read_dir(dir) {
         for entry in entries.flatten() {
             let path = entry.path();
-            if path.is_file() {
-                if let Some(fname) = path.file_name().and_then(|s| s.to_str()) {
-                    if fname != "mod.rs" {
+            if path.is_file()
+                && let Some(fname) = path.file_name().and_then(|s| s.to_str())
+                    && fname != "mod.rs" {
                         println!("cargo:rerun-if-changed={}", path.display());
                     }
-                }
-            }
         }
     }
 }
