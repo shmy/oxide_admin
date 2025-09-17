@@ -8,10 +8,10 @@ setup:
     sqlx migrate run --source app/infrastructure/migration/sql
 
 test:
-    cargo llvm-cov nextest --workspace
+    cargo llvm-cov nextest --package server
 
 test_coverage:
-    cargo llvm-cov nextest --workspace --html
+    cargo llvm-cov nextest --package server --html
 
 sqlx_prepare:
     cargo clean

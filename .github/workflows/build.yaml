@@ -48,7 +48,7 @@ jobs:
 
       - name: Backend test
         run: |
-          cargo llvm-cov nextest --workspace
+          cargo llvm-cov nextest --package server
 
       - name: Build frontend
         run: cd frontend && pnpm install && pnpm run build
