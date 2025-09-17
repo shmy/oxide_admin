@@ -1,8 +1,8 @@
 > 一个基于Rust和Amis.js/React的后台管理系统起始模版
 
 [![Build](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml/badge.svg)](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml)
+[![Codecov](https://img.shields.io/codecov/c/github/shmy/oxide_admin)](https://app.codecov.io/github/shmy/oxide_admin)
 ![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)
-![Codecov](https://img.shields.io/codecov/c/github/shmy/oxide_admin)
 
 ## 🎯 项目目标
 - 提供一个快速构建后台管理系统的起点

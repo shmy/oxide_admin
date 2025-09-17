@@ -7,8 +7,8 @@ check:
 setup:
     sqlx migrate run --source app/infrastructure/migration/sql
 
-test:
-    cargo llvm-cov nextest --workspace
+test_watch:
+    cargo watch -q -c -x "nextest run --workspace" -w app -w crates -w bin
 
 test_coverage:
     cargo llvm-cov nextest --workspace --html
