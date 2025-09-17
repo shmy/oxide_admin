@@ -59,7 +59,7 @@ impl UploadService {
     ) -> Result<FinishResponse> {
         let extension = Self::extract_extension(filename);
         let filename = IdGenerator::filename().to_lowercase();
-        let relative_path = self.build_relative_path(format!("{filename}.{extension}"));
+        let relative_path = self.build_relative_path(format!("{filename}{extension}"));
         tokio::try_join!(
             self.object_storage.write(&relative_path, file),
             self.file_service.create(&relative_path)
