@@ -35,7 +35,10 @@ jobs:
           version: 10
 
       - name: Install musl-tools
-        run: sudo apt-get update -y && sudo apt-get install -y musl-tools
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: musl-tools
+          version: 1.0
 
       - name: Restore cache
         uses: actions/cache@v4
@@ -48,7 +51,7 @@ jobs:
 
       - name: Backend test
         run: |
-          cargo llvm-cov nextest --package server
+          cargo llvm-cov nextest --workspace
 
       - name: Build frontend
         run: cd frontend && pnpm install && pnpm run build
