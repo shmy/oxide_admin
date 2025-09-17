@@ -19,25 +19,26 @@
 
 
 ## ✨ 特性
-- DDD架构：遵循领域驱动设计(DDD)和整洁架构原则，实现适配展示、应用服务、领域模型、基础设施层的分离；
+- DDD：遵循领域驱动设计(DDD)和整洁架构原则，实现适配展示、应用服务、领域模型、基础设施层的分离；
+- CQRS：内置轻量CQRS模式，读写分离；
 - 事件总线：内置事件系统，通过发布/监听领域事件来解耦业务逻辑；
-- 依赖注入：由`nject` crate进行支持；
+- 依赖注入：由[`nject`](https://github.com/nicolascotton/nject)进行支持；
 - 代码生成：一键生成各个模块的代码，诸如`CRUD`、`CommandHandler`、`QueryHandler`等等；
 - 时区配置：配置数据库、定时任务时区；
-- 接口文档：使用`utoipa`生成接口文档，可以在`/scalar`中查看接口文档，支持配置关闭；
+- 接口文档：使用`utoipa`生成接口文档，可以在[`/scalar`](https://oxide-admin.onrender.com/scalar)中查看接口文档，支持配置关闭；
 - 用户认证：使用`JWT`，支持`refresh_token`和`access_token`的签发、验证和刷新；
 - 用户授权：内置`RBAC`，灵活的控制前端菜单权限以及接口权限验证；
 - 数据库自动迁移：部署时无需手动迁移；
 - 速率限制中间件: 可对路由进行限速；
 - 图形验证: 防止暴力破解，防止恶意请求；
-- 日志与trace：支持多种日志方式，支持`OpenTelemetry`；
+- 日志与trace：支持多种日志方式，支持[`OpenTelemetry`](https://opentelemetry.io/)；
 - 内建*single_flight*宏：缓解数据库压力；
 - 文件上传及访问签名：内建单文件上传、图片上传、分片上传等接口，适配`Amis`，支持`本地文件系统`和`S3`兼容协议；
-- KV缓存：支持`ttl`，使用`redis`或`redb`；
-- 后台任务：支持单机`sqlite`，分布式`faktory`；
+- KV缓存：支持`ttl`，使用`redis`或[`redb`](https://github.com/cberner/redb)；
+- 后台任务：支持单机`sqlite`，分布式[`faktory`](https://github.com/contribsys/faktory)；
 - 优雅关停：严谨地结束服务、释放资源；
-- 多源配置：支持环境变量、`.env`文件，或者使用`cli`参数；
-- Feature Flag：支持`flipt`；
+- 多源配置：支持环境变量、`.env`/`cli`参数；
+- Feature Flag：支持[`flipt`](https://github.com/flipt-io/flipt)；
 - Github CI：自动构建`x86_64-unknown-linux-musl`；
 - ...
 
@@ -129,11 +130,12 @@
 > `bin/server/Cargo.toml`处修改
 
 ## 🎈前端
-- 架构：使用`Amis`低代码，借用其丰富的组件，快速地完成的CRUD相关功能，也可以通过React自定义组件进行补充；
+- 架构：使用[`Amis.js`](https://github.com/baidu/amis)低代码，借用其丰富的组件，快速地完成的CRUD相关功能，也可以通过React自定义组件进行补充；
 - 优化：构建时自动混淆、自动gzip压缩（可选brolti）
+- 嵌入：静态资源伴随嵌入二进制
 
 ## ⚙️ 技术栈
-- **后端**: Rust + Axum + SQLx + Nject + Postgres + Redb
+- **后端**: Rust + Axum + Nject + SQLx + Postgres
 - **前端**: Amis.js + React + TypeScript + Rsbuild
 - **工具**: just + pnpm
 
