@@ -9,8 +9,9 @@ use nject::injectable;
 use serde::Deserialize;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
+use utoipa::ToSchema;
 
-#[derive(Debug, Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct BatchDelete{{entity | pluralize | pascal_case}}Command {
     ids: Vec<{{entity | pascal_case}}Id>,
 }

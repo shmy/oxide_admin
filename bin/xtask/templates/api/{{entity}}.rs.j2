@@ -8,37 +8,53 @@ use application::{
         dto::{{entity}}::{{entity | pascal_case}}Dto,
         query::{
             retrieve_{{entity}}::{Retrieve{{entity | pascal_case}}Query, Retrieve{{entity | pascal_case}}QueryHandler},
-            search_{{entity}}s::{Search{{entity | pascal_case}}sQuery, Search{{entity | pascal_case}}sQueryHandler},
+            search_{{entity | pluralize}}::{Search{{entity | pluralize| pascal_case}}Query, Search{{entity | pluralize| pascal_case}}QueryHandler},
         },
     },
     shared::{command_handler::CommandHandler, paging_result::PagingResult, query_handler::QueryHandler as _},
 };
-use axum::{
-    Json, Router,
-    extract::{Path, Query},
-    routing::{get, post, put},
-};
+use axum::{Json, extract::{Path, Query}};
 use domain::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
 use domain::iam::value_object::permission_code::{{(module ~ "_" ~ entity) | uppercase}};
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     WebState, perms,
     shared::{
         extractor::inject::Inject,
-        middleware::perm_router_ext::PermRouterExt as _,
-        response::{JsonResponse, JsonResponsePagingType, JsonResponseType, PagingResponse},
+        middleware::perm_router_ext::PermissonRouteExt as _,
+        response::{JsonResponse, JsonResponseEmpty, JsonResponsePagingType, JsonResponseType, PagingResponse},
     },
 };
 
+#[utoipa::path(
+    get,
+    params(Search{{entity | pluralize| pascal_case}}Query),
+    path = "/",
+    summary = "Search {{entity | pluralize}}",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponse<PagingResponse<{{entity | pascal_case}}Dto>>))
+    )
+)]
 #[tracing::instrument]
 async fn search(
-    Inject(query_handler): Inject<Search{{entity | pascal_case}}sQueryHandler>,
-    Query(query): Query<Search{{entity | pascal_case}}sQuery>,
+    Inject(query_handler): Inject<Search{{entity | pluralize| pascal_case}}QueryHandler>,
+    Query(query): Query<Search{{entity | pluralize| pascal_case}}Query>,
 ) -> JsonResponsePagingType<{{entity | pascal_case}}Dto> {
     let PagingResult { total, items } = query_handler.query(query).await?;
     JsonResponse::ok(PagingResponse { total, items })
 }
 
+#[utoipa::path(
+    get,
+    path = "/{id}",
+    summary = "Retrieve {{entity}}",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponse<{{entity | pascal_case}}Dto>))
+    )
+)]
 #[tracing::instrument]
 async fn retrieve(
     Inject(query_handler): Inject<Retrieve{{entity | pascal_case}}QueryHandler>,
@@ -50,15 +66,33 @@ async fn retrieve(
     JsonResponse::ok({{entity}})
 }
 
+#[utoipa::path(
+    post,
+    path = "/batch/delete",
+    summary = "Batch delete {{entity | pluralize}}",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn batch_delete(
-    Inject(command_handler): Inject<BatchDelete{{entity | pascal_case}}sCommandHandler>,
-    Json(command): Json<BatchDelete{{entity | pascal_case}}sCommand>,
+    Inject(command_handler): Inject<BatchDelete{{entity | pluralize | pascal_case}}CommandHandler>,
+    Json(command): Json<BatchDelete{{entity | pluralize | pascal_case}}Command>,
 ) -> JsonResponseType<()> {
     command_handler.handle(command).await?;
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    post,
+    path = "/",
+    summary = "Create {{entity}}",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn create(
     Inject(command_handler): Inject<Create{{entity | pascal_case}}CommandHandler>,
@@ -68,6 +102,15 @@ async fn create(
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    put,
+    path = "/{id}",
+    summary = "Update {{entity}}",
+    tag = "Iam",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
 #[tracing::instrument]
 async fn update(
     Inject(command_handler): Inject<Update{{entity | pascal_case}}CommandHandler>,
@@ -78,11 +121,11 @@ async fn update(
     JsonResponse::ok(())
 }
 
-pub fn routing() -> Router<WebState> {
-    Router::new()
-        .route_with_permission("/", get(search), perms!({{(module ~ "_" ~ entity) | uppercase}}))
-        .route_with_permission("/", post(create), perms!({{(module ~ "_" ~ entity) | uppercase}}))
-        .route_with_permission("/{id}", get(retrieve), perms!({{(module ~ "_" ~ entity) | uppercase}}))
-        .route_with_permission("/{id}", put(update), perms!({{(module ~ "_" ~ entity) | uppercase}}))
-        .route_with_permission("/batch/delete", post(batch_delete), perms!({{(module ~ "_" ~ entity) | uppercase}}))
+pub fn routing() -> OpenApiRouter<WebState> {
+    OpenApiRouter::new()
+        .routes(routes!(search).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}})))
+        .routes(routes!(retrieve).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}})))
+        .routes(routes!(create).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}})))
+        .routes(routes!(update).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}})))
+        .routes(routes!(batch_delete).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}})))
 }

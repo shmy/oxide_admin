@@ -8,10 +8,11 @@ use domain::shared::event_util::UpdatedEvent;
 use infrastructure::repository::{{module}}::{{entity}}_repository::{{entity | pascal_case}}RepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
+use utoipa::ToSchema;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
-#[derive(Debug, Deserialize, Builder)]
+#[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct Update{{entity | pascal_case}}Command {
     id: {{entity | pascal_case}}Id,
     {%- for field in domain_fields %}

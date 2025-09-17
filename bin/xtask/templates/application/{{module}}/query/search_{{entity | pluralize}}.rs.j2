@@ -17,11 +17,13 @@ use crate::{
 };
 use kvdb_kit::Kvdb;
 use crate::shared::query_handler::QueryHandler;
+use utoipa::IntoParams;
 
 #[serde_as]
-#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Builder)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, IntoParams, Builder)]
 pub struct Search{{entity | pluralize | pascal_case}}Query {
     #[serde(flatten)]
+    #[param(inline)]
     paging: PagingQuery,
 }
 
