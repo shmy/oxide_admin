@@ -6,9 +6,61 @@ on:
       - main
 
 jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd "pg_isready -U test -d test_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgres://test:test@postgres:5432/test_db
+
+    steps:
+      - name: Set up rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: llvm-tools-preview
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@nextest
+      - name: Clone code
+        uses: actions/checkout@v4
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h postgres -p 5432 -U test; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+      - name: Backend test
+        run: |
+          cargo llvm-cov nextest --workspace --lcov > lcov.info
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./lcov.info
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
   build:
     name: Build
     runs-on: ubuntu-latest
+    depends-on: test
     steps:
       - name: Clone code
         uses: actions/checkout@v4
@@ -19,10 +71,6 @@ jobs:
           target: x86_64-unknown-linux-musl
           toolchain: stable
           override: true
-          components: llvm-tools-preview
-
-      - uses: taiki-e/install-action@cargo-llvm-cov
-      - uses: taiki-e/install-action@nextest
 
       - name: Install musl-tools
         uses: awalsh128/cache-apt-pkgs-action@latest
@@ -48,17 +96,6 @@ jobs:
             target/
             node_modules/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-
-      - name: Backend test
-        run: |
-          cargo llvm-cov nextest --workspace --lcov > lcov.info
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./lcov.info
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Build frontend
         run: cd frontend && pnpm install && pnpm run build
