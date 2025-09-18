@@ -40,3 +40,40 @@ pub async fn try_new(timezone: chrono_tz::Tz, db: &Database) -> Result<PgPool> {
     info!("Database timezone: {}", row.timezone);
     Ok(pool)
 }
+
+#[cfg(test)]
+mod tests {
+
+    use std::time::Duration;
+
+    use testcontainers::{ImageExt, runners::AsyncRunner as _};
+    use testcontainers_modules::postgres;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_try_new() {
+        let container = postgres::Postgres::default()
+            .with_tag("17-alpine")
+            .start()
+            .await
+            .unwrap();
+        let connection_string = format!(
+            "postgresql://postgres:postgres@127.0.0.1:{}/postgres",
+            container.get_host_port_ipv4(5432).await.unwrap()
+        );
+        let result = try_new(
+            chrono_tz::Asia::Shanghai,
+            &Database::builder()
+                .url(connection_string)
+                .max_connections(10)
+                .min_connections(5)
+                .max_lifetime(Duration::from_secs(60))
+                .idle_timeout(Duration::from_secs(30))
+                .acquire_timeout(Duration::from_secs(10))
+                .build(),
+        )
+        .await;
+        assert!(result.is_ok());
+    }
+}

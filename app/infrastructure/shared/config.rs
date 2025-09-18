@@ -122,3 +122,53 @@ pub struct Flip {
 pub struct Openapi {
     pub enabled: bool,
 }
+
+#[cfg(test)]
+impl Default for Config {
+    fn default() -> Self {
+        Config::builder()
+            .log(Log::builder().level("debug".to_string()).build())
+            .database(
+                Database::builder()
+                    .url("sqlite://:memory:".to_string())
+                    .max_connections(10)
+                    .min_connections(5)
+                    .max_lifetime(Duration::from_secs(60))
+                    .idle_timeout(Duration::from_secs(30))
+                    .acquire_timeout(Duration::from_secs(10))
+                    .build(),
+            )
+            .fs(StorageFs::builder()
+                .hmac_secret(b"secret")
+                .link_period(Duration::from_secs(60))
+                .build())
+            .jwt(
+                Jwt::builder()
+                    .access_token_secret(b"secret")
+                    .access_token_period(Duration::from_secs(60))
+                    .refresh_token_period(Duration::from_secs(60))
+                    .build(),
+            )
+            .server(
+                Server::builder()
+                    .bind("127.0.0.1".to_string())
+                    .port(8080)
+                    .build(),
+            )
+            .openapi(Openapi::builder().enabled(true).build())
+            .timezone(chrono_tz::Asia::Shanghai)
+            .build()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_config() {
+        let config = Config::default();
+
+        assert_eq!(format!("{:?}", config), "Config");
+    }
+}

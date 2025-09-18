@@ -44,3 +44,52 @@ impl<T: Clone + Send + Sync + 'static> EventBus<T> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Clone, Debug)]
+    struct TestEvent {
+        value: i32,
+    }
+
+    impl TestEvent {
+        pub fn new(value: i32) -> Self {
+            Self { value }
+        }
+    }
+
+    #[derive(Clone)]
+    struct TestEventHandler {
+        value: i32,
+    }
+
+    impl EventSubscriber<TestEvent> for TestEventHandler {
+        fn on_received(&self, event: TestEvent) -> impl Future<Output = Result<()>> + Send {
+            async move {
+                assert_eq!(event.value, self.value);
+                Ok(())
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_publish() {
+        let bus = EventBus::<TestEvent>::new(16);
+        bus.publish(TestEvent::new(1));
+        bus.publish(TestEvent::new(2));
+        bus.publish(TestEvent::new(3));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe() {
+        let bus = EventBus::<TestEvent>::new(16);
+        let handler = TestEventHandler { value: 1 };
+        bus.subscribe(handler.clone());
+        bus.publish(TestEvent::new(1));
+        bus.publish(TestEvent::new(2));
+        bus.publish(TestEvent::new(3));
+        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+    }
+}

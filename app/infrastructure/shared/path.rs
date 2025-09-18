@@ -29,3 +29,23 @@ pub static LOG_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
     std::fs::create_dir_all(&dir).expect("create log dir");
     dir.to_owned()
 });
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dirs_created() {
+        // 确保 LazyLock 被触发
+        let data_dir = DATA_DIR.clone();
+        let temp_dir = TEMP_DIR.clone();
+        let upload_dir = UPLOAD_DIR.clone();
+        let log_dir = LOG_DIR.clone();
+
+        // 目录必须存在
+        assert!(data_dir.exists() && data_dir.is_dir());
+        assert!(temp_dir.exists() && temp_dir.is_dir());
+        assert!(upload_dir.exists() && upload_dir.is_dir());
+        assert!(log_dir.exists() && log_dir.is_dir());
+    }
+}

@@ -13,3 +13,15 @@ pub fn is_unique_constraint_error(err: &Error, table: &str, column: &str) -> boo
     }
     false
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_unique_constraint_error_not() {
+        let err = sqlx::Error::BeginFailed;
+
+        assert!(!is_unique_constraint_error(&err, "_users", "account"));
+    }
+}

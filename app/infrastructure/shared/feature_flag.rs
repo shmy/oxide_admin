@@ -53,3 +53,23 @@ impl FeatureFlag {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::any::{Any as _, TypeId};
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_try_new() {
+        let result = FeatureFlag::try_new(&Config::default()).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_debug() {
+        let result = FeatureFlag::try_new(&Config::default()).await.unwrap();
+        assert_eq!(format!("{:?}", &result), "FeatureFlag");
+        assert_eq!(result.deref().type_id(), TypeId::of::<Client>());
+    }
+}
