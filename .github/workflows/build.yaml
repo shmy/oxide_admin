@@ -60,7 +60,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    depends-on: test
+    needs: test
     steps:
       - name: Clone code
         uses: actions/checkout@v4
