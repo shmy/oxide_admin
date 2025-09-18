@@ -242,24 +242,9 @@ impl From<UserDto> for User {
 #[cfg(test)]
 mod tests {
 
-    use crate::{migration::migrate, repository::iam::role_repository::RoleRepositoryImpl};
+    use crate::test::setup_database;
 
     use super::*;
-
-    async fn setup_database(pool: PgPool) {
-        let ct = ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build();
-        let user_repository = UserRepositoryImpl::builder()
-            .pool(pool.clone())
-            .ct(ct.clone())
-            .build();
-        let role_repository = RoleRepositoryImpl::builder()
-            .pool(pool.clone())
-            .ct(ct.clone())
-            .build();
-        migrate(pool.clone(), user_repository, role_repository)
-            .await
-            .unwrap();
-    }
 
     #[sqlx::test]
     async fn test_create_and_fetch(pool: PgPool) {
@@ -337,10 +322,12 @@ mod tests {
         assert_eq!(user.privileged, false);
         assert_eq!(user.role_ids, vec![]);
         assert_eq!(user.enabled, true);
-        user_repository
-            .toggle_enabled(&[id.clone()], false)
-            .await
-            .unwrap();
+        assert!(
+            user_repository
+                .toggle_enabled(&[id.clone()], false)
+                .await
+                .is_ok()
+        );
         let user = user_repository.by_id(&id).await.unwrap();
         assert_eq!(user.id, id);
         assert_eq!(user.account, "test");
@@ -348,5 +335,69 @@ mod tests {
         assert_eq!(user.privileged, false);
         assert_eq!(user.role_ids, vec![]);
         assert_eq!(user.enabled, false);
+    }
+
+    #[sqlx::test]
+    async fn test_batch_delete(pool: PgPool) {
+        setup_database(pool.clone()).await;
+        let user_repository = UserRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .build();
+        let id = UserId::generate();
+        let user = User::builder()
+            .id(id.clone())
+            .account("test".to_string())
+            .name("test".to_string())
+            .privileged(false)
+            .password(HashedPassword::try_new("123456".to_string()).unwrap())
+            .role_ids(vec![])
+            .refresh_token("refresh_token".to_string())
+            .enabled(true)
+            .build();
+        assert!(user_repository.save(user).await.is_ok());
+        let user = user_repository.by_id(&id).await.unwrap();
+        assert_eq!(user.id, id);
+        assert_eq!(user.account, "test");
+        assert_eq!(user.name, "test");
+        assert_eq!(user.privileged, false);
+        assert_eq!(user.role_ids, vec![]);
+        assert_eq!(user.enabled, true);
+        assert!(user_repository.batch_delete(&[id.clone()]).await.is_ok());
+        let result = user_repository.by_id(&id).await;
+        assert!(result.is_err());
+        assert_eq!(result.err(), Some(IamError::UserNotFound));
+    }
+
+    #[sqlx::test]
+    async fn test_duplicated_account(pool: PgPool) {
+        setup_database(pool.clone()).await;
+        let user_repository = UserRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .build();
+        let user = User::builder()
+            .id(UserId::generate())
+            .account("test".to_string())
+            .name("test".to_string())
+            .privileged(false)
+            .password(HashedPassword::try_new("123456".to_string()).unwrap())
+            .role_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(user_repository.save(user).await.is_ok());
+        let user = User::builder()
+            .id(UserId::generate())
+            .account("test".to_string())
+            .name("test".to_string())
+            .privileged(false)
+            .password(HashedPassword::try_new("123456".to_string()).unwrap())
+            .role_ids(vec![])
+            .enabled(true)
+            .build();
+        assert_eq!(
+            user_repository.save(user).await.err(),
+            Some(IamError::UserDuplicated)
+        );
     }
 }

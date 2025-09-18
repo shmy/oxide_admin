@@ -170,3 +170,127 @@ impl From<RoleDto> for Role {
             .build()
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use crate::test::setup_database;
+
+    use super::*;
+
+    #[sqlx::test]
+    async fn test_create_and_fetch(pool: PgPool) {
+        setup_database(pool.clone()).await;
+        let role_repository = RoleRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .build();
+        let id = RoleId::generate();
+        let role = Role::builder()
+            .id(id.clone())
+            .name("test".to_string())
+            .privileged(false)
+            .permission_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(role_repository.save(role).await.is_ok());
+        let role = role_repository.by_id(&id).await.unwrap();
+        assert_eq!(role.id, id);
+        assert_eq!(role.name, "test");
+        assert_eq!(role.privileged, false);
+        assert_eq!(role.permission_ids, vec![]);
+        assert_eq!(role.enabled, true);
+    }
+
+    #[sqlx::test]
+    async fn test_toggle_enabled(pool: PgPool) {
+        setup_database(pool.clone()).await;
+        let role_repository = RoleRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .build();
+        let id = RoleId::generate();
+        let role = Role::builder()
+            .id(id.clone())
+            .name("test".to_string())
+            .privileged(false)
+            .permission_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(role_repository.save(role).await.is_ok());
+        let role = role_repository.by_id(&id).await.unwrap();
+        assert_eq!(role.id, id);
+        assert_eq!(role.name, "test");
+        assert_eq!(role.privileged, false);
+        assert_eq!(role.permission_ids, vec![]);
+        assert_eq!(role.enabled, true);
+        assert!(
+            role_repository
+                .toggle_enabled(&[id.clone()], false)
+                .await
+                .is_ok()
+        );
+        let role = role_repository.by_id(&id).await.unwrap();
+        assert_eq!(role.id, id);
+        assert_eq!(role.name, "test");
+        assert_eq!(role.privileged, false);
+        assert_eq!(role.permission_ids, vec![]);
+        assert_eq!(role.enabled, false);
+    }
+
+    #[sqlx::test]
+    async fn test_batch_delete(pool: PgPool) {
+        setup_database(pool.clone()).await;
+        let role_repository = RoleRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .build();
+        let id = RoleId::generate();
+        let role = Role::builder()
+            .id(id.clone())
+            .name("test".to_string())
+            .privileged(false)
+            .permission_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(role_repository.save(role).await.is_ok());
+        let role = role_repository.by_id(&id).await.unwrap();
+        assert_eq!(role.id, id);
+        assert_eq!(role.name, "test");
+        assert_eq!(role.privileged, false);
+        assert_eq!(role.permission_ids, vec![]);
+        assert_eq!(role.enabled, true);
+        assert!(role_repository.batch_delete(&[id.clone()]).await.is_ok());
+        let result = role_repository.by_id(&id).await;
+        assert!(result.is_err());
+        assert_eq!(result.err(), Some(IamError::RoleNotFound));
+    }
+
+    #[sqlx::test]
+    async fn test_duplicated_name(pool: PgPool) {
+        setup_database(pool.clone()).await;
+        let role_repository = RoleRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .build();
+        let role = Role::builder()
+            .id(RoleId::generate())
+            .name("test".to_string())
+            .privileged(false)
+            .permission_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(role_repository.save(role).await.is_ok());
+        let role = Role::builder()
+            .id(RoleId::generate())
+            .name("test".to_string())
+            .privileged(false)
+            .permission_ids(vec![])
+            .enabled(true)
+            .build();
+        assert_eq!(
+            role_repository.save(role).await.err(),
+            Some(IamError::RoleDuplicated)
+        );
+    }
+}
