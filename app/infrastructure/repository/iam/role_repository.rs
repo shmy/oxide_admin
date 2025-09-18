@@ -1,5 +1,6 @@
 use std::result::Result;
 
+use bon::Builder;
 use domain::iam::port::role_repository::RoleRepository;
 use domain::iam::value_object::permission_code::PermissionCode;
 use domain::iam::value_object::role_id::RoleId;
@@ -14,7 +15,7 @@ use crate::shared::chrono_tz::ChronoTz;
 use crate::shared::error_util::is_unique_constraint_error;
 use crate::shared::pg_pool::PgPool;
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct RoleRepositoryImpl {
     pool: PgPool,

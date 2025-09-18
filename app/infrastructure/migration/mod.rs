@@ -11,23 +11,28 @@ use tracing::info;
 use crate::repository::iam::role_repository::RoleRepositoryImpl;
 use crate::repository::iam::user_repository::UserRepositoryImpl;
 use crate::shared::pg_pool::PgPool;
-use crate::shared::provider::Provider;
 
-pub async fn migrate(provider: &Provider) -> Result<()> {
-    let pool = provider.provide::<PgPool>();
+pub async fn migrate(
+    pool: PgPool,
+    user_repository: UserRepositoryImpl,
+    role_repository: RoleRepositoryImpl,
+) -> Result<()> {
     sqlx::migrate!("migration/sql").run(&pool).await?;
-    insert_user_role(&pool, provider).await?;
+    insert_user_role(&pool, &user_repository, &role_repository).await?;
     Ok(())
 }
 
-async fn insert_user_role(pool: &PgPool, provider: &Provider) -> Result<()> {
+async fn insert_user_role(
+    pool: &PgPool,
+    user_repository: &UserRepositoryImpl,
+    role_repository: &RoleRepositoryImpl,
+) -> Result<()> {
     let (role_opt, user_opt) = tokio::try_join!(
         sqlx::query!("SELECT id from _roles WHERE privileged = true").fetch_optional(pool),
         sqlx::query!("SELECT id from _users WHERE privileged = true").fetch_optional(pool),
     )?;
 
     if role_opt.is_none() {
-        let role_repository = provider.provide::<RoleRepositoryImpl>();
         let role_id = RoleId::generate();
         let role = Role::builder()
             .id(role_id)
@@ -39,7 +44,6 @@ async fn insert_user_role(pool: &PgPool, provider: &Provider) -> Result<()> {
         let role = role_repository.save(role).await?;
         info!("Role inserted: {}", role.id.deref());
         if user_opt.is_none() {
-            let user_repository = provider.provide::<UserRepositoryImpl>();
             let user = User::builder()
                 .id(UserId::generate())
                 .account("admin".to_string())

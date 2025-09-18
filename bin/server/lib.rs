@@ -7,6 +7,7 @@ use axum::Router;
 use bg_worker_kit::queuer::Queuer;
 use bg_worker_kit::worker_manager::WorkerManager;
 use infrastructure::shared::{
+    chrono_tz::ChronoTz,
     config::{Config, Log, Server},
     feature_flag::FeatureFlag,
     pg_pool,
@@ -31,13 +32,13 @@ pub async fn serve(config: Config) -> Result<()> {
     let provider = build_provider(&config).await?;
     #[cfg(feature = "serve_with_sched")]
     let (_, worker_manager, sched) = try_join!(
-        migration::migrate(&provider),
+        migration::migrate(provider.provide(), provider.provide(), provider.provide()),
         build_worker_manager(&provider),
         build_scheduler_job(&provider),
     )?;
     #[cfg(not(feature = "serve_with_sched"))]
     let (_, worker_manager) = try_join!(
-        migration::migrate(&provider),
+        migration::migrate(provider.provide(), provider.provide(), provider.provide()),
         build_worker_manager(&provider),
     )?;
     register_subscribers(&provider);
@@ -67,10 +68,7 @@ pub async fn serve(config: Config) -> Result<()> {
 pub async fn sched(config: Config) -> Result<()> {
     let _guard = init_tracing(&config.log);
     let provider = build_provider(&config).await?;
-    let (_, sched) = try_join!(
-        migration::migrate(&provider),
-        build_scheduler_job(&provider)
-    )?;
+    let sched = build_scheduler_job(&provider).await?;
     let pg_pool = provider.provide::<PgPool>();
     let kvdb = provider.provide::<Kvdb>();
     let notify_shutdown = Arc::new(Notify::new());
@@ -121,6 +119,7 @@ async fn build_provider(config: &Config) -> Result<Provider> {
         .queuer(queuer)
         .object_storage(object_storage)
         .feature_flag(feature_flag)
+        .chrono_tz(ChronoTz::builder().tz(config.timezone).build())
         .build();
     Ok(provider)
 }

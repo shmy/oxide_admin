@@ -15,7 +15,7 @@ pub type Kvdb = crate::redis::RedisKvdb;
 #[cfg(feature = "redis")]
 pub use redis::RedisKvdbConfig;
 
-pub trait KvdbTrait {
+pub trait KvdbTrait: Clone {
     fn get<T: DeserializeOwned>(&self, key: &str) -> impl Future<Output = Option<T>>;
     fn set_with_ex<T: Serialize>(
         &self,

@@ -1,9 +1,9 @@
 use anyhow::Result;
 use domain::shared::id_generator::IdGenerator;
 use futures_util::stream::BoxStream;
-use infrastructure::{
-    shared::chrono_tz::{ChronoTz, Duration},
-    shared::pg_pool::PgPool,
+use infrastructure::shared::{
+    chrono_tz::{ChronoTz, Duration},
+    pg_pool::PgPool,
 };
 use nject::injectable;
 use sqlx::prelude::FromRow;

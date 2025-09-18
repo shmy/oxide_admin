@@ -1,10 +1,11 @@
+use crate::shared::{
+    chrono_tz::ChronoTz, config::Config, feature_flag::FeatureFlag, pg_pool::PgPool,
+};
 use bg_worker_kit::queuer::Queuer;
 use bon::Builder;
 use kvdb_kit::Kvdb;
 use nject::provider;
 use object_storage_kit::ObjectStorage;
-
-use crate::shared::{config::Config, feature_flag::FeatureFlag, pg_pool::PgPool};
 
 #[derive(Clone, Builder)]
 #[provider]
@@ -21,4 +22,6 @@ pub struct Provider {
     config: Config,
     #[provide(FeatureFlag, |dep| dep.clone())]
     feature_flag: FeatureFlag,
+    #[provide(ChronoTz, |dep| dep.clone())]
+    chrono_tz: ChronoTz,
 }

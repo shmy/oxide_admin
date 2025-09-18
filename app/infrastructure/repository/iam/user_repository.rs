@@ -1,4 +1,5 @@
 use anyhow::Result;
+use bon::Builder;
 use chrono::NaiveDateTime;
 use domain::iam::value_object::role_id::RoleId;
 use domain::shared::event_util::UpdatedEvent;
@@ -19,7 +20,7 @@ use crate::shared::chrono_tz::ChronoTz;
 use crate::shared::error_util::is_unique_constraint_error;
 use crate::shared::pg_pool::PgPool;
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct UserRepositoryImpl {
     pool: PgPool,
@@ -235,5 +236,117 @@ impl From<UserDto> for User {
             .maybe_refresh_token(value.refresh_token)
             .maybe_refresh_token_expired_at(value.refresh_token_expired_at)
             .build()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use crate::{migration::migrate, repository::iam::role_repository::RoleRepositoryImpl};
+
+    use super::*;
+
+    async fn setup_database(pool: PgPool) {
+        let ct = ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build();
+        let user_repository = UserRepositoryImpl::builder()
+            .pool(pool.clone())
+            .ct(ct.clone())
+            .build();
+        let role_repository = RoleRepositoryImpl::builder()
+            .pool(pool.clone())
+            .ct(ct.clone())
+            .build();
+        migrate(pool.clone(), user_repository, role_repository)
+            .await
+            .unwrap();
+    }
+
+    #[sqlx::test]
+    async fn test_create_and_fetch(pool: PgPool) {
+        setup_database(pool.clone()).await;
+        let user_repository = UserRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .build();
+        let id = UserId::generate();
+        let user = User::builder()
+            .id(id.clone())
+            .account("test".to_string())
+            .name("test".to_string())
+            .privileged(false)
+            .password(HashedPassword::try_new("123456".to_string()).unwrap())
+            .role_ids(vec![])
+            .refresh_token("refresh_token".to_string())
+            .enabled(true)
+            .build();
+        assert!(user_repository.save(user).await.is_ok());
+        let user = user_repository.by_id(&id).await.unwrap();
+        assert_eq!(user.id, id);
+        assert_eq!(user.account, "test");
+        assert_eq!(user.name, "test");
+        assert_eq!(user.privileged, false);
+        assert_eq!(user.role_ids, vec![]);
+        assert_eq!(user.enabled, true);
+
+        let user = user_repository
+            .by_account("test".to_string())
+            .await
+            .unwrap();
+        assert_eq!(user.id, id);
+        assert_eq!(user.account, "test");
+        assert_eq!(user.name, "test");
+        assert_eq!(user.privileged, false);
+        assert_eq!(user.role_ids, vec![]);
+        assert_eq!(user.enabled, true);
+
+        let user = user_repository
+            .by_refresh_token("refresh_token".to_string())
+            .await
+            .unwrap();
+        assert_eq!(user.id, id);
+        assert_eq!(user.account, "test");
+        assert_eq!(user.name, "test");
+        assert_eq!(user.privileged, false);
+        assert_eq!(user.role_ids, vec![]);
+        assert_eq!(user.enabled, true);
+    }
+
+    #[sqlx::test]
+    async fn test_toggle_enabled(pool: PgPool) {
+        setup_database(pool.clone()).await;
+        let user_repository = UserRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .build();
+        let id = UserId::generate();
+        let user = User::builder()
+            .id(id.clone())
+            .account("test".to_string())
+            .name("test".to_string())
+            .privileged(false)
+            .password(HashedPassword::try_new("123456".to_string()).unwrap())
+            .role_ids(vec![])
+            .refresh_token("refresh_token".to_string())
+            .enabled(true)
+            .build();
+        assert!(user_repository.save(user).await.is_ok());
+        let user = user_repository.by_id(&id).await.unwrap();
+        assert_eq!(user.id, id);
+        assert_eq!(user.account, "test");
+        assert_eq!(user.name, "test");
+        assert_eq!(user.privileged, false);
+        assert_eq!(user.role_ids, vec![]);
+        assert_eq!(user.enabled, true);
+        user_repository
+            .toggle_enabled(&[id.clone()], false)
+            .await
+            .unwrap();
+        let user = user_repository.by_id(&id).await.unwrap();
+        assert_eq!(user.id, id);
+        assert_eq!(user.account, "test");
+        assert_eq!(user.name, "test");
+        assert_eq!(user.privileged, false);
+        assert_eq!(user.role_ids, vec![]);
+        assert_eq!(user.enabled, false);
     }
 }

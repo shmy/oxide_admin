@@ -1,21 +1,16 @@
+use bon::Builder;
 use chrono::{DateTime, NaiveDateTime, Utc};
 pub use chrono::{Datelike, Duration};
-use nject::injectable;
 
-use crate::shared::config::Config;
-
-#[derive(Debug, Clone)]
-#[injectable]
+#[derive(Debug, Clone, Builder)]
 pub struct ChronoTz {
-    config: Config,
+    tz: chrono_tz::Tz,
 }
 
 impl ChronoTz {
     #[tracing::instrument]
     pub fn now(&self) -> NaiveDateTime {
-        self.now_utc()
-            .with_timezone(&self.config.timezone)
-            .naive_local()
+        self.now_utc().with_timezone(&self.tz).naive_local()
     }
 
     #[tracing::instrument]
