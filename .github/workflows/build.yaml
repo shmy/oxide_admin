@@ -41,12 +41,6 @@ jobs:
         uses: taiki-e/install-action@nextest
       - name: Clone code
         uses: actions/checkout@v4
-      - name: Wait for Postgres
-        run: |
-          until pg_isready -h postgres -p 5432 -U test; do
-            echo "Waiting for postgres..."
-            sleep 2
-          done
       - name: Backend test
         run: |
           cargo llvm-cov nextest --workspace --lcov > lcov.info
