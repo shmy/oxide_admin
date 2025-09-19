@@ -41,8 +41,10 @@ build_windows_x86_64_msvc: build_frontend
 build_image:
     docker buildx build --platform linux/amd64 -t server --pull .
 
-sort:
+pre_commit:
     cargo sort app/**
     cargo sort crates/**
     cargo sort bin/**
     cargo sort
+    cargo fmt --all
+    cargo clippy --workspace

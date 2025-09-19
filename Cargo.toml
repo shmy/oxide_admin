@@ -79,6 +79,9 @@ syn = { version = "2.0" }
 sysinfo = { version = "0.37", default-features = false }
 tempfile = { version = "3", default-features = false }
 tempoid = { version = "0.1", default-features = false }
+
+testcontainers = { version = "0.25", default-features = false }
+testcontainers-modules = { version = "0.13", default-features = false }
 thiserror = { version = "2", default-features = false }
 tokio = { version = "1", default-features = false }
 tokio-cron-scheduler = { version = "0.14", default-features = false }
@@ -94,9 +97,6 @@ twox-hash = { version = "2.1", default-features = false }
 utoipa = { version = "5.4", default-features = false }
 utoipa-axum = { version = "0.2", default-features = false }
 utoipa-scalar = { version = "0.3", default-features = false }
-
-testcontainers = { version = "0.25", default-features = false }
-testcontainers-modules = { version = "0.13", default-features = false }
 
 [profile.dev]
 debug = "line-tables-only"   # 生成调试信息，便于调试

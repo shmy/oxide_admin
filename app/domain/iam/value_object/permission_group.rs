@@ -27,6 +27,10 @@ impl PermissionGroup {
             PermissionChecker::Any(group) => group.0.iter().any(|p| self.0.contains(p)),
         }
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
 }
 
 #[derive(Debug, Clone)]
