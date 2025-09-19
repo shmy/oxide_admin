@@ -24,7 +24,7 @@ pub struct UpdateUserCommand {
     enabled: Option<bool>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct UpdateUserCommandHandler {
     user_repository: UserRepositoryImpl,
@@ -81,5 +81,91 @@ impl CommandHandler for UpdateUserCommandHandler {
                 }],
             },
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use domain::iam::value_object::hashed_password::HashedPassword;
+    use infrastructure::{
+        port::token_store_impl::TokenStoreImpl,
+        shared::{chrono_tz::ChronoTz, pg_pool::PgPool},
+        test_utils::{setup_database, setup_kvdb},
+    };
+    use object_storage_kit::FsConfig;
+
+    use super::*;
+    async fn build_command_handler(pool: PgPool) -> UpdateUserCommandHandler {
+        setup_database(pool.clone()).await;
+        let kvdb = setup_kvdb().await;
+        let user_repository = UserRepositoryImpl::builder()
+            .pool(pool.clone())
+            .ct(ChronoTz::default())
+            .build();
+        let object_storage = {
+            let dir = tempfile::tempdir().unwrap();
+            ObjectStorage::try_new(
+                FsConfig::builder()
+                    .root(dir.path().to_string_lossy().to_string())
+                    .basepath("/uploads".to_string())
+                    .hmac_secret(b"secret")
+                    .link_period(Duration::from_secs(60))
+                    .build(),
+            )
+            .unwrap()
+        };
+        let sign_out_command_handler = {
+            let user_repository = UserRepositoryImpl::builder()
+                .pool(pool.clone())
+                .ct(ChronoTz::default())
+                .build();
+            SignOutCommandHandler::builder()
+                .user_repository(user_repository)
+                .token_store(TokenStoreImpl::builder().kvdb(kvdb).build())
+                .build()
+        };
+        UpdateUserCommandHandler::builder()
+            .user_repository(user_repository)
+            .object_storage(object_storage)
+            .sign_out_command_handler(sign_out_command_handler)
+            .build()
+    }
+
+    #[sqlx::test]
+    async fn test_update_user_return_err_given_user_not_found(pool: PgPool) {
+        let handler = build_command_handler(pool).await;
+        let cmd = UpdateUserCommand::builder()
+            .id(UserId::generate())
+            .name("test".to_string())
+            .enabled(true)
+            .build();
+        let result = handler.handle(cmd).await;
+        assert_eq!(result.err(), Some(IamError::UserNotFound));
+    }
+
+    #[sqlx::test]
+    async fn test_update_user_return_err_given_user_is_privated(pool: PgPool) {
+        let handler = build_command_handler(pool).await;
+        let user_id = UserId::generate();
+        let user = User::builder()
+            .id(user_id.clone())
+            .account("test".to_string())
+            .name("Test".to_string())
+            .password(HashedPassword::try_new("123123".to_string()).unwrap())
+            .privileged(true)
+            .role_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(handler.user_repository.save(user).await.is_ok());
+        let cmd = UpdateUserCommand::builder()
+            .id(user_id)
+            .name("test".to_string())
+            .enabled(true)
+            .role_ids(vec![])
+            .build();
+        let result = handler.handle(cmd).await;
+        assert_eq!(result.err(), Some(IamError::UserPrivilegedImmutable));
     }
 }

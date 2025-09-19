@@ -118,7 +118,7 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn test_sign_in(pool: PgPool) {
+    async fn test_sign_in_return_err_given_captcha_invalid(pool: PgPool) {
         let command_handler = build_command_handler(pool).await;
         let user = User::builder()
             .id(UserId::generate())

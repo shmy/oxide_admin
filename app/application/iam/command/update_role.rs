@@ -21,10 +21,10 @@ pub struct UpdateRoleCommand {
     enabled: Option<bool>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct UpdateRoleCommandHandler {
-    role_repo: RoleRepositoryImpl,
+    role_repository: RoleRepositoryImpl,
 }
 
 impl CommandHandler for UpdateRoleCommandHandler {
@@ -39,7 +39,7 @@ impl CommandHandler for UpdateRoleCommandHandler {
         cmd: Self::Command,
     ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
         let id = cmd.id;
-        let mut role = self.role_repo.by_id(&id).await?;
+        let mut role = self.role_repository.by_id(&id).await?;
         if role.privileged {
             return Err(IamError::RolePrivilegedImmutable);
         }
@@ -53,7 +53,7 @@ impl CommandHandler for UpdateRoleCommandHandler {
         if let Some(enabled) = cmd.enabled {
             role.update_enabled(enabled);
         }
-        let role = self.role_repo.save(role).await?;
+        let role = self.role_repository.save(role).await?;
         Ok(CommandResult::with_event(
             role.clone(),
             IamEvent::RolesUpdated {
@@ -63,5 +63,59 @@ impl CommandHandler for UpdateRoleCommandHandler {
                 }],
             },
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use infrastructure::{
+        shared::{chrono_tz::ChronoTz, pg_pool::PgPool},
+        test_utils::setup_database,
+    };
+
+    use super::*;
+    async fn build_command_handler(pool: PgPool) -> UpdateRoleCommandHandler {
+        setup_database(pool.clone()).await;
+        let role_repository = RoleRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::default())
+            .build();
+        UpdateRoleCommandHandler::builder()
+            .role_repository(role_repository)
+            .build()
+    }
+
+    #[sqlx::test]
+    async fn test_update_role_return_err_given_role_not_found(pool: PgPool) {
+        let handler = build_command_handler(pool).await;
+        let cmd = UpdateRoleCommand::builder()
+            .id(RoleId::generate())
+            .name("test".to_string())
+            .enabled(true)
+            .build();
+        let result = handler.handle(cmd).await;
+        assert_eq!(result.err(), Some(IamError::RoleNotFound));
+    }
+
+    #[sqlx::test]
+    async fn test_update_role_return_err_given_role_is_privated(pool: PgPool) {
+        let handler = build_command_handler(pool).await;
+        let role_id = RoleId::generate();
+        let role = Role::builder()
+            .id(role_id.clone())
+            .name("test".to_string())
+            .privileged(true)
+            .permission_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(handler.role_repository.save(role).await.is_ok());
+        let cmd = UpdateRoleCommand::builder()
+            .id(role_id)
+            .name("test".to_string())
+            .enabled(true)
+            .permission_ids(vec![])
+            .build();
+        let result = handler.handle(cmd).await;
+        assert_eq!(result.err(), Some(IamError::RolePrivilegedImmutable));
     }
 }
