@@ -26,7 +26,7 @@ pub struct CreateUserCommand {
     enabled: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct CreateUserCommandHandler {
     user_repository: UserRepositoryImpl,
@@ -60,5 +60,79 @@ impl CommandHandler for CreateUserCommandHandler {
             user.clone(),
             IamEvent::UsersCreated { items: vec![user] },
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use infrastructure::{
+        shared::{chrono_tz::ChronoTz, pg_pool::PgPool},
+        test_utils::setup_database,
+    };
+    use object_storage_kit::FsConfig;
+
+    use super::*;
+
+    async fn build_command_handler(pool: PgPool) -> CreateUserCommandHandler {
+        setup_database(pool.clone()).await;
+        let user_repository = UserRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::default())
+            .build();
+        let object_storage = {
+            let dir = tempfile::tempdir().unwrap();
+            ObjectStorage::try_new(
+                FsConfig::builder()
+                    .root(dir.path().to_string_lossy().to_string())
+                    .basepath("/uploads".to_string())
+                    .hmac_secret(b"secret")
+                    .link_period(Duration::from_secs(60))
+                    .build(),
+            )
+            .unwrap()
+        };
+        CreateUserCommandHandler::builder()
+            .user_repository(user_repository)
+            .object_storage(object_storage)
+            .build()
+    }
+
+    #[sqlx::test]
+    async fn test_create(pool: PgPool) {
+        let command_handler = build_command_handler(pool).await;
+        let cmd = CreateUserCommand::builder()
+            .name("test".to_string())
+            .account("test".to_string())
+            .password("123456".to_string())
+            .role_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(command_handler.handle(cmd).await.is_ok());
+    }
+
+    #[sqlx::test]
+    async fn test_create_return_duplicated_err(pool: PgPool) {
+        let command_handler = build_command_handler(pool).await;
+        let cmd = CreateUserCommand::builder()
+            .name("test".to_string())
+            .account("test".to_string())
+            .password("123456".to_string())
+            .role_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(command_handler.handle(cmd).await.is_ok());
+        let cmd = CreateUserCommand::builder()
+            .name("test".to_string())
+            .account("test".to_string())
+            .password("123456".to_string())
+            .role_ids(vec![])
+            .enabled(true)
+            .build();
+        assert_eq!(
+            command_handler.handle(cmd).await.err(),
+            Some(IamError::UserDuplicated)
+        );
     }
 }

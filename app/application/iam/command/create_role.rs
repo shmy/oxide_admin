@@ -19,10 +19,10 @@ pub struct CreateRoleCommand {
     enabled: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct CreateRoleCommandHandler {
-    role_repo: RoleRepositoryImpl,
+    role_repository: RoleRepositoryImpl,
 }
 
 impl CommandHandler for CreateRoleCommandHandler {
@@ -43,10 +43,62 @@ impl CommandHandler for CreateRoleCommandHandler {
             .permission_ids(cmd.permission_ids)
             .enabled(cmd.enabled)
             .build();
-        let role = self.role_repo.save(role).await?;
+        let role = self.role_repository.save(role).await?;
         Ok(CommandResult::with_event(
             role.clone(),
             IamEvent::RolesCreated { items: vec![role] },
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use infrastructure::{
+        shared::{chrono_tz::ChronoTz, pg_pool::PgPool},
+        test_utils::setup_database,
+    };
+
+    use super::*;
+
+    async fn build_command_handler(pool: PgPool) -> CreateRoleCommandHandler {
+        setup_database(pool.clone()).await;
+        let role_repository = RoleRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::default())
+            .build();
+        CreateRoleCommandHandler::builder()
+            .role_repository(role_repository)
+            .build()
+    }
+
+    #[sqlx::test]
+    async fn test_create(pool: PgPool) {
+        let command_handler = build_command_handler(pool).await;
+        let cmd = CreateRoleCommand::builder()
+            .name("test".to_string())
+            .permission_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(command_handler.handle(cmd).await.is_ok());
+    }
+
+    #[sqlx::test]
+    async fn test_create_return_duplicated_err(pool: PgPool) {
+        let command_handler = build_command_handler(pool).await;
+        let cmd = CreateRoleCommand::builder()
+            .name("test".to_string())
+            .permission_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(command_handler.handle(cmd).await.is_ok());
+        let cmd = CreateRoleCommand::builder()
+            .name("test".to_string())
+            .permission_ids(vec![])
+            .enabled(true)
+            .build();
+        assert_eq!(
+            command_handler.handle(cmd).await.err(),
+            Some(IamError::RoleDuplicated)
+        );
     }
 }

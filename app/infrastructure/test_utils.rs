@@ -24,6 +24,5 @@ pub async fn setup_database(pool: PgPool) {
 
 pub async fn setup_kvdb() -> Kvdb {
     let dir = tempfile::tempdir().unwrap();
-    let kvdb = Kvdb::try_new(dir.path().join("kvdb")).await.unwrap();
-    kvdb
+    Kvdb::try_new(dir.path().join("kvdb")).await.unwrap()
 }
