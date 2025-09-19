@@ -143,12 +143,11 @@ mod tests {
             .pool(pool.clone())
             .kvdb(kvdb)
             .build();
-        let row: UserRow = sqlx::query_as(
-            r#"SELECT id AS "id: UserId" from _users WHERE privileged = true LIMIT 1"#,
-        )
-        .fetch_one(&pool)
-        .await
-        .unwrap();
+        let row: UserRow =
+            sqlx::query_as(r#"SELECT id from _users WHERE privileged = true LIMIT 1"#)
+                .fetch_one(&pool)
+                .await
+                .unwrap();
         let group = resolver.resolve(&row.id).await;
         assert!(!group.is_empty());
         let group = resolver.resolve(&UserId::generate()).await;
@@ -202,12 +201,11 @@ mod tests {
         let group = resolver.resolve(&user.id).await;
         assert!(!group.is_empty());
         // add privileged user to the user
-        let row: RoleRow = sqlx::query_as(
-            r#"SELECT id AS "id: RoleId" from _roles WHERE privileged = true LIMIT 1"#,
-        )
-        .fetch_one(&pool)
-        .await
-        .unwrap();
+        let row: RoleRow =
+            sqlx::query_as(r#"SELECT id from _roles WHERE privileged = true LIMIT 1"#)
+                .fetch_one(&pool)
+                .await
+                .unwrap();
         let mut role_ids = user.role_ids.clone();
         role_ids.extend_from_slice(&[row.id]);
         user.update_role_ids(role_ids);
