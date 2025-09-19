@@ -50,8 +50,9 @@ sqlx = { workspace = true, features = [
 tempoid = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
-
-[dev-dependencies]
 tempfile = { workspace = true }
 testcontainers = { workspace = true }
 testcontainers-modules = { workspace = true, features = ["postgres"] }
+
+[dev-dependencies]
+rstest = { workspace = true }

@@ -98,6 +98,8 @@ utoipa = { version = "5.4", default-features = false }
 utoipa-axum = { version = "0.2", default-features = false }
 utoipa-scalar = { version = "0.3", default-features = false }
 
+rstest = { version = "0.26", default-features = false }
+
 [profile.dev]
 debug = "line-tables-only"   # 生成调试信息，便于调试
 split-debuginfo = "unpacked" # 加速MacOS上的编译速度

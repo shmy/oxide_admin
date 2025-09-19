@@ -174,17 +174,19 @@ impl From<RoleDto> for Role {
 #[cfg(test)]
 mod tests {
 
-    use crate::test::setup_database;
+    use crate::test_utils::setup_database;
 
     use super::*;
 
+    async fn build_role_repository(pool: PgPool) -> RoleRepositoryImpl {
+        setup_database(pool.clone()).await;
+        let ct = ChronoTz::default();
+        RoleRepositoryImpl::builder().pool(pool).ct(ct).build()
+    }
+
     #[sqlx::test]
     async fn test_create_and_fetch(pool: PgPool) {
-        setup_database(pool.clone()).await;
-        let role_repository = RoleRepositoryImpl::builder()
-            .pool(pool)
-            .ct(ChronoTz::default())
-            .build();
+        let role_repository = build_role_repository(pool.clone()).await;
         let id = RoleId::generate();
         let role = Role::builder()
             .id(id.clone())
@@ -204,11 +206,7 @@ mod tests {
 
     #[sqlx::test]
     async fn test_toggle_enabled(pool: PgPool) {
-        setup_database(pool.clone()).await;
-        let role_repository = RoleRepositoryImpl::builder()
-            .pool(pool)
-            .ct(ChronoTz::default())
-            .build();
+        let role_repository = build_role_repository(pool.clone()).await;
         let id = RoleId::generate();
         let role = Role::builder()
             .id(id.clone())
@@ -240,39 +238,44 @@ mod tests {
 
     #[sqlx::test]
     async fn test_batch_delete(pool: PgPool) {
-        setup_database(pool.clone()).await;
-        let role_repository = RoleRepositoryImpl::builder()
-            .pool(pool)
-            .ct(ChronoTz::default())
-            .build();
-        let id = RoleId::generate();
-        let role = Role::builder()
-            .id(id.clone())
-            .name("test".to_string())
+        #[derive(FromRow)]
+        struct RoleRow {
+            id: RoleId,
+        }
+        let role_repository = build_role_repository(pool.clone()).await;
+        let role1 = Role::builder()
+            .id(RoleId::generate())
+            .name("test1".to_string())
             .privileged(false)
             .permission_ids(vec![])
             .enabled(true)
             .build();
-        assert!(role_repository.save(role).await.is_ok());
-        let role = role_repository.by_id(&id).await.unwrap();
-        assert_eq!(role.id, id);
-        assert_eq!(role.name, "test");
-        assert_eq!(role.privileged, false);
-        assert_eq!(role.permission_ids, vec![]);
-        assert_eq!(role.enabled, true);
-        assert!(role_repository.batch_delete(&[id.clone()]).await.is_ok());
-        let result = role_repository.by_id(&id).await;
-        assert!(result.is_err());
-        assert_eq!(result.err(), Some(IamError::RoleNotFound));
+        let role2 = Role::builder()
+            .id(RoleId::generate())
+            .name("test2".to_string())
+            .privileged(false)
+            .permission_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(role_repository.save(role1).await.is_ok());
+        assert!(role_repository.save(role2).await.is_ok());
+        let rows: Vec<RoleRow> = sqlx::query_as(r#"SELECT id from _roles"#)
+            .fetch_all(&pool)
+            .await
+            .unwrap();
+        assert_eq!(rows.len(), 3); // because the have a privileged role
+        let ids = rows.into_iter().map(|row| row.id).collect::<Vec<_>>();
+        assert!(role_repository.batch_delete(&ids).await.is_ok());
+        let rows: Vec<RoleRow> = sqlx::query_as(r#"SELECT id from _roles"#)
+            .fetch_all(&pool)
+            .await
+            .unwrap();
+        assert_eq!(rows.len(), 1); // because privileged role cannot be deleted
     }
 
     #[sqlx::test]
     async fn test_duplicated_name(pool: PgPool) {
-        setup_database(pool.clone()).await;
-        let role_repository = RoleRepositoryImpl::builder()
-            .pool(pool)
-            .ct(ChronoTz::default())
-            .build();
+        let role_repository = build_role_repository(pool.clone()).await;
         let role = Role::builder()
             .id(RoleId::generate())
             .name("test".to_string())

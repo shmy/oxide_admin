@@ -19,7 +19,7 @@ impl ChronoTz {
     }
 }
 
-#[cfg(test)]
+/// Only for test
 impl Default for ChronoTz {
     fn default() -> Self {
         ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build()

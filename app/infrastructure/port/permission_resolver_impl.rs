@@ -127,30 +127,35 @@ mod tests {
             role_repository::RoleRepositoryImpl, user_repository::UserRepositoryImpl,
         },
         shared::chrono_tz::ChronoTz,
-        test::{setup_database, setup_kvdb},
+        test_utils::{setup_database, setup_kvdb},
     };
 
     use super::*;
+
+    async fn build_permission_resolver(pool: PgPool) -> PermissionResolverImpl {
+        setup_database(pool.clone()).await;
+        let kvdb = setup_kvdb().await;
+        PermissionResolverImpl::builder()
+            .pool(pool.clone())
+            .kvdb(kvdb)
+            .build()
+    }
+
     #[sqlx::test]
     async fn test_resolve_privileged_user(pool: PgPool) {
         #[derive(FromRow)]
         struct UserRow {
             id: UserId,
         }
-        setup_database(pool.clone()).await;
-        let kvdb = setup_kvdb().await;
-        let resolver = PermissionResolverImpl::builder()
-            .pool(pool.clone())
-            .kvdb(kvdb)
-            .build();
+        let permission_resolver = build_permission_resolver(pool.clone()).await;
         let row: UserRow =
             sqlx::query_as(r#"SELECT id from _users WHERE privileged = true LIMIT 1"#)
                 .fetch_one(&pool)
                 .await
                 .unwrap();
-        let group = resolver.resolve(&row.id).await;
+        let group = permission_resolver.resolve(&row.id).await;
         assert!(!group.is_empty());
-        let group = resolver.resolve(&UserId::generate()).await;
+        let group = permission_resolver.resolve(&UserId::generate()).await;
         assert!(group.is_empty());
     }
 
@@ -160,13 +165,7 @@ mod tests {
         struct RoleRow {
             id: RoleId,
         }
-        setup_database(pool.clone()).await;
-        let kvdb = setup_kvdb().await;
-        let resolver = PermissionResolverImpl::builder()
-            .pool(pool.clone())
-            .kvdb(kvdb)
-            .build();
-
+        let permission_resolver = build_permission_resolver(pool.clone()).await;
         let role = Role::builder()
             .id(RoleId::generate())
             .name("test".to_string())
@@ -192,13 +191,13 @@ mod tests {
             .ct(ChronoTz::default())
             .build();
         let mut user = user_repository.save(user).await.unwrap();
-        let group = resolver.resolve(&user.id).await;
+        let group = permission_resolver.resolve(&user.id).await;
         assert!(group.is_empty());
         assert!(role_repository.save(role).await.is_ok());
-        let group = resolver.resolve(&user.id).await;
+        let group = permission_resolver.resolve(&user.id).await;
         assert!(group.is_empty()); // because cached
-        assert!(resolver.refresh().await.is_ok()); // refresh cache
-        let group = resolver.resolve(&user.id).await;
+        assert!(permission_resolver.refresh().await.is_ok()); // refresh cache
+        let group = permission_resolver.resolve(&user.id).await;
         assert!(!group.is_empty());
         // add privileged user to the user
         let row: RoleRow =
@@ -210,8 +209,8 @@ mod tests {
         role_ids.extend_from_slice(&[row.id]);
         user.update_role_ids(role_ids);
         let user = user_repository.save(user).await.unwrap();
-        assert!(resolver.refresh().await.is_ok()); // refresh cache
-        let group = resolver.resolve(&user.id).await;
+        assert!(permission_resolver.refresh().await.is_ok()); // refresh cache
+        let group = permission_resolver.resolve(&user.id).await;
         assert!(!group.is_empty());
     }
 }

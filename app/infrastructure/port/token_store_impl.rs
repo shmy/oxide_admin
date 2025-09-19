@@ -49,32 +49,37 @@ impl TokenStoreImpl {
 
 #[cfg(test)]
 mod tests {
-    use crate::test::setup_kvdb;
+    use crate::test_utils::setup_kvdb;
 
     use super::*;
+    use rstest::*;
 
-    #[tokio::test]
-    async fn test_store() {
+    #[fixture]
+    async fn token_store() -> TokenStoreImpl {
         let kvdb = setup_kvdb().await;
-        let store = TokenStoreImpl::builder().kvdb(kvdb).build();
-        store
+        TokenStoreImpl::builder().kvdb(kvdb).build()
+    }
+
+    #[rstest]
+    #[tokio::test]
+    async fn test_store(#[future(awt)] token_store: TokenStoreImpl) {
+        token_store
             .store("test".to_string(), "token".to_string(), Utc::now())
             .await
             .unwrap();
-        let token = store.retrieve("test".to_string()).await.unwrap();
+        let token = token_store.retrieve("test".to_string()).await.unwrap();
         assert_eq!(token, "token");
     }
 
+    #[rstest]
     #[tokio::test]
-    async fn test_delete() {
-        let kvdb = setup_kvdb().await;
-        let store = TokenStoreImpl::builder().kvdb(kvdb).build();
-        store
+    async fn test_delete(#[future(awt)] token_store: TokenStoreImpl) {
+        token_store
             .store("test".to_string(), "token".to_string(), Utc::now())
             .await
             .unwrap();
-        store.delete("test".to_string()).await.unwrap();
-        let token = store.retrieve("test".to_string()).await;
+        token_store.delete("test".to_string()).await.unwrap();
+        let token = token_store.retrieve("test".to_string()).await;
         assert!(token.is_none());
     }
 }

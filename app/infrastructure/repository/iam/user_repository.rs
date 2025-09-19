@@ -242,17 +242,19 @@ impl From<UserDto> for User {
 #[cfg(test)]
 mod tests {
 
-    use crate::test::setup_database;
+    use crate::test_utils::setup_database;
 
     use super::*;
 
+    async fn build_user_repository(pool: PgPool) -> UserRepositoryImpl {
+        setup_database(pool.clone()).await;
+        let ct = ChronoTz::default();
+        UserRepositoryImpl::builder().pool(pool).ct(ct).build()
+    }
+
     #[sqlx::test]
     async fn test_create_and_fetch(pool: PgPool) {
-        setup_database(pool.clone()).await;
-        let user_repository = UserRepositoryImpl::builder()
-            .pool(pool)
-            .ct(ChronoTz::default())
-            .build();
+        let user_repository = build_user_repository(pool.clone()).await;
         let id = UserId::generate();
         let user = User::builder()
             .id(id.clone())
@@ -298,11 +300,7 @@ mod tests {
 
     #[sqlx::test]
     async fn test_toggle_enabled(pool: PgPool) {
-        setup_database(pool.clone()).await;
-        let user_repository = UserRepositoryImpl::builder()
-            .pool(pool)
-            .ct(ChronoTz::default())
-            .build();
+        let user_repository = build_user_repository(pool.clone()).await;
         let id = UserId::generate();
         let user = User::builder()
             .id(id.clone())
@@ -339,43 +337,48 @@ mod tests {
 
     #[sqlx::test]
     async fn test_batch_delete(pool: PgPool) {
-        setup_database(pool.clone()).await;
-        let user_repository = UserRepositoryImpl::builder()
-            .pool(pool)
-            .ct(ChronoTz::default())
-            .build();
-        let id = UserId::generate();
-        let user = User::builder()
-            .id(id.clone())
-            .account("test".to_string())
-            .name("test".to_string())
-            .privileged(false)
+        #[derive(FromRow)]
+        struct UserRow {
+            id: UserId,
+        }
+        let user_repository = build_user_repository(pool.clone()).await;
+        let user1 = User::builder()
+            .id(UserId::generate())
+            .account("test1".to_string())
             .password(HashedPassword::try_new("123456".to_string()).unwrap())
-            .role_ids(vec![])
-            .refresh_token("refresh_token".to_string())
+            .name("Test".to_string())
             .enabled(true)
+            .privileged(false)
+            .role_ids(vec![])
             .build();
-        assert!(user_repository.save(user).await.is_ok());
-        let user = user_repository.by_id(&id).await.unwrap();
-        assert_eq!(user.id, id);
-        assert_eq!(user.account, "test");
-        assert_eq!(user.name, "test");
-        assert_eq!(user.privileged, false);
-        assert_eq!(user.role_ids, vec![]);
-        assert_eq!(user.enabled, true);
-        assert!(user_repository.batch_delete(&[id.clone()]).await.is_ok());
-        let result = user_repository.by_id(&id).await;
-        assert!(result.is_err());
-        assert_eq!(result.err(), Some(IamError::UserNotFound));
+        let user2 = User::builder()
+            .id(UserId::generate())
+            .account("test2".to_string())
+            .password(HashedPassword::try_new("123456".to_string()).unwrap())
+            .name("Test2".to_string())
+            .enabled(true)
+            .privileged(false)
+            .role_ids(vec![])
+            .build();
+        assert!(user_repository.save(user1).await.is_ok());
+        assert!(user_repository.save(user2).await.is_ok());
+        let rows: Vec<UserRow> = sqlx::query_as(r#"SELECT id from _users"#)
+            .fetch_all(&pool)
+            .await
+            .unwrap();
+        assert_eq!(rows.len(), 3); // because the have a privileged user
+        let ids = rows.into_iter().map(|row| row.id).collect::<Vec<_>>();
+        assert!(user_repository.batch_delete(&ids).await.is_ok());
+        let rows: Vec<UserRow> = sqlx::query_as(r#"SELECT id from _users"#)
+            .fetch_all(&pool)
+            .await
+            .unwrap();
+        assert_eq!(rows.len(), 1); // because privileged user cannot be deleted
     }
 
     #[sqlx::test]
     async fn test_duplicated_account(pool: PgPool) {
-        setup_database(pool.clone()).await;
-        let user_repository = UserRepositoryImpl::builder()
-            .pool(pool)
-            .ct(ChronoTz::default())
-            .build();
+        let user_repository = build_user_repository(pool.clone()).await;
         let user = User::builder()
             .id(UserId::generate())
             .account("test".to_string())

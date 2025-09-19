@@ -48,4 +48,3 @@ pre_commit:
     cargo sort
     cargo fmt --all
     cargo clippy --workspace
-    just sqlx_prepare

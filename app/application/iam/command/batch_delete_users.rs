@@ -16,7 +16,7 @@ pub struct BatchDeleteUsersCommand {
     ids: Vec<UserId>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct BatchDeleteUsersCommandHandler {
     user_repository: UserRepositoryImpl,
@@ -38,5 +38,35 @@ impl CommandHandler for BatchDeleteUsersCommandHandler {
             (),
             IamEvent::UsersDeleted { items },
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use infrastructure::{
+        shared::{chrono_tz::ChronoTz, pg_pool::PgPool},
+        test_utils::setup_database,
+    };
+
+    use super::*;
+
+    async fn build_command_handler(pool: PgPool) -> BatchDeleteUsersCommandHandler {
+        setup_database(pool.clone()).await;
+        let user_repository = UserRepositoryImpl::builder()
+            .pool(pool.clone())
+            .ct(ChronoTz::default())
+            .build();
+        let command_handler = BatchDeleteUsersCommandHandler::builder()
+            .user_repository(user_repository)
+            .build();
+        command_handler
+    }
+    #[sqlx::test]
+    async fn test_batch_delete(pool: PgPool) {
+        let command_handler = build_command_handler(pool).await;
+        let cmd = BatchDeleteUsersCommand::builder()
+            .ids(vec![UserId::generate()])
+            .build();
+        assert!(command_handler.handle(cmd).await.is_ok());
     }
 }

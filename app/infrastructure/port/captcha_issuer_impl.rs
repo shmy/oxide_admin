@@ -62,12 +62,18 @@ mod tests {
     use std::time::Duration;
 
     use super::*;
-    use crate::test::setup_kvdb;
+    use crate::test_utils::setup_kvdb;
+    use rstest::*;
 
-    #[tokio::test]
-    async fn test_generate_with_ttl() {
+    #[fixture]
+    async fn captcha_issuer() -> CaptchaIssuerImpl {
         let kvdb = setup_kvdb().await;
-        let captcha_issuer = CaptchaIssuerImpl::builder().kvdb(kvdb).build();
+        CaptchaIssuerImpl::builder().kvdb(kvdb).build()
+    }
+
+    #[rstest]
+    #[tokio::test]
+    async fn test_generate_with_ttl(#[future(awt)] captcha_issuer: CaptchaIssuerImpl) {
         let result = captcha_issuer
             .generate_with_ttl(Duration::from_secs(10))
             .await
@@ -76,10 +82,9 @@ mod tests {
         assert!(!result.bytes.is_empty());
     }
 
+    #[rstest]
     #[tokio::test]
-    async fn test_verify_return_err() {
-        let kvdb = setup_kvdb().await;
-        let captcha_issuer = CaptchaIssuerImpl::builder().kvdb(kvdb).build();
+    async fn test_verify_return_err(#[future(awt)] captcha_issuer: CaptchaIssuerImpl) {
         let result = captcha_issuer
             .generate_with_ttl(Duration::from_secs(10))
             .await
