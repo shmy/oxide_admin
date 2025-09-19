@@ -18,7 +18,7 @@ pub struct UpdateUserSelfPasswordCommand {
     confirm_new_password: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct UpdateUserSelfPasswordCommandHandler {
     user_repository: UserRepositoryImpl,
@@ -60,5 +60,113 @@ impl CommandHandler for UpdateUserSelfPasswordCommandHandler {
                 }],
             },
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use domain::iam::value_object::hashed_password::HashedPassword;
+    use infrastructure::{
+        shared::{chrono_tz::ChronoTz, pg_pool::PgPool},
+        test_utils::setup_database,
+    };
+
+    use super::*;
+    async fn build_command_handler(pool: PgPool) -> UpdateUserSelfPasswordCommandHandler {
+        setup_database(pool.clone()).await;
+        let user_repository = UserRepositoryImpl::builder()
+            .pool(pool.clone())
+            .ct(ChronoTz::default())
+            .build();
+
+        UpdateUserSelfPasswordCommandHandler::builder()
+            .user_repository(user_repository)
+            .build()
+    }
+
+    #[sqlx::test]
+    async fn test_update_user_return_err_given_user_not_found(pool: PgPool) {
+        let handler = build_command_handler(pool).await;
+        let cmd = UpdateUserSelfPasswordCommand::builder()
+            .id(UserId::generate())
+            .password("abc123".to_string())
+            .new_password("abc1234".to_string())
+            .confirm_new_password("abc1234".to_string())
+            .build();
+        let result = handler.handle(cmd).await;
+        assert_eq!(result.err(), Some(IamError::UserNotFound));
+    }
+
+    #[sqlx::test]
+    async fn test_update_user_return_err_given_submit_password_not_match(pool: PgPool) {
+        let handler = build_command_handler(pool).await;
+        let user_id = UserId::generate();
+        let user = User::builder()
+            .id(user_id.clone())
+            .account("test".to_string())
+            .name("Test".to_string())
+            .password(HashedPassword::try_new("123123".to_string()).unwrap())
+            .privileged(true)
+            .role_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(handler.user_repository.save(user).await.is_ok());
+        let cmd = UpdateUserSelfPasswordCommand::builder()
+            .id(user_id)
+            .password("abc123".to_string())
+            .new_password("abc123".to_string())
+            .confirm_new_password("abc1234".to_string())
+            .build();
+        let result = handler.handle(cmd).await;
+        assert_eq!(result.err(), Some(IamError::PasswordMismatch));
+    }
+
+    #[sqlx::test]
+    async fn test_update_user_return_err_given_password_eq_original_password(pool: PgPool) {
+        let handler = build_command_handler(pool).await;
+        let user_id = UserId::generate();
+        let user = User::builder()
+            .id(user_id.clone())
+            .account("test".to_string())
+            .name("Test".to_string())
+            .password(HashedPassword::try_new("123123".to_string()).unwrap())
+            .privileged(true)
+            .role_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(handler.user_repository.save(user).await.is_ok());
+        let cmd = UpdateUserSelfPasswordCommand::builder()
+            .id(user_id)
+            .password("abc123".to_string())
+            .new_password("abc123".to_string())
+            .confirm_new_password("abc123".to_string())
+            .build();
+        let result = handler.handle(cmd).await;
+        assert_eq!(result.err(), Some(IamError::PasswordUnchanged));
+    }
+
+    #[sqlx::test]
+    async fn test_update_user_return_err_given_user_disabled(pool: PgPool) {
+        let handler = build_command_handler(pool).await;
+        let user_id = UserId::generate();
+        let user = User::builder()
+            .id(user_id.clone())
+            .account("test".to_string())
+            .name("Test".to_string())
+            .password(HashedPassword::try_new("123123".to_string()).unwrap())
+            .privileged(true)
+            .role_ids(vec![])
+            .enabled(false)
+            .build();
+        assert!(handler.user_repository.save(user).await.is_ok());
+        let cmd = UpdateUserSelfPasswordCommand::builder()
+            .id(user_id)
+            .password("abc123".to_string())
+            .new_password("abc1234".to_string())
+            .confirm_new_password("abc1234".to_string())
+            .build();
+        let result = handler.handle(cmd).await;
+        assert_eq!(result.err(), Some(IamError::UserDisabled));
     }
 }
