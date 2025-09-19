@@ -143,9 +143,8 @@ mod tests {
             .pool(pool.clone())
             .kvdb(kvdb)
             .build();
-        let row = sqlx::query_as!(
-            UserRow,
-            r#"SELECT id AS "id: UserId" from _users WHERE privileged = true LIMIT 1"#
+        let row: UserRow = sqlx::query_as(
+            r#"SELECT id AS "id: UserId" from _users WHERE privileged = true LIMIT 1"#,
         )
         .fetch_one(&pool)
         .await
@@ -203,9 +202,8 @@ mod tests {
         let group = resolver.resolve(&user.id).await;
         assert!(!group.is_empty());
         // add privileged user to the user
-        let row = sqlx::query_as!(
-            RoleRow,
-            r#"SELECT id AS "id: RoleId" from _roles WHERE privileged = true LIMIT 1"#
+        let row: RoleRow = sqlx::query_as(
+            r#"SELECT id AS "id: RoleId" from _roles WHERE privileged = true LIMIT 1"#,
         )
         .fetch_one(&pool)
         .await
