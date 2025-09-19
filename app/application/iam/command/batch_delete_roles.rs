@@ -56,10 +56,9 @@ mod tests {
             .pool(pool.clone())
             .ct(ChronoTz::default())
             .build();
-        let command_handler = BatchDeleteRolesCommandHandler::builder()
+        BatchDeleteRolesCommandHandler::builder()
             .role_repository(role_repository)
-            .build();
-        command_handler
+            .build()
     }
 
     #[sqlx::test]

@@ -56,11 +56,11 @@ mod tests {
             .pool(pool.clone())
             .ct(ChronoTz::default())
             .build();
-        let command_handler = BatchDeleteUsersCommandHandler::builder()
+        BatchDeleteUsersCommandHandler::builder()
             .user_repository(user_repository)
-            .build();
-        command_handler
+            .build()
     }
+
     #[sqlx::test]
     async fn test_batch_delete(pool: PgPool) {
         let command_handler = build_command_handler(pool).await;

@@ -14,7 +14,7 @@ pub struct BatchDisableUsersCommand {
     ids: Vec<UserId>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct BatchDisableUsersCommandHandler {
     user_repository: UserRepositoryImpl,
@@ -46,5 +46,46 @@ impl CommandHandler for BatchDisableUsersCommandHandler {
             (),
             IamEvent::UsersUpdated { items },
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use infrastructure::{
+        port::token_store_impl::TokenStoreImpl,
+        shared::{chrono_tz::ChronoTz, pg_pool::PgPool},
+        test_utils::{setup_database, setup_kvdb},
+    };
+
+    use super::*;
+
+    async fn build_command_handler(pool: PgPool) -> BatchDisableUsersCommandHandler {
+        setup_database(pool.clone()).await;
+        let kvdb = setup_kvdb().await;
+        let user_repository1 = UserRepositoryImpl::builder()
+            .pool(pool.clone())
+            .ct(ChronoTz::default())
+            .build();
+        let user_repository2 = UserRepositoryImpl::builder()
+            .pool(pool.clone())
+            .ct(ChronoTz::default())
+            .build();
+        let sign_out_command_handler = SignOutCommandHandler::builder()
+            .user_repository(user_repository1)
+            .token_store(TokenStoreImpl::builder().kvdb(kvdb).build())
+            .build();
+        BatchDisableUsersCommandHandler::builder()
+            .user_repository(user_repository2)
+            .sign_out_command_handler(sign_out_command_handler)
+            .build()
+    }
+
+    #[sqlx::test]
+    async fn test_batch_delete(pool: PgPool) {
+        let command_handler = build_command_handler(pool).await;
+        let cmd = BatchDisableUsersCommand::builder()
+            .ids(vec![UserId::generate()])
+            .build();
+        assert!(command_handler.handle(cmd).await.is_ok());
     }
 }
