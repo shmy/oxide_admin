@@ -38,7 +38,7 @@ pub struct SearchUsersQuery {
     role_id: Option<String>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Builder)]
 #[injectable]
 pub struct SearchUsersQueryHandler {
     pool: PgPool,
@@ -126,5 +126,54 @@ impl SearchUsersQueryHandler {
         query: SearchUsersQuery,
     ) -> Result<PagingResult<UserDto>, IamError> {
         self.cache_provider.get_with(query, |q| self.query(q)).await
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use infrastructure::test_utils::{setup_database, setup_kvdb};
+
+    use super::*;
+
+    async fn build_query_handler(pool: PgPool) -> SearchUsersQueryHandler {
+        setup_database(pool.clone()).await;
+        let kvdb = setup_kvdb().await;
+        let cache_provider = CacheProvider::builder()
+            .prefix("iam_search_roles:")
+            .ttl(Duration::from_secs(15 * 60))
+            .kvdb(kvdb)
+            .build();
+        SearchUsersQueryHandler::builder()
+            .pool(pool)
+            .cache_provider(cache_provider)
+            .build()
+    }
+
+    #[sqlx::test]
+    async fn test_search_users(pool: PgPool) {
+        let handler = build_query_handler(pool).await;
+        let result = handler
+            .query_cached(
+                SearchUsersQuery::builder()
+                    .paging(PagingQuery::default())
+                    .build(),
+            )
+            .await;
+        assert!(result.is_ok());
+        assert!(handler.clean_cache().await.is_ok());
+    }
+
+    #[sqlx::test]
+    async fn test_search_users_return_err_given_pool_is_closed(pool: PgPool) {
+        let handler = build_query_handler(pool.clone()).await;
+        pool.close().await;
+        let result = handler
+            .query_cached(
+                SearchUsersQuery::builder()
+                    .paging(PagingQuery::default())
+                    .build(),
+            )
+            .await;
+        assert!(result.is_err());
     }
 }

@@ -37,3 +37,12 @@ impl PagingQuery {
         self.page_size.clamp(1, 100)
     }
 }
+
+impl Default for PagingQuery {
+    fn default() -> Self {
+        Self {
+            page: Self::DEFAULT_PAGE,
+            page_size: Self::DEFAULT_PAGE_SIZE,
+        }
+    }
+}
