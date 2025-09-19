@@ -60,7 +60,7 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn test_batch_delete(pool: PgPool) {
+    async fn test_batch_disable(pool: PgPool) {
         let command_handler = build_command_handler(pool).await;
         let cmd = BatchDisableRolesCommand::builder()
             .ids(vec![RoleId::generate()])

@@ -61,7 +61,7 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn test_batch_delete(pool: PgPool) {
+    async fn test_batch_enable(pool: PgPool) {
         let command_handler = build_command_handler(pool).await;
         let cmd = BatchEnableUsersCommand::builder()
             .ids(vec![UserId::generate()])

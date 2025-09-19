@@ -86,7 +86,7 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn test_update_user_return_err_given_user_not_found(pool: PgPool) {
+    async fn test_update_user_password_return_err_given_user_not_found(pool: PgPool) {
         let handler = build_command_handler(pool).await;
         let cmd = UpdateUserSelfPasswordCommand::builder()
             .id(UserId::generate())
@@ -99,7 +99,7 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn test_update_user_return_err_given_submit_password_not_match(pool: PgPool) {
+    async fn test_update_user_password_return_err_given_passwords_mismatch(pool: PgPool) {
         let handler = build_command_handler(pool).await;
         let user_id = UserId::generate();
         let user = User::builder()
@@ -123,7 +123,7 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn test_update_user_return_err_given_password_eq_original_password(pool: PgPool) {
+    async fn test_update_user_password_return_err_given_password_unchanged(pool: PgPool) {
         let handler = build_command_handler(pool).await;
         let user_id = UserId::generate();
         let user = User::builder()
@@ -147,7 +147,7 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn test_update_user_return_err_given_user_disabled(pool: PgPool) {
+    async fn test_update_user_password_return_err_given_user_disabled(pool: PgPool) {
         let handler = build_command_handler(pool).await;
         let user_id = UserId::generate();
         let user = User::builder()

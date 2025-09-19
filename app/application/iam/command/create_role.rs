@@ -83,7 +83,7 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn test_create_return_duplicated_err(pool: PgPool) {
+    async fn test_create_return_err_given_duplicated_name(pool: PgPool) {
         let command_handler = build_command_handler(pool).await;
         let cmd = CreateRoleCommand::builder()
             .name("test".to_string())
