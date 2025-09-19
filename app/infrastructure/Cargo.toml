@@ -47,12 +47,12 @@ sqlx = { workspace = true, features = [
     "json",
     "derive",
 ] }
-tempoid = { workspace = true }
-tokio = { workspace = true, features = ["full"] }
-tracing = { workspace = true }
 tempfile = { workspace = true }
+tempoid = { workspace = true }
 testcontainers = { workspace = true }
 testcontainers-modules = { workspace = true, features = ["postgres"] }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
 
 [dev-dependencies]
 rstest = { workspace = true }

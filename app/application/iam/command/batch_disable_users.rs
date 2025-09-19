@@ -62,20 +62,22 @@ mod tests {
     async fn build_command_handler(pool: PgPool) -> BatchDisableUsersCommandHandler {
         setup_database(pool.clone()).await;
         let kvdb = setup_kvdb().await;
-        let user_repository1 = UserRepositoryImpl::builder()
+        let sign_out_command_handler = {
+            let user_repository = UserRepositoryImpl::builder()
+                .pool(pool.clone())
+                .ct(ChronoTz::default())
+                .build();
+            SignOutCommandHandler::builder()
+                .user_repository(user_repository)
+                .token_store(TokenStoreImpl::builder().kvdb(kvdb).build())
+                .build()
+        };
+        let user_repository = UserRepositoryImpl::builder()
             .pool(pool.clone())
             .ct(ChronoTz::default())
-            .build();
-        let user_repository2 = UserRepositoryImpl::builder()
-            .pool(pool.clone())
-            .ct(ChronoTz::default())
-            .build();
-        let sign_out_command_handler = SignOutCommandHandler::builder()
-            .user_repository(user_repository1)
-            .token_store(TokenStoreImpl::builder().kvdb(kvdb).build())
             .build();
         BatchDisableUsersCommandHandler::builder()
-            .user_repository(user_repository2)
+            .user_repository(user_repository)
             .sign_out_command_handler(sign_out_command_handler)
             .build()
     }
