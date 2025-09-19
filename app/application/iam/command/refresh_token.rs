@@ -18,7 +18,7 @@ pub struct RefreshTokenCommand {
     refresh_token: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct RefreshTokenCommandHandler {
     user_repository: UserRepositoryImpl,
@@ -60,5 +60,142 @@ impl CommandHandler for RefreshTokenCommandHandler {
             token_output,
             IamEvent::UserRefreshTokenSucceeded { id },
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use domain::iam::{
+        entity::user::User,
+        value_object::{hashed_password::HashedPassword, user_id::UserId},
+    };
+    use infrastructure::{
+        shared::{chrono_tz::ChronoTz, config::Config, pg_pool::PgPool},
+        test_utils::{setup_database, setup_kvdb},
+    };
+    use sqlx::types::chrono::Utc;
+
+    use super::*;
+    async fn build_command_handler(pool: PgPool) -> RefreshTokenCommandHandler {
+        setup_database(pool.clone()).await;
+        let kvdb = setup_kvdb().await;
+        let user_repository = UserRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::default())
+            .build();
+        let token_issuer = TokenIssuerImpl::builder()
+            .config(Config::default())
+            .ct(ChronoTz::default())
+            .build();
+        let token_store = TokenStoreImpl::builder().kvdb(kvdb).build();
+        RefreshTokenCommandHandler::builder()
+            .user_repository(user_repository)
+            .token_issuer(token_issuer)
+            .token_store(token_store)
+            .build()
+    }
+
+    #[sqlx::test]
+    async fn test_refresh_token(pool: PgPool) {
+        let command_handler = build_command_handler(pool).await;
+        let user = User::builder()
+            .id(UserId::generate())
+            .account("test".to_string())
+            .name("test".to_string())
+            .password(HashedPassword::try_new("123123".to_string()).unwrap())
+            .privileged(false)
+            .role_ids(vec![])
+            .refresh_token_expired_at(Utc::now().naive_utc() + Duration::from_secs(60))
+            .refresh_token("test-token".to_string())
+            .enabled(true)
+            .build();
+        assert!(command_handler.user_repository.save(user).await.is_ok());
+
+        assert!(
+            command_handler
+                .handle(
+                    RefreshTokenCommand::builder()
+                        .refresh_token("test-token".to_string())
+                        .build(),
+                )
+                .await
+                .is_ok()
+        );
+    }
+
+    #[sqlx::test]
+    async fn test_refresh_token_return_err_given_user_not_found(pool: PgPool) {
+        let command_handler = build_command_handler(pool).await;
+        assert_eq!(
+            command_handler
+                .handle(
+                    RefreshTokenCommand::builder()
+                        .refresh_token("fake-token".to_string())
+                        .build()
+                )
+                .await
+                .err(),
+            Some(IamError::UserNotFound)
+        );
+    }
+
+    #[sqlx::test]
+    async fn test_refresh_token_return_err_given_user_disabled(pool: PgPool) {
+        let command_handler = build_command_handler(pool).await;
+        let user = User::builder()
+            .id(UserId::generate())
+            .account("test".to_string())
+            .name("test".to_string())
+            .password(HashedPassword::try_new("123123".to_string()).unwrap())
+            .privileged(false)
+            .role_ids(vec![])
+            .refresh_token_expired_at(Utc::now().naive_utc() + Duration::from_secs(60))
+            .refresh_token("test-token".to_string())
+            .enabled(false)
+            .build();
+        assert!(command_handler.user_repository.save(user).await.is_ok());
+
+        assert_eq!(
+            command_handler
+                .handle(
+                    RefreshTokenCommand::builder()
+                        .refresh_token("test-token".to_string())
+                        .build()
+                )
+                .await
+                .err(),
+            Some(IamError::UserDisabled)
+        );
+    }
+
+    #[sqlx::test]
+    async fn test_refresh_token_return_err_given_user_refreh_token_expired(pool: PgPool) {
+        let command_handler = build_command_handler(pool).await;
+        let user = User::builder()
+            .id(UserId::generate())
+            .account("test".to_string())
+            .name("test".to_string())
+            .password(HashedPassword::try_new("123123".to_string()).unwrap())
+            .privileged(false)
+            .role_ids(vec![])
+            .refresh_token_expired_at(Utc::now().naive_utc() - Duration::from_secs(60))
+            .refresh_token("test-token".to_string())
+            .enabled(true)
+            .build();
+        assert!(command_handler.user_repository.save(user).await.is_ok());
+
+        assert_eq!(
+            command_handler
+                .handle(
+                    RefreshTokenCommand::builder()
+                        .refresh_token("test-token".to_string())
+                        .build()
+                )
+                .await
+                .err(),
+            Some(IamError::RefreshTokenExpired)
+        );
     }
 }

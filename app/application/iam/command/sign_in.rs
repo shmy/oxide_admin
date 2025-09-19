@@ -36,7 +36,7 @@ impl Debug for SignInCommand {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct SignInCommandHandler {
     captcha_issuer: CaptchaIssuerImpl,
@@ -80,5 +80,84 @@ impl CommandHandler for SignInCommandHandler {
             token_output,
             IamEvent::UserLoginSucceeded { id },
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use domain::iam::{
+        entity::user::User,
+        value_object::{hashed_password::HashedPassword, user_id::UserId},
+    };
+    use infrastructure::{
+        shared::{chrono_tz::ChronoTz, config::Config, pg_pool::PgPool},
+        test_utils::{setup_database, setup_kvdb},
+    };
+
+    use super::*;
+
+    async fn build_command_handler(pool: PgPool) -> SignInCommandHandler {
+        setup_database(pool.clone()).await;
+        let kvdb = setup_kvdb().await;
+        let captcha_issuer = CaptchaIssuerImpl::builder().kvdb(kvdb.clone()).build();
+        let user_repository = UserRepositoryImpl::builder()
+            .pool(pool)
+            .ct(ChronoTz::default())
+            .build();
+        let token_issuer = TokenIssuerImpl::builder()
+            .config(Config::default())
+            .ct(ChronoTz::default())
+            .build();
+        let token_store = TokenStoreImpl::builder().kvdb(kvdb).build();
+        SignInCommandHandler::builder()
+            .captcha_issuer(captcha_issuer)
+            .user_repository(user_repository)
+            .token_issuer(token_issuer)
+            .token_store(token_store)
+            .build()
+    }
+
+    #[sqlx::test]
+    async fn test_sign_in(pool: PgPool) {
+        let command_handler = build_command_handler(pool).await;
+        let user = User::builder()
+            .id(UserId::generate())
+            .account("test".to_string())
+            .name("test".to_string())
+            .password(HashedPassword::try_new("123123".to_string()).unwrap())
+            .privileged(false)
+            .role_ids(vec![])
+            .enabled(true)
+            .build();
+        assert!(command_handler.user_repository.save(user).await.is_ok());
+
+        assert_eq!(
+            command_handler
+                .handle(
+                    SignInCommand::builder()
+                        .account("test".to_string())
+                        .password("123123".to_string())
+                        .captcha_key("test-key".to_string())
+                        .captcha_value("test-value".to_string())
+                        .build()
+                )
+                .await
+                .err(),
+            Some(IamError::CaptchaInvalid)
+        );
+    }
+
+    #[test]
+    fn test_debug_command() {
+        let command = SignInCommand::builder()
+            .account("test".to_string())
+            .password("123123".to_string())
+            .captcha_key("test-key".to_string())
+            .captcha_value("test-value".to_string())
+            .build();
+        assert_eq!(
+            format!("{:?}", command),
+            "SignInCommand { account: \"test\", password: \"<RESERVED>\", captcha_key: \"test-key\", captcha_value: \"test-value\" }"
+        );
     }
 }

@@ -11,7 +11,7 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize, Builder)]
 pub struct RefreshCaptchaCommand {}
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct RefreshCaptchaCommandHandler {
     captcha_issuer: CaptchaIssuerImpl,
@@ -32,5 +32,30 @@ impl CommandHandler for RefreshCaptchaCommandHandler {
             .generate_with_ttl(Duration::from_secs(60))
             .await?;
         Ok(CommandResult::without_events(output))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use infrastructure::test_utils::setup_kvdb;
+
+    use super::*;
+    async fn build_command_handler() -> RefreshCaptchaCommandHandler {
+        let kvdb = setup_kvdb().await;
+        let captcha_issuer = CaptchaIssuerImpl::builder().kvdb(kvdb).build();
+        RefreshCaptchaCommandHandler::builder()
+            .captcha_issuer(captcha_issuer)
+            .build()
+    }
+
+    #[tokio::test]
+    async fn test_refresh_captcha() {
+        let command_handler = build_command_handler().await;
+        assert!(
+            command_handler
+                .handle(RefreshCaptchaCommand {})
+                .await
+                .is_ok()
+        );
     }
 }

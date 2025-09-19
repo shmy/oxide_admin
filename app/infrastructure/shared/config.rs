@@ -123,7 +123,7 @@ pub struct Openapi {
     pub enabled: bool,
 }
 
-#[cfg(test)]
+/// Only for test
 impl Default for Config {
     fn default() -> Self {
         Config::builder()
