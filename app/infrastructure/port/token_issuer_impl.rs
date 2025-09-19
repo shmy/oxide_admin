@@ -1,3 +1,4 @@
+use bon::Builder;
 use domain::{
     iam::error::IamError,
     shared::port::token_issuer::{TokenIssuerOutput, TokenIssuerTrait, UserClaims},
@@ -10,11 +11,11 @@ use crate::shared::{chrono_tz::ChronoTz, config::Config};
 
 const ALGORITHM: Algorithm = Algorithm::HS256;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Builder)]
 #[injectable]
 pub struct TokenIssuerImpl {
     config: Config,
-    tz: ChronoTz,
+    ct: ChronoTz,
 }
 
 impl TokenIssuerTrait for TokenIssuerImpl {
@@ -44,7 +45,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
 
     #[tracing::instrument]
     fn generate(&self, sub: String) -> Result<TokenIssuerOutput, Self::Error> {
-        let now = self.tz.now_utc();
+        let now = self.ct.now_utc();
         let iat = now.timestamp();
         let jwt_config = &self.config.jwt;
         let secret = jwt_config.access_token_secret;
@@ -58,9 +59,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
             iat,
             exp: access_token_expires_at_timestamp,
         };
-        let access_token = self
-            .generate_access_token(&claims, secret)
-            .map_err(|_| IamError::AccessTokenSignFailed)?;
+        let access_token = self.generate_access_token(&claims, secret)?;
         let refresh_token = self.generate_refresh_token();
         Ok(TokenIssuerOutput {
             access_token,
@@ -98,5 +97,134 @@ impl TokenIssuerTrait for TokenIssuerImpl {
             jsonwebtoken::decode(access_token, &DecodingKey::from_secret(&[]), &validation)
                 .map_err(|_| IamError::AccessTokenVerifyFailed)?;
         Ok(tokendata.claims)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use chrono::Utc;
+    use serde::Deserialize;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_generate_access_token_and_verify_ok() {
+        #[derive(Debug, Serialize, Deserialize)]
+        struct UserClaims {
+            sub: String,
+            iat: i64,
+            exp: i64,
+        }
+        const SECRET: &[u8] = b"secret";
+        let token_issuer = TokenIssuerImpl::builder()
+            .config(Config::default())
+            .ct(ChronoTz::default())
+            .build();
+        let iat = Utc::now().timestamp();
+        let exp = iat + 3600;
+        let token = token_issuer
+            .generate_access_token(
+                &UserClaims {
+                    sub: "test".to_string(),
+                    iat,
+                    exp,
+                },
+                SECRET,
+            )
+            .unwrap();
+        let claims: UserClaims = token_issuer.verify(&token, SECRET).unwrap();
+        assert_eq!(claims.sub, "test");
+        assert_eq!(claims.iat, iat);
+        assert_eq!(claims.exp, exp);
+    }
+
+    #[tokio::test]
+    async fn test_generate_access_token_and_verify_err() {
+        #[derive(Debug, Serialize, Deserialize)]
+        struct UserClaims {
+            sub: String,
+            iat: i64,
+            exp: i64,
+        }
+        const SECRET: &[u8] = b"secret";
+        let token_issuer = TokenIssuerImpl::builder()
+            .config(Config::default())
+            .ct(ChronoTz::default())
+            .build();
+        let iat = Utc::now().timestamp();
+        let token1 = token_issuer
+            .generate_access_token(
+                &UserClaims {
+                    sub: "test".to_string(),
+                    iat,
+                    exp: iat - 3600,
+                },
+                SECRET,
+            )
+            .unwrap();
+        let token2 = token_issuer
+            .generate_access_token(
+                &UserClaims {
+                    sub: "test".to_string(),
+                    iat,
+                    exp: iat - 60,
+                },
+                SECRET,
+            )
+            .unwrap();
+        let result = token_issuer.verify::<UserClaims>(&token1, SECRET);
+        assert_eq!(result.err(), Some(IamError::AccessTokenVerifyFailed));
+        let result = token_issuer.verify::<UserClaims>(&token2, SECRET);
+        assert_eq!(result.err(), Some(IamError::AccessTokenVerifyFailed));
+    }
+
+    #[tokio::test]
+    async fn test_generate_refresh_token() {
+        let token_issuer = TokenIssuerImpl::builder()
+            .config(Config::default())
+            .ct(ChronoTz::default())
+            .build();
+        let token = token_issuer.generate_refresh_token();
+        assert_eq!(token.len(), 21);
+    }
+
+    #[tokio::test]
+    async fn test_generate() {
+        #[derive(Debug, Serialize, Deserialize)]
+        struct UserClaims {
+            sub: String,
+            iat: i64,
+            exp: i64,
+        }
+        let token_issuer = TokenIssuerImpl::builder()
+            .config(Config::default())
+            .ct(ChronoTz::default())
+            .build();
+        let token_data = token_issuer.generate("test".to_string()).unwrap();
+        let claims: UserClaims = token_issuer
+            .decode_without_validation(&token_data.access_token)
+            .unwrap();
+        assert_eq!(claims.sub, "test");
+        assert!(claims.iat > 0);
+        assert!(claims.exp > 0);
+        assert_eq!(token_data.refresh_token.len(), 21);
+    }
+
+    #[tokio::test]
+    async fn test_decode_without_validation_err() {
+        #[derive(Debug, Serialize, Deserialize)]
+        struct UserClaims {
+            sub: String,
+            iat: i64,
+            exp: i64,
+        }
+        let token = "xxxx";
+        let token_issuer = TokenIssuerImpl::builder()
+            .config(Config::default())
+            .ct(ChronoTz::default())
+            .build();
+        let result = token_issuer.decode_without_validation::<UserClaims>(token);
+        assert_eq!(result.err(), Some(IamError::AccessTokenVerifyFailed));
     }
 }

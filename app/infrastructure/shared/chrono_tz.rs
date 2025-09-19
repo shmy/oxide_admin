@@ -18,3 +18,10 @@ impl ChronoTz {
         Utc::now()
     }
 }
+
+#[cfg(test)]
+impl Default for ChronoTz {
+    fn default() -> Self {
+        ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build()
+    }
+}

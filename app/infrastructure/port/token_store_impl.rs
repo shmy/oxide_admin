@@ -1,9 +1,10 @@
+use bon::Builder;
 use domain::{iam::error::IamError, shared::port::token_store::TokenStoreTrait};
 use kvdb_kit::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 use sqlx::types::chrono::{DateTime, Utc};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Builder)]
 #[injectable]
 pub struct TokenStoreImpl {
     kvdb: Kvdb,
@@ -43,5 +44,37 @@ impl TokenStoreTrait for TokenStoreImpl {
 impl TokenStoreImpl {
     fn fill_key(key: &str) -> String {
         format!("user:access_token:{key}")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::test::setup_kvdb;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_store() {
+        let kvdb = setup_kvdb().await;
+        let store = TokenStoreImpl::builder().kvdb(kvdb).build();
+        store
+            .store("test".to_string(), "token".to_string(), Utc::now())
+            .await
+            .unwrap();
+        let token = store.retrieve("test".to_string()).await.unwrap();
+        assert_eq!(token, "token");
+    }
+
+    #[tokio::test]
+    async fn test_delete() {
+        let kvdb = setup_kvdb().await;
+        let store = TokenStoreImpl::builder().kvdb(kvdb).build();
+        store
+            .store("test".to_string(), "token".to_string(), Utc::now())
+            .await
+            .unwrap();
+        store.delete("test".to_string()).await.unwrap();
+        let token = store.retrieve("test".to_string()).await;
+        assert!(token.is_none());
     }
 }

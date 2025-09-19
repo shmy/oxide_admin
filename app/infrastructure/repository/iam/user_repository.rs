@@ -251,7 +251,7 @@ mod tests {
         setup_database(pool.clone()).await;
         let user_repository = UserRepositoryImpl::builder()
             .pool(pool)
-            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .ct(ChronoTz::default())
             .build();
         let id = UserId::generate();
         let user = User::builder()
@@ -301,7 +301,7 @@ mod tests {
         setup_database(pool.clone()).await;
         let user_repository = UserRepositoryImpl::builder()
             .pool(pool)
-            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .ct(ChronoTz::default())
             .build();
         let id = UserId::generate();
         let user = User::builder()
@@ -342,7 +342,7 @@ mod tests {
         setup_database(pool.clone()).await;
         let user_repository = UserRepositoryImpl::builder()
             .pool(pool)
-            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .ct(ChronoTz::default())
             .build();
         let id = UserId::generate();
         let user = User::builder()
@@ -374,7 +374,7 @@ mod tests {
         setup_database(pool.clone()).await;
         let user_repository = UserRepositoryImpl::builder()
             .pool(pool)
-            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .ct(ChronoTz::default())
             .build();
         let user = User::builder()
             .id(UserId::generate())

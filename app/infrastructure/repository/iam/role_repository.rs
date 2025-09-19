@@ -183,7 +183,7 @@ mod tests {
         setup_database(pool.clone()).await;
         let role_repository = RoleRepositoryImpl::builder()
             .pool(pool)
-            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .ct(ChronoTz::default())
             .build();
         let id = RoleId::generate();
         let role = Role::builder()
@@ -207,7 +207,7 @@ mod tests {
         setup_database(pool.clone()).await;
         let role_repository = RoleRepositoryImpl::builder()
             .pool(pool)
-            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .ct(ChronoTz::default())
             .build();
         let id = RoleId::generate();
         let role = Role::builder()
@@ -243,7 +243,7 @@ mod tests {
         setup_database(pool.clone()).await;
         let role_repository = RoleRepositoryImpl::builder()
             .pool(pool)
-            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .ct(ChronoTz::default())
             .build();
         let id = RoleId::generate();
         let role = Role::builder()
@@ -271,7 +271,7 @@ mod tests {
         setup_database(pool.clone()).await;
         let role_repository = RoleRepositoryImpl::builder()
             .pool(pool)
-            .ct(ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build())
+            .ct(ChronoTz::default())
             .build();
         let role = Role::builder()
             .id(RoleId::generate())

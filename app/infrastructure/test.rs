@@ -1,3 +1,4 @@
+use kvdb_kit::Kvdb;
 use sqlx::PgPool;
 
 use crate::{
@@ -7,7 +8,7 @@ use crate::{
 };
 
 pub async fn setup_database(pool: PgPool) {
-    let ct = ChronoTz::builder().tz(chrono_tz::Asia::Shanghai).build();
+    let ct = ChronoTz::default();
     let user_repository = UserRepositoryImpl::builder()
         .pool(pool.clone())
         .ct(ct.clone())
@@ -19,4 +20,10 @@ pub async fn setup_database(pool: PgPool) {
     migrate(pool.clone(), user_repository, role_repository)
         .await
         .unwrap();
+}
+
+pub async fn setup_kvdb() -> Kvdb {
+    let dir = tempfile::tempdir().unwrap();
+    let kvdb = Kvdb::try_new(dir.path().join("kvdb")).await.unwrap();
+    kvdb
 }
