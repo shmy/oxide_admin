@@ -1,3 +1,4 @@
+use bon::Builder;
 use captcha_kit::CaptchaTrait as _;
 use domain::{
     iam::error::IamError,
@@ -9,7 +10,7 @@ use domain::{
 use kvdb_kit::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 #[injectable]
 pub struct CaptchaIssuerImpl {
     kvdb: Kvdb,
@@ -53,5 +54,40 @@ impl CaptchaIssuerTrait for CaptchaIssuerImpl {
 
         let _ = self.kvdb.delete(&full_key).await;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use super::*;
+    use crate::test::setup_kvdb;
+
+    #[tokio::test]
+    async fn test_generate_with_ttl() {
+        let kvdb = setup_kvdb().await;
+        let captcha_issuer = CaptchaIssuerImpl::builder().kvdb(kvdb).build();
+        let result = captcha_issuer
+            .generate_with_ttl(Duration::from_secs(10))
+            .await
+            .unwrap();
+        assert!(!result.key.is_empty());
+        assert!(!result.bytes.is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_verify_return_err() {
+        let kvdb = setup_kvdb().await;
+        let captcha_issuer = CaptchaIssuerImpl::builder().kvdb(kvdb).build();
+        let result = captcha_issuer
+            .generate_with_ttl(Duration::from_secs(10))
+            .await
+            .unwrap();
+        let result = captcha_issuer.verify(&result.key, "fake_value").await;
+        assert_eq!(result.err(), Some(IamError::CaptchaIncorrect));
+
+        let result = captcha_issuer.verify("not_exist_key", "fake_value").await;
+        assert_eq!(result.err(), Some(IamError::CaptchaInvalid));
     }
 }
