@@ -79,7 +79,7 @@ impl MathCaptcha {
                 }
             }
             '÷' => {
-                if c != 0 && a % c == 0 && a / c <= self.max_result {
+                if c != 0 && a.is_multiple_of(c) && a / c <= self.max_result {
                     Some(a / c)
                 } else {
                     None
