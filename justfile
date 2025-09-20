@@ -11,7 +11,7 @@ test_watch:
     cargo watch -q -c -x "nextest run --workspace" -w app -w crates -w bin
 
 test_coverage:
-    cargo llvm-cov nextest --workspace --html
+    cargo llvm-cov nextest --workspace --ignore-filename-regex 'bin/|src/'  --html
 
 sqlx_prepare:
     cargo clean

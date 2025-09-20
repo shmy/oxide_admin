@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Backend test
         run: |
-          cargo llvm-cov nextest --workspace --lcov > lcov.info
+          cargo llvm-cov nextest --workspace --ignore-filename-regex 'bin/|src/' --lcov > lcov.info
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
