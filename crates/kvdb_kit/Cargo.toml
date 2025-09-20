@@ -21,3 +21,7 @@ serde = { workspace = true, features = ["derive"] }
 tokio = { workspace = true, features = ["full"], optional = true }
 tokio-cron-scheduler = { workspace = true, optional = true }
 tracing = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["full"] }

@@ -68,10 +68,12 @@ mod tests {
         let mut sched = TokioCronScheduler::try_new().await.unwrap();
 
         sched.add(TestJob, chrono_tz::Asia::Shanghai).await.unwrap();
-        sched
-            .run_with_signal(tokio::time::sleep(std::time::Duration::from_secs(2)))
-            .await
-            .unwrap();
+        assert!(
+            sched
+                .run_with_signal(tokio::time::sleep(std::time::Duration::from_secs(2)))
+                .await
+                .is_ok()
+        );
         assert!(logs_contain("test job running"));
     }
 }

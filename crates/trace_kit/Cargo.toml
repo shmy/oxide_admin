@@ -38,3 +38,7 @@ tracing-subscriber = { version = "0.3", default-features = false, features = [
     "ansi",
     "env-filter",
 ] }
+
+[dev-dependencies]
+tracing = { workspace = true }
+tracing-test = { workspace = true }

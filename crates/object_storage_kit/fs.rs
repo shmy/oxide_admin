@@ -113,3 +113,88 @@ pub struct FileParams {
     #[serde(with = "chrono::serde::ts_seconds")]
     exp: chrono::DateTime<Utc>,
 }
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use super::*;
+
+    fn build_fs() -> Fs {
+        let dir = tempfile::tempdir().unwrap();
+        Fs::try_new(
+            FsConfig::builder()
+                .root(dir.path().to_string_lossy().to_string())
+                .basepath("/uploads".to_string())
+                .hmac_secret(b"secret")
+                .link_period(Duration::from_secs(60))
+                .build(),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn test_try_new() {
+        let fs = build_fs();
+        let debug_str = format!("{:?}", fs);
+        assert_eq!(debug_str, "Fs");
+    }
+
+    #[test]
+    fn test_try_new_return_ok_given_basepath_has_trailing_slash() {
+        let dir = tempfile::tempdir().unwrap();
+
+        let fs = Fs::try_new(
+            FsConfig::builder()
+                .root(dir.path().to_string_lossy().to_string())
+                .basepath("/uploads/".to_string())
+                .hmac_secret(b"secret")
+                .link_period(Duration::from_secs(60))
+                .build(),
+        )
+        .unwrap();
+        let debug_str = format!("{:?}", fs);
+        assert_eq!(debug_str, "Fs");
+    }
+
+    #[test]
+    fn test_verify_url_return_false_given_url_is_not_query() {
+        let fs = build_fs();
+        let uri = Uri::from_static("http://localhost:8080/uploads/test.txt");
+        assert!(!fs.verify_url(uri));
+    }
+
+    #[test]
+    fn test_verify_url_return_false_given_url_invalid() {
+        let fs = build_fs();
+        let uri = Uri::from_static("http://localhost:8080/uploads/test.txt?a=1&b=2");
+        assert!(!fs.verify_url(uri));
+    }
+
+    #[test]
+    fn test_verify_url_return_false_given_url_exp_expired() {
+        let fs = build_fs();
+        let now = (Utc::now() - Duration::from_secs(60)).timestamp();
+        let uri = Uri::from_str(&format!(
+            "http://localhost:8080/uploads/test.txt?sign=123456&exp={}",
+            now
+        ))
+        .unwrap();
+        assert!(!fs.verify_url(uri));
+    }
+
+    #[test]
+    fn test_purify_url_opt() {
+        let fs = build_fs();
+
+        assert!(fs.purify_url_opt(None).is_none());
+        assert!(
+            fs.purify_url_opt(Some("2025/09/09/test.txt".to_string()))
+                .is_some()
+        );
+        assert!(
+            fs.purify_url_opt(Some("2025/09/09/test.txt?a=1&b=2".to_string()))
+                .is_some()
+        );
+    }
+}

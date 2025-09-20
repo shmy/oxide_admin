@@ -2185,6 +2185,7 @@ dependencies = [
  "redb",
  "rmp-serde",
  "serde",
+ "tempfile",
  "tokio",
  "tokio-cron-scheduler",
  "tracing",
@@ -2678,6 +2679,7 @@ dependencies = [
  "opendal",
  "serde",
  "serde_urlencoded",
+ "tempfile",
  "tokio",
  "tokio-util",
  "tracing",
@@ -4960,9 +4962,11 @@ dependencies = [
  "opentelemetry-semantic-conventions",
  "opentelemetry_sdk",
  "serde_json",
+ "tracing",
  "tracing-appender",
  "tracing-opentelemetry",
  "tracing-subscriber",
+ "tracing-test",
 ]
 
 [[package]]

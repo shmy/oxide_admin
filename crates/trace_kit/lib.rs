@@ -138,3 +138,30 @@ impl Drop for OtlpGuard {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::result::Result::Ok;
+    use tracing::{debug, error, info, warn};
+    use tracing_test::traced_test;
+
+    #[test]
+    fn test_init_tracing_does_not_panic() {
+        let config = TraceConfig::builder().level("debug").build();
+        let _guard = init_tracing(config);
+    }
+
+    #[test]
+    #[traced_test]
+    fn test_init_tracing() {
+        debug!("this is a debug log");
+        info!("this is a info log");
+        warn!("this is a warn log");
+        error!("this is a error log");
+        assert!(logs_contain("this is a debug log"));
+        assert!(logs_contain("this is a info log"));
+        assert!(logs_contain("this is a warn log"));
+        assert!(logs_contain("this is a error log"));
+    }
+}

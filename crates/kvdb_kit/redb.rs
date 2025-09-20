@@ -239,3 +239,57 @@ impl KvdbTrait for RedbKvdb {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    async fn build_redb() -> RedbKvdb {
+        let dir = tempfile::tempdir().unwrap();
+        RedbKvdb::try_new(dir.path().join("kvdb")).await.unwrap()
+    }
+
+    #[tokio::test]
+    async fn test_debug() {
+        let kvdb = build_redb().await;
+        let debug_str = format!("{:?}", kvdb);
+        assert_eq!(debug_str, "RedbKvdb");
+        kvdb.close().await;
+    }
+
+    #[tokio::test]
+    async fn test_delete_expired() {
+        let kvdb = build_redb().await;
+        assert!(kvdb.set("key", "value").await.is_ok());
+        assert!(
+            kvdb.set_with_ex("key2", "value2", Duration::from_secs(1))
+                .await
+                .is_ok()
+        );
+        tokio::time::sleep(Duration::from_secs(2)).await;
+        assert!(kvdb.get::<String>("key").await.is_some());
+        assert!(kvdb.get::<String>("key2").await.is_none());
+        assert!(kvdb.delete_expired().await.is_ok());
+        kvdb.close().await;
+    }
+
+    #[tokio::test]
+    async fn test_delete_expired_return_ok_given_key_not_found() {
+        let kvdb = build_redb().await;
+        assert!(kvdb.set("key", "value").await.is_ok());
+        tokio::time::sleep(Duration::from_secs(2)).await;
+        assert!(kvdb.delete_expired().await.is_ok());
+        kvdb.close().await;
+    }
+
+    #[tokio::test]
+    async fn test_delete_prefix() {
+        let kvdb = build_redb().await;
+        assert!(kvdb.set("key", "value").await.is_ok());
+        assert!(kvdb.set("bkey2", "value2").await.is_ok());
+        assert!(kvdb.delete_prefix("key").await.is_ok());
+        assert!(kvdb.get::<String>("key").await.is_none());
+        assert!(kvdb.get::<String>("bkey2").await.is_some());
+        kvdb.close().await;
+    }
+}
