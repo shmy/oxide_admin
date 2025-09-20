@@ -1,6 +1,7 @@
 use std::time::{Duration, SystemTime};
 
 use anyhow::Result;
+use bon::Builder;
 use futures_util::StreamExt as _;
 use infrastructure::shared::workspace::WorkspaceRef;
 use nject::injectable;
@@ -8,7 +9,7 @@ use sched_kit::ScheduledJob;
 use tokio::fs;
 use tracing::warn;
 
-#[derive(Clone)]
+#[derive(Clone, Builder)]
 #[injectable]
 pub struct CleanupTempDir {
     workspace: WorkspaceRef,
@@ -56,5 +57,30 @@ impl ScheduledJob for CleanupTempDir {
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_cleanup_temp_dir() {
+        let workspace = WorkspaceRef::default();
+        let temp_subdir = workspace.temp_dir().join("old_dir");
+        std::fs::create_dir_all(&temp_subdir).unwrap();
+        let path = temp_subdir.join("test.txt");
+        std::fs::write(&path, "test").unwrap();
+        assert!(path.exists());
+
+        // Change the modification time to two days ago
+        let two_days_ago = SystemTime::now() - Duration::from_secs(2 * 24 * 3600 + 1);
+        let ft = filetime::FileTime::from_system_time(two_days_ago);
+        filetime::set_file_mtime(&temp_subdir, ft).unwrap();
+
+        let job = CleanupTempDir::builder().workspace(workspace).build();
+        assert!(job.run().await.is_ok());
+        assert!(!path.exists());
     }
 }
