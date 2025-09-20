@@ -17,3 +17,7 @@ tokio-cron-scheduler = { workspace = true, features = [
     "english",
 ], optional = true }
 tracing = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["full"] }
+tracing-test = { workspace = true }

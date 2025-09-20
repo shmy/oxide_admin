@@ -19,3 +19,19 @@ pub async fn connect_sqlite(path: impl AsRef<Path>) -> Result<sqlx::SqlitePool> 
     migration::migrate(&pool).await?;
     Ok(pool)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_connect() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool = connect_sqlite(dir.path().join("test.sqlite"))
+            .await
+            .unwrap();
+        assert!(!pool.is_closed());
+        pool.close().await;
+        assert!(pool.is_closed());
+    }
+}

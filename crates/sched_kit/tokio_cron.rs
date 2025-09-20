@@ -42,3 +42,36 @@ impl TokioCronScheduler {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use std::result::Result::Ok;
+    use tracing::info;
+    use tracing_test::traced_test;
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_add() {
+        #[derive(Clone)]
+        struct TestJob;
+
+        impl ScheduledJob for TestJob {
+            const SCHEDULER: &'static str = "every 1 second";
+
+            async fn run(&self) -> Result<()> {
+                info!("test job running");
+                Ok(())
+            }
+        }
+        let mut sched = TokioCronScheduler::try_new().await.unwrap();
+
+        sched.add(TestJob, chrono_tz::Asia::Shanghai).await.unwrap();
+        sched
+            .run_with_signal(tokio::time::sleep(std::time::Duration::from_secs(2)))
+            .await
+            .unwrap();
+        assert!(logs_contain("test job running"));
+    }
+}
