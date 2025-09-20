@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bun build_brotli",
+    "build": "bun build_gzip",
     "build_gzip": "rsbuild build && gulp gzip",
     "build_brotli": "rsbuild build && gulp brotli",
     "check": "biome check --write",

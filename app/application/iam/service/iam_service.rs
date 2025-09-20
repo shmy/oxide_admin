@@ -2,6 +2,7 @@ use crate::iam::dto::user::UserDto;
 use crate::iam::service::page::{PAGES, Page, SHARED_PAGES};
 use crate::system::service::upload_service::UploadService;
 use anyhow::{Result, bail};
+use bon::Builder;
 use domain::iam::value_object::permission_code::{ALL_PERMISSIONS, NONE, PermissionCode};
 use domain::iam::value_object::permission_group::{PermissionChecker, PermissionGroup};
 use domain::iam::value_object::user_id::UserId;
@@ -15,7 +16,7 @@ use infrastructure::port::token_store_impl::TokenStoreImpl;
 use infrastructure::shared::config::Config;
 use nject::injectable;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Builder)]
 #[injectable]
 pub struct IamService {
     token_issuer: TokenIssuerImpl,
@@ -125,5 +126,138 @@ impl IamService {
                 }
             })
             .await;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use std::collections::HashSet;
+
+    use domain::iam::value_object::permission_code::SYSTEM;
+    use infrastructure::{
+        shared::{chrono_tz::ChronoTz, pg_pool::PgPool},
+        test_utils::{setup_database, setup_kvdb, setup_object_storage},
+    };
+    use sqlx::{prelude::FromRow, types::chrono::Utc};
+
+    use crate::system::service::file_service::FileService;
+
+    use super::*;
+
+    #[derive(FromRow)]
+    struct UserRow {
+        id: UserId,
+    }
+
+    async fn build_service(pool: PgPool) -> IamService {
+        setup_database(pool.clone()).await;
+        let kvdb = setup_kvdb().await;
+        let object_storage = setup_object_storage().await;
+        let token_issuer = TokenIssuerImpl::builder()
+            .config(Config::default())
+            .ct(ChronoTz::default())
+            .build();
+        let token_store = TokenStoreImpl::builder().kvdb(kvdb.clone()).build();
+        let permission_resolver = PermissionResolverImpl::builder()
+            .pool(pool.clone())
+            .kvdb(kvdb.clone())
+            .build();
+        let upload_service = {
+            let file_service = FileService::builder()
+                .pool(pool)
+                .ct(ChronoTz::default())
+                .build();
+            UploadService::builder()
+                .ct(ChronoTz::default())
+                .object_storage(object_storage)
+                .file_service(file_service)
+                .build()
+        };
+        IamService::builder()
+            .token_issuer(token_issuer)
+            .token_store(token_store)
+            .permission_resolver(permission_resolver)
+            .config(Config::default())
+            .upload_service(upload_service)
+            .build()
+    }
+
+    #[sqlx::test]
+    async fn test_get_all_permissions(pool: PgPool) {
+        let service = build_service(pool).await;
+        let pages = service.get_all_permissions();
+        assert_eq!(pages.len(), ALL_PERMISSIONS.len());
+    }
+
+    #[sqlx::test]
+    async fn test_get_all_pages(pool: PgPool) {
+        let service = build_service(pool).await;
+        let pages = service.get_all_pages();
+        assert_eq!(pages.len(), PAGES.len());
+    }
+
+    #[sqlx::test]
+    async fn test_get_available_pages(pool: PgPool) {
+        let service = build_service(pool.clone()).await;
+        let row: UserRow =
+            sqlx::query_as(r#"SELECT id from _users WHERE privileged = true LIMIT 1"#)
+                .fetch_one(&pool)
+                .await
+                .unwrap();
+        let pages = service.get_available_pages(row.id).await;
+        assert_eq!(pages.len(), 2);
+    }
+
+    #[sqlx::test]
+    async fn test_replenish_user_portrait(pool: PgPool) {
+        let service = build_service(pool.clone()).await;
+        let user_dto = UserDto {
+            id: UserId::generate().to_string(),
+            account: "test".to_string(),
+            portrait: None,
+            name: "test".to_string(),
+            role_ids: vec![],
+            role_names: vec![],
+            privileged: false,
+            enabled: true,
+            created_at: Utc::now().naive_local(),
+            updated_at: Utc::now().naive_local(),
+        };
+        let mut dtos = vec![user_dto];
+        service.replenish_user_portrait(&mut dtos).await;
+        assert!(dtos[0].portrait.is_none());
+        dtos[0].portrait = Some("test".to_string());
+        service.replenish_user_portrait(&mut dtos).await;
+        assert!(dtos[0].portrait.is_some());
+    }
+
+    #[sqlx::test]
+    async fn test_check_permissions(pool: PgPool) {
+        let service = build_service(pool.clone()).await;
+        let row: UserRow =
+            sqlx::query_as(r#"SELECT id from _users WHERE privileged = true LIMIT 1"#)
+                .fetch_one(&pool)
+                .await
+                .unwrap();
+        let mut hash_set = HashSet::new();
+        hash_set.insert(SYSTEM);
+        let result = service
+            .check_permissions(
+                &row.id,
+                PermissionChecker::All(PermissionGroup::new(hash_set)),
+            )
+            .await;
+        assert!(result.is_ok());
+
+        let mut hash_set = HashSet::new();
+        hash_set.insert(PermissionCode::new(-1));
+        let result = service
+            .check_permissions(
+                &row.id,
+                PermissionChecker::All(PermissionGroup::new(hash_set)),
+            )
+            .await;
+        assert!(result.is_err_and(|err| err.to_string() == "权限不足"));
     }
 }
