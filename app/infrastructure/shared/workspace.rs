@@ -55,12 +55,11 @@ mod tests {
 
     #[test]
     fn test_dirs_created() {
-        let paths = Workspace::default();
+        let workspace = Workspace::default();
 
-        // 目录必须存在
-        assert!(paths.data_dir.exists() && paths.data_dir.is_dir());
-        assert!(paths.temp_dir.exists() && paths.temp_dir.is_dir());
-        assert!(paths.upload_dir.exists() && paths.upload_dir.is_dir());
-        assert!(paths.log_dir.exists() && paths.log_dir.is_dir());
+        assert!(workspace.data_dir().exists() && workspace.data_dir().is_dir());
+        assert!(workspace.temp_dir().exists() && workspace.temp_dir().is_dir());
+        assert!(workspace.upload_dir().exists() && workspace.upload_dir().is_dir());
+        assert!(workspace.log_dir().exists() && workspace.log_dir().is_dir());
     }
 }
