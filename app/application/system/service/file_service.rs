@@ -1,4 +1,5 @@
 use anyhow::Result;
+use bon::Builder;
 use domain::shared::id_generator::IdGenerator;
 use futures_util::stream::BoxStream;
 use infrastructure::shared::{
@@ -8,7 +9,7 @@ use infrastructure::shared::{
 use nject::injectable;
 use sqlx::prelude::FromRow;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Builder)]
 #[injectable]
 pub struct FileService {
     ct: ChronoTz,

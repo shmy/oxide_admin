@@ -1,5 +1,6 @@
 use anyhow::{Result, bail};
 use axum::http::Uri;
+use bon::Builder;
 use domain::shared::id_generator::IdGenerator;
 use futures_util::{StreamExt, stream};
 use image::{ImageFormat, ImageReader};
@@ -24,7 +25,7 @@ use utoipa::ToSchema;
 
 use crate::system::service::file_service::FileService;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Builder)]
 #[injectable]
 pub struct UploadService {
     ct: ChronoTz,
@@ -138,7 +139,8 @@ impl UploadService {
 
     #[tracing::instrument(skip_all)]
     pub async fn delete(&self, path: impl AsRef<str>) -> Result<()> {
-        self.object_storage.delete(path).await
+        self.delete_many(Vec::from([path.as_ref().to_string()]))
+            .await
     }
 
     #[tracing::instrument(skip_all)]
@@ -259,4 +261,183 @@ async fn persist_file(file: NamedTempFile, destination: &Path) -> Result<()> {
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{io::Write, str::FromStr as _, time::Duration};
+
+    use infrastructure::{shared::pg_pool::PgPool, test_utils::setup_database};
+    use object_storage_kit::FsConfig;
+
+    use crate::system::service::file_service;
+
+    use super::*;
+
+    async fn build_service(pool: PgPool) -> UploadService {
+        setup_database(pool.clone()).await;
+        let object_storage = {
+            let dir = tempfile::tempdir().unwrap();
+            ObjectStorage::try_new(
+                FsConfig::builder()
+                    .root(dir.path().to_string_lossy().to_string())
+                    .basepath("/uploads".to_string())
+                    .hmac_secret(b"secret")
+                    .link_period(Duration::from_secs(60))
+                    .build(),
+            )
+            .unwrap()
+        };
+        let file_service = {
+            file_service::FileService::builder()
+                .pool(pool.clone())
+                .ct(ChronoTz::default())
+                .build()
+        };
+        UploadService::builder()
+            .ct(ChronoTz::default())
+            .object_storage(object_storage)
+            .file_service(file_service)
+            .build()
+    }
+
+    fn build_text_file() -> NamedTempFile {
+        let mut file = NamedTempFile::new().unwrap();
+        writeln!(file, "Brian was here. Briefly.").unwrap();
+        file.rewind().unwrap();
+        file
+    }
+
+    fn build_png_file() -> NamedTempFile {
+        let mut file = NamedTempFile::new().unwrap();
+        file.write_all(include_bytes!("../../tests/fixtures/rust-logo.png"))
+            .unwrap();
+        file.rewind().unwrap();
+        file
+    }
+
+    fn build_jpg_file() -> NamedTempFile {
+        let mut file = NamedTempFile::new().unwrap();
+        file.write_all(include_bytes!("../../tests/fixtures/rust-logo.jpg"))
+            .unwrap();
+        file.rewind().unwrap();
+        file
+    }
+
+    fn build_jpeg_file() -> NamedTempFile {
+        let mut file = NamedTempFile::new().unwrap();
+        file.write_all(include_bytes!("../../tests/fixtures/rust-logo.jpeg"))
+            .unwrap();
+        file.rewind().unwrap();
+        file
+    }
+
+    fn build_webp_file() -> NamedTempFile {
+        let mut file = NamedTempFile::new().unwrap();
+        file.write_all(include_bytes!("../../tests/fixtures/rust-logo.webp"))
+            .unwrap();
+        file.rewind().unwrap();
+        file
+    }
+
+    fn build_bmp_file() -> NamedTempFile {
+        let mut file = NamedTempFile::new().unwrap();
+        file.write_all(include_bytes!("../../tests/fixtures/rust-logo.bmp"))
+            .unwrap();
+        file.rewind().unwrap();
+        file
+    }
+
+    #[tokio::test]
+    async fn test_persist() {
+        let file = build_text_file();
+        let dir = tempfile::tempdir().unwrap();
+        let destination = dir.path().join("test.txt");
+        persist_file(file, &destination).await.unwrap();
+        assert!(destination.exists());
+    }
+
+    #[sqlx::test]
+    async fn test_image_upload_return_ok_given_png_format(pool: PgPool) {
+        let service = build_service(pool).await;
+        let result = service.image(build_png_file()).await;
+        assert!(result.is_ok());
+        let path = result.unwrap().value;
+        assert!(path.ends_with(".webp"));
+        let presigned_url = service.presign_url(path).await.unwrap();
+        let uri = Uri::from_str(&presigned_url).unwrap();
+        assert!(service.verify_url(uri));
+    }
+
+    #[sqlx::test]
+    async fn test_image_upload_return_ok_given_jpg_format(pool: PgPool) {
+        let service = build_service(pool).await;
+        let result = service.image(build_jpg_file()).await;
+        assert!(result.is_ok());
+        let path = result.unwrap().value;
+        assert!(path.ends_with(".webp"));
+        let presigned_url = service.presign_url(path).await.unwrap();
+        let uri = Uri::from_str(&presigned_url).unwrap();
+        assert!(service.verify_url(uri));
+    }
+
+    #[sqlx::test]
+    async fn test_image_upload_return_ok_given_jpeg_format(pool: PgPool) {
+        let service = build_service(pool).await;
+        let result = service.image(build_jpeg_file()).await;
+        assert!(result.is_ok());
+        let path = result.unwrap().value;
+        assert!(path.ends_with(".webp"));
+        let presigned_url = service.presign_url(path).await.unwrap();
+        let uri = Uri::from_str(&presigned_url).unwrap();
+        assert!(service.verify_url(uri));
+    }
+
+    #[sqlx::test]
+    async fn test_image_upload_return_ok_given_webp_format(pool: PgPool) {
+        let service = build_service(pool).await;
+        let result = service.image(build_webp_file()).await;
+        assert!(result.is_ok());
+        let path = result.unwrap().value;
+        assert!(path.ends_with(".webp"));
+        let presigned_url = service.presign_url(path).await.unwrap();
+        let uri = Uri::from_str(&presigned_url).unwrap();
+        assert!(service.verify_url(uri));
+    }
+
+    #[sqlx::test]
+    async fn test_image_upload_return_err_given_bmp_format(pool: PgPool) {
+        let service = build_service(pool).await;
+        let result = service.image(build_bmp_file()).await;
+        assert!(result.is_err_and(|err| err.to_string() == "不支持的图片格式"));
+    }
+
+    #[sqlx::test]
+    async fn test_image_upload_return_err_given_text_format(pool: PgPool) {
+        let service = build_service(pool).await;
+        let result = service.image(build_text_file()).await;
+        assert!(result.is_err_and(|err| err.to_string() == "不支持的图片格式"));
+    }
+
+    #[sqlx::test]
+    async fn test_single_upload(pool: PgPool) {
+        let service = build_service(pool).await;
+        assert!(service.single(None, build_text_file()).await.is_ok());
+        let result = service
+            .single(Some("test.txt".to_string()), build_text_file())
+            .await;
+        assert!(result.is_ok());
+        let path = result.unwrap().value;
+        assert!(path.ends_with(".txt"));
+        let presigned_url = service.presign_url(&path).await.unwrap();
+        let uri = Uri::from_str(&presigned_url).unwrap();
+        assert!(service.verify_url(uri));
+        assert!(service.delete(path).await.is_ok());
+    }
+
+    #[sqlx::test]
+    async fn test_chunk_upload(pool: PgPool) {
+        let service = build_service(pool).await;
+        assert!(service.start_chunk("test.txt".to_string()).await.is_ok());
+    }
 }

@@ -89,3 +89,18 @@ pub static SHARED_PAGES: LazyLock<[Page; 1]> = LazyLock::new(|| {
         .visible(false)
         .build()]
 });
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_pages() {
+        assert_eq!(PAGES.len(), 1);
+    }
+
+    #[test]
+    fn test_shared_pages() {
+        assert_eq!(SHARED_PAGES.len(), 1);
+    }
+}

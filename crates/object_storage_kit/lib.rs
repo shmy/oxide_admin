@@ -64,13 +64,6 @@ pub trait ObjectStorageWriter: ObjectStorageTrait {
         }
     }
 
-    fn delete(&self, path: impl AsRef<str>) -> impl Future<Output = Result<()>> {
-        async move {
-            self.operator().delete(path.as_ref()).await?;
-            Ok(())
-        }
-    }
-
     fn delete_many(&self, paths: Vec<String>) -> impl Future<Output = Result<()>> {
         async move {
             let items: Vec<DeleteInput> = paths
