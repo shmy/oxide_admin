@@ -1,9 +1,8 @@
-FROM node:22-alpine AS frontend-build
+FROM oven/bun:alpine AS frontend-build
 WORKDIR /frontend
-RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY frontend/ ./
-RUN pnpm install --registry=https://mirrors.cloud.tencent.com/npm/
-RUN pnpm build
+RUN bun install --registry=https://mirrors.cloud.tencent.com/npm/
+RUN bun run build
 
 FROM rust:latest AS backend-build
 WORKDIR /_

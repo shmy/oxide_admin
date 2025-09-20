@@ -138,7 +138,7 @@
 ## ⚙️ 技术栈
 - **后端**: Rust + Axum + Nject + SQLx + Postgres
 - **前端**: Amis.js + React + TypeScript + Rsbuild
-- **工具**: just + pnpm
+- **工具**: just + Bun
 
 
 ## 📁 目录结构
@@ -160,7 +160,7 @@ oxide_admin/
 > 严格遵守`DDD`设计原则，确保代码的可维护性和可扩展性。
 
 ## 🛠️ 快速开始
-> 请先确保已安装 Rust 和 Node.js 环境，以及 just 和 pnpm。
+> 请先确保已安装 [Rust](https://www.rust-lang.org/tools/install) 和 [Bun](https://bun.com/docs/installation)，以及 [just](https://just.systems/man/en/introduction.html)。
 
 ### 克隆项目及初始化
 ```bash
@@ -184,8 +184,8 @@ just dev
 ### 启动前端
 ```base
 cd frontend
-pnpm install
-pnpm dev
+bun install
+bun run dev
 ```
 > 访问 `http://127.0.0.1:3000/_`
 
