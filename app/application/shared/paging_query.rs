@@ -46,3 +46,16 @@ impl Default for PagingQuery {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_paging_query() {
+        let json = r#"{}"#;
+        let query: PagingQuery = serde_json::from_str(json).unwrap();
+        assert_eq!(query.page(), 1);
+        assert_eq!(query.page_size(), 10);
+    }
+}

@@ -139,7 +139,7 @@ mod tests {
         setup_database(pool.clone()).await;
         let kvdb = setup_kvdb().await;
         let cache_provider = CacheProvider::builder()
-            .prefix("iam_search_roles:")
+            .prefix("iam_search_users:")
             .ttl(Duration::from_secs(15 * 60))
             .kvdb(kvdb)
             .build();
