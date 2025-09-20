@@ -265,10 +265,12 @@ async fn persist_file(file: NamedTempFile, destination: &Path) -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use std::{io::Write, str::FromStr as _, time::Duration};
+    use std::{io::Write, str::FromStr as _};
 
-    use infrastructure::{shared::pg_pool::PgPool, test_utils::setup_database};
-    use object_storage_kit::FsConfig;
+    use infrastructure::{
+        shared::pg_pool::PgPool,
+        test_utils::{setup_database, setup_object_storage},
+    };
 
     use crate::system::service::file_service;
 
@@ -276,18 +278,7 @@ mod tests {
 
     async fn build_service(pool: PgPool) -> UploadService {
         setup_database(pool.clone()).await;
-        let object_storage = {
-            let dir = tempfile::tempdir().unwrap();
-            ObjectStorage::try_new(
-                FsConfig::builder()
-                    .root(dir.path().to_string_lossy().to_string())
-                    .basepath("/uploads".to_string())
-                    .hmac_secret(b"secret")
-                    .link_period(Duration::from_secs(60))
-                    .build(),
-            )
-            .unwrap()
-        };
+        let object_storage = setup_object_storage().await;
         let file_service = {
             file_service::FileService::builder()
                 .pool(pool.clone())
@@ -438,6 +429,31 @@ mod tests {
     #[sqlx::test]
     async fn test_chunk_upload(pool: PgPool) {
         let service = build_service(pool).await;
-        assert!(service.start_chunk("test.txt".to_string()).await.is_ok());
+        let start_response = service.start_chunk("test.txt".to_string()).await.unwrap();
+        let mut part_list = Vec::new();
+        assert!(
+            service
+                .chunk(start_response.key.to_string(), 1, build_text_file())
+                .await
+                .is_ok()
+        );
+        part_list.push(PartItem { part_number: 1 });
+        assert!(
+            service
+                .chunk(start_response.key.to_string(), 2, build_text_file())
+                .await
+                .is_ok()
+        );
+        part_list.push(PartItem { part_number: 2 });
+        assert!(
+            service
+                .finish_chunk(
+                    start_response.key.to_string(),
+                    start_response.upload_id,
+                    part_list,
+                )
+                .await
+                .is_ok()
+        );
     }
 }

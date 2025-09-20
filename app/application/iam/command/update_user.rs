@@ -86,15 +86,13 @@ impl CommandHandler for UpdateUserCommandHandler {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
 
     use domain::iam::value_object::hashed_password::HashedPassword;
     use infrastructure::{
         port::token_store_impl::TokenStoreImpl,
         shared::{chrono_tz::ChronoTz, pg_pool::PgPool},
-        test_utils::{setup_database, setup_kvdb},
+        test_utils::{setup_database, setup_kvdb, setup_object_storage},
     };
-    use object_storage_kit::FsConfig;
 
     use super::*;
     async fn build_command_handler(pool: PgPool) -> UpdateUserCommandHandler {
@@ -104,18 +102,8 @@ mod tests {
             .pool(pool.clone())
             .ct(ChronoTz::default())
             .build();
-        let object_storage = {
-            let dir = tempfile::tempdir().unwrap();
-            ObjectStorage::try_new(
-                FsConfig::builder()
-                    .root(dir.path().to_string_lossy().to_string())
-                    .basepath("/uploads".to_string())
-                    .hmac_secret(b"secret")
-                    .link_period(Duration::from_secs(60))
-                    .build(),
-            )
-            .unwrap()
-        };
+        let object_storage = setup_object_storage().await;
+
         let sign_out_command_handler = {
             let user_repository = UserRepositoryImpl::builder()
                 .pool(pool.clone())

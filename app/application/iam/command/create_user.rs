@@ -65,13 +65,11 @@ impl CommandHandler for CreateUserCommandHandler {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
 
     use infrastructure::{
         shared::{chrono_tz::ChronoTz, pg_pool::PgPool},
-        test_utils::setup_database,
+        test_utils::{setup_database, setup_object_storage},
     };
-    use object_storage_kit::FsConfig;
 
     use super::*;
 
@@ -81,18 +79,7 @@ mod tests {
             .pool(pool)
             .ct(ChronoTz::default())
             .build();
-        let object_storage = {
-            let dir = tempfile::tempdir().unwrap();
-            ObjectStorage::try_new(
-                FsConfig::builder()
-                    .root(dir.path().to_string_lossy().to_string())
-                    .basepath("/uploads".to_string())
-                    .hmac_secret(b"secret")
-                    .link_period(Duration::from_secs(60))
-                    .build(),
-            )
-            .unwrap()
-        };
+        let object_storage = setup_object_storage().await;
         CreateUserCommandHandler::builder()
             .user_repository(user_repository)
             .object_storage(object_storage)
