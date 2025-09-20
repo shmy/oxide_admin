@@ -13,7 +13,7 @@ use futures_util::{StreamExt, stream};
 use infrastructure::port::permission_resolver_impl::PermissionResolverImpl;
 use infrastructure::port::token_issuer_impl::TokenIssuerImpl;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
-use infrastructure::shared::config::Config;
+use infrastructure::shared::config::ConfigRef;
 use nject::injectable;
 
 #[derive(Debug, Clone, Builder)]
@@ -22,7 +22,7 @@ pub struct IamService {
     token_issuer: TokenIssuerImpl,
     token_store: TokenStoreImpl,
     permission_resolver: PermissionResolverImpl,
-    config: Config,
+    config: ConfigRef,
     upload_service: UploadService,
 }
 
@@ -155,7 +155,7 @@ mod tests {
         let kvdb = setup_kvdb().await;
         let object_storage = setup_object_storage().await;
         let token_issuer = TokenIssuerImpl::builder()
-            .config(Config::default())
+            .config(ConfigRef::default())
             .ct(ChronoTz::default())
             .build();
         let token_store = TokenStoreImpl::builder().kvdb(kvdb.clone()).build();
@@ -179,7 +179,7 @@ mod tests {
             .token_issuer(token_issuer)
             .token_store(token_store)
             .permission_resolver(permission_resolver)
-            .config(Config::default())
+            .config(ConfigRef::default())
             .upload_service(upload_service)
             .build()
     }

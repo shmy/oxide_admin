@@ -202,7 +202,7 @@ use sched_kit::tokio_cron::TokioCronScheduler;
 #[allow(unused_imports)]
 use sched_kit::ScheduledJob;
 #[allow(unused_imports)]
-use infrastructure::shared::config::Config;
+use infrastructure::shared::config::ConfigRef;
 
 pub async fn register_scheduled_jobs(
     #[allow(unused)]
@@ -210,7 +210,7 @@ pub async fn register_scheduled_jobs(
     #[allow(unused)]
     provider: &Provider,
 ) -> Result<()> {
-    let config = provider.provide::<Config>();
+    let config = provider.provide::<ConfigRef>();
 
     {%- for job in jobs %}
 

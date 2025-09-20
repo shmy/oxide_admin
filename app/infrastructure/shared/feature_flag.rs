@@ -1,6 +1,6 @@
 use std::{fmt::Debug, ops::Deref, sync::Arc};
 
-use super::config::Config;
+use super::config::ConfigRef;
 use anyhow::Result;
 use open_feature::{Client, OpenFeature};
 
@@ -24,7 +24,7 @@ impl Debug for FeatureFlag {
 
 impl FeatureFlag {
     #[cfg(feature = "flag_flipt")]
-    pub async fn try_new(config: &Config) -> Result<Self> {
+    pub async fn try_new(config: &ConfigRef) -> Result<Self> {
         use flag_kit::{FliptProvider, FliptProviderConfig};
         let mut api = OpenFeature::singleton_mut().await;
         api.set_provider(FliptProvider::try_new(
@@ -42,7 +42,7 @@ impl FeatureFlag {
     }
 
     #[cfg(not(feature = "flag_flipt"))]
-    pub async fn try_new(_config: &Config) -> Result<Self> {
+    pub async fn try_new(_config: &ConfigRef) -> Result<Self> {
         use open_feature::provider::NoOpProvider;
 
         let mut api = OpenFeature::singleton_mut().await;
@@ -62,13 +62,13 @@ mod tests {
 
     #[tokio::test]
     async fn test_try_new() {
-        let result = FeatureFlag::try_new(&Config::default()).await;
+        let result = FeatureFlag::try_new(&ConfigRef::default()).await;
         assert!(result.is_ok());
     }
 
     #[tokio::test]
     async fn test_debug() {
-        let result = FeatureFlag::try_new(&Config::default()).await.unwrap();
+        let result = FeatureFlag::try_new(&ConfigRef::default()).await.unwrap();
         assert_eq!(format!("{:?}", &result), "FeatureFlag");
         assert_eq!(result.deref().type_id(), TypeId::of::<Client>());
     }

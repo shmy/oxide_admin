@@ -7,14 +7,14 @@ use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use nject::injectable;
 use serde::{Serialize, de::DeserializeOwned};
 
-use crate::shared::{chrono_tz::ChronoTz, config::Config};
+use crate::shared::{chrono_tz::ChronoTz, config::ConfigRef};
 
 const ALGORITHM: Algorithm = Algorithm::HS256;
 
 #[derive(Debug, Clone, Builder)]
 #[injectable]
 pub struct TokenIssuerImpl {
-    config: Config,
+    config: ConfigRef,
     ct: ChronoTz,
 }
 
@@ -111,7 +111,7 @@ mod tests {
     #[fixture]
     async fn token_issuer() -> TokenIssuerImpl {
         TokenIssuerImpl::builder()
-            .config(Config::default())
+            .config(ConfigRef::default())
             .ct(ChronoTz::default())
             .build()
     }

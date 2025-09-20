@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser as _;
-use infrastructure::shared::config::Config;
+use infrastructure::shared::config::ConfigRef;
 use server::cli::{Cli, Commands};
 
 #[global_allocator]
@@ -11,7 +11,7 @@ async fn main() -> Result<()> {
     dotenvy::dotenv_override().ok();
     let cli: Cli = Cli::parse();
     let command = cli.command.clone();
-    let config: Config = cli.try_into()?;
+    let config: ConfigRef = cli.try_into()?;
     match command {
         Commands::Serve => {
             if let Err(e) = server::serve(config).await {

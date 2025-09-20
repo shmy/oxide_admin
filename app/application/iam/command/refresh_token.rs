@@ -72,7 +72,7 @@ mod tests {
         value_object::{hashed_password::HashedPassword, user_id::UserId},
     };
     use infrastructure::{
-        shared::{chrono_tz::ChronoTz, config::Config, pg_pool::PgPool},
+        shared::{chrono_tz::ChronoTz, config::ConfigRef, pg_pool::PgPool},
         test_utils::{setup_database, setup_kvdb},
     };
     use sqlx::types::chrono::Utc;
@@ -86,7 +86,7 @@ mod tests {
             .ct(ChronoTz::default())
             .build();
         let token_issuer = TokenIssuerImpl::builder()
-            .config(Config::default())
+            .config(ConfigRef::default())
             .ct(ChronoTz::default())
             .build();
         let token_store = TokenStoreImpl::builder().kvdb(kvdb).build();

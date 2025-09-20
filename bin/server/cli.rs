@@ -1,7 +1,9 @@
+use std::sync::Arc;
+
 use chrono_tz::Tz;
 use clap::{Parser, Subcommand};
 use humantime::parse_duration;
-use infrastructure::shared::config::{Config, Database, Jwt, Log, Openapi, Server};
+use infrastructure::shared::config::{Config, ConfigRef, Database, Jwt, Log, Openapi, Server};
 
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
@@ -182,11 +184,11 @@ pub enum Commands {
     Sched,
 }
 
-impl TryFrom<Cli> for Config {
+impl TryFrom<Cli> for ConfigRef {
     type Error = anyhow::Error;
 
     fn try_from(value: Cli) -> Result<Self, Self::Error> {
-        let builder = Self::builder()
+        let builder = Config::builder()
             .timezone(value.timezone)
             .openapi(Openapi::builder().enabled(value.openapi_enabled).build())
             .database(
@@ -267,6 +269,6 @@ impl TryFrom<Cli> for Config {
                 .namespace(value.flip_namespace)
                 .build(),
         );
-        Ok(builder.build())
+        Ok(Arc::new(builder.build()))
     }
 }

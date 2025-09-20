@@ -1,7 +1,9 @@
 use bon::Builder;
 use std::fmt::Debug;
+use std::sync::Arc;
 use std::time::Duration;
 
+pub type ConfigRef = Arc<Config>;
 #[derive(Clone, Builder)]
 #[readonly::make]
 pub struct Config {
@@ -167,7 +169,7 @@ mod tests {
 
     #[test]
     fn test_config() {
-        let config = Config::default();
+        let config = ConfigRef::default();
 
         assert_eq!(format!("{:?}", config), "Config");
     }

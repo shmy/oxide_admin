@@ -9,7 +9,7 @@ use bg_worker_kit::queuer::Queuer;
 use bg_worker_kit::worker_manager::WorkerManager;
 use infrastructure::shared::{
     chrono_tz::ChronoTz,
-    config::{Config, Log, Server},
+    config::{ConfigRef, Log, Server},
     feature_flag::FeatureFlag,
     pg_pool,
 };
@@ -27,7 +27,7 @@ use tracing::{info, warn};
 
 pub mod cli;
 
-pub async fn serve(config: Config) -> Result<()> {
+pub async fn serve(config: ConfigRef) -> Result<()> {
     let workspace = WorkspaceRef::default();
     let _guard = init_tracing(&config.log, &workspace);
     let listener = build_listener(&config.server).await?;
@@ -67,7 +67,7 @@ pub async fn serve(config: Config) -> Result<()> {
     Ok(())
 }
 
-pub async fn sched(config: Config) -> Result<()> {
+pub async fn sched(config: ConfigRef) -> Result<()> {
     let workspace = WorkspaceRef::default();
     let _guard = init_tracing(&config.log, &workspace);
     let provider = build_provider(&config, workspace).await?;
@@ -108,7 +108,7 @@ async fn build_listener(server: &Server) -> Result<TcpListener> {
     Ok(listener)
 }
 
-async fn build_provider(config: &Config, workspace: WorkspaceRef) -> Result<Provider> {
+async fn build_provider(config: &ConfigRef, workspace: WorkspaceRef) -> Result<Provider> {
     let (pg_pool, kvdb, queuer, object_storage, feature_flag) = tokio::try_join!(
         pg_pool::try_new(config.timezone, &config.database),
         build_kvdb(config, &workspace),
@@ -130,7 +130,7 @@ async fn build_provider(config: &Config, workspace: WorkspaceRef) -> Result<Prov
 }
 
 #[allow(unused_variables)]
-async fn build_queuer(config: &Config, workspace: &WorkspaceRef) -> Result<Queuer> {
+async fn build_queuer(config: &ConfigRef, workspace: &WorkspaceRef) -> Result<Queuer> {
     #[cfg(feature = "bg_faktory")]
     return Queuer::try_new(&config.faktory.url, &config.faktory.queue).await;
     #[cfg(feature = "bg_sqlite")]
@@ -141,7 +141,10 @@ async fn build_queuer(config: &Config, workspace: &WorkspaceRef) -> Result<Queue
     };
 }
 
-async fn build_object_storage(config: &Config, workspace: &WorkspaceRef) -> Result<ObjectStorage> {
+async fn build_object_storage(
+    config: &ConfigRef,
+    workspace: &WorkspaceRef,
+) -> Result<ObjectStorage> {
     #[cfg(feature = "object_storage_fs")]
     return {
         let config = object_storage_kit::FsConfig::builder()
@@ -166,7 +169,7 @@ async fn build_object_storage(config: &Config, workspace: &WorkspaceRef) -> Resu
 }
 
 #[allow(unused_variables)]
-async fn build_kvdb(config: &Config, workspace: &WorkspaceRef) -> Result<Kvdb> {
+async fn build_kvdb(config: &ConfigRef, workspace: &WorkspaceRef) -> Result<Kvdb> {
     #[cfg(feature = "kv_redb")]
     return Kvdb::try_new(workspace.data_dir().join("data.redb")).await;
     #[cfg(feature = "kv_redis")]
@@ -186,7 +189,7 @@ async fn build_kvdb(config: &Config, workspace: &WorkspaceRef) -> Result<Kvdb> {
 async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
     #[cfg(feature = "bg_faktory")]
     let mut worker_manager = {
-        let config = &provider.provide::<Config>();
+        let config = &provider.provide::<ConfigRef>();
         WorkerManager::new(&config.faktory.url, &config.faktory.queue)
     };
     #[cfg(feature = "bg_sqlite")]

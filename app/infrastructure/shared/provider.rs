@@ -1,5 +1,5 @@
 use crate::shared::{
-    chrono_tz::ChronoTz, config::Config, feature_flag::FeatureFlag, pg_pool::PgPool,
+    chrono_tz::ChronoTz, config::ConfigRef, feature_flag::FeatureFlag, pg_pool::PgPool,
     workspace::WorkspaceRef,
 };
 use bg_worker_kit::queuer::Queuer;
@@ -19,8 +19,8 @@ pub struct Provider {
     object_storage: ObjectStorage,
     #[provide(Kvdb, |dep| dep.clone())]
     kvdb: Kvdb,
-    #[provide(Config, |dep| dep.clone())]
-    config: Config,
+    #[provide(ConfigRef, |dep| dep.clone())]
+    config: ConfigRef,
     #[provide(FeatureFlag, |dep| dep.clone())]
     feature_flag: FeatureFlag,
     #[provide(ChronoTz, |dep| dep.clone())]
