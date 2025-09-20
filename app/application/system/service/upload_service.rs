@@ -5,10 +5,8 @@ use domain::shared::id_generator::IdGenerator;
 use futures_util::{StreamExt, stream};
 use image::{ImageFormat, ImageReader};
 use imageformat::detect_image_format;
-use infrastructure::shared::{
-    chrono_tz::{ChronoTz, Datelike as _},
-    path::TEMP_DIR,
-};
+use infrastructure::shared::chrono_tz::{ChronoTz, Datelike as _};
+use infrastructure::shared::workspace::WorkspaceRef;
 use nject::injectable;
 use object_storage_kit::{ObjectStorage, ObjectStorageReader, ObjectStorageWriter};
 use serde::{Deserialize, Serialize};
@@ -31,6 +29,7 @@ pub struct UploadService {
     ct: ChronoTz,
     file_service: FileService,
     object_storage: ObjectStorage,
+    workspace: WorkspaceRef,
 }
 
 impl UploadService {
@@ -76,7 +75,7 @@ impl UploadService {
         let extension = Self::extract_extension(Some(filename));
         let key = IdGenerator::filename().to_lowercase();
         let upload_id = format!("{key}{extension}").to_lowercase();
-        let tmp_dir = TEMP_DIR.join(&key);
+        let tmp_dir = self.workspace.temp_dir().join(&key);
         tokio::fs::create_dir_all(tmp_dir).await?;
         Ok(StartChunkResponse { key, upload_id })
     }
@@ -88,7 +87,7 @@ impl UploadService {
         part_number: u32,
         file: NamedTempFile,
     ) -> Result<ChunkResponse> {
-        let tmp_dir = TEMP_DIR.join(&key);
+        let tmp_dir = self.workspace.temp_dir().join(&key);
         let filepath = tmp_dir.join(part_number.to_string());
         persist_file(file, &filepath).await?;
         Ok(ChunkResponse {
@@ -103,7 +102,7 @@ impl UploadService {
         upload_id: String,
         part_list: Vec<PartItem>,
     ) -> Result<FinishResponse> {
-        let tmp_dir = TEMP_DIR.join(&key);
+        let tmp_dir = self.workspace.temp_dir().join(&key);
         let relative_path = self.build_relative_path(upload_id);
         let stream = stream::iter(part_list).then(|part| {
             let chunk_path = tmp_dir.join(part.part_number.to_string());
@@ -289,6 +288,7 @@ mod tests {
             .ct(ChronoTz::default())
             .object_storage(object_storage)
             .file_service(file_service)
+            .workspace(WorkspaceRef::default())
             .build()
     }
 

@@ -1,5 +1,6 @@
 use crate::shared::{
     chrono_tz::ChronoTz, config::Config, feature_flag::FeatureFlag, pg_pool::PgPool,
+    workspace::WorkspaceRef,
 };
 use bg_worker_kit::queuer::Queuer;
 use bon::Builder;
@@ -24,4 +25,6 @@ pub struct Provider {
     feature_flag: FeatureFlag,
     #[provide(ChronoTz, |dep| dep.clone())]
     chrono_tz: ChronoTz,
+    #[provide(WorkspaceRef, |dep| dep.clone())]
+    workspace: WorkspaceRef,
 }

@@ -1,7 +1,8 @@
 use adapter::WebState;
 use anyhow::Result;
-use application::shared::{
-    background_worker::register_workers, event_subscriber::register_subscribers,
+use application::{
+    re_export::WorkspaceRef,
+    shared::{background_worker::register_workers, event_subscriber::register_subscribers},
 };
 use axum::Router;
 use bg_worker_kit::queuer::Queuer;
@@ -27,9 +28,10 @@ use tracing::{info, warn};
 pub mod cli;
 
 pub async fn serve(config: Config) -> Result<()> {
-    let _guard = init_tracing(&config.log);
+    let workspace = WorkspaceRef::default();
+    let _guard = init_tracing(&config.log, &workspace);
     let listener = build_listener(&config.server).await?;
-    let provider = build_provider(&config).await?;
+    let provider = build_provider(&config, workspace).await?;
     #[cfg(feature = "serve_with_sched")]
     let (_, worker_manager, sched) = try_join!(
         migration::migrate(provider.provide(), provider.provide(), provider.provide()),
@@ -66,8 +68,9 @@ pub async fn serve(config: Config) -> Result<()> {
 }
 
 pub async fn sched(config: Config) -> Result<()> {
-    let _guard = init_tracing(&config.log);
-    let provider = build_provider(&config).await?;
+    let workspace = WorkspaceRef::default();
+    let _guard = init_tracing(&config.log, &workspace);
+    let provider = build_provider(&config, workspace).await?;
     let sched = build_scheduler_job(&provider).await?;
     let pg_pool = provider.provide::<PgPool>();
     let kvdb = provider.provide::<Kvdb>();
@@ -83,12 +86,13 @@ pub async fn sched(config: Config) -> Result<()> {
     Ok(())
 }
 
-fn init_tracing(config: &Log) -> TracingGuard {
+#[allow(unused)]
+fn init_tracing(config: &Log, workspace: &WorkspaceRef) -> TracingGuard {
     let config_builder = trace_kit::TraceConfig::builder().level(&config.level);
     #[cfg(feature = "trace_rolling")]
     let config_builder = config_builder
         .rolling_kind(&config.rolling_kind)
-        .rolling_dir(infrastructure::shared::path::LOG_DIR.as_path());
+        .rolling_dir(workspace.log_dir());
     #[cfg(feature = "trace_otlp")]
     let config_builder = config_builder
         .otlp_service_name(&config.otlp_service_name)
@@ -104,12 +108,12 @@ async fn build_listener(server: &Server) -> Result<TcpListener> {
     Ok(listener)
 }
 
-async fn build_provider(config: &Config) -> Result<Provider> {
+async fn build_provider(config: &Config, workspace: WorkspaceRef) -> Result<Provider> {
     let (pg_pool, kvdb, queuer, object_storage, feature_flag) = tokio::try_join!(
         pg_pool::try_new(config.timezone, &config.database),
-        build_kvdb(config),
-        build_queuer(config),
-        build_object_storage(config),
+        build_kvdb(config, &workspace),
+        build_queuer(config, &workspace),
+        build_object_storage(config, &workspace),
         FeatureFlag::try_new(config),
     )?;
     let provider = Provider::builder()
@@ -120,32 +124,28 @@ async fn build_provider(config: &Config) -> Result<Provider> {
         .object_storage(object_storage)
         .feature_flag(feature_flag)
         .chrono_tz(ChronoTz::builder().tz(config.timezone).build())
+        .workspace(workspace)
         .build();
     Ok(provider)
 }
 
 #[allow(unused_variables)]
-async fn build_queuer(config: &Config) -> Result<Queuer> {
+async fn build_queuer(config: &Config, workspace: &WorkspaceRef) -> Result<Queuer> {
     #[cfg(feature = "bg_faktory")]
     return Queuer::try_new(&config.faktory.url, &config.faktory.queue).await;
     #[cfg(feature = "bg_sqlite")]
     return {
         use bg_worker_kit::helper::connect_sqlite;
-        use infrastructure::shared::path::DATA_DIR;
-        let pool = connect_sqlite(DATA_DIR.join("job.sqlite")).await?;
+        let pool = connect_sqlite(workspace.data_dir().join("job.sqlite")).await?;
         Ok(Queuer::new(pool))
     };
 }
 
-async fn build_object_storage(config: &Config) -> Result<ObjectStorage> {
+async fn build_object_storage(config: &Config, workspace: &WorkspaceRef) -> Result<ObjectStorage> {
     #[cfg(feature = "object_storage_fs")]
     return {
         let config = object_storage_kit::FsConfig::builder()
-            .root(
-                infrastructure::shared::path::UPLOAD_DIR
-                    .to_string_lossy()
-                    .to_string(),
-            )
+            .root(workspace.upload_dir().to_string_lossy().to_string())
             .basepath(adapter::UPLOAD_PATH.to_string())
             .hmac_secret(config.fs.hmac_secret)
             .link_period(config.fs.link_period)
@@ -166,9 +166,9 @@ async fn build_object_storage(config: &Config) -> Result<ObjectStorage> {
 }
 
 #[allow(unused_variables)]
-async fn build_kvdb(config: &Config) -> Result<Kvdb> {
+async fn build_kvdb(config: &Config, workspace: &WorkspaceRef) -> Result<Kvdb> {
     #[cfg(feature = "kv_redb")]
-    return Kvdb::try_new(infrastructure::shared::path::DATA_DIR.join("data.redb")).await;
+    return Kvdb::try_new(workspace.data_dir().join("data.redb")).await;
     #[cfg(feature = "kv_redis")]
     return {
         let config = kvdb_kit::RedisKvdbConfig::builder()

@@ -2,7 +2,7 @@ use std::time::{Duration, SystemTime};
 
 use anyhow::Result;
 use futures_util::StreamExt as _;
-use infrastructure::shared::path::TEMP_DIR;
+use infrastructure::shared::workspace::WorkspaceRef;
 use nject::injectable;
 use sched_kit::ScheduledJob;
 use tokio::fs;
@@ -10,7 +10,9 @@ use tracing::warn;
 
 #[derive(Clone)]
 #[injectable]
-pub struct CleanupTempDir {}
+pub struct CleanupTempDir {
+    workspace: WorkspaceRef,
+}
 
 /// 每日凌晨0点删除两天前的临时目录
 impl ScheduledJob for CleanupTempDir {
@@ -19,7 +21,7 @@ impl ScheduledJob for CleanupTempDir {
     async fn run(&self) -> Result<()> {
         let now = SystemTime::now();
 
-        if let Ok(dir) = fs::read_dir(TEMP_DIR.as_path()).await {
+        if let Ok(dir) = fs::read_dir(self.workspace.temp_dir()).await {
             // 直接流式遍历，无需 Vec 缓存
             let stream = tokio_stream::wrappers::ReadDirStream::new(dir);
 

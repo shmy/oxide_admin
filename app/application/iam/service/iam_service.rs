@@ -136,7 +136,7 @@ mod tests {
 
     use domain::iam::value_object::permission_code::SYSTEM;
     use infrastructure::{
-        shared::{chrono_tz::ChronoTz, pg_pool::PgPool},
+        shared::{chrono_tz::ChronoTz, pg_pool::PgPool, workspace::WorkspaceRef},
         test_utils::{setup_database, setup_kvdb, setup_object_storage},
     };
     use sqlx::{prelude::FromRow, types::chrono::Utc};
@@ -172,6 +172,7 @@ mod tests {
                 .ct(ChronoTz::default())
                 .object_storage(object_storage)
                 .file_service(file_service)
+                .workspace(WorkspaceRef::default())
                 .build()
         };
         IamService::builder()

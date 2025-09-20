@@ -1,4 +1,4 @@
-use application::{re_export::path::UPLOAD_DIR, system::service::upload_service::UploadService};
+use application::{re_export::WorkspaceRef, system::service::upload_service::UploadService};
 use axum::{
     extract::{OriginalUri, Request, State},
     http::StatusCode,
@@ -14,7 +14,8 @@ use utoipa_axum::router::OpenApiRouter;
 use crate::{UPLOAD_PATH, WebState};
 
 pub fn routing(state: WebState) -> OpenApiRouter {
-    let serve_dir = ServeDir::new(UPLOAD_DIR.as_path());
+    let workspace = state.provider().provide::<WorkspaceRef>();
+    let serve_dir = ServeDir::new(workspace.upload_dir());
     let router = OpenApiRouter::new()
         .route(
             "/{*path}",
