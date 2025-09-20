@@ -4,7 +4,7 @@
     "": {
       "name": "frontend",
       "dependencies": {
-        "antd": "^5.27.0",
+        "antd": "^5.27.4",
         "es-toolkit": "^1.39.10",
         "file-saver": "^2.0.5",
         "pretty-bytes": "^7.0.1",
@@ -14,11 +14,11 @@
       },
       "devDependencies": {
         "@biomejs/biome": "2.0.6",
-        "@rsbuild/core": "^1.5.1",
+        "@rsbuild/core": "^1.5.10",
         "@rsbuild/plugin-react": "^1.4.0",
         "@rsbuild/plugin-sass": "^1.4.0",
-        "@tailwindcss/postcss": "^4.1.12",
-        "@types/react": "^18.3.23",
+        "@tailwindcss/postcss": "^4.1.13",
+        "@types/react": "^18.3.24",
         "@types/react-dom": "^18.3.7",
         "amis": "^6.13.0",
         "delete": "^1.1.0",
@@ -29,7 +29,7 @@
         "gulp-if": "^3.0.0",
         "history": "^4.10.1",
         "rsbuild-plugin-html-minifier-terser": "^1.1.2",
-        "tailwindcss": "^4.1.12",
+        "tailwindcss": "^4.1.13",
         "typescript": "^5.9.2",
       },
     },
