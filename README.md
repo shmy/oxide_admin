@@ -1,7 +1,7 @@
-# A Starter Template for Admin Panel Based on Rust and Amis.js/React
+> A Starter Template for Admin Panel Based on Rust and Amis.js/React
 
-[![Build](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml/badge.svg)](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml)  
-[![Codecov](https://img.shields.io/codecov/c/github/shmy/oxide_admin)](https://app.codecov.io/github/shmy/oxide_admin)  
+[![Build](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml/badge.svg)](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml)
+[![Codecov](https://img.shields.io/codecov/c/github/shmy/oxide_admin)](https://app.codecov.io/github/shmy/oxide_admin)
 ![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)
 
 English | [简体中文](./README_ZH_CN.md)
