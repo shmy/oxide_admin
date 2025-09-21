@@ -1,168 +1,167 @@
-> 一个基于Rust和Amis.js/React的后台管理系统起始模版
+# A Starter Template for Admin Panel Based on Rust and Amis.js/React
 
-[![Build](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml/badge.svg)](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml)
-[![Codecov](https://img.shields.io/codecov/c/github/shmy/oxide_admin)](https://app.codecov.io/github/shmy/oxide_admin)
+[![Build](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml/badge.svg)](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml)  
+[![Codecov](https://img.shields.io/codecov/c/github/shmy/oxide_admin)](https://app.codecov.io/github/shmy/oxide_admin)  
 ![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)
 
-## 🎯 项目目标
-- 提供一个快速构建后台管理系统的起点
-- 使用现代化的Rust和Amis.js/React技术栈
-- 遵循领域驱动设计(DDD)和整洁架构原则
+English | [简体中文](./README_ZH_CN.md)
 
-## 👀 在线预览
-> 由于使用 `Render`的免费计划，访问可能较慢，15分钟无操作会冻结实例，之后访问需要经过`Render`的中间页，请知悉。
+## 🎯 Project Goals
+- Provide a quick starting point for building admin systems
+- Use a modern Rust + Amis.js/React technology stack
+- Follow Domain-Driven Design (DDD) and Clean Architecture principles
 
-[https://oxide-admin.onrender.com/_](https://oxide-admin.onrender.com/_)
-> 请勿修改密码
+## 👀 Online Preview
+> Since the free plan of `Render` is used, access may be slow. The instance will freeze after 15 minutes of inactivity, and subsequent access will go through `Render`’s interstitial page. Please be aware.
 
-- 账号：admin
-- 密码：123456
+[https://oxide-admin.onrender.com/_](https://oxide-admin.onrender.com/_)  
+> Please do not modify the password.
 
+- Account: `admin`  
+- Password: `123456`
 
-## ✨ 特性
-- DDD：遵循领域驱动设计(DDD)和整洁架构原则，实现适配展示、应用服务、领域模型、基础设施层的分离；
-- CQRS：内置轻量CQRS模式，读写分离；
-- 事件总线：内置事件系统，通过发布/监听领域事件来解耦业务逻辑；
-- 依赖注入：由[`nject`](https://github.com/nicolascotton/nject)进行支持；
-- 代码生成：一键生成各个模块的代码，诸如`CRUD`、`CommandHandler`、`QueryHandler`等等；
-- 时区配置：配置数据库、定时任务时区；
-- 接口文档：使用[`utoipa`](https://github.com/juhaku/utoipa)生成接口文档，可以在[`/scalar`](https://oxide-admin.onrender.com/scalar)中查看接口文档，支持配置关闭；
-- 用户认证：使用`JWT`，支持`refresh_token`和`access_token`的签发、验证和刷新；
-- 用户授权：内置`RBAC`，灵活的控制前端菜单权限以及接口权限验证；
-- 数据库自动迁移：部署时无需手动迁移；
-- 速率限制中间件: 可对路由进行限速；
-- 图形验证: 防止暴力破解，防止恶意请求；
-- 日志与trace：支持多种日志方式，支持[`OpenTelemetry`](https://opentelemetry.io/)；
-- 内建*single_flight*宏：缓解数据库压力；
-- 文件上传及访问签名：内建单文件上传、图片上传、分片上传等接口，适配`Amis`，支持`本地文件系统`和`S3`兼容协议；
-- KV缓存：支持`ttl`，使用`redis`或[`redb`](https://github.com/cberner/redb)；
-- 后台任务：支持单机`sqlite`，分布式[`faktory`](https://github.com/contribsys/faktory)；
-- 优雅关停：严谨地结束服务、释放资源；
-- 多源配置：支持环境变量、`.env`/`cli`参数；
-- Feature Flag：支持[`flipt`](https://github.com/flipt-io/flipt)；
-- Github CI：自动构建`x86_64-unknown-linux-musl`；
+## ✨ Features
+- **DDD**: Separation of adapter (presentation), application services, domain models, and infrastructure layers.
+- **CQRS**: Lightweight CQRS built-in, supporting read/write separation.
+- **Event Bus**: Built-in event system to decouple business logic via domain events.
+- **Dependency Injection**: Supported by [`nject`](https://github.com/nicolascotton/nject).
+- **Code Generation**: One-click generation of module code such as `CRUD`, `CommandHandler`, `QueryHandler`, etc.
+- **Timezone Config**: Configurable for database and scheduled jobs.
+- **API Docs**: Generated using [`utoipa`](https://github.com/juhaku/utoipa), available at [`/scalar`](https://oxide-admin.onrender.com/scalar), configurable to disable.
+- **Authentication**: JWT-based with `refresh_token` and `access_token` issuance, validation, and refresh.
+- **Authorization**: Built-in RBAC for flexible menu and API permission control.
+- **DB Auto Migration**: No manual migrations required during deployment.
+- **Rate Limiting Middleware**: Route-level rate limiting.
+- **Captcha**: Prevent brute force and malicious requests.
+- **Logging & Tracing**: Multiple logging options, supports [`OpenTelemetry`](https://opentelemetry.io/).
+- **Built-in `single_flight` macro**: Reduce DB load.
+- **File Upload & Access Signature**: APIs for single file, image, and chunked upload; supports `local FS` and `S3-compatible` storage.
+- **KV Cache**: With TTL support, via `redis` or [`redb`](https://github.com/cberner/redb).
+- **Background Tasks**: Single-node via `sqlite`, distributed via [`faktory`](https://github.com/contribsys/faktory).
+- **Graceful Shutdown**: Properly terminates services and releases resources.
+- **Multi-Source Config**: Supports env vars, `.env`, and CLI args.
+- **Feature Flags**: Supports [`flipt`](https://github.com/flipt-io/flipt).
+- **Github CI**: Auto build for `x86_64-unknown-linux-musl`.
 - ...
 
-
-### 🎖️ 内置 features
+### 🎖️ Built-in Features
 <table>
     <tr>
-        <th>功能</th>
-        <th>名称</th>
-        <th>备注</th>
-        <th>默认启用</th>
+        <th>Feature</th>
+        <th>Name</th>
+        <th>Notes</th>
+        <th>Enabled by Default</th>
     </tr>
     <tr>
-        <td rowspan="2">Kv存储，<b>只能同时选择一个</b></td>
+        <td rowspan="2">KV Storage <b>(choose one only)</b></td>
         <td>kv_redb</td>
-        <td>使用redb作为kv/缓存，适合单体项目</td>
+        <td>Use redb as kv/cache, suitable for monolithic projects</td>
         <td>✅</td>
     </tr>
     <tr>
         <td>kv_redis</td>
-        <td>使用redis作为kv/缓存，适合分布式项目</td>
+        <td>Use redis as kv/cache, suitable for distributed projects</td>
         <td></td>
     </tr>
     <tr>
-        <td rowspan="3">后台任务，<b>只能同时选择一个</b></td>
-         <td>bg_sqlite</td>
-        <td>使用sqlite作为后台任务，适合单体项目</td>
+        <td rowspan="3">Background Tasks <b>(choose one only)</b></td>
+        <td>bg_sqlite</td>
+        <td>Use sqlite for background tasks, suitable for monolithic projects</td>
         <td>✅</td>
     </tr>
     <tr>
         <td>bg_faktory</td>
-        <td>使用faktory作为后台任务，适合分布式项目</td>
+        <td>Use faktory for background tasks, suitable for distributed projects</td>
         <td></td>
     </tr>
     <tr>
         <td>bg_faktory_tls</td>
-        <td>使用faktory作为后台任务，适合分布式项目，启用tls</td>
+        <td>Use faktory for background tasks with TLS enabled</td>
         <td></td>
     </tr>
     <tr>
-        <td>定时任务</td>
+        <td>Scheduled Tasks</td>
         <td>serve_with_sched</td>
-        <td>将定时任务嵌入web服务进程，适合单机项目；禁用后可以通过`server sched`进行启动，适合分布式项目</td>
+        <td>Embed scheduled tasks in web server process (single-node). When disabled, can run separately via `server sched` (distributed).</td>
         <td>✅</td>
     </tr>
     <tr>
-        <td rowspan="3">对象存储，<b>只能同时选择一个</b></td>
+        <td rowspan="3">Object Storage <b>(choose one only)</b></td>
         <td>object_storage_fs</td>
-        <td>使用本地文件系统</td>
+        <td>Use local filesystem</td>
         <td>✅</td>
     </tr>
     <tr>
         <td>object_storage_s3</td>
-        <td>使用S3兼容服务作为对象存储</td>
+        <td>Use S3-compatible service as object storage</td>
     </tr>
     <tr>
         <td>object_storage_s3_tls</td>
-        <td>使用S3兼容服务作为对象存储，启用tls</td>
+        <td>Use S3-compatible service with TLS enabled</td>
     </tr>
     <tr>
-        <td rowspan="4">日志与trace，<b>可以同时选择多个</b></td>
+        <td rowspan="4">Logging & Trace <b>(multiple options allowed)</b></td>
         <td>trace_console</td>
-        <td>使用控制台输出日志</td>
+        <td>Log output to console</td>
         <td>✅</td>
     </tr>
     <tr>
         <td>trace_rolling</td>
-        <td>使用滚动日志保存json格式</td>
+        <td>Rolling logs in JSON format</td>
         <td></td>
     </tr>
     <tr>
         <td>trace_otlp</td>
-        <td>接入OpenTelemetry，适合分布式项目</td>
+        <td>Integrate with OpenTelemetry, suitable for distributed projects</td>
         <td></td>
     </tr>
     <tr>
         <td>trace_otlp_tls</td>
-        <td>接入OpenTelemetry，适合分布式项目，启用tls</td>
+        <td>Integrate with OpenTelemetry with TLS enabled</td>
         <td></td>
     </tr>
-     <tr>
-        <td>特性开关，<b>只能同时选择一个</b></td>
+    <tr>
+        <td>Feature Flags <b>(choose one only)</b></td>
         <td>flag_flipt</td>
-        <td>使用flipt作为feature flag，适合分布式项目</td>
+        <td>Use flipt as feature flag, suitable for distributed projects</td>
         <td></td>
     </tr>
 </table>
 
-> `bin/server/Cargo.toml`处修改
+> Modify in `bin/server/Cargo.toml`.
 
-## 🎈前端
-- 架构：使用[`Amis.js`](https://github.com/baidu/amis)低代码，借用其丰富的组件，快速地完成的CRUD相关功能，也可以通过React自定义组件进行补充；
-- 优化：构建时自动混淆、自动gzip压缩（可选brolti）
-- 嵌入：静态资源伴随嵌入二进制
+## 🎈 Frontend
+- **Architecture**: Powered by [`Amis.js`](https://github.com/baidu/amis) low-code with rich components for fast CRUD, extendable with React custom components.
+- **Optimization**: Auto obfuscation, gzip compression (brotli optional) at build time.
+- **Embedding**: Static assets embedded into binaries.
 
-## ⚙️ 技术栈
-- **后端**: Rust + Axum + Nject + SQLx + Postgres
-- **前端**: Amis.js + React + TypeScript + Rsbuild
-- **工具**: just + Bun
+## ⚙️ Tech Stack
+- **Backend**: Rust + Axum + Nject + SQLx + Postgres
+- **Frontend**: Amis.js + React + TypeScript + Rsbuild
+- **Tools**: just + Bun
 
-
-## 📁 目录结构
-
+## 📁 Project Structure
 ```txt
 oxide_admin/
-├── app/                    # Rust后端
-│   ├── adapter/            # API层 (REST端点)
-│   ├── application/        # 应用层 (用例/服务)
-│   ├── domain/             # 领域层 (实体/值对象)
-│   ├── infrastructure/     # 基础设施层 (技术实现)
-│         └── port/             # 领域实现
-│         └── migration/        # 数据库迁移
-│         └── repository/       # 仓储实现
-├── frontend/             # 前端应用
-├── target/               # 构建输出
-└── Cargo.toml            # workspace 配置
+├── app/                    # Rust backend
+│   ├── adapter/            # API layer (REST endpoints)
+│   ├── application/        # Application layer (use cases/services)
+│   ├── domain/             # Domain layer (entities/value objects)
+│   ├── infrastructure/     # Infrastructure layer (technical details)
+│         └── port/             # Domain implementations
+│         └── migration/        # Database migrations
+│         └── repository/       # Repository implementations
+├── frontend/             # Frontend app
+├── target/               # Build output
+└── Cargo.toml            # Workspace config
 ```
-> 严格遵守`DDD`设计原则，确保代码的可维护性和可扩展性。
+> Strictly follows DDD design principles to ensure maintainability and scalability.
 
-## 🛠️ 快速开始
-> 请先确保已安装 [Rust](https://www.rust-lang.org/tools/install) 和 [Bun](https://bun.com/docs/installation)，以及 [just](https://just.systems/man/en/introduction.html)。
+## 🛠️ Quick Start
 
-### 克隆项目及初始化
+> Please ensure that you have installed [Rust](https://www.rust-lang.org/tools/install) and [Bun](https://bun.com/docs/installation), as well as [just](https://just.systems/man/en/introduction.html).
+
+### Clone the project and initialize
 ```bash
 git clone git@github.com:shmy/oxide_admin.git
 cd oxide_admin
@@ -175,62 +174,63 @@ cargo install sqlx-cli cargo-watch
 # setup sqlx migration
 just setup
 ```
-### 启动后端
+
+### Run Backend
 ```base
 just dev
 ```
-> 后端默认监听`127.0.0.1:8080`，前端会有`dev server`进行代理；
+> The backend listens on `127.0.0.1:8080` by default, and the frontend will have a `dev server` to proxy; 
 
-### 启动前端
+### Run Frontend
 ```base
 cd frontend
 bun install
 bun run dev
 ```
-> 访问 `http://127.0.0.1:3000/_`
+> Access `http://127.0.0.1:3000/_`
 
-## 📦 构建命令
-- 本机架构:
+## 📦 Build Commands
+- Local Architecture:
 ```bash
 just build
 ```
-- 交叉编译：`Linux/x86_64-unknown-linux-musl`
-> 需要确保安装了`cross`, 使用`cargo install cross`命令进行安装。
+- Cross Compilation: `Linux/x86_64-unknown-linux-musl`
+> Ensure that `cross` is installed, use `cargo install cross` to install.
 ```bash
 just build_linux_x86_64_musl
 ```
-- 交叉编译：`Windows/x86_64-pc-windows-msvc`
-> 需要确保安装了`xwin`, 使用`cargo install cargo-xwin`命令进行安装。
+- Cross Compilation: `Windows/x86_64-pc-windows-msvc`
+> Ensure that `xwin` is installed, use `cargo install cargo-xwin` to install.
 ```bash
 just build_windows_x86_64_msvc
 ```
-- 编译Docker image
+- Build Docker image
 ```bash
 just build_image
 ```
 
-## 🉑 测试
-> 安装以下工具
+## 🉑 Test
+> Install the following tools
 ```bash
 cargo install cargo-llvm-cov
 cargo install cargo-nextest
 ```
-### 运行
+### Run
 ```bash
 just test
 ```
 
-### 生成覆盖率报告
+### Generate Coverage Report
 ```bash
 just test_coverage
 ```
 
-## 📃 代码生成
+## 📃 Code Generation
 ```bash
 cargo g scaffold -h
 ```
 
-### 更多详见
+### More
 ```bash
 cargo g -h
 ```
