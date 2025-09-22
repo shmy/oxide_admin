@@ -4023,6 +4023,8 @@ dependencies = [
  "object_storage_kit",
  "reqwest",
  "sched_kit",
+ "serde",
+ "serde_json",
  "tokio",
  "trace_kit",
  "tracing",

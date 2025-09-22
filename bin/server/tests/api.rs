@@ -1,5 +1,6 @@
 use clap::Parser;
 use infrastructure::shared::config::ConfigRef;
+use serde::Deserialize;
 use server::cli::Cli;
 use tokio::task::JoinHandle;
 
@@ -16,9 +17,14 @@ async fn wait_for_health(url: &str, retries: u32) {
 }
 
 #[tokio::test]
-async fn main() {
+async fn api_integration_test() {
     let (handle, base_url) = setup_server().await;
-    run_hurl("health", &base_url).await;
+    let variables = get_access_token(&base_url).await;
+    run_hurl("auth", &variables).await;
+    run_hurl("option", &variables).await;
+    run_hurl("iam", &variables).await;
+    run_hurl("system", &variables).await;
+    assert_refresh_access_token(&base_url, &variables.refresh_token).await;
     handle.abort();
 }
 
@@ -34,11 +40,15 @@ async fn setup_server() -> (JoinHandle<()>, String) {
     (handle, base_url)
 }
 
-async fn run_hurl(filename: &str, base_url: &str) {
+async fn run_hurl(filename: &str, variables: &TestVariables) {
     let output = tokio::process::Command::new("hurl")
         .arg(&format!("tests/hurl/{}.hurl", filename))
         .arg("--variable")
-        .arg(&format!("base_url={}", base_url))
+        .arg(&format!("base_url={}", variables.base_url))
+        .arg("--variable")
+        .arg(&format!("access_token={}", variables.access_token))
+        .arg("--variable")
+        .arg(&format!("refresh_token={}", variables.refresh_token))
         .output()
         .await
         .expect("failed to run hurl");
@@ -48,4 +58,68 @@ async fn run_hurl(filename: &str, base_url: &str) {
     if !output.status.success() {
         panic!("Hurl test failed: {}", stderr);
     }
+}
+
+async fn get_access_token(base_url: &str) -> TestVariables {
+    let res = reqwest::get(format!("{}/api/auth/refresh_captcha", base_url))
+        .await
+        .unwrap();
+    let captcha_id = res
+        .headers()
+        .get("X-Captcha-Id")
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_string();
+    let res = reqwest::Client::new()
+        .post(format!("{}/api/auth/sign_in", base_url))
+        .json(&serde_json::json!({
+            "account": "admin",
+            "password": "123456",
+            "captcha_key": captcha_id,
+            "captcha_value": "2"
+        }))
+        .send()
+        .await
+        .unwrap()
+        .json::<SignInResponse>()
+        .await
+        .unwrap();
+    TestVariables {
+        base_url: base_url.to_string(),
+        access_token: res.data.access_token,
+        refresh_token: res.data.refresh_token,
+    }
+}
+
+async fn assert_refresh_access_token(base_url: &str, refresh_token: &str) {
+    let res = reqwest::Client::new()
+        .post(format!("{}/api/auth/refresh_token", base_url))
+        .json(&serde_json::json!({
+            "refresh_token": refresh_token
+        }))
+        .send()
+        .await
+        .unwrap()
+        .json::<SignInResponse>()
+        .await
+        .unwrap();
+    assert!(res.data.access_token.len() > 0);
+}
+
+struct TestVariables {
+    base_url: String,
+    access_token: String,
+    refresh_token: String,
+}
+
+#[derive(Deserialize)]
+struct SignInResponse {
+    data: SignInResponseData,
+}
+
+#[derive(Deserialize)]
+struct SignInResponseData {
+    access_token: String,
+    refresh_token: String,
 }

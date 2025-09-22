@@ -1,3 +1,4 @@
+#![allow(unused)]
 use ab_glyph::{FontRef, PxScale};
 use image::{ImageBuffer, Rgba};
 use std::{io::Cursor, sync::LazyLock};
@@ -28,7 +29,10 @@ impl Default for MathCaptcha {
 
 impl CaptchaTrait for MathCaptcha {
     fn generate(&self) -> anyhow::Result<CaptchaData> {
+        #[cfg(not(feature = "test"))]
         let (question, answer) = self.rand_math();
+        #[cfg(feature = "test")]
+        let (question, answer) = ("1+1".to_string(), "2".to_string());
         let bytes = self.draw_text_png(&question)?;
         Ok(CaptchaData {
             bytes,

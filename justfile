@@ -7,6 +7,10 @@ check:
 setup:
     sqlx migrate run --source app/infrastructure/migration/sql
 
+
+integration_test_watch:
+    cargo watch -q -c -x "nextest run --package server --no-default-features --features server/test" -w app -w crates -w bin
+
 test_watch:
     cargo watch -q -c -x "nextest run --workspace --no-default-features --features server/test" -w app -w crates -w bin
 

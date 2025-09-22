@@ -18,7 +18,12 @@ object_storage_s3_tls = ["object_storage_kit/s3_tls"]
 trace_rolling = []
 trace_otlp = []
 flag_flipt = ["flag_kit/flipt"]
-test = ["dep:rstest", "dep:testcontainers", "dep:testcontainers-modules"]
+test = [
+    "dep:rstest",
+    "dep:testcontainers",
+    "dep:testcontainers-modules",
+    "captcha_kit/test",
+]
 
 [dependencies]
 anyhow = { workspace = true }

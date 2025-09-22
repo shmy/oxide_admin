@@ -13,8 +13,4 @@ impl WebState {
     pub fn provider(&self) -> &Provider {
         &self.provider
     }
-
-    pub fn provider_owned(&self) -> Provider {
-        self.provider.clone()
-    }
 }

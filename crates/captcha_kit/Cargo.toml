@@ -6,6 +6,9 @@ edition = "2024"
 [lib]
 path = "lib.rs"
 
+[features]
+test = []
+
 [dependencies]
 ab_glyph = { version = "0.2", default-features = false, features = ["std"] }
 anyhow = { workspace = true }
