@@ -31,7 +31,7 @@ pub struct Search{{entity | pluralize | pascal_case}}Query {
 #[injectable]
 pub struct Search{{entity | pluralize | pascal_case}}QueryHandler {
     pool: PgPool,
-    #[inject(|kvdb: Kvdb| CacheProvider::builder().prefix("{{module}}_search_{{entity | pluralize}}:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
+    #[inject(|kvdb: Kvdb| CacheProvider::builder().key("{{module}}_search_{{entity | pluralize}}:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
     cache_provider: CacheProvider,
 }
 
