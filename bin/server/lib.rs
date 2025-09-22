@@ -116,9 +116,6 @@ async fn build_provider(config: &ConfigRef, workspace: WorkspaceRef) -> Result<P
         build_object_storage(config, &workspace),
         FeatureFlag::try_new(config),
     )?;
-    #[cfg(feature = "test")]
-    kvdb.delete_prefix(application::shared::cache_provider::CACHE_PREFIX)
-        .await?;
     let provider = Provider::builder()
         .pg_pool(pg_pool)
         .kvdb(kvdb)
@@ -174,7 +171,12 @@ async fn build_object_storage(
 #[allow(unused_variables)]
 async fn build_kvdb(config: &ConfigRef, workspace: &WorkspaceRef) -> Result<Kvdb> {
     #[cfg(feature = "kv_redb")]
-    return Kvdb::try_new(workspace.data_dir().join("data.redb")).await;
+    return {
+        let path = workspace.data_dir().join("data.redb");
+        #[cfg(feature = "test")]
+        tokio::fs::remove_file(&path).await.unwrap();
+        Kvdb::try_new(path).await
+    };
     #[cfg(feature = "kv_redis")]
     return {
         let config = kvdb_kit::RedisKvdbConfig::builder()
