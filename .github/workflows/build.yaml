@@ -35,16 +35,16 @@ jobs:
           toolchain: stable
           override: true
           components: llvm-tools-preview
-
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
       - name: Install cargo-nextest
         uses: taiki-e/install-action@nextest
+      - name: Install just
+        uses: extractions/setup-just@v3
       - name: Clone code
         uses: actions/checkout@v4
       - name: Backend test
-        run: |
-          cargo llvm-cov nextest --workspace --ignore-filename-regex 'bin/|src/' --lcov > lcov.info
+        run: just test_coverage_ci
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
@@ -57,25 +57,23 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - name: Clone code
-        uses: actions/checkout@v4
-
       - name: Set up rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           target: x86_64-unknown-linux-musl
           toolchain: stable
           override: true
-
       - name: Install musl-tools
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: musl-tools
           version: 1.0
-
       - name: Set up bun
         uses: oven-sh/setup-bun@v2
-
+      - name: Install just
+        uses: extractions/setup-just@v3
+      - name: Clone code
+        uses: actions/checkout@v4
       - name: Restore cache
         uses: actions/cache@v4
         with:
@@ -84,15 +82,8 @@ jobs:
             target/
             node_modules/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-bun-${{ hashFiles('**/bun.lock') }}
-
-      - name: Build frontend
-        run: cd frontend && bun install && bun run build
-
       - name: Build x86_64-unknown-linux-musl
-        run: |
-          cargo build --package server --release --target x86_64-unknown-linux-musl --locked
-          ls -lh target/x86_64-unknown-linux-musl/release
-
+        run: just build_linux_x86_64_musl_ci
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:

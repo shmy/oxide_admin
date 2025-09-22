@@ -18,6 +18,7 @@ object_storage_s3_tls = ["object_storage_kit/s3_tls"]
 trace_rolling = []
 trace_otlp = []
 flag_flipt = ["flag_kit/flipt"]
+test = ["dep:rstest", "dep:testcontainers", "dep:testcontainers-modules"]
 
 [dependencies]
 anyhow = { workspace = true }
@@ -35,6 +36,7 @@ nject = { workspace = true, features = ["macro"] }
 object_storage_kit = { workspace = true }
 open-feature = { workspace = true }
 readonly = { workspace = true }
+rstest = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
 single_flight = { workspace = true }
@@ -49,10 +51,10 @@ sqlx = { workspace = true, features = [
 ] }
 tempfile = { workspace = true }
 tempoid = { workspace = true }
+testcontainers = { workspace = true, optional = true }
+testcontainers-modules = { workspace = true, features = [
+    "postgres",
+    "redis",
+], optional = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
-
-[dev-dependencies]
-rstest = { workspace = true }
-testcontainers = { workspace = true }
-testcontainers-modules = { workspace = true, features = ["postgres"] }

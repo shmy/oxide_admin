@@ -43,3 +43,4 @@ serde = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
 filetime = { version = "0.2", default-features = false }
+infrastructure = { workspace = true, features = ["test"] }

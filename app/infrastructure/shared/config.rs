@@ -125,10 +125,10 @@ pub struct Openapi {
     pub enabled: bool,
 }
 
-/// Only for test
+#[cfg(feature = "test")]
 impl Default for Config {
     fn default() -> Self {
-        Config::builder()
+        let builder = Config::builder()
             .log(Log::builder().level("debug".to_string()).build())
             .database(
                 Database::builder()
@@ -158,8 +158,20 @@ impl Default for Config {
                     .build(),
             )
             .openapi(Openapi::builder().enabled(true).build())
-            .timezone(chrono_tz::Asia::Shanghai)
-            .build()
+            .timezone(chrono_tz::Asia::Shanghai);
+        #[cfg(feature = "kv_redis")]
+        let builder = builder.redis(
+            Redis::builder()
+                .url("redis://127.0.0.1:6379/0".to_string())
+                .connection_timeout(Duration::from_secs(10))
+                .max_size(10)
+                .min_idle(1)
+                .max_lifetime(Duration::from_secs(60))
+                .idle_timeout(Duration::from_secs(30))
+                .build(),
+        );
+
+        builder.build()
     }
 }
 

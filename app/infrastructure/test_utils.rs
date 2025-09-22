@@ -1,16 +1,13 @@
-use std::time::Duration;
+#[cfg(feature = "test")]
+pub async fn setup_database(pool: sqlx::PgPool) {
+    use crate::{
+        migration::migrate,
+        repository::iam::{
+            role_repository::RoleRepositoryImpl, user_repository::UserRepositoryImpl,
+        },
+        shared::chrono_tz::ChronoTz,
+    };
 
-use kvdb_kit::Kvdb;
-use object_storage_kit::{FsConfig, ObjectStorage};
-use sqlx::PgPool;
-
-use crate::{
-    migration::migrate,
-    repository::iam::{role_repository::RoleRepositoryImpl, user_repository::UserRepositoryImpl},
-    shared::chrono_tz::ChronoTz,
-};
-
-pub async fn setup_database(pool: PgPool) {
     let ct = ChronoTz::default();
     let user_repository = UserRepositoryImpl::builder()
         .pool(pool.clone())
@@ -25,12 +22,18 @@ pub async fn setup_database(pool: PgPool) {
         .unwrap();
 }
 
-pub async fn setup_kvdb() -> Kvdb {
+#[cfg(feature = "test")]
+pub async fn setup_kvdb() -> kvdb_kit::Kvdb {
+    use kvdb_kit::Kvdb;
     let dir = tempfile::tempdir().unwrap();
     Kvdb::try_new(dir.path().join("kvdb")).await.unwrap()
 }
 
-pub async fn setup_object_storage() -> ObjectStorage {
+#[cfg(feature = "test")]
+pub async fn setup_object_storage() -> object_storage_kit::ObjectStorage {
+    use object_storage_kit::{FsConfig, ObjectStorage};
+    use std::time::Duration;
+
     let dir = tempfile::tempdir().unwrap();
     ObjectStorage::try_new(
         FsConfig::builder()
