@@ -16,9 +16,9 @@ impl TableInfoTrait for Postgres {
     async fn table_info(&self, table: &str) -> Result<Vec<Field>> {
         let infos: Vec<PostgresTableInfo> = sqlx::query_as(
             r#"
-            SELECT column_name AS "name!",
-                    data_type AS "type!",
-                    is_nullable = 'NO' AS "notnull!"
+            SELECT column_name AS name,
+                    data_type AS type,
+                    is_nullable = 'NO' AS notnull
             FROM information_schema.columns
             WHERE table_name = $1
             ORDER BY ordinal_position
