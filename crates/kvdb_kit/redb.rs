@@ -11,6 +11,8 @@ use redb::{Database, ReadableDatabase as _, ReadableTable as _, TableDefinition}
 
 use crate::{KvdbTrait, serde_util};
 
+const TABLE_NAME: TableDefinition<&str, &[u8]> = TableDefinition::new("app_data");
+
 pub struct RedbKvdb {
     db: Arc<Database>,
     sched: Arc<Mutex<JobScheduler>>,
@@ -27,7 +29,7 @@ impl RedbKvdb {
         let db_path = path.as_ref();
         let db = Database::create(db_path)?;
         let tx = db.begin_write()?;
-        let _ = tx.open_table(TABLE)?;
+        let _ = tx.open_table(TABLE_NAME)?;
         info!("Redb {} connected", db_path.display());
         let sched = JobScheduler::new().await?;
 
@@ -76,7 +78,7 @@ impl RedbKvdb {
     async fn delete_expired(&self) -> Result<()> {
         debug!("Start delete_expired");
         let tx = self.db.begin_read()?;
-        let table = tx.open_table(TABLE)?;
+        let table = tx.open_table(TABLE_NAME)?;
         let iter = table.iter()?;
         let keys = iter
             .filter_map(|access| {
@@ -102,7 +104,7 @@ impl RedbKvdb {
         if !keys.is_empty() {
             let tx = self.db.begin_write()?;
             {
-                let mut table = tx.open_table(TABLE)?;
+                let mut table = tx.open_table(TABLE_NAME)?;
                 for key in keys {
                     info!("Delete expired key: {}", key);
                     let _ = table.remove(key.as_str());
@@ -114,8 +116,6 @@ impl RedbKvdb {
     }
 }
 
-const TABLE: TableDefinition<&str, &[u8]> = TableDefinition::new("app_data");
-
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct KvValue {
     pub value: Vec<u8>,
@@ -125,7 +125,7 @@ pub struct KvValue {
 impl KvdbTrait for RedbKvdb {
     async fn get<T: DeserializeOwned>(&self, key: &str) -> Option<T> {
         let tx = self.db.begin_read().ok()?;
-        let table = tx.open_table(TABLE).ok()?;
+        let table = tx.open_table(TABLE_NAME).ok()?;
         let value_opt = table.get(key).ok()?;
         if let Some(value) = value_opt {
             let kv: KvValue = serde_util::rmp_decode(value.value()).ok()?;
@@ -155,7 +155,7 @@ impl KvdbTrait for RedbKvdb {
             expires_at: Some(expires_at.timestamp()),
         })?;
         {
-            let mut table = tx.open_table(TABLE)?;
+            let mut table = tx.open_table(TABLE_NAME)?;
             table.insert(key, value.as_slice())?;
         }
         tx.commit()?;
@@ -174,7 +174,7 @@ impl KvdbTrait for RedbKvdb {
             expires_at: Some(expires_at),
         })?;
         {
-            let mut table = tx.open_table(TABLE)?;
+            let mut table = tx.open_table(TABLE_NAME)?;
             table.insert(key, value.as_slice())?;
         }
         tx.commit()?;
@@ -188,7 +188,7 @@ impl KvdbTrait for RedbKvdb {
             expires_at: None,
         })?;
         {
-            let mut table = tx.open_table(TABLE)?;
+            let mut table = tx.open_table(TABLE_NAME)?;
             table.insert(key, value.as_slice())?;
         }
         tx.commit()?;
@@ -198,7 +198,7 @@ impl KvdbTrait for RedbKvdb {
     async fn delete(&self, key: &str) -> Result<()> {
         let tx = self.db.begin_write()?;
         {
-            let mut table = tx.open_table(TABLE)?;
+            let mut table = tx.open_table(TABLE_NAME)?;
             table.remove(key)?;
         }
         tx.commit()?;
@@ -207,7 +207,7 @@ impl KvdbTrait for RedbKvdb {
 
     async fn delete_prefix(&self, prefix: &str) -> Result<()> {
         let tx = self.db.begin_read()?;
-        let table = tx.open_table(TABLE)?;
+        let table = tx.open_table(TABLE_NAME)?;
         let iter = table.iter()?;
         let keys = iter
             .filter_map(|access| {
@@ -224,7 +224,7 @@ impl KvdbTrait for RedbKvdb {
         if !keys.is_empty() {
             let tx = self.db.begin_write()?;
             {
-                let mut table = tx.open_table(TABLE)?;
+                let mut table = tx.open_table(TABLE_NAME)?;
                 for key in keys {
                     let _ = table.remove(key.as_str());
                 }
