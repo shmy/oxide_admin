@@ -1,7 +1,7 @@
 pub mod error;
 use serde::{Serialize, de::DeserializeOwned};
 
-use crate::error::RunnerError;
+use crate::error::WorkerError;
 
 #[cfg(feature = "faktory")]
 mod faktory;
@@ -15,5 +15,5 @@ pub use sqlite::*;
 
 pub trait Worker {
     type Params: Serialize + DeserializeOwned;
-    fn run(&self, params: Self::Params) -> impl Future<Output = Result<(), RunnerError>> + Send;
+    fn run(&self, params: Self::Params) -> impl Future<Output = Result<(), WorkerError>> + Send;
 }

@@ -13,25 +13,10 @@ fn main() -> Result<()> {
     generate_background_workers()?;
     generate_scheduler_jobs()?;
     println!("cargo:rerun-if-changed=build.rs");
-    rerun_if_changed_except_mod("cargo:rerun-if-changed=shared/event_subscriber");
-    rerun_if_changed_except_mod("cargo:rerun-if-changed=shared/background_job");
-    rerun_if_changed_except_mod("cargo:rerun-if-changed=shared/scheduler_job");
+    println!("cargo:rerun-if-changed=shared/event_subscriber");
+    println!("cargo:rerun-if-changed=shared/background_worker");
+    println!("cargo:rerun-if-changed=shared/scheduler_job");
     Ok(())
-}
-
-fn rerun_if_changed_except_mod(path: &str) {
-    let dir = Path::new(path);
-    if let Ok(entries) = fs::read_dir(dir) {
-        for entry in entries.flatten() {
-            let path = entry.path();
-            if path.is_file()
-                && let Some(fname) = path.file_name().and_then(|s| s.to_str())
-                && fname != "mod.rs"
-            {
-                println!("cargo:rerun-if-changed={}", path.display());
-            }
-        }
-    }
 }
 
 fn generate_subscribers() -> Result<()> {
@@ -49,7 +34,7 @@ fn generate_subscribers() -> Result<()> {
     let env = build_env();
     let code = env.render_str(EVENT_TEMPLATE, EventContext { events })?;
     let out_dir = std::env::var("OUT_DIR")?;
-    let out_path = Path::new(&out_dir).join("subscribers.rs");
+    let out_path = Path::new(&out_dir).join("event_subscriber.rs");
 
     fs::write(out_path, code)?;
     Ok(())
@@ -57,7 +42,7 @@ fn generate_subscribers() -> Result<()> {
 
 fn generate_background_workers() -> Result<()> {
     let entries = read_rs("shared/background_worker")?;
-    let mut jobs = Vec::new();
+    let mut workers = Vec::new();
     for entry in entries {
         let stem = entry.file_stem().unwrap().to_string_lossy();
         let struct_name = stem.to_pascal_case();
@@ -66,13 +51,13 @@ fn generate_background_workers() -> Result<()> {
             continue;
         }
         let stem = stem.to_string();
-        jobs.push(stem);
+        workers.push(stem);
     }
 
     let env = build_env();
-    let code = env.render_str(WORKER_TEMPLATE, JobContext { jobs })?;
+    let code = env.render_str(WORKER_TEMPLATE, JobContext { jobs: workers })?;
     let out_dir = std::env::var("OUT_DIR")?;
-    let out_path = Path::new(&out_dir).join("workers.rs");
+    let out_path = Path::new(&out_dir).join("background_worker.rs");
 
     fs::write(out_path, code)?;
     Ok(())
@@ -95,7 +80,7 @@ fn generate_scheduler_jobs() -> Result<()> {
     let env = build_env();
     let code = env.render_str(JOB_TEMPLATE, JobContext { jobs })?;
     let out_dir = std::env::var("OUT_DIR")?;
-    let out_path = Path::new(&out_dir).join("jobs.rs");
+    let out_path = Path::new(&out_dir).join("scheduler_job.rs");
 
     fs::write(out_path, code)?;
     Ok(())
@@ -137,10 +122,10 @@ use crate::shared::event::EVENT_BUS;
 #[allow(unused_imports)]
 use infrastructure::shared::provider::Provider;
 
-pub fn register_subscribers(provider: &Provider) {
+pub fn register_event_subscribers(provider: &Provider) {
     {%- for event in events %}
 
-    EVENT_BUS.subscribe(provider.provide::<{{event}}::{{event | pascal_case}}>());
+    EVENT_BUS.subscribe(provider.provide::<crate::shared::event_subscriber::{{event}}::{{event | pascal_case}}>());
     tracing::info!("Event subscriber [{{event | pascal_case}}] has been registered");
     {%- endfor %}
 }
@@ -165,14 +150,14 @@ use anyhow::Result;
 #[allow(unused_imports)]
 use nject::injectable;
 
-pub fn register_workers(
+pub fn register_background_workers(
     #[allow(unused)]
     worker_manager: &mut WorkerManager,
     #[allow(unused)]
     provider: &Provider) {
     {%- for job in jobs %}
 
-    worker_manager.register("{{job}}", provider.provide::<{{job}}::{{job | pascal_case}}>());
+    worker_manager.register("{{job}}", provider.provide::<crate::shared::background_worker::{{job}}::{{job | pascal_case}}>());
     tracing::info!("Worker [{{job | pascal_case}}] has been registered");
     {%- endfor %}
 
@@ -186,7 +171,7 @@ pub struct {{item | pascal_case}}Queuer {
 }
 
 impl {{item | pascal_case}}Queuer {
-    pub async fn enqueue(&self, params: <{{item}}::{{item | pascal_case}} as Worker>::Params) -> Result<()> {
+    pub async fn enqueue(&self, params: <crate::shared::background_worker::{{item}}::{{item | pascal_case}} as Worker>::Params) -> Result<()> {
         self.queuer.enqueue("{{item}}", params).await
     }
 }
@@ -214,9 +199,9 @@ pub async fn register_scheduled_jobs(
 
     {%- for job in jobs %}
 
-    let job = provider.provide::<{{job}}::{{job | pascal_case}}>();
+    let job = provider.provide::<crate::shared::scheduler_job::{{job}}::{{job | pascal_case}}>();
     scheduler_job.add(job, config.timezone).await?;
-    tracing::info!("Scheduled job [{{job | pascal_case}}]({}) has been registered", {{job}}::{{job | pascal_case}}::SCHEDULER);
+    tracing::info!("Scheduled job [{{job | pascal_case}}]({}) has been registered", crate::shared::scheduler_job::{{job}}::{{job | pascal_case}}::SCHEDULER);
     {%- endfor %}
     Ok(())
 }

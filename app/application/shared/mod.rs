@@ -8,3 +8,15 @@ pub mod paging_query;
 pub mod paging_result;
 pub mod query_handler;
 pub mod scheduler_job;
+
+pub mod background_worker_impl {
+    include!(concat!(env!("OUT_DIR"), "/background_worker.rs"));
+}
+
+pub mod event_subscriber_impl {
+    include!(concat!(env!("OUT_DIR"), "/event_subscriber.rs"));
+}
+
+pub mod scheduler_job_impl {
+    include!(concat!(env!("OUT_DIR"), "/scheduler_job.rs"));
+}

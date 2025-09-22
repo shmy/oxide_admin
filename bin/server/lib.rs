@@ -2,7 +2,11 @@ use adapter::WebState;
 use anyhow::Result;
 use application::{
     re_export::WorkspaceRef,
-    shared::{background_worker::register_workers, event_subscriber::register_subscribers},
+    shared::{
+        background_worker_impl::register_background_workers,
+        event_subscriber_impl::register_event_subscribers,
+        scheduler_job_impl::register_scheduled_jobs,
+    },
 };
 use axum::Router;
 use bg_worker_kit::queuer::Queuer;
@@ -43,7 +47,7 @@ pub async fn serve(config: ConfigRef) -> Result<()> {
         migration::migrate(provider.provide(), provider.provide(), provider.provide()),
         build_worker_manager(&provider),
     )?;
-    register_subscribers(&provider);
+    register_event_subscribers(&provider);
     let pg_pool = provider.provide::<PgPool>();
     let kvdb = provider.provide::<Kvdb>();
     let app = adapter::routing(WebState::new(provider), config.openapi.enabled);
@@ -202,15 +206,13 @@ async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
         let queuer = provider.provide::<Queuer>();
         WorkerManager::new(queuer)
     };
-    register_workers(&mut worker_manager, provider);
+    register_background_workers(&mut worker_manager, provider);
     Ok(worker_manager)
 }
 
 async fn build_scheduler_job(
     provider: &Provider,
 ) -> Result<sched_kit::tokio_cron::TokioCronScheduler> {
-    use application::shared::scheduler_job::register_scheduled_jobs;
-
     let scheduler = sched_kit::tokio_cron::TokioCronScheduler::try_new().await?;
     register_scheduled_jobs(&scheduler, provider).await?;
     Ok(scheduler)

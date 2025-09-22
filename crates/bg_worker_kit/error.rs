@@ -1,5 +1,5 @@
 #[derive(Debug, thiserror::Error)]
-pub enum RunnerError {
+pub enum WorkerError {
     #[cfg(feature = "faktory")]
     #[error("Faktory error: {0}")]
     Faktory(#[from] faktory::Error),

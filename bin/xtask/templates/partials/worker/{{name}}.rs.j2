@@ -1,5 +1,5 @@
 use anyhow::Result;
-use bg_worker_kit::{JobRunner, error::RunnerError};
+use bg_worker_kit::{Worker, error::WorkerError};
 use nject::injectable;
 use serde::{Deserialize, Serialize};
 
@@ -12,10 +12,10 @@ pub struct {{name | pascal_case}}Params {
 #[injectable]
 pub struct {{name | pascal_case}};
 
-impl JobRunner for {{name | pascal_case}} {
+impl Worker for {{name | pascal_case}} {
     type Params = {{name | pascal_case}}Params;
 
-    async fn run(&self, _params: Self::Params) -> Result<(), RunnerError> {
+    async fn run(&self, _params: Self::Params) -> Result<(), WorkerError> {
 
         Ok(())
     }

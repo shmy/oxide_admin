@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 
-use crate::{Worker, error::RunnerError, queuer::Queuer};
+use crate::{Worker, error::WorkerError, queuer::Queuer};
 use anyhow::Result;
 use futures_util::{FutureExt, future::BoxFuture};
 use sqlx::FromRow;
@@ -14,7 +14,7 @@ trait WorkerDyn {
         &self,
         row: JobRow,
         pool: sqlx::SqlitePool,
-    ) -> BoxFuture<'static, Result<(), RunnerError>>;
+    ) -> BoxFuture<'static, Result<(), WorkerError>>;
 }
 
 impl<T> WorkerDyn for RunnerWrapper<T>
@@ -25,7 +25,7 @@ where
         &self,
         row: JobRow,
         pool: sqlx::SqlitePool,
-    ) -> BoxFuture<'static, Result<(), RunnerError>> {
+    ) -> BoxFuture<'static, Result<(), WorkerError>> {
         let inner = self.0.clone();
         async move {
             let params: T::Params = serde_json::from_str(&row.params)?;
@@ -36,7 +36,7 @@ where
                         .bind(row.id)
                         .execute(&pool)
                         .await
-                        .map_err(|e| RunnerError::Custom(e.to_string()))?;
+                        .map_err(|e| WorkerError::Custom(e.to_string()))?;
                 },
                 Err(err) => {
                     error!("Job {} run with {} failed: {}", row.kind, &row.params, err);
@@ -45,7 +45,7 @@ where
                         .bind(row.id)
                         .execute(&pool)
                         .await
-                        .map_err(|e| RunnerError::Custom(e.to_string()))?;
+                        .map_err(|e| WorkerError::Custom(e.to_string()))?;
                 },
             }
             Ok(())

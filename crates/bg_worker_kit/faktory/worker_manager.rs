@@ -1,4 +1,4 @@
-use crate::{Worker, error::RunnerError};
+use crate::{Worker, error::WorkerError};
 use anyhow::Result;
 use faktory::WorkerBuilder;
 
@@ -11,20 +11,20 @@ impl<T> ::faktory::Worker for RunnerWrapper<T>
 where
     T: Worker + Send + Sync + 'static,
 {
-    type Error = RunnerError;
+    type Error = WorkerError;
     async fn run(&self, job: ::faktory::Job) -> Result<(), Self::Error> {
         if let Some(arg) = job.args().first() {
             let params: T::Params = serde_json::from_value(arg.clone())?;
             return self.0.run(params).await;
         }
-        Err(RunnerError::Custom("No params".to_string()))
+        Err(WorkerError::Custom("No params".to_string()))
     }
 }
 
 pub struct WorkerManager {
     addr: String,
     queue: String,
-    worker_builder: WorkerBuilder<RunnerError>,
+    worker_builder: WorkerBuilder<WorkerError>,
 }
 
 impl WorkerManager {
