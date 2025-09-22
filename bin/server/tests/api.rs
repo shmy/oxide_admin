@@ -6,18 +6,6 @@ use testcontainers::{ContainerAsync, ImageExt as _, runners::AsyncRunner as _};
 use testcontainers_modules::postgres::{self, Postgres};
 use tokio::task::JoinHandle;
 
-async fn wait_for_health(url: &str, retries: u32) {
-    for _ in 0..retries {
-        if let Ok(resp) = reqwest::get(url).await {
-            if resp.status() == 200 {
-                return;
-            }
-        }
-        std::thread::sleep(std::time::Duration::from_secs(1));
-    }
-    panic!("Health check failed {}", url);
-}
-
 #[tokio::test]
 async fn api_integration_test() {
     let (handle, base_url, _container) = setup_server().await;
@@ -47,7 +35,7 @@ async fn setup_server() -> (JoinHandle<()>, String, ContainerAsync<Postgres>) {
     let handle = tokio::spawn(async move {
         server::serve(config).await.unwrap();
     });
-    wait_for_health(&format!("{}/health", &base_url), 3).await;
+    wait_for_server_health(&format!("{}/health", &base_url), 3).await;
     (handle, base_url, container)
 }
 
@@ -116,6 +104,18 @@ async fn assert_refresh_access_token(base_url: &str, refresh_token: &str) {
         .await
         .unwrap();
     assert!(res.data.access_token.len() > 0);
+}
+
+async fn wait_for_server_health(url: &str, retries: u32) {
+    for _ in 0..retries {
+        if let Ok(resp) = reqwest::get(url).await {
+            if resp.status() == 200 {
+                return;
+            }
+        }
+        std::thread::sleep(std::time::Duration::from_secs(1));
+    }
+    panic!("Health check failed {}", url);
 }
 
 struct TestVariables {

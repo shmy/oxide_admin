@@ -10,6 +10,7 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     services:
+      # for sqlx::test
       postgres:
         image: postgres:17-alpine
         ports:
