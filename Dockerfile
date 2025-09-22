@@ -15,6 +15,5 @@ RUN cargo build --package server --release --target x86_64-unknown-linux-musl --
 # https://github.com/GoogleContainerTools/distroless/blob/main/README.md#debian-12
 FROM gcr.io/distroless/static-debian12:latest
 WORKDIR /opt
-ARG BIN_NAME="server"
-COPY --from=backend-build "/_/target/x86_64-unknown-linux-musl/release/${BIN_NAME}" app
+COPY --from=backend-build /_/target/x86_64-unknown-linux-musl/release/server app
 ENTRYPOINT ["./app", "serve"]

@@ -1,5 +1,0 @@
-# https://github.com/GoogleContainerTools/distroless/blob/main/README.md#debian-12
-FROM gcr.io/distroless/static-debian12:latest
-WORKDIR /opt
-COPY target/x86_64-unknown-linux-musl/release/server app
-ENTRYPOINT ["./app", "serve"]
