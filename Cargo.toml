@@ -59,7 +59,6 @@ minijinja = { version = "2.11", default-features = false }
 nject = { version = "0.4", default-features = false }
 object_storage_kit = { path = "crates/object_storage_kit" }
 open-feature = { version = "0.2", default-features = false }
-parking_lot = { version = "0.12", default-features = false }
 quote = { version = "1.0" }
 readonly = { version = "0.2", default-features = false }
 

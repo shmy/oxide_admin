@@ -23,10 +23,12 @@ English | [简体中文](./README_ZH_CN.md)
 ## ✨ Features
 - **DDD**: Separation of adapter (presentation), application services, domain models, and infrastructure layers.
 - **CQRS**: Lightweight CQRS built-in, supporting read/write separation.
+- **PostgreSQL**: Integrated `PostgreSQL`, based on `sqlx`.
 - **Event Bus**: Built-in event system to decouple business logic via domain events.
 - **Dependency Injection**: Supported by [`nject`](https://github.com/nicolascotton/nject).
 - **Code Generation**: One-click generation of module code such as `CRUD`, `CommandHandler`, `QueryHandler`, etc.
 - **Timezone Config**: Configurable for database and scheduled jobs.
+- **Comprehensive coverage**: complete unit test/integration test;
 - **API Docs**: Generated using [`utoipa`](https://github.com/juhaku/utoipa), available at [`/scalar`](https://oxide-admin.onrender.com/scalar), configurable to disable.
 - **Authentication**: JWT-based with `refresh_token` and `access_token` issuance, validation, and refresh.
 - **Authorization**: Built-in RBAC for flexible menu and API permission control.
@@ -38,11 +40,12 @@ English | [简体中文](./README_ZH_CN.md)
 - **File Upload & Access Signature**: APIs for single file, image, and chunked upload; supports `local FS` and `S3-compatible` storage.
 - **KV Cache**: With TTL support, via `redis` or [`redb`](https://github.com/cberner/redb).
 - **Background Tasks**: Single-node via `sqlite`, distributed via [`faktory`](https://github.com/contribsys/faktory).
+- **Scheduled Task**: Supports embedded execution or separate execution.
 - **Graceful Shutdown**: Properly terminates services and releases resources.
 - **Multi-Source Config**: Supports env vars, `.env`, and CLI args.
 - **Feature Flags**: Supports [`flipt`](https://github.com/flipt-io/flipt).
 - **Github CI**: Auto build for `x86_64-unknown-linux-musl`.
-- ...
+- **Docker Image**: Provides a `Dockerfile` for containerized deployment.
 
 ### 🎖️ Built-in Features
 <table>
