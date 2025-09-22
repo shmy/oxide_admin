@@ -26,6 +26,8 @@ jobs:
 
     env:
       DATABASE_URL: postgres://test:test@127.0.0.1:5432/test_db
+      JWT_ACCESS_TOKEN_SECRET: tirHl5AYuj3x7QPLXG1f4ZVas2Dn4gRi
+      FS_HMAC_SECRET: SVCpfZHIWK5nvl3wqELIeuScxaejA4bj
       SQLX_OFFLINE: true
 
     steps:
@@ -39,6 +41,8 @@ jobs:
         uses: taiki-e/install-action@cargo-llvm-cov
       - name: Install cargo-nextest
         uses: taiki-e/install-action@nextest
+      - name: Install hurl
+        uses: gacts/install-hurl@v1
       - name: Install just
         uses: extractions/setup-just@v3
       - name: Clone code

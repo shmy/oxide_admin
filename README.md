@@ -214,6 +214,7 @@ just build_image
 ```bash
 cargo install cargo-llvm-cov
 cargo install cargo-nextest
+cargo install hurl
 ```
 ### Run
 ```bash

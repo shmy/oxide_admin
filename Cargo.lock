@@ -4021,6 +4021,7 @@ dependencies = [
  "kvdb_kit",
  "mimalloc",
  "object_storage_kit",
+ "reqwest",
  "sched_kit",
  "tokio",
  "trace_kit",

@@ -25,7 +25,10 @@ bg_sqlite = ["infrastructure/bg_sqlite"]
 bg_faktory_tls = ["bg_faktory", "infrastructure/bg_faktory_tls"]
 object_storage_fs = ["infrastructure/object_storage_fs"]
 object_storage_s3 = ["infrastructure/object_storage_s3"]
-object_storage_s3_tls = ["object_storage_s3", "infrastructure/object_storage_s3_tls"]
+object_storage_s3_tls = [
+    "object_storage_s3",
+    "infrastructure/object_storage_s3_tls",
+]
 trace_console = ["trace_kit/console"]
 trace_rolling = ["trace_kit/rolling", "infrastructure/trace_rolling"]
 trace_otlp = [
@@ -71,3 +74,6 @@ sched_kit = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 trace_kit = { workspace = true }
 tracing = { workspace = true }
+
+[dev-dependencies]
+reqwest = { version = "0.12", default-features = false }
