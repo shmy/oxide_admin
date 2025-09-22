@@ -26,6 +26,8 @@ impl RedbKvdb {
     pub async fn try_new(path: impl AsRef<Path>) -> Result<Self> {
         let db_path = path.as_ref();
         let db = Database::create(db_path)?;
+        let tx = db.begin_write()?;
+        let _ = tx.open_table(TABLE)?;
         info!("Redb {} connected", db_path.display());
         let sched = JobScheduler::new().await?;
 

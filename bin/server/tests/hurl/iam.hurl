@@ -50,9 +50,10 @@ HTTP 200
 [Captures]
 user_id: jsonpath "$.data.items[0].id"
 [Asserts]
+jsonpath "$.data.items[0].name" == "Admin"
+jsonpath "$.data.items[1]" not exists
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
-jsonpath "$.data" exists
 jsonpath "$.data.total" exists
 
 GET {{base_url}}/api/users/fake_user
