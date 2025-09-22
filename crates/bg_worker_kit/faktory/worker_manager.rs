@@ -1,15 +1,15 @@
-use crate::{JobRunner, error::RunnerError};
+use crate::{Worker, error::RunnerError};
 use anyhow::Result;
 use faktory::WorkerBuilder;
 
 struct RunnerWrapper<T>(pub T)
 where
-    T: JobRunner;
+    T: Worker;
 
 #[async_trait::async_trait]
-impl<T> ::faktory::JobRunner for RunnerWrapper<T>
+impl<T> ::faktory::Worker for RunnerWrapper<T>
 where
-    T: JobRunner + Send + Sync + 'static,
+    T: Worker + Send + Sync + 'static,
 {
     type Error = RunnerError;
     async fn run(&self, job: ::faktory::Job) -> Result<(), Self::Error> {
@@ -39,7 +39,7 @@ impl WorkerManager {
     pub fn register<K, P, H>(&mut self, kind: K, runner: H)
     where
         K: Into<String>,
-        H: JobRunner<Params = P> + Send + Sync + 'static,
+        H: Worker<Params = P> + Send + Sync + 'static,
     {
         let old = std::mem::take(&mut self.worker_builder);
         self.worker_builder = old.register(kind, RunnerWrapper(runner));

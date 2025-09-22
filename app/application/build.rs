@@ -156,7 +156,7 @@ use bg_worker_kit::worker_manager::WorkerManager;
 #[allow(unused_imports)]
 use bg_worker_kit::queuer::Queuer;
 #[allow(unused_imports)]
-use bg_worker_kit::JobRunner;
+use bg_worker_kit::Worker;
 #[allow(unused_imports)]
 use infrastructure::shared::provider::Provider;
 #[allow(unused_imports)]
@@ -186,7 +186,7 @@ pub struct {{item | pascal_case}}Queuer {
 }
 
 impl {{item | pascal_case}}Queuer {
-    pub async fn enqueue(&self, params: <{{item}}::{{item | pascal_case}} as JobRunner>::Params) -> Result<()> {
+    pub async fn enqueue(&self, params: <{{item}}::{{item | pascal_case}} as Worker>::Params) -> Result<()> {
         self.queuer.enqueue("{{item}}", params).await
     }
 }

@@ -13,7 +13,7 @@ mod sqlite;
 #[cfg(feature = "sqlite")]
 pub use sqlite::*;
 
-pub trait JobRunner {
+pub trait Worker {
     type Params: Serialize + DeserializeOwned;
     fn run(&self, params: Self::Params) -> impl Future<Output = Result<(), RunnerError>> + Send;
 }

@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 
-use crate::{JobRunner, error::RunnerError, queuer::Queuer};
+use crate::{Worker, error::RunnerError, queuer::Queuer};
 use anyhow::Result;
 use futures_util::{FutureExt, future::BoxFuture};
 use sqlx::FromRow;
@@ -8,8 +8,8 @@ use tracing::{error, info};
 
 struct RunnerWrapper<T>(pub T)
 where
-    T: JobRunner + Clone + Send + Sync + 'static;
-trait JobRunnerDyn {
+    T: Worker + Clone + Send + Sync + 'static;
+trait WorkerDyn {
     fn run(
         &self,
         row: JobRow,
@@ -17,9 +17,9 @@ trait JobRunnerDyn {
     ) -> BoxFuture<'static, Result<(), RunnerError>>;
 }
 
-impl<T> JobRunnerDyn for RunnerWrapper<T>
+impl<T> WorkerDyn for RunnerWrapper<T>
 where
-    T: JobRunner + Clone + Send + Sync + 'static,
+    T: Worker + Clone + Send + Sync + 'static,
 {
     fn run(
         &self,
@@ -56,7 +56,7 @@ where
 
 pub struct WorkerManager {
     queuer: Queuer,
-    runners: HashMap<String, Arc<dyn JobRunnerDyn + Send + Sync + 'static>>,
+    runners: HashMap<String, Arc<dyn WorkerDyn + Send + Sync + 'static>>,
 }
 
 impl WorkerManager {
@@ -70,7 +70,7 @@ impl WorkerManager {
     pub fn register<K, R>(&mut self, kind: K, runner: R)
     where
         K: Into<String>,
-        R: JobRunner + Clone + Send + Sync + 'static,
+        R: Worker + Clone + Send + Sync + 'static,
     {
         let kind = kind.into();
         self.runners.insert(kind, Arc::new(RunnerWrapper(runner)));
