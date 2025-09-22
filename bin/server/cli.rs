@@ -7,7 +7,7 @@ use infrastructure::shared::config::{Config, ConfigRef, Database, Jwt, Log, Open
 
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
-/// The web server
+/// Oxide admin server
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
