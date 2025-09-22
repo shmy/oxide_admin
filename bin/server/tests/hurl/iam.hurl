@@ -1,3 +1,4 @@
+# Roles
 GET {{base_url}}/api/roles
 HTTP 401
 [Asserts]
@@ -10,10 +11,12 @@ Authorization: Bearer {{access_token}}
 HTTP 200
 [Captures]
 role_id: jsonpath "$.data.items[0].id"
+
 [Asserts]
+jsonpath "$.data.items[0].name" == "admin"
+jsonpath "$.data.items[1]" not exists
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
-jsonpath "$.data" exists
 jsonpath "$.data.total" exists
 
 GET {{base_url}}/api/roles/fake_role

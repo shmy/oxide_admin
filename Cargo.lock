@@ -4025,6 +4025,8 @@ dependencies = [
  "sched_kit",
  "serde",
  "serde_json",
+ "testcontainers",
+ "testcontainers-modules",
  "tokio",
  "trace_kit",
  "tracing",

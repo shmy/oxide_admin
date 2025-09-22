@@ -16,17 +16,21 @@ fn hash_encode(query: &impl Hash) -> u64 {
     hasher.finish()
 }
 
+pub const CACHE_PREFIX: &str = "CACHE:";
 #[derive(Debug, Clone, Builder)]
 pub struct CacheProvider {
-    prefix: &'static str,
+    key: &'static str,
     ttl: Duration,
     kvdb: Kvdb,
 }
 
 impl CacheProvider {
+    fn fill_key(&self) -> String {
+        format!("{}{}", CACHE_PREFIX, self.key)
+    }
     #[tracing::instrument]
     pub async fn clear(&self) -> Result<()> {
-        self.kvdb.delete_prefix(self.prefix).await?;
+        self.kvdb.delete_prefix(&self.fill_key()).await?;
         Ok(())
     }
 
@@ -38,7 +42,7 @@ impl CacheProvider {
         F: FnOnce(K) -> Fut,
         Fut: Future<Output = Result<V, E>>,
     {
-        let cache_key = format!("{}{}", self.prefix, hash_encode(&key));
+        let cache_key = format!("{}{}", &self.fill_key(), hash_encode(&key));
         if let Some(cache) = self.kvdb.get::<V>(&cache_key).await {
             return Ok(cache);
         }

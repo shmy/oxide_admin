@@ -145,7 +145,7 @@ mod tests {
             .build();
         let search_user_query_handler = {
             let cache_provider = CacheProvider::builder()
-                .prefix("iam_search_users:")
+                .key("iam_search_users:")
                 .ttl(Duration::from_secs(15 * 60))
                 .kvdb(kvdb.clone())
                 .build();
@@ -156,7 +156,7 @@ mod tests {
         };
         let search_role_query_handler = {
             let cache_provider = CacheProvider::builder()
-                .prefix("iam_search_roles:")
+                .key("iam_search_roles:")
                 .ttl(Duration::from_secs(15 * 60))
                 .kvdb(kvdb)
                 .build();

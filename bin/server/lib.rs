@@ -116,6 +116,9 @@ async fn build_provider(config: &ConfigRef, workspace: WorkspaceRef) -> Result<P
         build_object_storage(config, &workspace),
         FeatureFlag::try_new(config),
     )?;
+    #[cfg(feature = "test")]
+    kvdb.delete_prefix(application::shared::cache_provider::CACHE_PREFIX)
+        .await?;
     let provider = Provider::builder()
         .pg_pool(pg_pool)
         .kvdb(kvdb)

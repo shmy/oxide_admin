@@ -2,6 +2,8 @@ use clap::Parser;
 use infrastructure::shared::config::ConfigRef;
 use serde::Deserialize;
 use server::cli::Cli;
+use testcontainers::{ContainerAsync, ImageExt as _, runners::AsyncRunner as _};
+use testcontainers_modules::postgres::{self, Postgres};
 use tokio::task::JoinHandle;
 
 async fn wait_for_health(url: &str, retries: u32) {
@@ -18,7 +20,7 @@ async fn wait_for_health(url: &str, retries: u32) {
 
 #[tokio::test]
 async fn api_integration_test() {
-    let (handle, base_url) = setup_server().await;
+    let (handle, base_url, _container) = setup_server().await;
     let variables = get_access_token(&base_url).await;
     run_hurl("auth", &variables).await;
     run_hurl("option", &variables).await;
@@ -28,16 +30,25 @@ async fn api_integration_test() {
     handle.abort();
 }
 
-async fn setup_server() -> (JoinHandle<()>, String) {
+async fn setup_server() -> (JoinHandle<()>, String, ContainerAsync<Postgres>) {
     dotenvy::dotenv().ok();
-    let cli = Cli::parse_from(&["", "serve"]);
+    let container = postgres::Postgres::default()
+        .with_tag("17-alpine")
+        .start()
+        .await
+        .unwrap();
+    let connection_string = format!(
+        "postgresql://postgres:postgres@127.0.0.1:{}/postgres",
+        container.get_host_port_ipv4(5432).await.unwrap()
+    );
+    let cli = Cli::parse_from(&["", "--database-url", &connection_string, "serve"]);
     let config: ConfigRef = cli.try_into().unwrap();
     let base_url = format!("http://{}:{}", config.server.bind, config.server.port);
     let handle = tokio::spawn(async move {
         server::serve(config).await.unwrap();
     });
     wait_for_health(&format!("{}/health", &base_url), 3).await;
-    (handle, base_url)
+    (handle, base_url, container)
 }
 
 async fn run_hurl(filename: &str, variables: &TestVariables) {
