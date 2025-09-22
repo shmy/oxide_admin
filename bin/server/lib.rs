@@ -174,7 +174,7 @@ async fn build_kvdb(config: &ConfigRef, workspace: &WorkspaceRef) -> Result<Kvdb
     return {
         let path = workspace.data_dir().join("data.redb");
         #[cfg(feature = "test")]
-        tokio::fs::remove_file(&path).await.unwrap();
+        let _ = tokio::fs::remove_file(&path).await;
         Kvdb::try_new(path).await
     };
     #[cfg(feature = "kv_redis")]
