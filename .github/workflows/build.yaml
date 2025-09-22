@@ -82,6 +82,8 @@ jobs:
             target/
             node_modules/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-bun-${{ hashFiles('**/bun.lock') }}
+      - name: Install frontend dependencies
+        run: cd frontend && bun install
       - name: Build x86_64-unknown-linux-musl
         run: just build_linux_x86_64_musl_ci
       - name: Upload binary

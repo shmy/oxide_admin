@@ -143,7 +143,7 @@ async fn build_queuer(config: &ConfigRef, workspace: &WorkspaceRef) -> Result<Qu
 
 async fn build_object_storage(
     config: &ConfigRef,
-    workspace: &WorkspaceRef,
+    #[allow(unused)] workspace: &WorkspaceRef,
 ) -> Result<ObjectStorage> {
     #[cfg(feature = "object_storage_fs")]
     return {
