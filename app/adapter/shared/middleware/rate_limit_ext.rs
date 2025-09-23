@@ -1,14 +1,12 @@
 use std::time::Duration;
 
-use axum::{
-    Router, body::Body, http::Response, response::IntoResponse as _, routing::MethodRouter,
-};
+use axum::{body::Body, http::Response, response::IntoResponse as _};
 use governor::middleware::NoOpMiddleware;
 use tower_governor::{
     GovernorError, GovernorLayer, governor::GovernorConfigBuilder,
     key_extractor::PeerIpKeyExtractor,
 };
-use utoipa_axum::router::{OpenApiRouter, UtoipaMethodRouter, UtoipaMethodRouterExt as _};
+use utoipa_axum::router::{UtoipaMethodRouter, UtoipaMethodRouterExt as _};
 
 use crate::{WebState, shared::response::JsonResponse};
 type AxumGovernorLayer = GovernorLayer<PeerIpKeyExtractor, NoOpMiddleware, Body>;
@@ -26,17 +24,17 @@ pub trait RateLimitRouterExt {
     fn rate_limit_layer(self, period: Duration, burst_size: u32) -> Self;
 }
 
-impl RateLimitRouterExt for MethodRouter<WebState> {
-    fn rate_limit_layer(self, period: Duration, burst_size: u32) -> Self {
-        self.layer(build_governor_layer(period, burst_size))
-    }
-}
+// impl RateLimitRouterExt for MethodRouter<WebState> {
+//     fn rate_limit_layer(self, period: Duration, burst_size: u32) -> Self {
+//         self.layer(build_governor_layer(period, burst_size))
+//     }
+// }
 
-impl RateLimitRouterExt for Router<WebState> {
-    fn rate_limit_layer(self, period: Duration, burst_size: u32) -> Self {
-        self.layer(build_governor_layer(period, burst_size))
-    }
-}
+// impl RateLimitRouterExt for Router<WebState> {
+//     fn rate_limit_layer(self, period: Duration, burst_size: u32) -> Self {
+//         self.layer(build_governor_layer(period, burst_size))
+//     }
+// }
 
 impl RateLimitRouterExt for UtoipaMethodRouter<WebState> {
     fn rate_limit_layer(self, period: Duration, burst_size: u32) -> Self {
@@ -44,11 +42,11 @@ impl RateLimitRouterExt for UtoipaMethodRouter<WebState> {
     }
 }
 
-impl RateLimitRouterExt for OpenApiRouter<WebState> {
-    fn rate_limit_layer(self, period: Duration, burst_size: u32) -> Self {
-        self.layer(build_governor_layer(period, burst_size))
-    }
-}
+// impl RateLimitRouterExt for OpenApiRouter<WebState> {
+//     fn rate_limit_layer(self, period: Duration, burst_size: u32) -> Self {
+//         self.layer(build_governor_layer(period, burst_size))
+//     }
+// }
 
 fn error_handler(err: GovernorError) -> Response<Body> {
     match err {

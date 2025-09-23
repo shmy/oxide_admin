@@ -1,12 +1,4 @@
-POST {{base_url}}/api/auth/refresh_token
-{
-    "refresh_token": "{{refresh_token}}"
-}
-HTTP 200
-[Asserts]
-jsonpath "$.status" == 0
-jsonpath "$.msg" == "OK"
-
+# Should success when change password given valid token
 POST {{base_url}}/api/profile/password
 Authorization: Bearer {{access_token}}
 {
@@ -19,6 +11,19 @@ HTTP 200
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
 
+# Should success when refresh token given valid refresh token
+POST {{base_url}}/api/auth/refresh_token
+{
+    "refresh_token": "{{refresh_token}}"
+}
+HTTP 200
+[Captures]
+access_token: jsonpath "$.data.access_token"
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+
+# Should success when sign out given valid token
 POST {{base_url}}/api/profile/sign_out
 Authorization: Bearer {{access_token}}
 HTTP 200

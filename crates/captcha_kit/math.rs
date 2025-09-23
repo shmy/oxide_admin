@@ -207,4 +207,25 @@ mod tests {
         assert!(result.value.parse::<u16>().is_ok());
         assert!(result.bytes.starts_with(b"\x89PNG\r\n\x1a\n"));
     }
+
+    #[test]
+    fn test_rand_math() {
+        let captcha = MathCaptcha::default();
+        let (question, answer) = captcha.rand_math();
+        let expected = {
+            let parts: Vec<&str> = question.split_whitespace().collect();
+            let left: u16 = parts[0].parse().unwrap();
+            let op = parts[1];
+            let right: u16 = parts[2].parse().unwrap();
+            match op {
+                "+" => left + right,
+                "-" => left - right,
+                "*" => left * right,
+                "/" => left / right,
+                _ => panic!("Unknown operator"),
+            }
+        };
+
+        assert_eq!(answer, expected);
+    }
 }

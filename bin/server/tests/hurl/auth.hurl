@@ -1,3 +1,4 @@
+# Should error when fetch current user without token
 GET {{base_url}}/api/profile/current
 HTTP 401
 [Asserts]
@@ -5,7 +6,7 @@ jsonpath "$.status" == 1
 jsonpath "$.msg" == "请提供 Token"
 jsonpath "$.data" not exists
 
-
+# Should success when fetch current user given valid token
 GET {{base_url}}/api/profile/current
 Authorization: Bearer {{access_token}}
 HTTP 200
@@ -13,3 +14,15 @@ HTTP 200
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
 jsonpath "$.data.user.account" == "admin"
+
+# Should error when sign in with invalid account
+POST {{base_url}}/api/auth/sign_in
+{
+    "account": "fake_account",
+    "password": "123456"
+}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 1
+jsonpath "$.msg" contains "请求过快"
+jsonpath "$.data" not exists
