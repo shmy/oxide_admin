@@ -220,8 +220,8 @@ mod tests {
             match op {
                 "+" => left + right,
                 "-" => left - right,
-                "*" => left * right,
-                "/" => left / right,
+                "×" => left * right,
+                "÷" => left / right,
                 _ => panic!("Unknown operator"),
             }
         };
