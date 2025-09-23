@@ -5,8 +5,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
-jsonpath "$.data" exists
-jsonpath "$.data[0]" exists
+jsonpath "$.data" count == 1
 
 # Should success when fetch permissions given valid token
 GET {{base_url}}/api/options/permissions
@@ -15,5 +14,4 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
-jsonpath "$.data" exists
-jsonpath "$.data[0]" exists
+jsonpath "$.data" count == 1

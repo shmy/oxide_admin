@@ -12,11 +12,10 @@ GET {{base_url}}/api/users
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
-jsonpath "$.data.items[0].name" == "Admin"
-jsonpath "$.data.items[1]" not exists
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
-jsonpath "$.data.total" exists
+jsonpath "$.data.items" count == 1
+jsonpath "$.data.total" == 1
 
 # Should error when fetch user without token
 GET {{base_url}}/api/users/fake_user
@@ -44,7 +43,7 @@ user_id: jsonpath "$.data"
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
-jsonpath "$.data" exists
+jsonpath "$.data" matches ".{24}"
 
 # Should success when fetch user given previously created user
 GET {{base_url}}/api/users/{{user_id}}
@@ -69,6 +68,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" == null
 
 # Should success when update user given previously created user
 PUT {{base_url}}/api/users/{{user_id}}
@@ -84,7 +84,7 @@ user_id: jsonpath "$.data"
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
-jsonpath "$.data" exists
+jsonpath "$.data" matches ".{24}"
 
 # Should success when enable user given previously created user
 POST {{base_url}}/api/users/batch/enable
@@ -96,6 +96,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" == null
 
 # Should success when fetch user given previously created user
 GET {{base_url}}/api/users/{{user_id}}
@@ -117,6 +118,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" == null
 
 # Should success when fetch user given previously created user
 GET {{base_url}}/api/users/{{user_id}}
@@ -138,6 +140,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" == null
 
 # Should success when fetch user given previously created user
 GET {{base_url}}/api/users/{{user_id}}
@@ -146,3 +149,4 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 1
 jsonpath "$.msg" == "用户不存在"
+jsonpath "$.data" not exists

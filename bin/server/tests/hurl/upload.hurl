@@ -19,6 +19,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 1
 jsonpath "$.msg" == "不支持的图片格式"
+jsonpath "$.data" not exists
 
 # Should success when upload image file given valid file
 POST {{base_url}}/api/uploads/image
@@ -57,6 +58,7 @@ upload_id: jsonpath "$.data.uploadId"
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" exists
 
 # Should success when upload chunk given valid file
 POST {{base_url}}/api/uploads/chunk
@@ -71,6 +73,7 @@ e_tag: jsonpath "$.data.eTag"
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" exists
 
 # Should success when finish upload chunk given valid parameters
 POST {{base_url}}/api/uploads/finish_chunk

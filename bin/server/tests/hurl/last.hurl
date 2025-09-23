@@ -10,6 +10,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" == null
 
 # Should success when refresh token given valid refresh token
 POST {{base_url}}/api/auth/refresh_token
@@ -22,6 +23,7 @@ access_token: jsonpath "$.data.access_token"
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" exists
 
 # Should success when sign out given valid token
 POST {{base_url}}/api/profile/sign_out
@@ -30,3 +32,4 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" == null

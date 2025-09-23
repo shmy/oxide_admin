@@ -12,11 +12,10 @@ GET {{base_url}}/api/roles
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
-jsonpath "$.data.items[0].name" == "admin"
-jsonpath "$.data.items[1]" not exists
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
-jsonpath "$.data.total" exists
+jsonpath "$.data.items" count == 1
+jsonpath "$.data.total" == 1
 
 # Should error when fetch role without token
 GET {{base_url}}/api/roles/fake_role
@@ -41,7 +40,7 @@ role_id: jsonpath "$.data"
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
-jsonpath "$.data" exists
+jsonpath "$.data" matches ".{24}"
 
 # Should success when fetch role given previously created role
 GET {{base_url}}/api/roles/{{role_id}}
@@ -68,7 +67,7 @@ role_id: jsonpath "$.data"
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
-jsonpath "$.data" exists
+jsonpath "$.data" matches ".{24}"
 
 # Should success when enable role given previously created role
 POST {{base_url}}/api/roles/batch/enable
@@ -80,6 +79,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" == null
 
 # Should success when fetch role given previously created role
 GET {{base_url}}/api/roles/{{role_id}}
@@ -101,6 +101,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" == null
 
 # Should success when fetch role given previously created role
 GET {{base_url}}/api/roles/{{role_id}}
@@ -122,6 +123,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" == null
 
 # Should success when fetch role given previously created role
 GET {{base_url}}/api/roles/{{role_id}}
@@ -130,3 +132,4 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 1
 jsonpath "$.msg" == "角色不存在"
+jsonpath "$.data" not exists
