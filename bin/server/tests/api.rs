@@ -44,7 +44,8 @@ async fn setup_server() -> (JoinHandle<()>, String, ContainerAsync<Postgres>) {
 async fn run_hurl(filename: &str, variables: &TestVariables) {
     let output = tokio::process::Command::new("hurl")
         .arg(&format!("tests/hurl/{}.hurl", filename))
-        .arg("--very-verbose")
+        .arg("--error-format")
+        .arg("long")
         .arg("--variable")
         .arg(&format!("base_url={}", variables.base_url))
         .arg("--variable")
