@@ -80,7 +80,7 @@ async fn current(
 async fn password(
     ValidUser(id): ValidUser,
     Inject(command_handler): Inject<UpdateUserSelfPasswordCommandHandler>,
-    Json(request): Json<request::UpdateUserPasswordRequest>,
+    Json(request): Json<request::UpdatePasswordRequest>,
 ) -> JsonResponseType<()> {
     let command = UpdateUserSelfPasswordCommand::builder()
         .id(id)
@@ -97,7 +97,7 @@ mod request {
     use utoipa::ToSchema;
 
     #[derive(Deserialize, ToSchema)]
-    pub struct UpdateUserPasswordRequest {
+    pub struct UpdatePasswordRequest {
         pub password: String,
         pub new_password: String,
         pub confirm_new_password: String,

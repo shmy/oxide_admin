@@ -151,9 +151,9 @@ async fn batch_disable(
 async fn create(
     Inject(command_handler): Inject<CreateUserCommandHandler>,
     Json(command): Json<CreateUserCommand>,
-) -> JsonResponseType<()> {
-    let _ = command_handler.handle(command).await?;
-    JsonResponse::ok(())
+) -> JsonResponseType<UserId> {
+    let user = command_handler.handle(command).await?;
+    JsonResponse::ok(user.id.clone())
 }
 
 #[utoipa::path(
@@ -168,11 +168,11 @@ async fn create(
 #[tracing::instrument]
 async fn update(
     Inject(command_handler): Inject<UpdateUserCommandHandler>,
-    Path(_id): Path<UserId>,
+    Path(id): Path<UserId>,
     Json(command): Json<UpdateUserCommand>,
-) -> JsonResponseType<()> {
+) -> JsonResponseType<UserId> {
     let _ = command_handler.handle(command).await?;
-    JsonResponse::ok(())
+    JsonResponse::ok(id)
 }
 
 #[utoipa::path(

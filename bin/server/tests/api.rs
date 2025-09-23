@@ -12,7 +12,8 @@ async fn api_integration_test() {
     let variables = get_access_token(&base_url).await;
     run_hurl("auth", &variables).await;
     run_hurl("option", &variables).await;
-    run_hurl("iam", &variables).await;
+    run_hurl("iam/user", &variables).await;
+    run_hurl("iam/role", &variables).await;
     run_hurl("system", &variables).await;
     run_hurl("upload", &variables).await;
     run_hurl("last", &variables).await;

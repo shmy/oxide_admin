@@ -143,9 +143,9 @@ async fn batch_disable(
 async fn create(
     Inject(command_handler): Inject<CreateRoleCommandHandler>,
     Json(command): Json<CreateRoleCommand>,
-) -> JsonResponseType<()> {
-    let _ = command_handler.handle(command).await?;
-    JsonResponse::ok(())
+) -> JsonResponseType<RoleId> {
+    let role = command_handler.handle(command).await?;
+    JsonResponse::ok(role.id.clone())
 }
 
 #[utoipa::path(
@@ -160,11 +160,11 @@ async fn create(
 #[tracing::instrument]
 async fn update(
     Inject(command_handler): Inject<UpdateRoleCommandHandler>,
-    Path(_id): Path<RoleId>,
+    Path(id): Path<RoleId>,
     Json(command): Json<UpdateRoleCommand>,
-) -> JsonResponseType<()> {
+) -> JsonResponseType<RoleId> {
     let _ = command_handler.handle(command).await?;
-    JsonResponse::ok(())
+    JsonResponse::ok(id)
 }
 
 pub fn routing() -> OpenApiRouter<WebState> {

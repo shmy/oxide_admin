@@ -1,0 +1,148 @@
+
+# Should error when fetch users without token
+GET {{base_url}}/api/users
+HTTP 401
+[Asserts]
+jsonpath "$.status" == 1
+jsonpath "$.msg" == "请提供 Token"
+jsonpath "$.data" not exists
+
+# Should success when fetch users given valid token
+GET {{base_url}}/api/users
+Authorization: Bearer {{access_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.data.items[0].name" == "Admin"
+jsonpath "$.data.items[1]" not exists
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+jsonpath "$.data.total" exists
+
+# Should error when fetch user without token
+GET {{base_url}}/api/users/fake_user
+Authorization: Bearer {{access_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 1
+jsonpath "$.msg" == "用户不存在"
+jsonpath "$.data" not exists
+
+# Should success when create user given valid token
+POST {{base_url}}/api/users
+Authorization: Bearer {{access_token}}
+{
+  "account": "test",
+  "enabled": true,
+  "name": "Test",
+  "password": "123123",
+  "portrait": null,
+  "role_ids": []
+}
+HTTP 200
+[Captures]
+user_id: jsonpath "$.data"
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+jsonpath "$.data" exists
+
+# Should success when fetch user given previously created user
+GET {{base_url}}/api/users/{{user_id}}
+Authorization: Bearer {{access_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+jsonpath "$.data.id" == {{user_id}}
+jsonpath "$.data.account" == "test"
+jsonpath "$.data.enabled" == true
+jsonpath "$.data.portrait" == null
+
+# Should success when update user password given previously created user
+PUT {{base_url}}/api/users/{{user_id}}/password
+Authorization: Bearer {{access_token}}
+{
+  "confirm_new_password": "123456",
+  "new_password": "123456"
+}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+
+# Should success when update user given previously created user
+PUT {{base_url}}/api/users/{{user_id}}
+Authorization: Bearer {{access_token}}
+{
+  "id": "{{user_id}}",
+  "enabled": false,
+  "name": "Test1"
+}
+HTTP 200
+[Captures]
+user_id: jsonpath "$.data"
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+jsonpath "$.data" exists
+
+# Should success when enable user given previously created user
+POST {{base_url}}/api/users/batch/enable
+Authorization: Bearer {{access_token}}
+{
+  "ids": ["{{user_id}}"]
+}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+
+# Should success when fetch user given previously created user
+GET {{base_url}}/api/users/{{user_id}}
+Authorization: Bearer {{access_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+jsonpath "$.data.id" == {{user_id}}
+jsonpath "$.data.enabled" == true
+
+# Should success when disable user given previously created user
+POST {{base_url}}/api/users/batch/disable
+Authorization: Bearer {{access_token}}
+{
+  "ids": ["{{user_id}}"]
+}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+
+# Should success when fetch user given previously created user
+GET {{base_url}}/api/users/{{user_id}}
+Authorization: Bearer {{access_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+jsonpath "$.data.id" == {{user_id}}
+jsonpath "$.data.enabled" == false
+
+# Should success when delete user given previously created user
+POST {{base_url}}/api/users/batch/delete
+Authorization: Bearer {{access_token}}
+{
+  "ids": ["{{user_id}}"]
+}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+
+# Should success when fetch user given previously created user
+GET {{base_url}}/api/users/{{user_id}}
+Authorization: Bearer {{access_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 1
+jsonpath "$.msg" == "用户不存在"
