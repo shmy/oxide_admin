@@ -21,7 +21,10 @@ pub fn routing(state: WebState) -> OpenApiRouter {
             "/{*path}",
             get(move |req: Request<axum::body::Body>| async move { serve_dir.oneshot(req).await }),
         )
-        .layer(middleware::from_fn_with_state(state, limited_middleware));
+        .layer(middleware::from_fn_with_state(
+            state,
+            sign_required_middleware,
+        ));
 
     let router = OpenApiRouter::new().nest(UPLOAD_PATH, router);
     #[cfg(feature = "trace_otlp")]
@@ -31,7 +34,7 @@ pub fn routing(state: WebState) -> OpenApiRouter {
     router
 }
 
-async fn limited_middleware(
+async fn sign_required_middleware(
     State(state): State<WebState>,
     uri: OriginalUri,
     request: Request,
