@@ -14,7 +14,8 @@ async fn api_integration_test() {
     run_hurl("option", &variables).await;
     run_hurl("iam", &variables).await;
     run_hurl("system", &variables).await;
-    assert_refresh_access_token(&base_url, &variables.refresh_token).await;
+    run_hurl("upload", &variables).await;
+    run_hurl("last", &variables).await;
     handle.abort();
 }
 
@@ -42,6 +43,7 @@ async fn setup_server() -> (JoinHandle<()>, String, ContainerAsync<Postgres>) {
 async fn run_hurl(filename: &str, variables: &TestVariables) {
     let output = tokio::process::Command::new("hurl")
         .arg(&format!("tests/hurl/{}.hurl", filename))
+        .arg("--very-verbose")
         .arg("--variable")
         .arg(&format!("base_url={}", variables.base_url))
         .arg("--variable")
@@ -89,21 +91,6 @@ async fn get_access_token(base_url: &str) -> TestVariables {
         access_token: res.data.access_token,
         refresh_token: res.data.refresh_token,
     }
-}
-
-async fn assert_refresh_access_token(base_url: &str, refresh_token: &str) {
-    let res = reqwest::Client::new()
-        .post(format!("{}/api/auth/refresh_token", base_url))
-        .json(&serde_json::json!({
-            "refresh_token": refresh_token
-        }))
-        .send()
-        .await
-        .unwrap()
-        .json::<SignInResponse>()
-        .await
-        .unwrap();
-    assert!(res.data.access_token.len() > 0);
 }
 
 async fn wait_for_server_health(url: &str, retries: u32) {

@@ -148,6 +148,7 @@ mod request {
     pub(crate) struct ChunkRequest {
         pub key: String,
         #[form_data(field_name = "partNumber")]
+        #[schema(rename = "partNumber")]
         pub part_number: u32,
         #[form_data(limit = "2MiB")]
         #[schema(value_type = Vec<u8>)]
