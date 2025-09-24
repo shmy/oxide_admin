@@ -1,7 +1,7 @@
 use std::{fmt::Debug, ops::Deref, sync::Arc};
 
 use super::config::ConfigRef;
-use crate::error::Result;
+use crate::error::InfrastructureResult;
 use open_feature::{Client, OpenFeature};
 
 #[derive(Clone)]
@@ -24,7 +24,7 @@ impl Debug for FeatureFlag {
 
 impl FeatureFlag {
     #[cfg(feature = "flag_flipt")]
-    pub async fn try_new(config: &ConfigRef) -> Result<Self> {
+    pub async fn try_new(config: &ConfigRef) -> InfrastructureResult<Self> {
         use flag_kit::{FliptProvider, FliptProviderConfig};
         let mut api = OpenFeature::singleton_mut().await;
         api.set_provider(FliptProvider::try_new(
@@ -42,7 +42,7 @@ impl FeatureFlag {
     }
 
     #[cfg(not(feature = "flag_flipt"))]
-    pub async fn try_new(_config: &ConfigRef) -> Result<Self> {
+    pub async fn try_new(_config: &ConfigRef) -> InfrastructureResult<Self> {
         use open_feature::provider::NoOpProvider;
 
         let mut api = OpenFeature::singleton_mut().await;

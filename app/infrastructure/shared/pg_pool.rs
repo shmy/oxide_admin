@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use crate::error::Result;
+use crate::error::InfrastructureResult;
 use sqlx::ConnectOptions as _;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
 use tracing::info;
@@ -10,7 +10,7 @@ use crate::shared::config::Database;
 
 pub type PgPool = sqlx::PgPool;
 
-pub async fn try_new(timezone: chrono_tz::Tz, db: &Database) -> Result<PgPool> {
+pub async fn try_new(timezone: chrono_tz::Tz, db: &Database) -> InfrastructureResult<PgPool> {
     let pool_connection_options: PgConnectOptions = db.url.parse()?;
     let pool_connection_options = pool_connection_options.log_statements(LevelFilter::Debug);
 

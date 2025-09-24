@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use crate::error::Result;
+use crate::error::InfrastructureResult;
 use domain::iam::entity::user::User;
 use domain::iam::value_object::hashed_password::HashedPassword;
 use domain::iam::value_object::user_id::UserId;
@@ -16,7 +16,7 @@ pub async fn migrate(
     pool: PgPool,
     user_repository: UserRepositoryImpl,
     role_repository: RoleRepositoryImpl,
-) -> Result<()> {
+) -> InfrastructureResult<()> {
     sqlx::migrate!("migration/sql").run(&pool).await?;
     insert_user_role(&pool, &user_repository, &role_repository).await?;
     Ok(())
@@ -26,7 +26,7 @@ async fn insert_user_role(
     pool: &PgPool,
     user_repository: &UserRepositoryImpl,
     role_repository: &RoleRepositoryImpl,
-) -> Result<()> {
+) -> InfrastructureResult<()> {
     let (role_opt, user_opt) = tokio::try_join!(
         sqlx::query!("SELECT id from _roles WHERE privileged = true").fetch_optional(pool),
         sqlx::query!("SELECT id from _users WHERE privileged = true").fetch_optional(pool),

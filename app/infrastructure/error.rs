@@ -1,7 +1,7 @@
 use domain::iam::{error::IamError, value_object::hashed_password::PasswordError};
 use kvdb_kit::error::KvdbError;
 
-pub type Result<T> = std::result::Result<T, InfrastructureError>;
+pub type InfrastructureResult<T> = std::result::Result<T, InfrastructureError>;
 
 #[derive(Debug, thiserror::Error)]
 pub enum InfrastructureError {
@@ -22,4 +22,7 @@ pub enum InfrastructureError {
 
     #[error("{0}")]
     Kvdb(#[from] KvdbError),
+
+    #[error("{0}")]
+    Flag(#[from] flag_kit::error::FlagError),
 }

@@ -100,7 +100,7 @@ impl RoleRepository for RoleRepositoryImpl {
         &self,
         ids: &[RoleId],
         enabled: bool,
-    ) -> std::result::Result<Vec<UpdatedEvent<Self::Entity>>, Self::Error> {
+    ) -> Result<Vec<UpdatedEvent<Self::Entity>>, Self::Error> {
         if ids.is_empty() {
             return Ok(Vec::with_capacity(0));
         }

@@ -1,9 +1,9 @@
-use crate::error::Result;
+use crate::error::InfrastructureResult;
 use tokio::sync::broadcast::{self, Receiver, Sender};
 use tracing::error;
 
 pub trait EventSubscriber<T>: Clone + Send + Sync + 'static {
-    fn on_received(&self, event: T) -> impl Future<Output = Result<()>> + Send;
+    fn on_received(&self, event: T) -> impl Future<Output = InfrastructureResult<()>> + Send;
 }
 
 pub struct EventBus<T: Clone + Send + Sync + 'static> {
@@ -66,7 +66,10 @@ mod tests {
     }
 
     impl EventSubscriber<TestEvent> for TestEventHandler {
-        fn on_received(&self, event: TestEvent) -> impl Future<Output = Result<()>> + Send {
+        fn on_received(
+            &self,
+            event: TestEvent,
+        ) -> impl Future<Output = InfrastructureResult<()>> + Send {
             async move {
                 assert_eq!(event.value, self.value);
                 Ok(())

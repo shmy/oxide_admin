@@ -91,10 +91,7 @@ impl DomainRepository for UserRepositoryImpl {
     }
 
     #[tracing::instrument]
-    async fn batch_delete(
-        &self,
-        ids: &[Self::EntityId],
-    ) -> std::result::Result<Vec<Self::Entity>, Self::Error> {
+    async fn batch_delete(&self, ids: &[Self::EntityId]) -> Result<Vec<Self::Entity>, Self::Error> {
         if ids.is_empty() {
             return Ok(Vec::with_capacity(0));
         }
@@ -149,7 +146,7 @@ impl UserRepository for UserRepositoryImpl {
         &self,
         ids: &[UserId],
         enabled: bool,
-    ) -> std::result::Result<Vec<UpdatedEvent<Self::Entity>>, Self::Error> {
+    ) -> Result<Vec<UpdatedEvent<Self::Entity>>, Self::Error> {
         if ids.is_empty() {
             return Ok(Vec::with_capacity(0));
         }
