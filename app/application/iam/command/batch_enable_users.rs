@@ -1,4 +1,3 @@
-use anyhow::Result;
 use bon::Builder;
 use domain::iam::port::user_repository::UserRepository;
 use domain::iam::{error::IamError, event::IamEvent, value_object::user_id::UserId};

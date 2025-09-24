@@ -179,7 +179,7 @@ impl {{item | pascal_case}}Queuer {
 "#;
 
 const JOB_TEMPLATE: &str = r#"#[allow(unused_imports)]
-use anyhow::Result;
+use crate::error::ApplicationResult;
 #[allow(unused_imports)]
 use infrastructure::shared::provider::Provider;
 #[allow(unused_imports)]
@@ -194,7 +194,7 @@ pub async fn register_scheduled_jobs(
     scheduler_job: &TokioCronScheduler,
     #[allow(unused)]
     provider: &Provider,
-) -> Result<()> {
+) -> ApplicationResult<()> {
     let config = provider.provide::<ConfigRef>();
 
     {%- for job in jobs %}

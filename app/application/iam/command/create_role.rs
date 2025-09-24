@@ -1,4 +1,3 @@
-use anyhow::Result;
 use bon::Builder;
 use domain::iam::error::IamError;
 use domain::iam::event::IamEvent;

@@ -1,6 +1,5 @@
 use std::time::Duration;
 
-use anyhow::Result;
 use bon::Builder;
 use domain::iam::{error::IamError, value_object::role_id::RoleId};
 use infrastructure::shared::pg_pool::PgPool;
@@ -12,6 +11,7 @@ use single_flight::single_flight;
 use utoipa::IntoParams;
 
 use crate::{
+    error::ApplicationResult,
     iam::dto::user::UserDto,
     shared::{
         cache_provider::CacheProvider, paging_query::PagingQuery, paging_result::PagingResult,
@@ -116,7 +116,7 @@ impl QueryHandler for SearchUsersQueryHandler {
 
 impl SearchUsersQueryHandler {
     #[tracing::instrument]
-    pub async fn clean_cache(&self) -> Result<()> {
+    pub async fn clean_cache(&self) -> ApplicationResult<()> {
         self.cache_provider.clear().await
     }
 

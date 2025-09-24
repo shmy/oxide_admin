@@ -10,6 +10,7 @@ use std::time::Duration;
 use utoipa::IntoParams;
 
 use crate::{
+    error::ApplicationResult,
     iam::dto::role::RoleDto,
     shared::{
         cache_provider::CacheProvider, paging_query::PagingQuery, paging_result::PagingResult,
@@ -96,7 +97,7 @@ impl QueryHandler for SearchRolesQueryHandler {
 
 impl SearchRolesQueryHandler {
     #[tracing::instrument]
-    pub async fn clean_cache(&self) -> anyhow::Result<()> {
+    pub async fn clean_cache(&self) -> ApplicationResult<()> {
         self.cache_provider.clear().await
     }
 

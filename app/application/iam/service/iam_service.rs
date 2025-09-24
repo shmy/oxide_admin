@@ -1,7 +1,7 @@
+use crate::error::{ApplicationError, ApplicationResult};
 use crate::iam::dto::user::UserDto;
 use crate::iam::service::page::{PAGES, Page, SHARED_PAGES};
 use crate::system::service::upload_service::UploadService;
-use anyhow::{Result, bail};
 use bon::Builder;
 use domain::iam::value_object::permission_code::{ALL_PERMISSIONS, NONE, PermissionCode};
 use domain::iam::value_object::permission_group::{PermissionChecker, PermissionGroup};
@@ -28,24 +28,28 @@ pub struct IamService {
 
 impl IamService {
     #[tracing::instrument]
-    pub async fn verify_token(&self, token: &str) -> Result<UserId> {
+    pub async fn verify_token(&self, token: &str) -> ApplicationResult<UserId> {
         let secret = &self.config.jwt.access_token_secret;
         let claims = self.token_issuer.verify::<UserClaims>(token, secret)?;
         let id = claims.sub;
         let Some(existing_token) = self.token_store.retrieve(id.clone()).await else {
-            bail!("Token 非法");
+            return Err(ApplicationError::IllegalToken);
         };
         if existing_token != token {
-            bail!("Token 已被回收");
+            return Err(ApplicationError::RecycledToken);
         }
         Ok(UserId::new_unchecked(id))
     }
 
     #[tracing::instrument]
-    pub async fn check_permissions(&self, id: &UserId, checker: PermissionChecker) -> Result<()> {
+    pub async fn check_permissions(
+        &self,
+        id: &UserId,
+        checker: PermissionChecker,
+    ) -> ApplicationResult<()> {
         let existing_group = self.permission_resolver.resolve(id).await;
         if !existing_group.permits(checker) {
-            anyhow::bail!("权限不足");
+            return Err(ApplicationError::PermissionDenied);
         }
         Ok(())
     }

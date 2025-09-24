@@ -3,7 +3,7 @@ use std::{
     time::Duration,
 };
 
-use anyhow::Result;
+use crate::error::ApplicationResult;
 use bon::Builder;
 use kvdb_kit::{Kvdb, KvdbTrait as _};
 use serde::{Serialize, de::DeserializeOwned};
@@ -29,7 +29,7 @@ impl CacheProvider {
         format!("{}{}", CACHE_PREFIX, self.key)
     }
     #[tracing::instrument]
-    pub async fn clear(&self) -> Result<()> {
+    pub async fn clear(&self) -> ApplicationResult<()> {
         self.kvdb.delete_prefix(&self.fill_key()).await?;
         Ok(())
     }

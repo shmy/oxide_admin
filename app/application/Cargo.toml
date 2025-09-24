@@ -7,7 +7,6 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-anyhow = { workspace = true }
 axum = { workspace = true }
 bg_worker_kit = { workspace = true }
 bon = { workspace = true }

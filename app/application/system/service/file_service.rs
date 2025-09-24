@@ -1,4 +1,4 @@
-use anyhow::Result;
+use crate::error::ApplicationResult;
 use bon::Builder;
 use domain::shared::id_generator::IdGenerator;
 use futures_util::stream::BoxStream;
@@ -31,7 +31,7 @@ impl FileService {
     }
 
     #[tracing::instrument]
-    pub async fn create(&self, relative_path: &str) -> Result<()> {
+    pub async fn create(&self, relative_path: &str) -> ApplicationResult<()> {
         let now = self.ct.now();
         let id = IdGenerator::primary_id();
         let _ = sqlx::query!(
@@ -48,17 +48,21 @@ impl FileService {
     }
 
     #[tracing::instrument]
-    pub async fn set_files_unused(&self, relative_paths: &[String]) -> Result<()> {
+    pub async fn set_files_unused(&self, relative_paths: &[String]) -> ApplicationResult<()> {
         self.set_files_status(relative_paths, false).await
     }
 
     #[tracing::instrument]
-    pub async fn set_files_used(&self, relative_paths: &[String]) -> Result<()> {
+    pub async fn set_files_used(&self, relative_paths: &[String]) -> ApplicationResult<()> {
         self.set_files_status(relative_paths, true).await
     }
 
     #[tracing::instrument]
-    async fn set_files_status(&self, relative_paths: &[String], used: bool) -> Result<()> {
+    async fn set_files_status(
+        &self,
+        relative_paths: &[String],
+        used: bool,
+    ) -> ApplicationResult<()> {
         if relative_paths.is_empty() {
             return Ok(());
         }
@@ -77,7 +81,7 @@ impl FileService {
     }
 
     #[tracing::instrument]
-    pub async fn delete_files(&self, relative_paths: &[String]) -> Result<()> {
+    pub async fn delete_files(&self, relative_paths: &[String]) -> ApplicationResult<()> {
         if relative_paths.is_empty() {
             return Ok(());
         }

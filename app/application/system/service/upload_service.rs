@@ -1,4 +1,4 @@
-use anyhow::{Result, bail};
+use crate::error::{ApplicationError, ApplicationResult};
 use axum::http::Uri;
 use bon::Builder;
 use domain::shared::id_generator::IdGenerator;
@@ -35,9 +35,9 @@ pub struct UploadService {
 
 impl UploadService {
     #[tracing::instrument(skip(file))]
-    pub async fn image(&self, mut file: NamedTempFile) -> Result<FinishResponse> {
+    pub async fn image(&self, mut file: NamedTempFile) -> ApplicationResult<FinishResponse> {
         let Some(format) = SupportedFormat::validate_image_type(&mut file) else {
-            bail!("不支持的图片格式");
+            return Err(ApplicationError::UnsupportedImageFormat);
         };
         let filename = IdGenerator::filename().to_lowercase();
         let relative_path = self.build_relative_path(format!("{}.{}", filename, "webp"));
@@ -59,7 +59,7 @@ impl UploadService {
         &self,
         filename: Option<String>,
         file: NamedTempFile,
-    ) -> Result<FinishResponse> {
+    ) -> ApplicationResult<FinishResponse> {
         let extension = Self::extract_extension(filename);
         let filename = IdGenerator::filename().to_lowercase();
         let relative_path = self.build_relative_path(format!("{filename}{extension}"));
@@ -76,7 +76,7 @@ impl UploadService {
     }
 
     #[tracing::instrument]
-    pub async fn start_chunk(&self, filename: String) -> Result<StartChunkResponse> {
+    pub async fn start_chunk(&self, filename: String) -> ApplicationResult<StartChunkResponse> {
         let extension = Self::extract_extension(Some(filename));
         let key = IdGenerator::filename().to_lowercase();
         let upload_id = format!("{key}{extension}").to_lowercase();
@@ -91,7 +91,7 @@ impl UploadService {
         key: String,
         part_number: u32,
         file: NamedTempFile,
-    ) -> Result<ChunkResponse> {
+    ) -> ApplicationResult<ChunkResponse> {
         let tmp_dir = self.workspace.temp_dir().join(&key);
         let filepath = tmp_dir.join(part_number.to_string());
         persist_file(file, &filepath).await?;
@@ -106,7 +106,7 @@ impl UploadService {
         key: String,
         upload_id: String,
         part_list: Vec<PartItem>,
-    ) -> Result<FinishResponse> {
+    ) -> ApplicationResult<FinishResponse> {
         let tmp_dir = self.workspace.temp_dir().join(&key);
         let relative_path = self.build_relative_path(upload_id);
         let stream = stream::iter(part_list).then(|part| {
@@ -133,11 +133,9 @@ impl UploadService {
     }
 
     #[tracing::instrument(skip(path))]
-    pub async fn presign_url(&self, path: impl AsRef<str>) -> Result<String> {
-        self.object_storage
-            .presign_url(path)
-            .await
-            .map_err(Into::into)
+    pub async fn presign_url(&self, path: impl AsRef<str>) -> ApplicationResult<String> {
+        let url = self.object_storage.presign_url(path).await?;
+        Ok(url)
     }
 
     #[tracing::instrument]
@@ -146,17 +144,15 @@ impl UploadService {
     }
 
     #[tracing::instrument(skip_all)]
-    pub async fn delete(&self, path: impl AsRef<str>) -> Result<()> {
+    pub async fn delete(&self, path: impl AsRef<str>) -> ApplicationResult<()> {
         self.delete_many(Vec::from([path.as_ref().to_string()]))
             .await
     }
 
     #[tracing::instrument(skip_all)]
-    pub async fn delete_many(&self, paths: Vec<String>) -> Result<()> {
-        self.object_storage
-            .delete_many(paths)
-            .await
-            .map_err(Into::into)
+    pub async fn delete_many(&self, paths: Vec<String>) -> ApplicationResult<()> {
+        self.object_storage.delete_many(paths).await?;
+        Ok(())
     }
 
     #[tracing::instrument]
@@ -230,7 +226,7 @@ impl SupportedFormat {
     async fn convert_to_webp(
         format: SupportedFormat,
         mut file: NamedTempFile,
-    ) -> Result<impl Read + Seek> {
+    ) -> ApplicationResult<impl Read + Seek> {
         if let SupportedFormat::Webp = format {
             let data = tokio::fs::read(file.path()).await?;
             return Ok(Cursor::new(data)); // Cursor 实现了 Read + Seek
@@ -256,7 +252,7 @@ impl SupportedFormat {
     }
 }
 
-async fn persist_file(file: NamedTempFile, destination: &Path) -> Result<()> {
+async fn persist_file(file: NamedTempFile, destination: &Path) -> ApplicationResult<()> {
     #[cfg(unix)]
     {
         file.persist(destination)?;

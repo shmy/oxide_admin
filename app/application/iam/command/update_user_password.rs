@@ -1,5 +1,4 @@
 use crate::shared::command_handler::{CommandHandler, CommandResult};
-use anyhow::Result;
 use bon::Builder;
 use domain::iam::error::IamError;
 use domain::iam::event::IamEvent;
