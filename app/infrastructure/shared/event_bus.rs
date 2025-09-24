@@ -1,4 +1,4 @@
-use anyhow::Result;
+use crate::error::Result;
 use tokio::sync::broadcast::{self, Receiver, Sender};
 use tracing::error;
 

@@ -5,6 +5,7 @@ use crate::{
 };
 use bon::Builder;
 use domain::{iam::event::IamEvent, shared::port::permission_resolver::PermissionResolver};
+use infrastructure::error::Result;
 use infrastructure::{
     port::permission_resolver_impl::PermissionResolverImpl, shared::event_bus::EventSubscriber,
 };
@@ -49,7 +50,7 @@ impl IamEventSubscriber {
 }
 
 impl EventSubscriber<Event> for IamEventSubscriber {
-    async fn on_received(&self, event: Event) -> anyhow::Result<()> {
+    async fn on_received(&self, event: Event) -> Result<()> {
         #[allow(irrefutable_let_patterns)]
         if let Event::Iam(e) = event {
             if Self::is_permission_changed(&e)

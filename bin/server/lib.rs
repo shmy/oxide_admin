@@ -38,15 +38,13 @@ pub async fn serve(config: ConfigRef) -> Result<()> {
     let provider = build_provider(&config, workspace).await?;
     #[cfg(feature = "serve_with_sched")]
     let (_, worker_manager, sched) = try_join!(
-        migration::migrate(provider.provide(), provider.provide(), provider.provide()),
+        run_migration(&provider),
         build_worker_manager(&provider),
         build_scheduler_job(&provider),
     )?;
     #[cfg(not(feature = "serve_with_sched"))]
-    let (_, worker_manager) = try_join!(
-        migration::migrate(provider.provide(), provider.provide(), provider.provide()),
-        build_worker_manager(&provider),
-    )?;
+    let (_, worker_manager) =
+        try_join!(run_migration(&provider), build_worker_manager(&provider),)?;
     register_event_subscribers(&provider);
     let pg_pool = provider.provide::<PgPool>();
     let kvdb = provider.provide::<Kvdb>();
@@ -114,11 +112,11 @@ async fn build_listener(server: &Server) -> Result<TcpListener> {
 
 async fn build_provider(config: &ConfigRef, workspace: WorkspaceRef) -> Result<Provider> {
     let (pg_pool, kvdb, queuer, object_storage, feature_flag) = tokio::try_join!(
-        pg_pool::try_new(config.timezone, &config.database),
+        build_pg_pool(config),
         build_kvdb(config, &workspace),
         build_queuer(config, &workspace),
         build_object_storage(config, &workspace),
-        FeatureFlag::try_new(config),
+        build_feature_flag(config),
     )?;
     let provider = Provider::builder()
         .pg_pool(pg_pool)
@@ -172,6 +170,16 @@ async fn build_object_storage(
     };
 }
 
+async fn build_pg_pool(config: &ConfigRef) -> Result<PgPool> {
+    let pool = pg_pool::try_new(config.timezone, &config.database).await?;
+    Ok(pool)
+}
+
+async fn build_feature_flag(config: &ConfigRef) -> Result<FeatureFlag> {
+    let feature_flag = FeatureFlag::try_new(config).await?;
+    Ok(feature_flag)
+}
+
 #[allow(unused_variables)]
 async fn build_kvdb(config: &ConfigRef, workspace: &WorkspaceRef) -> Result<Kvdb> {
     #[cfg(feature = "kv_redb")]
@@ -216,6 +224,11 @@ async fn build_scheduler_job(
     let scheduler = sched_kit::tokio_cron::TokioCronScheduler::try_new().await?;
     register_scheduled_jobs(&scheduler, provider).await?;
     Ok(scheduler)
+}
+
+async fn run_migration(provider: &Provider) -> Result<()> {
+    migration::migrate(provider.provide(), provider.provide(), provider.provide()).await?;
+    Ok(())
 }
 
 async fn start_http_server(listener: TcpListener, app: Router, notify: Arc<Notify>) -> Result<()> {

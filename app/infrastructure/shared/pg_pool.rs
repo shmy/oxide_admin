@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use anyhow::Result;
+use crate::error::Result;
 use sqlx::ConnectOptions as _;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
 use tracing::info;

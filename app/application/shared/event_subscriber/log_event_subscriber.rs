@@ -1,8 +1,7 @@
-use anyhow::Result;
+use crate::shared::event::Event;
+use infrastructure::error::Result;
 use infrastructure::shared::event_bus::EventSubscriber;
 use nject::injectable;
-
-use crate::shared::event::Event;
 
 #[derive(Clone)]
 #[injectable]

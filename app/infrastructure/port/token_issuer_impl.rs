@@ -26,7 +26,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
         &self,
         claims: &T,
         secret: &[u8],
-    ) -> anyhow::Result<String, Self::Error> {
+    ) -> Result<String, Self::Error> {
         let header = Header::new(ALGORITHM);
         let token = jsonwebtoken::encode(&header, claims, &EncodingKey::from_secret(secret))
             .map_err(|_| IamError::AccessTokenSignFailed)?;

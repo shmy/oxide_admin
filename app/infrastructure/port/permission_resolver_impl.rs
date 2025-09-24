@@ -1,4 +1,4 @@
-use anyhow::Result;
+use crate::error::{InfrastructureError, Result};
 use bon::Builder;
 use domain::iam::error::IamError;
 use domain::iam::value_object::permission_code::{ALL_PERMISSIONS, PermissionCode};
@@ -39,7 +39,7 @@ impl PermissionResolverImpl {
     }
 }
 impl PermissionResolver for PermissionResolverImpl {
-    type Error = anyhow::Error;
+    type Error = InfrastructureError;
 
     #[tracing::instrument]
     async fn resolve(&self, id: &UserId) -> PermissionGroup {
@@ -63,7 +63,7 @@ impl PermissionResolver for PermissionResolverImpl {
     }
 
     #[tracing::instrument]
-    async fn refresh(&self) -> Result<(), Self::Error> {
+    async fn refresh(&self) -> std::result::Result<(), Self::Error> {
         self.kvdb.delete_prefix(KEY_PREFIX).await?;
         Ok(())
     }
@@ -71,7 +71,7 @@ impl PermissionResolver for PermissionResolverImpl {
 
 impl PermissionResolverImpl {
     #[single_flight]
-    pub async fn find_from_db(&self, id: UserId) -> Result<PermissionGroup, IamError> {
+    pub async fn find_from_db(&self, id: UserId) -> std::result::Result<PermissionGroup, IamError> {
         let user_record = sqlx::query!(
             r#"SELECT privileged, role_ids as "role_ids: Vec<RoleId>" from _users WHERE id = $1"#,
             &id

@@ -1,5 +1,3 @@
-use std::result::Result;
-
 use bon::Builder;
 use domain::iam::port::role_repository::RoleRepository;
 use domain::iam::value_object::permission_code::PermissionCode;

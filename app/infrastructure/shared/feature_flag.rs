@@ -1,7 +1,7 @@
 use std::{fmt::Debug, ops::Deref, sync::Arc};
 
 use super::config::ConfigRef;
-use anyhow::Result;
+use crate::error::Result;
 use open_feature::{Client, OpenFeature};
 
 #[derive(Clone)]

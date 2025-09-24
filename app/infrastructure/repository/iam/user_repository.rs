@@ -1,4 +1,3 @@
-use anyhow::Result;
 use bon::Builder;
 use chrono::NaiveDateTime;
 use domain::iam::value_object::role_id::RoleId;

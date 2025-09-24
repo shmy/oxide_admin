@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use anyhow::Result;
+use crate::error::Result;
 use domain::iam::entity::user::User;
 use domain::iam::value_object::hashed_password::HashedPassword;
 use domain::iam::value_object::user_id::UserId;

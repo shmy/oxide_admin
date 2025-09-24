@@ -2061,7 +2061,6 @@ dependencies = [
 name = "infrastructure"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "bg_worker_kit",
  "bon",
  "captcha_kit",
@@ -2084,6 +2083,7 @@ dependencies = [
  "tempoid",
  "testcontainers",
  "testcontainers-modules",
+ "thiserror 2.0.16",
  "tokio",
  "tracing",
 ]
