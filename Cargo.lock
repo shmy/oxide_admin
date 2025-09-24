@@ -2179,7 +2179,6 @@ dependencies = [
 name = "kvdb_kit"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "bb8-redis",
  "bon",
  "chrono",
@@ -2187,6 +2186,7 @@ dependencies = [
  "rmp-serde",
  "serde",
  "tempfile",
+ "thiserror 2.0.16",
  "tokio",
  "tokio-cron-scheduler",
  "tracing",

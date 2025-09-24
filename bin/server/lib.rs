@@ -179,7 +179,7 @@ async fn build_kvdb(config: &ConfigRef, workspace: &WorkspaceRef) -> Result<Kvdb
         let path = workspace.data_dir().join("data.redb");
         #[cfg(feature = "test")]
         let _ = tokio::fs::remove_file(&path).await;
-        Kvdb::try_new(path).await
+        Ok(Kvdb::try_new(path).await?)
     };
     #[cfg(feature = "kv_redis")]
     return {
@@ -191,7 +191,7 @@ async fn build_kvdb(config: &ConfigRef, workspace: &WorkspaceRef) -> Result<Kvdb
             .max_lifetime(config.redis.max_lifetime)
             .idle_timeout(config.redis.idle_timeout)
             .build();
-        Kvdb::try_new(config).await
+        Ok(Kvdb::try_new(config).await?)
     };
 }
 

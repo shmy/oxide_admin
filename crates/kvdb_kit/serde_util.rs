@@ -1,4 +1,4 @@
-use anyhow::Result;
+use crate::error::Result;
 use serde::{Serialize, de::DeserializeOwned};
 
 pub fn rmp_encode<T: Serialize>(value: &T) -> Result<Vec<u8>> {

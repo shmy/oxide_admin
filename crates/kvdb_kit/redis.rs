@@ -1,4 +1,4 @@
-use anyhow::Result;
+use crate::error::Result;
 use bb8_redis::{
     RedisConnectionManager,
     bb8::Pool,

@@ -1,7 +1,9 @@
 use std::time::Duration;
 
-use anyhow::Result;
+use crate::error::Result;
 use serde::{Serialize, de::DeserializeOwned};
+pub mod error;
+
 #[cfg(feature = "redb")]
 mod redb;
 #[cfg(feature = "redis")]

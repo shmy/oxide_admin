@@ -1,4 +1,4 @@
-use anyhow::Result;
+use crate::error::Result;
 use chrono::Utc;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::fmt::Debug;
