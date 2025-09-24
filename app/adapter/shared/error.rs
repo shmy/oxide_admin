@@ -12,13 +12,13 @@ pub enum WebError {
     Application(#[from] application::error::ApplicationError),
 
     #[error("{0}")]
-    IamError(#[from] IamError),
-
-    #[error("{0}")]
     InvalidHeaderValue(#[from] axum::http::header::InvalidHeaderValue),
 
     #[error("授权用户不存在")]
     ValidUserNotFound,
+
+    #[error("{0}")]
+    IamError(#[from] IamError),
 }
 
 impl IntoResponse for WebError {
