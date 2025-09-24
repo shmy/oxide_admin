@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::error::ApplicationResult;
 use nject::injectable;
 use std::sync::LazyLock;
 use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, System, UpdateKind};
@@ -15,7 +15,7 @@ pub struct SystemService;
 
 impl SystemService {
     #[tracing::instrument]
-    pub async fn info(&self) -> Result<&'static SystemSnapshot> {
+    pub async fn info(&self) -> ApplicationResult<&'static SystemSnapshot> {
         Ok(&SNAPSHOT)
     }
 

@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-pub type Result<T> = std::result::Result<T, ApplicationError>;
+pub type ApplicationResult<T> = std::result::Result<T, ApplicationError>;
 
 #[derive(Debug, Error)]
 pub enum ApplicationError {
