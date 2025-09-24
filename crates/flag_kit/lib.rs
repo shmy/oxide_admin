@@ -1,3 +1,5 @@
+pub mod error;
+
 #[cfg(feature = "flipt")]
 mod flipt;
 #[cfg(feature = "flipt")]

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use anyhow::Result;
 use bon::Builder;
 use flipt::{
     Config, ConfigBuilder, NoneAuthentication,
@@ -14,6 +13,7 @@ use open_feature::{
     provider::{FeatureProvider, ProviderMetadata, ResolutionDetails},
 };
 use reqwest::header::{HeaderMap, HeaderValue};
+use std::result::Result;
 
 const DEFAULT_ENTITY_ID: &str = "";
 const METADATA: &str = "flipt";
@@ -31,7 +31,7 @@ pub struct FliptProvider {
 }
 
 impl FliptProvider {
-    pub fn try_new(config: FliptProviderConfig) -> Result<Self> {
+    pub fn try_new(config: FliptProviderConfig) -> crate::error::Result<Self> {
         let mut headers = HeaderMap::new();
         headers.insert(
             "X-Flipt-Environment",
