@@ -1,4 +1,3 @@
-use anyhow::Result;
 use bon::Builder;
 use infrastructure::shared::pg_pool::PgPool;
 use domain::{{module}}::error::{{module | pascal_case}}Error;
@@ -8,6 +7,7 @@ use serde_with::serde_as;
 use std::time::Duration;
 use single_flight::single_flight;
 use crate::{
+    error::ApplicationResult,
     {{module}}::dto::{{entity}}::{{entity | pascal_case}}Dto,
     shared::{
         cache_provider::CacheProvider,
@@ -76,7 +76,7 @@ impl QueryHandler for Search{{entity | pluralize | pascal_case}}QueryHandler {
 impl Search{{entity | pluralize | pascal_case}}QueryHandler {
 
     #[tracing::instrument]
-    pub async fn clean_cache(&self) -> Result<()> {
+    pub async fn clean_cache(&self) -> ApplicationResult<()> {
         self.cache_provider.clear().await
     }
 
@@ -84,7 +84,7 @@ impl Search{{entity | pluralize | pascal_case}}QueryHandler {
     pub async fn query_cached(
         &self,
         query: Search{{entity | pluralize | pascal_case}}Query,
-    ) -> Result<PagingResult<{{entity | pascal_case}}Dto>, {{module | pascal_case}}Error> {
+    ) ->  Result<PagingResult<{{entity | pascal_case}}Dto>, {{module | pascal_case}}Error> {
         self.cache_provider.get_with(query, |q| self.query(q)).await
     }
 }
