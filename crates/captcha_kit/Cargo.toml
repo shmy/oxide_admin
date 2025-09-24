@@ -11,7 +11,7 @@ test = []
 
 [dependencies]
 ab_glyph = { version = "0.2", default-features = false, features = ["std"] }
-anyhow = { workspace = true }
 image = { workspace = true, features = ["png"] }
 imageproc = { version = "0.25", default-features = false }
 rand = { version = "0.9", default-features = false, features = ["thread_rng"] }
+thiserror = { workspace = true }

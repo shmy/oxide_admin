@@ -1,5 +1,5 @@
-use anyhow::Result;
-
+use crate::error::Result;
+pub mod error;
 pub mod math;
 
 pub struct CaptchaData {

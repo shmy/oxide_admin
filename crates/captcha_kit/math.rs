@@ -1,4 +1,5 @@
 #![allow(unused)]
+use crate::error::Result;
 use ab_glyph::{FontRef, PxScale};
 use image::{ImageBuffer, Rgba};
 use std::{io::Cursor, sync::LazyLock};
@@ -28,7 +29,7 @@ impl Default for MathCaptcha {
 }
 
 impl CaptchaTrait for MathCaptcha {
-    fn generate(&self) -> anyhow::Result<CaptchaData> {
+    fn generate(&self) -> Result<CaptchaData> {
         #[cfg(not(feature = "test"))]
         let (question, answer) = self.rand_math();
         #[cfg(feature = "test")]
@@ -137,7 +138,7 @@ impl MathCaptcha {
         Rgba([r.min(100), g.min(100), b.min(100), 255])
     }
 
-    fn draw_text_png(&self, text: &str) -> anyhow::Result<Vec<u8>> {
+    fn draw_text_png(&self, text: &str) -> Result<Vec<u8>> {
         let padding = 10.0; // 左右各保留10像素
         let available_width = self.width as f32 - padding * 2.0;
         let font_width = available_width / text.len() as f32;

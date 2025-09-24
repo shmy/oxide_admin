@@ -601,10 +601,10 @@ name = "captcha_kit"
 version = "0.1.0"
 dependencies = [
  "ab_glyph",
- "anyhow",
  "image",
  "imageproc",
  "rand 0.9.2",
+ "thiserror 2.0.16",
 ]
 
 [[package]]
