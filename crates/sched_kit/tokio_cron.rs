@@ -1,4 +1,4 @@
-use anyhow::{Ok, Result};
+use crate::error::Result;
 use tokio_cron_scheduler::{Job, JobScheduler};
 use tracing::error;
 

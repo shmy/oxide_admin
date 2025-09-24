@@ -1,5 +1,6 @@
-use anyhow::Result;
+use crate::error::Result;
 
+pub mod error;
 pub mod tokio_cron;
 
 pub trait ScheduledJob: Clone + Send + Sync + 'static {

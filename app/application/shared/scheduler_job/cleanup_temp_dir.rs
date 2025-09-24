@@ -1,11 +1,9 @@
-use std::time::{Duration, SystemTime};
-
-use anyhow::Result;
 use bon::Builder;
 use futures_util::StreamExt as _;
 use infrastructure::shared::workspace::WorkspaceRef;
 use nject::injectable;
-use sched_kit::ScheduledJob;
+use sched_kit::{ScheduledJob, error::Result};
+use std::time::{Duration, SystemTime};
 use tokio::fs;
 use tracing::warn;
 

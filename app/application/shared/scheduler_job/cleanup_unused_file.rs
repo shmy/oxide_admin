@@ -1,8 +1,7 @@
-use anyhow::Result;
 use bon::Builder;
 use futures_util::StreamExt as _;
 use nject::injectable;
-use sched_kit::ScheduledJob;
+use sched_kit::{ScheduledJob, error::Result};
 
 use crate::system::service::{file_service::FileService, upload_service::UploadService};
 

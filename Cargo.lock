@@ -123,6 +123,7 @@ dependencies = [
  "sqlx",
  "sysinfo",
  "tempfile",
+ "thiserror 2.0.16",
  "tokio",
  "tokio-stream",
  "tokio-util",
@@ -3804,8 +3805,8 @@ dependencies = [
 name = "sched_kit"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "chrono-tz",
+ "thiserror 2.0.16",
  "tokio",
  "tokio-cron-scheduler",
  "tracing",

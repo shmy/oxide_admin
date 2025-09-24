@@ -1,4 +1,4 @@
-use anyhow::Result;
+use crate::error::Result;
 use nject::injectable;
 use std::sync::LazyLock;
 use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, System, UpdateKind};

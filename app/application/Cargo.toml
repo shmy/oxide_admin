@@ -28,6 +28,7 @@ single_flight = { workspace = true }
 sqlx = { workspace = true }
 sysinfo = { workspace = true, features = ["system"] }
 tempfile = { workspace = true }
+thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tokio-stream = { workspace = true }
 tokio-util = { workspace = true }
