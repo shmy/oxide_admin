@@ -2670,7 +2670,6 @@ dependencies = [
 name = "object_storage_kit"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "axum",
  "bon",
  "chrono",
@@ -2681,6 +2680,7 @@ dependencies = [
  "serde",
  "serde_urlencoded",
  "tempfile",
+ "thiserror 2.0.16",
  "tokio",
  "tokio-util",
  "tracing",

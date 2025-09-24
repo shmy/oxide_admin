@@ -1,6 +1,6 @@
 use std::{fmt::Debug, time::Duration};
 
-use anyhow::Result;
+use crate::error::Result;
 use axum::http::Uri;
 use bon::Builder;
 use opendal::{Operator, layers::LoggingLayer, services};

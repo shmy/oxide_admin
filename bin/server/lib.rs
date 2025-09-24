@@ -157,7 +157,7 @@ async fn build_object_storage(
             .hmac_secret(config.fs.hmac_secret)
             .link_period(config.fs.link_period)
             .build();
-        ObjectStorage::try_new(config)
+        Ok(ObjectStorage::try_new(config)?)
     };
     #[cfg(feature = "object_storage_s3")]
     return {
@@ -168,7 +168,7 @@ async fn build_object_storage(
             .secret_access_key(config.s3.secret_access_key.to_string())
             .region(config.s3.region.to_string())
             .build();
-        ObjectStorage::try_new(config).await
+        Ok(ObjectStorage::try_new(config).await?)
     };
 }
 

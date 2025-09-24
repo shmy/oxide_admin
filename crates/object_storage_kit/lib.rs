@@ -1,11 +1,12 @@
 use futures_util::{SinkExt as _, Stream, StreamExt as _, TryStreamExt as _};
 use std::io::{Read, Seek};
 
-use anyhow::Result;
+use crate::error::Result;
 use axum::http::Uri;
 use opendal::{DeleteInput, IntoDeleteInput, Operator};
 use tokio::fs::File;
 use tokio_util::io::ReaderStream;
+pub mod error;
 #[cfg(feature = "fs")]
 mod fs;
 #[cfg(feature = "s3")]

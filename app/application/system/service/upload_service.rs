@@ -2,12 +2,13 @@ use anyhow::{Result, bail};
 use axum::http::Uri;
 use bon::Builder;
 use domain::shared::id_generator::IdGenerator;
-use futures_util::{StreamExt, stream};
+use futures_util::{StreamExt, TryFutureExt, stream};
 use image::{ImageFormat, ImageReader};
 use imageformat::detect_image_format;
 use infrastructure::shared::chrono_tz::{ChronoTz, Datelike as _};
 use infrastructure::shared::workspace::WorkspaceRef;
 use nject::injectable;
+use object_storage_kit::error::ObjectStorageError;
 use object_storage_kit::{ObjectStorage, ObjectStorageReader, ObjectStorageWriter};
 use serde::{Deserialize, Serialize};
 use std::io::{Cursor, Read};
@@ -42,7 +43,9 @@ impl UploadService {
         let relative_path = self.build_relative_path(format!("{}.{}", filename, "webp"));
         let reader = SupportedFormat::convert_to_webp(format, file).await?;
         tokio::try_join!(
-            self.object_storage.write(&relative_path, reader),
+            self.object_storage
+                .write(&relative_path, reader)
+                .map_err(Into::into),
             self.file_service.create(&relative_path)
         )?;
         Ok(FinishResponse {
@@ -61,7 +64,9 @@ impl UploadService {
         let filename = IdGenerator::filename().to_lowercase();
         let relative_path = self.build_relative_path(format!("{filename}{extension}"));
         tokio::try_join!(
-            self.object_storage.write(&relative_path, file),
+            self.object_storage
+                .write(&relative_path, file)
+                .map_err(Into::into),
             self.file_service.create(&relative_path)
         )?;
         Ok(FinishResponse {
@@ -109,7 +114,7 @@ impl UploadService {
             async move {
                 let file = File::open(chunk_path).await?;
                 let reader = ReaderStream::new(file);
-                Ok::<_, anyhow::Error>(reader)
+                Ok::<_, ObjectStorageError>(reader)
             }
         });
         tokio::try_join!(
@@ -117,6 +122,7 @@ impl UploadService {
                 self.object_storage
                     .write_stream(&relative_path, pin::pin!(stream))
                     .await
+                    .map_err(Into::into)
             },
             self.file_service.create(&relative_path)
         )?;
@@ -128,7 +134,10 @@ impl UploadService {
 
     #[tracing::instrument(skip(path))]
     pub async fn presign_url(&self, path: impl AsRef<str>) -> Result<String> {
-        self.object_storage.presign_url(path).await
+        self.object_storage
+            .presign_url(path)
+            .await
+            .map_err(Into::into)
     }
 
     #[tracing::instrument]
@@ -144,7 +153,10 @@ impl UploadService {
 
     #[tracing::instrument(skip_all)]
     pub async fn delete_many(&self, paths: Vec<String>) -> Result<()> {
-        self.object_storage.delete_many(paths).await
+        self.object_storage
+            .delete_many(paths)
+            .await
+            .map_err(Into::into)
     }
 
     #[tracing::instrument]

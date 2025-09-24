@@ -12,7 +12,6 @@ s3 = ["opendal/executors-tokio", "opendal/services-s3"]
 s3_tls = ["opendal/default"]
 
 [dependencies]
-anyhow = { workspace = true }
 axum = { workspace = true }
 bon = { workspace = true }
 chrono = { workspace = true }
@@ -22,6 +21,7 @@ hmac-sha256 = { workspace = true }
 opendal = { version = "0.54", default-features = false }
 serde = { workspace = true, features = ["derive"] }
 serde_urlencoded = { workspace = true }
+thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tokio-util = { workspace = true }
 tracing = { workspace = true }
