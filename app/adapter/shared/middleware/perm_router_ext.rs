@@ -31,7 +31,7 @@ impl _InternalPermissionExt for UtoipaMethodRouter<WebState> {
                         req.extensions().get::<ValidUser>(),
                         req.extensions().get::<IamService>(),
                     ) else {
-                        return Err(anyhow::anyhow!("未找到 ValidUser").into());
+                        return Err(WebError::ValidUserNotFound);
                     };
                     iam_service
                         .check_permissions(&valid_user.0, checker)

@@ -2,24 +2,29 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use domain::iam::error::IamError;
 
 use super::response::JsonResponse;
 
-pub struct WebError(anyhow::Error);
+#[derive(Debug, thiserror::Error)]
+pub enum WebError {
+    #[error("{0}")]
+    Application(#[from] application::error::ApplicationError),
 
-impl<E> From<E> for WebError
-where
-    E: Into<anyhow::Error>,
-{
-    fn from(err: E) -> Self {
-        Self(err.into())
-    }
+    #[error("{0}")]
+    IamError(#[from] IamError),
+
+    #[error("{0}")]
+    InvalidHeaderValue(#[from] axum::http::header::InvalidHeaderValue),
+
+    #[error("授权用户不存在")]
+    ValidUserNotFound,
 }
 
 impl IntoResponse for WebError {
     fn into_response(self) -> Response {
-        let info = self.0.to_string();
-        tracing::error!(error = %self.0, info);
+        let info = self.to_string();
+        tracing::error!(error = %self, info);
         (StatusCode::OK, JsonResponse::<()>::err(info)).into_response()
     }
 }

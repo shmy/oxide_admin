@@ -4,9 +4,8 @@ use utoipa::ToSchema;
 
 use super::error::WebError;
 
-pub type JsonResponseType<T> = anyhow::Result<Json<JsonResponse<T>>, WebError>;
-pub type JsonResponsePagingType<T> =
-    anyhow::Result<Json<JsonResponse<PagingResponse<T>>>, WebError>;
+pub type JsonResponseType<T> = Result<Json<JsonResponse<T>>, WebError>;
+pub type JsonResponsePagingType<T> = Result<Json<JsonResponse<PagingResponse<T>>>, WebError>;
 
 #[derive(Debug, Serialize, ToSchema)]
 pub struct PagingResponse<T> {

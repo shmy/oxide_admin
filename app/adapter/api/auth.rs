@@ -85,7 +85,7 @@ async fn refresh_token(
 #[tracing::instrument]
 async fn refresh_captcha(
     Inject(command_handler): Inject<RefreshCaptchaCommandHandler>,
-) -> anyhow::Result<impl IntoResponse, WebError> {
+) -> Result<impl IntoResponse, WebError> {
     let data = command_handler
         .handle(RefreshCaptchaCommand::builder().build())
         .await?;

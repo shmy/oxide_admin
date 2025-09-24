@@ -22,7 +22,6 @@ checksum = "366ffbaa4442f4684d91e2cd7c5ea7c4ed8add41959a31447066e279e432b618"
 name = "adapter"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "application",
  "axum",
  "axum-tracing-opentelemetry",
@@ -35,6 +34,7 @@ dependencies = [
  "serde",
  "serde_urlencoded",
  "tempfile",
+ "thiserror 2.0.16",
  "tokio",
  "tower",
  "tower-http",

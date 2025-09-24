@@ -21,7 +21,7 @@ impl FromRequestParts<WebState> for ValidUser {
         _state: &WebState,
     ) -> Result<Self, Self::Rejection> {
         let Some(valid_admin) = parts.extensions.get::<Self>() else {
-            return Err(anyhow::anyhow!("未找到 ValidUser").into());
+            return Err(WebError::ValidUserNotFound);
         };
         Ok(valid_admin.clone())
     }
