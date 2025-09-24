@@ -36,7 +36,6 @@ twox-hash = { workspace = true, features = ["xxhash64"] }
 utoipa = { workspace = true }
 
 [build-dependencies]
-anyhow = { workspace = true }
 cruet = { workspace = true }
 minijinja = { workspace = true, features = ["serde", "loader", "builtins"] }
 serde = { workspace = true, features = ["derive"] }

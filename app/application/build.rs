@@ -3,10 +3,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use anyhow::Result;
 use cruet::Inflector as _;
 use minijinja::Environment;
 use serde::{Deserialize, Serialize};
+
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 fn main() -> Result<()> {
     generate_subscribers()?;
