@@ -143,9 +143,9 @@ use bg_worker_kit::queuer::Queuer;
 #[allow(unused_imports)]
 use bg_worker_kit::Worker;
 #[allow(unused_imports)]
-use infrastructure::shared::provider::Provider;
+use bg_worker_kit::error::Result;
 #[allow(unused_imports)]
-use anyhow::Result;
+use infrastructure::shared::provider::Provider;
 
 #[allow(unused_imports)]
 use nject::injectable;
