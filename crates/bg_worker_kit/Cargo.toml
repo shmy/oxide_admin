@@ -12,7 +12,6 @@ faktory_tls = ["faktory/rustls"]
 sqlite = ["dep:sqlx"]
 
 [dependencies]
-anyhow = { workspace = true }
 async-trait = { version = "0.1", default-features = false }
 faktory = { version = "0.13", default-features = false, optional = true }
 futures-util = { workspace = true }

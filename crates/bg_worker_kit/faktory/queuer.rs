@@ -1,4 +1,4 @@
-use anyhow::Result;
+use crate::error::Result;
 use faktory::{Client, Job};
 use serde::Serialize;
 use std::fmt::Debug;

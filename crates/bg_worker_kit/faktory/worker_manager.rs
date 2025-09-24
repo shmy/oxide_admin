@@ -1,5 +1,5 @@
+use crate::error::Result;
 use crate::{Worker, error::WorkerError};
-use anyhow::Result;
 use faktory::WorkerBuilder;
 
 struct RunnerWrapper<T>(pub T)
@@ -7,12 +7,12 @@ where
     T: Worker;
 
 #[async_trait::async_trait]
-impl<T> ::faktory::Worker for RunnerWrapper<T>
+impl<T> ::faktory::JobRunner for RunnerWrapper<T>
 where
     T: Worker + Send + Sync + 'static,
 {
     type Error = WorkerError;
-    async fn run(&self, job: ::faktory::Job) -> Result<(), Self::Error> {
+    async fn run(&self, job: ::faktory::Job) -> Result<()> {
         if let Some(arg) = job.args().first() {
             let params: T::Params = serde_json::from_value(arg.clone())?;
             return self.0.run(params).await;

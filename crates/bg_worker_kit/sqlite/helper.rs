@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use anyhow::Result;
+use crate::error::Result;
 use sqlx::ConnectOptions;
 use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions};
 use tracing::log::LevelFilter;

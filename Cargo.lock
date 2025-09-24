@@ -419,7 +419,6 @@ dependencies = [
 name = "bg_worker_kit"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "async-trait",
  "faktory",
  "futures-util",

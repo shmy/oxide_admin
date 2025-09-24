@@ -136,7 +136,7 @@ async fn build_provider(config: &ConfigRef, workspace: WorkspaceRef) -> Result<P
 #[allow(unused_variables)]
 async fn build_queuer(config: &ConfigRef, workspace: &WorkspaceRef) -> Result<Queuer> {
     #[cfg(feature = "bg_faktory")]
-    return Queuer::try_new(&config.faktory.url, &config.faktory.queue).await;
+    return Ok(Queuer::try_new(&config.faktory.url, &config.faktory.queue).await?);
     #[cfg(feature = "bg_sqlite")]
     return {
         use bg_worker_kit::helper::connect_sqlite;

@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
+use crate::error::Result;
 use crate::{Worker, error::WorkerError, queuer::Queuer};
-use anyhow::Result;
 use futures_util::{FutureExt, future::BoxFuture};
 use sqlx::FromRow;
 use tracing::{error, info};
@@ -10,22 +10,14 @@ struct RunnerWrapper<T>(pub T)
 where
     T: Worker + Clone + Send + Sync + 'static;
 trait WorkerDyn {
-    fn run(
-        &self,
-        row: JobRow,
-        pool: sqlx::SqlitePool,
-    ) -> BoxFuture<'static, Result<(), WorkerError>>;
+    fn run(&self, row: JobRow, pool: sqlx::SqlitePool) -> BoxFuture<'static, Result<()>>;
 }
 
 impl<T> WorkerDyn for RunnerWrapper<T>
 where
     T: Worker + Clone + Send + Sync + 'static,
 {
-    fn run(
-        &self,
-        row: JobRow,
-        pool: sqlx::SqlitePool,
-    ) -> BoxFuture<'static, Result<(), WorkerError>> {
+    fn run(&self, row: JobRow, pool: sqlx::SqlitePool) -> BoxFuture<'static, Result<()>> {
         let inner = self.0.clone();
         async move {
             let params: T::Params = serde_json::from_str(&row.params)?;

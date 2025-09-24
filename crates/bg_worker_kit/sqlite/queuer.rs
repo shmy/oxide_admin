@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use anyhow::Result;
+use crate::error::{Result, WorkerError};
 use serde::Serialize;
 use sqlx::FromRow;
 use tokio::sync::broadcast::{self, Receiver, Sender};
@@ -46,7 +46,7 @@ impl Queuer {
                 let id = ele.rowid;
                 sender.send(id)?;
             }
-            anyhow::Ok(())
+            Ok::<_, WorkerError>(())
         });
     }
 
@@ -56,7 +56,7 @@ impl Queuer {
             sqlx::query("DELETE FROM _jobs WHERE status = 'done'")
                 .execute(&pool)
                 .await?;
-            anyhow::Ok(())
+            Ok::<_, WorkerError>(())
         });
     }
 
