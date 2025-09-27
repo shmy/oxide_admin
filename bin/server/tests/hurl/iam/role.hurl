@@ -32,7 +32,8 @@ Authorization: Bearer {{access_token}}
 {
   "enabled": true,
   "name": "test1",
-  "permission_ids": []
+  "menus": [],
+  "permissions": []
 }
 HTTP 200
 [Captures]

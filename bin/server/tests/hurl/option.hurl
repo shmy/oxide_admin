@@ -14,4 +14,13 @@ HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
+jsonpath "$.data" count == 3
+
+# Should success when fetch menus given valid token
+GET {{base_url}}/api/options/menus
+Authorization: Bearer {{access_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
 jsonpath "$.data" count == 1
