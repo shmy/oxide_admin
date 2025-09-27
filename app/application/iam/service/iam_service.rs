@@ -1,15 +1,20 @@
 use crate::error::{ApplicationError, ApplicationResult};
 use crate::iam::dto::user::UserDto;
-use crate::iam::service::page::{PAGES, Page, SHARED_PAGES};
+use crate::iam::service::menu::{MENUS, MenuTree, SHARED_MENUS};
+use crate::iam::service::permission::{PERMISSIONS, PermissionTree};
 use crate::system::service::upload_service::UploadService;
 use bon::Builder;
-use domain::iam::value_object::permission_code::{ALL_PERMISSIONS, NONE, PermissionCode};
-use domain::iam::value_object::permission_group::{PermissionChecker, PermissionGroup};
+use domain::iam::value_object::menu::NONE;
+use domain::iam::value_object::menu_group::MenuGroup;
+use domain::iam::value_object::permission::{ALL_PERMISSIONS, Permission};
+use domain::iam::value_object::permission_group::PermissionChecker;
 use domain::iam::value_object::user_id::UserId;
+use domain::shared::port::menu_resolver::MenuResolver;
 use domain::shared::port::permission_resolver::PermissionResolver;
 use domain::shared::port::token_issuer::{TokenIssuerTrait, UserClaims};
 use domain::shared::port::token_store::TokenStoreTrait;
 use futures_util::{StreamExt, stream};
+use infrastructure::port::menu_resolver_impl::MenuResolverImpl;
 use infrastructure::port::permission_resolver_impl::PermissionResolverImpl;
 use infrastructure::port::token_issuer_impl::TokenIssuerImpl;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
@@ -21,6 +26,7 @@ use nject::injectable;
 pub struct IamService {
     token_issuer: TokenIssuerImpl,
     token_store: TokenStoreImpl,
+    menu_resolver: MenuResolverImpl,
     permission_resolver: PermissionResolverImpl,
     config: ConfigRef,
     upload_service: UploadService,
@@ -55,32 +61,37 @@ impl IamService {
     }
 
     #[tracing::instrument]
-    pub fn get_all_permissions(&self) -> &'static [PermissionCode] {
+    pub fn get_all_permissions(&self) -> &'static [Permission] {
         ALL_PERMISSIONS
     }
 
     #[tracing::instrument]
-    pub fn get_all_pages(&self) -> &'static [Page] {
-        PAGES.as_ref()
+    pub fn get_all_pages(&self) -> &'static [MenuTree] {
+        MENUS.as_ref()
     }
 
     #[tracing::instrument]
-    pub async fn get_available_pages(&self, user_id: UserId) -> [Page; 2] {
-        let group = self.permission_resolver.resolve(&user_id).await;
-        let mut pages = Self::get_available_pages_by_group(PAGES.as_ref(), &group);
-        pages.extend_from_slice(&*SHARED_PAGES);
+    pub fn get_permission_tree(&self) -> &'static [PermissionTree] {
+        PERMISSIONS.as_ref()
+    }
+
+    #[tracing::instrument]
+    pub async fn get_available_pages(&self, user_id: UserId) -> [MenuTree; 2] {
+        let group = self.menu_resolver.resolve(&user_id).await;
+        let mut pages = Self::get_available_pages_by_group(MENUS.as_ref(), &group);
+        pages.extend_from_slice(&*SHARED_MENUS);
         [
-            Page::builder()
+            MenuTree::builder()
                 .key(NONE)
                 .url("/")
                 .maybe_redirect(Self::find_default_path(&pages))
                 .build(),
-            Page::builder().key(NONE).children(pages).build(),
+            MenuTree::builder().key(NONE).children(pages).build(),
         ]
     }
 
     #[tracing::instrument]
-    fn find_default_path(pages: &[Page]) -> Option<&'static str> {
+    fn find_default_path(pages: &[MenuTree]) -> Option<&'static str> {
         if pages.is_empty() {
             return None;
         }
@@ -93,7 +104,7 @@ impl IamService {
     }
 
     #[tracing::instrument]
-    fn get_available_pages_by_group(pages: &[Page], group: &PermissionGroup) -> Vec<Page> {
+    fn get_available_pages_by_group(pages: &[MenuTree], group: &MenuGroup) -> Vec<MenuTree> {
         pages
             .iter()
             .filter_map(|page| {
@@ -138,7 +149,9 @@ mod tests {
 
     use std::collections::HashSet;
 
-    use domain::iam::value_object::permission_code::SYSTEM;
+    use domain::iam::value_object::{
+        permission::SYSTEM_ROLE_CREATE, permission_group::PermissionGroup,
+    };
     use infrastructure::{
         shared::{chrono_tz::ChronoTz, pg_pool::PgPool, workspace::WorkspaceRef},
         test_utils::{setup_database, setup_kvdb, setup_object_storage},
@@ -163,6 +176,10 @@ mod tests {
             .ct(ChronoTz::default())
             .build();
         let token_store = TokenStoreImpl::builder().kvdb(kvdb.clone()).build();
+        let menu_resolver = MenuResolverImpl::builder()
+            .pool(pool.clone())
+            .kvdb(kvdb.clone())
+            .build();
         let permission_resolver = PermissionResolverImpl::builder()
             .pool(pool.clone())
             .kvdb(kvdb.clone())
@@ -182,6 +199,7 @@ mod tests {
         IamService::builder()
             .token_issuer(token_issuer)
             .token_store(token_store)
+            .menu_resolver(menu_resolver)
             .permission_resolver(permission_resolver)
             .config(ConfigRef::default())
             .upload_service(upload_service)
@@ -199,7 +217,7 @@ mod tests {
     async fn test_get_all_pages(pool: PgPool) {
         let service = build_service(pool).await;
         let pages = service.get_all_pages();
-        assert_eq!(pages.len(), PAGES.len());
+        assert_eq!(pages.len(), MENUS.len());
     }
 
     #[sqlx::test]
@@ -246,7 +264,7 @@ mod tests {
                 .await
                 .unwrap();
         let mut hash_set = HashSet::new();
-        hash_set.insert(SYSTEM);
+        hash_set.insert(SYSTEM_ROLE_CREATE);
         let result = service
             .check_permissions(
                 &row.id,
@@ -256,7 +274,7 @@ mod tests {
         assert!(result.is_ok());
 
         let mut hash_set = HashSet::new();
-        hash_set.insert(PermissionCode::new(-1));
+        hash_set.insert(Permission::new(-1));
         let result = service
             .check_permissions(
                 &row.id,

@@ -39,7 +39,8 @@ async fn insert_user_role(
             .name("admin".to_string())
             .enabled(true)
             .privileged(true)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .build();
         let role = role_repository.save(role).await?;
         info!("Role inserted: {}", role.id.deref());

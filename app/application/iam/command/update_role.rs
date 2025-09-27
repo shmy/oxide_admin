@@ -1,6 +1,7 @@
 use bon::Builder;
 use domain::iam::error::IamError;
-use domain::iam::value_object::permission_code::PermissionCode;
+use domain::iam::value_object::menu::Menu;
+use domain::iam::value_object::permission::Permission;
 use domain::iam::value_object::role_id::RoleId;
 use domain::iam::{entity::role::Role, event::IamEvent};
 use domain::shared::event_util::UpdatedEvent;
@@ -16,7 +17,8 @@ use crate::shared::command_handler::{CommandHandler, CommandResult};
 pub struct UpdateRoleCommand {
     id: RoleId,
     name: Option<String>,
-    permission_ids: Option<Vec<PermissionCode>>,
+    menus: Option<Vec<Menu>>,
+    permissions: Option<Vec<Permission>>,
     enabled: Option<bool>,
 }
 
@@ -46,8 +48,11 @@ impl CommandHandler for UpdateRoleCommandHandler {
         if let Some(name) = cmd.name {
             role.update_name(name);
         }
-        if let Some(permission_ids) = cmd.permission_ids {
-            role.update_permission_ids(permission_ids);
+        if let Some(menus) = cmd.menus {
+            role.update_menus(menus);
+        }
+        if let Some(permissions) = cmd.permissions {
+            role.update_permissions(permissions);
         }
         if let Some(enabled) = cmd.enabled {
             role.update_enabled(enabled);
@@ -104,7 +109,8 @@ mod tests {
             .id(role_id.clone())
             .name("test".to_string())
             .privileged(true)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         assert!(handler.role_repository.save(role).await.is_ok());
@@ -112,7 +118,8 @@ mod tests {
             .id(role_id)
             .name("test".to_string())
             .enabled(true)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .build();
         let result = handler.handle(cmd).await;
         assert_eq!(result.err(), Some(IamError::RolePrivilegedImmutable));

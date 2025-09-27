@@ -1,4 +1,4 @@
-use domain::iam::value_object::permission_code::PermissionCode;
+use domain::iam::value_object::{menu::Menu, permission::Permission};
 use serde::{Deserialize, Serialize};
 use sqlx::{prelude::FromRow, types::chrono::NaiveDateTime};
 use utoipa::ToSchema;
@@ -7,7 +7,8 @@ use utoipa::ToSchema;
 pub struct RoleDto {
     pub id: String,
     pub name: String,
-    pub permission_ids: Vec<PermissionCode>,
+    pub menus: Vec<Menu>,
+    pub permissions: Vec<Permission>,
     pub privileged: bool,
     pub enabled: bool,
     pub created_at: NaiveDateTime,

@@ -4,8 +4,9 @@ use crate::{
     system::service::file_service::FileService,
 };
 use bon::Builder;
+use domain::shared::port::menu_resolver::MenuResolver;
 use domain::{iam::event::IamEvent, shared::port::permission_resolver::PermissionResolver};
-use infrastructure::error::InfrastructureResult;
+use infrastructure::{error::InfrastructureResult, port::menu_resolver_impl::MenuResolverImpl};
 use infrastructure::{
     port::permission_resolver_impl::PermissionResolverImpl, shared::event_bus::EventSubscriber,
 };
@@ -15,6 +16,7 @@ use nject::injectable;
 #[injectable]
 pub struct IamEventSubscriber {
     permission_resolver: PermissionResolverImpl,
+    menu_resolver: MenuResolverImpl,
     search_user_query_handler: SearchUsersQueryHandler,
     search_role_query_handler: SearchRolesQueryHandler,
     file_service: FileService,
@@ -53,10 +55,13 @@ impl EventSubscriber<Event> for IamEventSubscriber {
     async fn on_received(&self, event: Event) -> InfrastructureResult<()> {
         #[allow(irrefutable_let_patterns)]
         if let Event::Iam(e) = event {
-            if Self::is_permission_changed(&e)
-                && let Err(err) = self.permission_resolver.refresh().await
-            {
-                tracing::error!(?e, error = %err, "权限刷新失败");
+            if Self::is_permission_changed(&e) {
+                if let Err(err) = self.permission_resolver.refresh().await {
+                    tracing::error!(?e, error = %err, "权限刷新失败");
+                }
+                if let Err(err) = self.menu_resolver.refresh().await {
+                    tracing::error!(?e, error = %err, "菜单刷新失败");
+                }
             }
             if Self::is_users_changed(&e) {
                 let _ = self.search_user_query_handler.clean_cache().await;
@@ -144,6 +149,10 @@ mod tests {
             .pool(pool.clone())
             .kvdb(kvdb.clone())
             .build();
+        let menu_resolver = MenuResolverImpl::builder()
+            .pool(pool.clone())
+            .kvdb(kvdb.clone())
+            .build();
         let search_user_query_handler = {
             let cache_provider = CacheProvider::builder()
                 .key("iam_search_users:")
@@ -171,6 +180,7 @@ mod tests {
             .ct(ChronoTz::default())
             .build();
         IamEventSubscriber::builder()
+            .menu_resolver(menu_resolver)
             .permission_resolver(permission_resolver)
             .search_user_query_handler(search_user_query_handler)
             .search_role_query_handler(search_role_query_handler)

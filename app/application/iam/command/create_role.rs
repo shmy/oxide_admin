@@ -1,7 +1,8 @@
 use bon::Builder;
 use domain::iam::error::IamError;
 use domain::iam::event::IamEvent;
-use domain::iam::value_object::permission_code::PermissionCode;
+use domain::iam::value_object::menu::Menu;
+use domain::iam::value_object::permission::Permission;
 use domain::iam::{entity::role::Role, value_object::role_id::RoleId};
 use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::iam::role_repository::RoleRepositoryImpl;
@@ -14,7 +15,8 @@ use crate::shared::command_handler::{CommandHandler, CommandResult};
 #[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct CreateRoleCommand {
     name: String,
-    permission_ids: Vec<PermissionCode>,
+    menus: Vec<Menu>,
+    permissions: Vec<Permission>,
     enabled: bool,
 }
 
@@ -39,7 +41,8 @@ impl CommandHandler for CreateRoleCommandHandler {
             .id(RoleId::generate())
             .name(cmd.name)
             .privileged(false)
-            .permission_ids(cmd.permission_ids)
+            .menus(cmd.menus)
+            .permissions(cmd.permissions)
             .enabled(cmd.enabled)
             .build();
         let role = self.role_repository.save(role).await?;
@@ -75,7 +78,8 @@ mod tests {
         let command_handler = build_command_handler(pool).await;
         let cmd = CreateRoleCommand::builder()
             .name("test".to_string())
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         assert!(command_handler.handle(cmd).await.is_ok());
@@ -86,13 +90,15 @@ mod tests {
         let command_handler = build_command_handler(pool).await;
         let cmd = CreateRoleCommand::builder()
             .name("test".to_string())
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         assert!(command_handler.handle(cmd).await.is_ok());
         let cmd = CreateRoleCommand::builder()
             .name("test".to_string())
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         assert_eq!(

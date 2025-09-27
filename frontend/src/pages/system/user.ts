@@ -2,7 +2,7 @@ import { logoUrl } from "../../lib/constant";
 import { enabledStatuses } from "../../lib/options";
 import { buildCrudTable } from "../../lib/table";
 
-export {};
+export { };
 const endpoint = "/users";
 const roleEndpoint = {
   method: "get",
@@ -45,6 +45,14 @@ const buildDrawer = (isAdd = true) => {
             copyable: true,
             disabled: true,
             visible: !isAdd,
+          },
+          {
+            type: "switch",
+            name: "enabled",
+            label: "状态",
+            value: true,
+            required: true,
+            disabledOn: "this.privileged",
           },
           {
             type: "input-text",
@@ -94,14 +102,6 @@ const buildDrawer = (isAdd = true) => {
             name: "privileged",
             value: false,
             required: true,
-          },
-          {
-            type: "switch",
-            name: "enabled",
-            label: "状态",
-            value: true,
-            required: true,
-            disabledOn: "this.privileged",
           },
         ],
       },

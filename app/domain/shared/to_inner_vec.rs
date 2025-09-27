@@ -26,6 +26,7 @@ macro_rules! impl_number {
     };
 }
 
+impl_number!(i8);
 impl_number!(i32);
 
 #[cfg(test)]

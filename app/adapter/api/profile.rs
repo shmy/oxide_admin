@@ -104,14 +104,14 @@ mod request {
     }
 }
 mod response {
-    use application::iam::{dto::user::UserDto, service::page::Page};
+    use application::iam::{dto::user::UserDto, service::menu::MenuTree};
     use serde::Serialize;
     use utoipa::ToSchema;
 
     #[derive(Serialize, ToSchema)]
     pub struct CurrentResponse {
         pub user: UserDto,
-        pub pages: [Page; 2],
+        pub pages: [MenuTree; 2],
     }
 }
 

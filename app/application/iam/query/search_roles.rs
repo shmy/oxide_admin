@@ -1,5 +1,7 @@
 use bon::Builder;
-use domain::iam::{error::IamError, value_object::permission_code::PermissionCode};
+use domain::iam::{
+    error::IamError, value_object::menu::Menu, value_object::permission::Permission,
+};
 use infrastructure::shared::pg_pool::PgPool;
 use kvdb_kit::Kvdb;
 use nject::{inject, injectable};
@@ -33,7 +35,10 @@ pub struct SearchRolesQuery {
     enabled: Option<bool>,
     #[serde_as(as = "NoneAsEmptyString")]
     #[serde(default)]
-    permission_id: Option<i32>,
+    menu: Option<i32>,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
+    permission: Option<i32>,
 }
 
 #[derive(Debug, Clone, Builder)]
@@ -59,12 +64,14 @@ impl QueryHandler for SearchRolesQueryHandler {
             WHERE ($1::text IS NULL OR name LIKE CONCAT('%', $1, '%'))
                 AND ($2::boolean IS NULL OR privileged = $2)
                 AND ($3::boolean IS NULL OR enabled = $3)
-                AND ($4::integer IS NULL OR $4 = ANY(permission_ids))
+                AND ($4::integer IS NULL OR $4 = ANY(menus))
+                AND ($5::integer IS NULL OR $5 = ANY(permissions))
             "#,
             query.name,
             query.privileged,
             query.enabled,
-            query.permission_id,
+            query.menu,
+            query.permission,
         )
         .fetch_one(&self.pool);
         let page = query.paging.page();
@@ -73,19 +80,21 @@ impl QueryHandler for SearchRolesQueryHandler {
         let rows_future = sqlx::query_as!(
             RoleDto,
             r#"
-        SELECT id, name, permission_ids as "permission_ids: Vec<PermissionCode>", privileged, enabled, created_at, updated_at
+        SELECT id, name, menus as "menus: Vec<Menu>", permissions as "permissions: Vec<Permission>", privileged, enabled, created_at, updated_at
         FROM _roles
         WHERE ($1::text IS NULL OR name LIKE CONCAT('%', $1, '%'))
             AND ($2::boolean IS NULL OR privileged = $2)
             AND ($3::boolean IS NULL OR enabled = $3)
-            AND ($4::integer IS NULL OR $4 = ANY(permission_ids))
+            AND ($4::integer IS NULL OR $4 = ANY(menus))
+            AND ($5::integer IS NULL OR $5 = ANY(permissions))
         ORDER BY updated_at DESC
-        LIMIT $5 OFFSET $6
+        LIMIT $6 OFFSET $7
         "#,
             query.name,
             query.privileged,
             query.enabled,
-            query.permission_id,
+            query.menu,
+            query.permission,
             page_size,
             offset,
         )

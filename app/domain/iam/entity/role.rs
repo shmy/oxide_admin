@@ -2,7 +2,7 @@ use bon::Builder;
 
 use crate::iam::{
     error::IamError,
-    value_object::{permission_code::PermissionCode, role_id::RoleId},
+    value_object::{menu::Menu, permission::Permission, role_id::RoleId},
 };
 
 #[derive(Debug, Clone, Builder)]
@@ -11,7 +11,8 @@ pub struct Role {
     pub id: RoleId,
     pub name: String,
     pub privileged: bool,
-    pub permission_ids: Vec<PermissionCode>,
+    pub menus: Vec<Menu>,
+    pub permissions: Vec<Permission>,
     pub enabled: bool,
 }
 
@@ -20,8 +21,12 @@ impl Role {
         self.name = name;
     }
 
-    pub fn update_permission_ids(&mut self, permission_ids: Vec<PermissionCode>) {
-        self.permission_ids = permission_ids;
+    pub fn update_menus(&mut self, menus: Vec<Menu>) {
+        self.menus = menus;
+    }
+
+    pub fn update_permissions(&mut self, permissions: Vec<Permission>) {
+        self.permissions = permissions;
     }
 
     pub fn update_enabled(&mut self, enabled: bool) {
@@ -39,7 +44,7 @@ impl Role {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::iam::value_object::permission_code::PermissionCode;
+    use crate::iam::value_object::permission::Permission;
 
     #[test]
     fn test_update_name() {
@@ -47,7 +52,8 @@ mod tests {
             .id(RoleId::generate())
             .name("test".to_string())
             .privileged(true)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         role.update_name("test2".to_string());
@@ -55,16 +61,17 @@ mod tests {
     }
 
     #[test]
-    fn test_update_permission_ids() {
+    fn test_update_permissions() {
         let mut role = Role::builder()
             .id(RoleId::generate())
             .name("test".to_string())
             .privileged(true)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
-        role.update_permission_ids(vec![PermissionCode::new(123)]);
-        assert_eq!(role.permission_ids.len(), 1);
+        role.update_permissions(vec![Permission::new(123)]);
+        assert_eq!(role.permissions.len(), 1);
     }
 
     #[test]
@@ -73,7 +80,8 @@ mod tests {
             .id(RoleId::generate())
             .name("test".to_string())
             .privileged(true)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         role.update_enabled(false);
@@ -86,7 +94,8 @@ mod tests {
             .id(RoleId::generate())
             .name("test".to_string())
             .privileged(true)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(false)
             .build();
         assert!(role.assert_activated().is_err());
@@ -98,7 +107,8 @@ mod tests {
             .id(RoleId::generate())
             .name("test".to_string())
             .privileged(true)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         assert!(role.assert_activated().is_ok());

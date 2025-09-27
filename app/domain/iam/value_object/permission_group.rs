@@ -2,10 +2,10 @@ use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 
-use crate::iam::value_object::permission_code::PermissionCode;
+use crate::iam::value_object::permission::Permission;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PermissionGroup(HashSet<PermissionCode>);
+pub struct PermissionGroup(HashSet<Permission>);
 
 impl Default for PermissionGroup {
     fn default() -> Self {
@@ -13,11 +13,11 @@ impl Default for PermissionGroup {
     }
 }
 impl PermissionGroup {
-    pub fn new(set: HashSet<PermissionCode>) -> Self {
+    pub fn new(set: HashSet<Permission>) -> Self {
         Self(set)
     }
 
-    pub fn permit(&self, required: &PermissionCode) -> bool {
+    pub fn permit(&self, required: &Permission) -> bool {
         self.0.contains(required)
     }
 
@@ -56,7 +56,7 @@ mod tests {
     #[test]
     fn test_new() {
         let mut set = HashSet::new();
-        set.insert(PermissionCode::new(1));
+        set.insert(Permission::new(1));
         let group = PermissionGroup::new(set);
         assert_eq!(group.0.len(), 1);
     }
@@ -70,20 +70,20 @@ mod tests {
     #[test]
     fn test_permit() {
         let mut set = HashSet::new();
-        set.insert(PermissionCode::new(1));
+        set.insert(Permission::new(1));
         let group = PermissionGroup::new(set);
-        assert!(group.permit(&PermissionCode::new(1)));
+        assert!(group.permit(&Permission::new(1)));
     }
 
     #[test]
     fn test_permits_all() {
         let mut set1 = HashSet::new();
-        set1.insert(PermissionCode::new(1));
-        set1.insert(PermissionCode::new(2));
+        set1.insert(Permission::new(1));
+        set1.insert(Permission::new(2));
         let group1 = PermissionGroup::new(set1);
 
         let mut set2 = HashSet::new();
-        set2.insert(PermissionCode::new(1));
+        set2.insert(Permission::new(1));
         let group2 = PermissionGroup::new(set2);
 
         assert!(group1.permits(PermissionChecker::all(group2)));
@@ -92,12 +92,12 @@ mod tests {
     #[test]
     fn test_permits_any() {
         let mut set1 = HashSet::new();
-        set1.insert(PermissionCode::new(1));
+        set1.insert(Permission::new(1));
         let group1 = PermissionGroup::new(set1);
 
         let mut set2 = HashSet::new();
-        set2.insert(PermissionCode::new(1));
-        set2.insert(PermissionCode::new(3));
+        set2.insert(Permission::new(1));
+        set2.insert(Permission::new(3));
         let group2 = PermissionGroup::new(set2);
 
         assert!(group1.permits(PermissionChecker::any(group2)));

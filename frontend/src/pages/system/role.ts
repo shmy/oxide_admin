@@ -1,11 +1,11 @@
 import { enabledStatuses } from "../../lib/options";
 import { buildCrudTable } from "../../lib/table";
 
-export {};
+export { };
 const endpoint = "/roles";
-const permissionEndpoint = {
+const menuEndpoint = {
   method: "get",
-  url: "/options/permissions",
+  url: "/options/menus",
   cache: 10000,
 };
 
@@ -30,7 +30,7 @@ const buildDrawer = (isAdd = true) => {
     disabledOn: "this.privileged",
     drawer: {
       title: title,
-      size: "md",
+      size: "lg",
       body: {
         type: "form",
         canAccessSuperData: false,
@@ -46,6 +46,14 @@ const buildDrawer = (isAdd = true) => {
             visible: !isAdd,
           },
           {
+            type: "switch",
+            name: "enabled",
+            label: "状态",
+            value: true,
+            required: true,
+            disabledOn: "this.privileged",
+          },
+          {
             type: "input-text",
             name: "name",
             label: "角色名称",
@@ -54,9 +62,9 @@ const buildDrawer = (isAdd = true) => {
           },
           {
             type: "tree-select",
-            name: "permission_ids",
-            label: "角色权限",
-            source: "/options/permissions",
+            name: "menus",
+            label: "角色菜单",
+            source: "/options/menus",
             labelField: "label",
             valueField: "key",
             multiple: true,
@@ -64,22 +72,26 @@ const buildDrawer = (isAdd = true) => {
             onlyChildren: false,
             joinValues: false,
             extractValue: true,
-            value: "${permission_ids || []}",
+            value: "${menus || []}",
             disabledOn: "this.privileged",
+          },
+          {
+            name: "permissions",
+            type: "checkboxes",
+            label: "角色权限",
+            checkAll: true,
+            columnsCount: 4,
+            inline: false,
+            joinValues: false,
+            extractValue: true,
+            source: "/options/permissions",
+            value: "${permissions || []}",
           },
           {
             type: "hidden",
             name: "privileged",
             value: false,
             required: true,
-          },
-          {
-            type: "switch",
-            name: "enabled",
-            label: "状态",
-            value: true,
-            required: true,
-            disabledOn: "this.privileged",
           },
         ],
       },
@@ -109,9 +121,9 @@ const schema = {
       },
       {
         type: "tree-select",
-        name: "permission_id",
-        label: "角色权限",
-        source: permissionEndpoint,
+        name: "menus",
+        label: "角色菜单",
+        source: menuEndpoint,
         placeholder: "请选择权限",
         labelField: "label",
         valueField: "key",
@@ -157,15 +169,6 @@ const schema = {
       {
         name: "name",
         label: "角色名称",
-      },
-      {
-        type: "tree-select",
-        name: "permission_ids",
-        label: "角色权限",
-        static: true,
-        source: permissionEndpoint,
-        labelField: "label",
-        valueField: "key",
       },
       {
         name: "enabled",

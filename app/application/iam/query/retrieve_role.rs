@@ -2,7 +2,8 @@ use crate::iam::dto::role::RoleDto;
 use crate::shared::query_handler::QueryHandler;
 use bon::Builder;
 use domain::iam::error::IamError;
-use domain::iam::value_object::permission_code::PermissionCode;
+use domain::iam::value_object::menu::Menu;
+use domain::iam::value_object::permission::Permission;
 use domain::iam::value_object::role_id::RoleId;
 use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
@@ -30,7 +31,7 @@ impl QueryHandler for RetrieveRoleQueryHandler {
         let row_opt = sqlx::query_as!(
             RoleDto,
             r#"
-            SELECT id, name, permission_ids as "permission_ids: Vec<PermissionCode>", privileged, enabled, created_at, updated_at
+            SELECT id, name, menus as "menus: Vec<Menu>", permissions as "permissions: Vec<Permission>", privileged, enabled, created_at, updated_at
             FROM _roles
             WHERE id = $1
             LIMIT 1
@@ -65,7 +66,8 @@ mod tests {
             .id(role_id.clone())
             .name("Test".to_string())
             .privileged(false)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         assert!(role_repository.save(role).await.is_ok());

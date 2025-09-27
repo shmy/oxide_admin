@@ -30,7 +30,7 @@ impl CacheProvider {
     }
     #[tracing::instrument]
     pub async fn clear(&self) -> ApplicationResult<()> {
-        self.kvdb.delete_prefix(&self.fill_key()).await?;
+        self.kvdb.delete_prefix(CACHE_PREFIX).await?;
         Ok(())
     }
 

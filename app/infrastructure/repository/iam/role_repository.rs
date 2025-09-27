@@ -1,6 +1,7 @@
 use bon::Builder;
 use domain::iam::port::role_repository::RoleRepository;
-use domain::iam::value_object::permission_code::PermissionCode;
+use domain::iam::value_object::menu::Menu;
+use domain::iam::value_object::permission::Permission;
 use domain::iam::value_object::role_id::RoleId;
 use domain::iam::{entity::role::Role, error::IamError};
 use domain::shared::event_util::UpdatedEvent;
@@ -32,7 +33,7 @@ impl DomainRepository for RoleRepositoryImpl {
         let row_opt = sqlx::query_as!(
             RoleDto,
             r#"
-        SELECT id as "id: RoleId", name, privileged, permission_ids as "permission_ids: Vec<PermissionCode>", enabled
+        SELECT id as "id: RoleId", name, privileged, menus as "menus: Vec<Menu>", permissions as "permissions: Vec<Permission>", enabled
         FROM _roles WHERE id = $1
         "#,
             id
@@ -48,19 +49,21 @@ impl DomainRepository for RoleRepositoryImpl {
 
         sqlx::query!(
             r#"
-            INSERT INTO _roles (id, name, privileged, permission_ids, enabled, created_at, updated_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO _roles (id, name, privileged, menus, permissions, enabled, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             ON CONFLICT (id) DO UPDATE SET
                 name = EXCLUDED.name,
                 privileged = EXCLUDED.privileged,
-                permission_ids = EXCLUDED.permission_ids,
+                menus = EXCLUDED.menus,
+                permissions = EXCLUDED.permissions,
                 enabled = EXCLUDED.enabled,
                 updated_at = EXCLUDED.updated_at
             "#,
             &entity.id,
             &entity.name,
             &entity.privileged,
-            &entity.permission_ids.inner_vec(),
+            &entity.menus.inner_vec(),
+            &entity.permissions.inner_vec(),
             &entity.enabled,
             &now,
             &now
@@ -83,7 +86,7 @@ impl DomainRepository for RoleRepositoryImpl {
         let items = sqlx::query_as!(
             RoleDto,
             r#"
-            DELETE FROM _roles WHERE id = ANY($1) AND privileged != true RETURNING id as "id: RoleId", name, privileged, permission_ids as "permission_ids: Vec<PermissionCode>", enabled
+            DELETE FROM _roles WHERE id = ANY($1) AND privileged != true RETURNING id as "id: RoleId", name, privileged, menus as "menus: Vec<Menu>", permissions as "permissions: Vec<Permission>", enabled
             "#,
             &ids.inner_vec()
         )
@@ -115,8 +118,8 @@ impl RoleRepository for RoleRepositoryImpl {
                 RETURNING *
             )
             SELECT
-            before.id as "before_id: RoleId", before.name as before_name, before.privileged as before_privileged, before.permission_ids as "before_permission_ids: Vec<PermissionCode>", before.enabled as before_enabled,
-            updated.id as "updated_id: RoleId", updated.name as updated_name, updated.privileged as updated_privileged, updated.permission_ids as "updated_permission_ids: Vec<PermissionCode>", updated.enabled as updated_enabled
+            before.id as "before_id: RoleId", before.name as before_name, before.privileged as before_privileged, before.menus as "before_menus: Vec<Menu>", before.permissions as "before_permissions: Vec<Permission>", before.enabled as before_enabled,
+            updated.id as "updated_id: RoleId", updated.name as updated_name, updated.privileged as updated_privileged, updated.menus as "updated_menus: Vec<Menu>", updated.permissions as "updated_permissions: Vec<Permission>", updated.enabled as updated_enabled
             FROM before
             JOIN updated ON before.id = updated.id;
             "#,
@@ -133,14 +136,16 @@ impl RoleRepository for RoleRepositoryImpl {
                     .enabled(row.before_enabled)
                     .name(row.before_name)
                     .privileged(row.before_privileged)
-                    .permission_ids(row.before_permission_ids)
+                    .menus(row.before_menus)
+                    .permissions(row.before_permissions)
                     .build(),
                 after: Role::builder()
                     .id(row.updated_id)
                     .enabled(row.updated_enabled)
                     .name(row.updated_name)
                     .privileged(row.updated_privileged)
-                    .permission_ids(row.updated_permission_ids)
+                    .menus(row.updated_menus)
+                    .permissions(row.updated_permissions)
                     .build(),
             })
             .collect();
@@ -153,7 +158,8 @@ struct RoleDto {
     id: RoleId,
     name: String,
     privileged: bool,
-    permission_ids: Vec<PermissionCode>,
+    menus: Vec<Menu>,
+    permissions: Vec<Permission>,
     enabled: bool,
 }
 
@@ -164,7 +170,8 @@ impl From<RoleDto> for Role {
             .enabled(value.enabled)
             .name(value.name)
             .privileged(value.privileged)
-            .permission_ids(value.permission_ids)
+            .menus(value.menus)
+            .permissions(value.permissions)
             .build()
     }
 }
@@ -190,7 +197,8 @@ mod tests {
             .id(id.clone())
             .name("test".to_string())
             .privileged(false)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         assert!(role_repository.save(role).await.is_ok());
@@ -198,7 +206,8 @@ mod tests {
         assert_eq!(role.id, id);
         assert_eq!(role.name, "test");
         assert_eq!(role.privileged, false);
-        assert_eq!(role.permission_ids, vec![]);
+        assert_eq!(role.menus, vec![]);
+        assert_eq!(role.permissions, vec![]);
         assert_eq!(role.enabled, true);
     }
 
@@ -210,7 +219,8 @@ mod tests {
             .id(id.clone())
             .name("test".to_string())
             .privileged(false)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         assert!(role_repository.save(role).await.is_ok());
@@ -218,7 +228,7 @@ mod tests {
         assert_eq!(role.id, id);
         assert_eq!(role.name, "test");
         assert_eq!(role.privileged, false);
-        assert_eq!(role.permission_ids, vec![]);
+        assert_eq!(role.permissions, vec![]);
         assert_eq!(role.enabled, true);
         assert!(
             role_repository
@@ -230,7 +240,7 @@ mod tests {
         assert_eq!(role.id, id);
         assert_eq!(role.name, "test");
         assert_eq!(role.privileged, false);
-        assert_eq!(role.permission_ids, vec![]);
+        assert_eq!(role.permissions, vec![]);
         assert_eq!(role.enabled, false);
     }
 
@@ -245,14 +255,16 @@ mod tests {
             .id(RoleId::generate())
             .name("test1".to_string())
             .privileged(false)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         let role2 = Role::builder()
             .id(RoleId::generate())
             .name("test2".to_string())
             .privileged(false)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         assert!(role_repository.save(role1).await.is_ok());
@@ -278,7 +290,8 @@ mod tests {
             .id(RoleId::generate())
             .name("test".to_string())
             .privileged(false)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         assert!(role_repository.save(role).await.is_ok());
@@ -286,7 +299,8 @@ mod tests {
             .id(RoleId::generate())
             .name("test".to_string())
             .privileged(false)
-            .permission_ids(vec![])
+            .menus(vec![])
+            .permissions(vec![])
             .enabled(true)
             .build();
         assert_eq!(

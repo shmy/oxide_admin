@@ -1,14 +1,12 @@
 use application::system::{
     dto::system_snapshot::SystemSnapshot, service::system_service::SystemService,
 };
-use domain::iam::value_object::permission_code::SYSTEM_INFO;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    WebState, perms,
+    WebState,
     shared::{
         extractor::inject::Inject,
-        middleware::perm_router_ext::PermissonRouteExt,
         response::{JsonResponse, JsonResponseType},
     },
 };
@@ -31,5 +29,5 @@ pub async fn system_info(
 }
 
 pub fn routing() -> OpenApiRouter<WebState> {
-    OpenApiRouter::new().routes(routes!(system_info).permit_all(perms!(SYSTEM_INFO)))
+    OpenApiRouter::new().routes(routes!(system_info))
 }

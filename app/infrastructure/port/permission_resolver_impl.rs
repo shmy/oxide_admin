@@ -1,12 +1,12 @@
 use crate::error::{InfrastructureError, InfrastructureResult};
 use bon::Builder;
 use domain::iam::error::IamError;
-use domain::iam::value_object::permission_code::{ALL_PERMISSIONS, PermissionCode};
+use domain::iam::value_object::permission::{ALL_PERMISSIONS, Permission};
 use domain::iam::value_object::permission_group::PermissionGroup;
 use domain::iam::value_object::role_id::RoleId;
 use domain::iam::value_object::user_id::UserId;
 use domain::shared::port::permission_resolver::PermissionResolver;
-use domain::shared::to_inner_vec::ToInnerVec;
+use domain::shared::to_inner_vec::ToInnerVec as _;
 use kvdb_kit::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 use single_flight::single_flight;
@@ -86,7 +86,7 @@ impl PermissionResolverImpl {
 
         let mut permissions = HashSet::new();
         let role_records = sqlx::query_as!(RoleRecord,r#"
-            SELECT privileged, permission_ids as "permission_ids: Vec<PermissionCode>" from _roles WHERE id = ANY($1)
+            SELECT privileged, permissions as "permissions: Vec<Permission>" from _roles WHERE id = ANY($1) AND enabled = true
             "#,
             &user_record.role_ids.inner_vec()
         ).fetch_all(&self.pool).await?;
@@ -95,7 +95,7 @@ impl PermissionResolverImpl {
             if role.privileged {
                 permissions.extend(ALL_PERMISSIONS.to_vec());
             } else {
-                permissions.extend(role.permission_ids);
+                permissions.extend(role.permissions);
             }
         }
         Ok(PermissionGroup::new(permissions))
@@ -109,7 +109,7 @@ impl PermissionResolverImpl {
 #[derive(FromRow)]
 struct RoleRecord {
     privileged: bool,
-    permission_ids: Vec<PermissionCode>,
+    permissions: Vec<Permission>,
 }
 
 #[cfg(test)]
@@ -171,7 +171,8 @@ mod tests {
             .name("test".to_string())
             .enabled(true)
             .privileged(false)
-            .permission_ids(vec![PermissionCode::new(100), PermissionCode::new(101)])
+            .menus(vec![])
+            .permissions(vec![Permission::new(100), Permission::new(101)])
             .build();
         let user = User::builder()
             .id(UserId::generate())

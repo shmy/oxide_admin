@@ -5,15 +5,15 @@ use utoipa::ToSchema;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, ToSchema, sqlx::Type)]
 #[sqlx(transparent)]
-pub struct PermissionCode(i32);
+pub struct Menu(i32);
 
-impl PermissionCode {
+impl Menu {
     pub const fn new(code: i32) -> Self {
         Self(code)
     }
 }
 
-impl Deref for PermissionCode {
+impl Deref for Menu {
     type Target = i32;
 
     fn deref(&self) -> &Self::Target {
@@ -21,25 +21,26 @@ impl Deref for PermissionCode {
     }
 }
 
-macro_rules! define_permissions {
+macro_rules! define_menus {
     ( $( $name:ident = $value:expr ),* $(,)? ) => {
         $(
-            pub const $name: PermissionCode = PermissionCode::new($value);
+            pub const $name: Menu = Menu::new($value);
         )*
 
-        pub const ALL_PERMISSIONS: &[PermissionCode] = &[
+        pub const ALL_MENUS: &[Menu] = &[
             $( $name ),*
         ];
     };
+
 }
 
-define_permissions! {
+define_menus! {
     NONE = 0,
-    SYSTEM = 100,
-    SYSTEM_USER = 101,
-    SYSTEM_ROLE = 102,
-    SYSTEM_INFO = 103,
-    SYSTEM_EXAMPLE = 104,
+    SYSTEM = 1,
+    SYSTEM_USER = 2,
+    SYSTEM_ROLE = 3,
+    SYSTEM_STAT = 4,
+    SYSTEM_EXAMPLE = 5,
 }
 
 #[cfg(test)]
@@ -48,8 +49,8 @@ mod tests {
 
     #[test]
     fn test_new() {
-        let permission_code = PermissionCode::new(100);
-        assert_eq!(permission_code.0, 100);
-        assert_eq!(*permission_code, 100);
+        let key = Menu::new(100);
+        assert_eq!(key.0, 100);
+        assert_eq!(*key, 100);
     }
 }

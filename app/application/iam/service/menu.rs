@@ -1,17 +1,16 @@
 use std::sync::LazyLock;
 
 use bon::Builder;
-use domain::iam::value_object::permission_code::{
-    NONE, PermissionCode, SYSTEM_EXAMPLE, SYSTEM_INFO,
+use domain::iam::value_object::menu::{
+    Menu, NONE, SYSTEM, SYSTEM_EXAMPLE, SYSTEM_ROLE, SYSTEM_STAT, SYSTEM_USER,
 };
 use serde::Serialize;
 
-use domain::iam::value_object::permission_code::{SYSTEM, SYSTEM_ROLE, SYSTEM_USER};
 use utoipa::ToSchema;
 
 #[derive(Debug, Clone, Serialize, Builder, ToSchema)]
-pub struct Page {
-    pub key: PermissionCode,
+pub struct MenuTree {
+    pub key: Menu,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<&'static str>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -26,7 +25,7 @@ pub struct Page {
     pub schema_api: Option<&'static str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(no_recursion)]
-    pub children: Option<Vec<Page>>,
+    pub children: Option<Vec<MenuTree>>,
     #[builder(default = true)]
     #[serde(skip_serializing_if = "is_true")]
     pub visible: bool,
@@ -42,34 +41,34 @@ macro_rules! build_schema_url {
     };
 }
 
-pub static PAGES: LazyLock<[Page; 1]> = LazyLock::new(|| {
-    [Page::builder()
+pub static MENUS: LazyLock<[MenuTree; 1]> = LazyLock::new(|| {
+    [MenuTree::builder()
         .key(SYSTEM)
         .label("系统管理")
         .icon("fas fa-screwdriver-wrench")
         .children(vec![
-            Page::builder()
+            MenuTree::builder()
                 .key(SYSTEM_USER)
                 .label("用户管理")
                 .url("/system/user")
                 .icon("fas fa-user")
                 .schema_api(build_schema_url!("/system/user"))
                 .build(),
-            Page::builder()
+            MenuTree::builder()
                 .key(SYSTEM_ROLE)
                 .label("角色管理")
                 .url("/system/role")
                 .icon("fas fa-people-group")
                 .schema_api(build_schema_url!("/system/role"))
                 .build(),
-            Page::builder()
-                .key(SYSTEM_INFO)
+            MenuTree::builder()
+                .key(SYSTEM_STAT)
                 .label("系统信息")
                 .url("/system/info")
                 .icon("fas fa-info")
                 .schema_api(build_schema_url!("/system/info"))
                 .build(),
-            Page::builder()
+            MenuTree::builder()
                 .key(SYSTEM_EXAMPLE)
                 .label("示例页面")
                 .url("/system/example")
@@ -80,8 +79,8 @@ pub static PAGES: LazyLock<[Page; 1]> = LazyLock::new(|| {
         .build()]
 });
 
-pub static SHARED_PAGES: LazyLock<[Page; 1]> = LazyLock::new(|| {
-    [Page::builder()
+pub static SHARED_MENUS: LazyLock<[MenuTree; 1]> = LazyLock::new(|| {
+    [MenuTree::builder()
         .key(NONE)
         .label("修改密码")
         .url("/profile/update_password")
@@ -95,12 +94,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_pages() {
-        assert_eq!(PAGES.len(), 1);
+    fn test_menus() {
+        assert_eq!(MENUS.len(), 1);
     }
 
     #[test]
-    fn test_shared_pages() {
-        assert_eq!(SHARED_PAGES.len(), 1);
+    fn test_shared_menus() {
+        assert_eq!(SHARED_MENUS.len(), 1);
     }
 }

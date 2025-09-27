@@ -1,2 +1,3 @@
 pub mod iam_service;
-pub mod page;
+pub mod menu;
+pub mod permission;

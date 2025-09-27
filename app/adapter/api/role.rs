@@ -22,7 +22,13 @@ use axum::{
     Json,
     extract::{Path, Query},
 };
-use domain::iam::value_object::{permission_code::SYSTEM_ROLE, role_id::RoleId};
+use domain::iam::value_object::{
+    permission::{
+        SYSTEM_ROLE_CREATE, SYSTEM_ROLE_DELETE, SYSTEM_ROLE_DISABLE, SYSTEM_ROLE_ENABLE,
+        SYSTEM_ROLE_READ, SYSTEM_ROLE_UPDATE,
+    },
+    role_id::RoleId,
+};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -169,11 +175,11 @@ async fn update(
 
 pub fn routing() -> OpenApiRouter<WebState> {
     OpenApiRouter::new()
-        .routes(routes!(search).permit_all(perms!(SYSTEM_ROLE)))
-        .routes(routes!(retrieve).permit_all(perms!(SYSTEM_ROLE)))
-        .routes(routes!(batch_delete).permit_all(perms!(SYSTEM_ROLE)))
-        .routes(routes!(batch_enable).permit_all(perms!(SYSTEM_ROLE)))
-        .routes(routes!(batch_disable).permit_all(perms!(SYSTEM_ROLE)))
-        .routes(routes!(create).permit_all(perms!(SYSTEM_ROLE)))
-        .routes(routes!(update).permit_all(perms!(SYSTEM_ROLE)))
+        .routes(routes!(search).permit_all(perms!(SYSTEM_ROLE_READ)))
+        .routes(routes!(retrieve).permit_all(perms!(SYSTEM_ROLE_READ)))
+        .routes(routes!(batch_delete).permit_all(perms!(SYSTEM_ROLE_DELETE)))
+        .routes(routes!(batch_enable).permit_all(perms!(SYSTEM_ROLE_ENABLE)))
+        .routes(routes!(batch_disable).permit_all(perms!(SYSTEM_ROLE_DISABLE)))
+        .routes(routes!(create).permit_all(perms!(SYSTEM_ROLE_CREATE)))
+        .routes(routes!(update).permit_all(perms!(SYSTEM_ROLE_UPDATE)))
 }
