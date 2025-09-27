@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT privileged, permission_ids as \"permission_ids: Vec<PermissionCode>\" from _roles WHERE id = ANY($1)\n            ",
+  "query": "\n            SELECT privileged, menus as \"menus: Vec<Menu>\" from _roles WHERE id = ANY($1) AND enabled = true\n            ",
   "describe": {
     "columns": [
       {
@@ -10,7 +10,7 @@
       },
       {
         "ordinal": 1,
-        "name": "permission_ids: Vec<PermissionCode>",
+        "name": "menus: Vec<Menu>",
         "type_info": "Int4Array"
       }
     ],
@@ -24,5 +24,5 @@
       false
     ]
   },
-  "hash": "e4c67825749f3ad361ec4251b53c25fe84b56d28fbc9cd532bf0c7c903a82c0b"
+  "hash": "9cee284d27838e20f09f184efef4ea4c03fc9b35276bd8285efe44c448ceaba5"
 }

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, name, permission_ids as \"permission_ids: Vec<PermissionCode>\", privileged, enabled, created_at, updated_at\n        FROM _roles\n        WHERE ($1::text IS NULL OR name LIKE CONCAT('%', $1, '%'))\n            AND ($2::boolean IS NULL OR privileged = $2)\n            AND ($3::boolean IS NULL OR enabled = $3)\n            AND ($4::integer IS NULL OR $4 = ANY(permission_ids))\n        ORDER BY updated_at DESC\n        LIMIT $5 OFFSET $6\n        ",
+  "query": "\n        SELECT id, name, menus as \"menus: Vec<Menu>\", permissions as \"permissions: Vec<Permission>\", privileged, enabled, created_at, updated_at\n        FROM _roles\n        WHERE ($1::text IS NULL OR name LIKE CONCAT('%', $1, '%'))\n            AND ($2::boolean IS NULL OR privileged = $2)\n            AND ($3::boolean IS NULL OR enabled = $3)\n            AND ($4::integer IS NULL OR $4 = ANY(menus))\n            AND ($5::integer IS NULL OR $5 = ANY(permissions))\n        ORDER BY updated_at DESC\n        LIMIT $6 OFFSET $7\n        ",
   "describe": {
     "columns": [
       {
@@ -15,26 +15,31 @@
       },
       {
         "ordinal": 2,
-        "name": "permission_ids: Vec<PermissionCode>",
+        "name": "menus: Vec<Menu>",
         "type_info": "Int4Array"
       },
       {
         "ordinal": 3,
+        "name": "permissions: Vec<Permission>",
+        "type_info": "Int4Array"
+      },
+      {
+        "ordinal": 4,
         "name": "privileged",
         "type_info": "Bool"
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "enabled",
         "type_info": "Bool"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "created_at",
         "type_info": "Timestamp"
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "updated_at",
         "type_info": "Timestamp"
       }
@@ -44,6 +49,7 @@
         "Text",
         "Bool",
         "Bool",
+        "Int4",
         "Int4",
         "Int8",
         "Int8"
@@ -56,8 +62,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "208739843bd3889f54f6d2251372fe70cfcfa582c5d215259110deb732795163"
+  "hash": "8937c75de13a23e61fb322e40399980445a5d54c8b82e42a8a275b8ac6b65c7f"
 }

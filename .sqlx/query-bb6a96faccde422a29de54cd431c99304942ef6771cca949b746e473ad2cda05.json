@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id as \"id: RoleId\", name, privileged, permission_ids as \"permission_ids: Vec<PermissionCode>\", enabled\n        FROM _roles WHERE id = $1\n        ",
+  "query": "\n            DELETE FROM _roles WHERE id = ANY($1) AND privileged != true RETURNING id as \"id: RoleId\", name, privileged, menus as \"menus: Vec<Menu>\", permissions as \"permissions: Vec<Permission>\", enabled\n            ",
   "describe": {
     "columns": [
       {
@@ -20,18 +20,23 @@
       },
       {
         "ordinal": 3,
-        "name": "permission_ids: Vec<PermissionCode>",
+        "name": "menus: Vec<Menu>",
         "type_info": "Int4Array"
       },
       {
         "ordinal": 4,
+        "name": "permissions: Vec<Permission>",
+        "type_info": "Int4Array"
+      },
+      {
+        "ordinal": 5,
         "name": "enabled",
         "type_info": "Bool"
       }
     ],
     "parameters": {
       "Left": [
-        "Bpchar"
+        "BpcharArray"
       ]
     },
     "nullable": [
@@ -39,8 +44,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "d260c14b44db17e5a3fb3b75a5ccf2d559c8de2157709eea880b32ab4c0ff13f"
+  "hash": "bb6a96faccde422a29de54cd431c99304942ef6771cca949b746e473ad2cda05"
 }

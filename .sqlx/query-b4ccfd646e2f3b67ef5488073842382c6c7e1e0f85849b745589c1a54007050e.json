@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, name, permission_ids as \"permission_ids: Vec<PermissionCode>\", privileged, enabled, created_at, updated_at\n            FROM _roles\n            WHERE id = $1\n            LIMIT 1\n        ",
+  "query": "\n            SELECT id, name, menus as \"menus: Vec<Menu>\", permissions as \"permissions: Vec<Permission>\", privileged, enabled, created_at, updated_at\n            FROM _roles\n            WHERE id = $1\n            LIMIT 1\n        ",
   "describe": {
     "columns": [
       {
@@ -15,26 +15,31 @@
       },
       {
         "ordinal": 2,
-        "name": "permission_ids: Vec<PermissionCode>",
+        "name": "menus: Vec<Menu>",
         "type_info": "Int4Array"
       },
       {
         "ordinal": 3,
+        "name": "permissions: Vec<Permission>",
+        "type_info": "Int4Array"
+      },
+      {
+        "ordinal": 4,
         "name": "privileged",
         "type_info": "Bool"
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "enabled",
         "type_info": "Bool"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "created_at",
         "type_info": "Timestamp"
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "updated_at",
         "type_info": "Timestamp"
       }
@@ -51,8 +56,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "fd85f71a2f63d8d088a60ebaae5bf952e9d75e4b8cf67214f6903d005a1bc4dd"
+  "hash": "b4ccfd646e2f3b67ef5488073842382c6c7e1e0f85849b745589c1a54007050e"
 }
