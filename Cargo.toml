@@ -107,7 +107,7 @@ opt-level = 0                # 不做任何优化，快速编译
 incremental = true           # 启用增量编译，加速编译过程
 overflow-checks = true       # 启用溢出检查，方便调试
 panic = "unwind"             # 保留 panic 时的栈信息，方便调试
-codegen-units = 8            # 多单元代码生成，加速编译（注意：过多可能降低优化效果）
+codegen-units = 16           # 多单元代码生成，加速编译（注意：过多可能降低优化效果）
 lto = "off"                  # 关闭全局优化，减少编译时间
 strip = false                # 保留符号表，方便调试
 

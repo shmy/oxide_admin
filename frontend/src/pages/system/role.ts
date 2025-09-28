@@ -121,7 +121,7 @@ const schema = {
       },
       {
         type: "tree-select",
-        name: "menus",
+        name: "menu",
         label: "角色菜单",
         source: menuEndpoint,
         placeholder: "请选择权限",
