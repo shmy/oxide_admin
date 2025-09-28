@@ -113,6 +113,16 @@ jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
 jsonpath "$.data" matches ".{24}"
 
+# Should success when fetch users given valid token
+GET {{base_url}}/api/users
+Authorization: Bearer {{access_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+jsonpath "$.data.items" count == 2
+jsonpath "$.data.total" == 2
+
 # Should success when remove portrait given previously created user
 PUT {{base_url}}/api/users/{{user_id}}
 Authorization: Bearer {{access_token}}

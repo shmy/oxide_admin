@@ -6,7 +6,6 @@ use crate::system::service::upload_service::UploadService;
 use bon::Builder;
 use domain::iam::value_object::menu::NONE;
 use domain::iam::value_object::menu_group::MenuGroup;
-use domain::iam::value_object::permission::{ALL_PERMISSIONS, Permission};
 use domain::iam::value_object::permission_group::PermissionChecker;
 use domain::iam::value_object::user_id::UserId;
 use domain::shared::port::menu_resolver::MenuResolver;
@@ -58,11 +57,6 @@ impl IamService {
             return Err(ApplicationError::PermissionDenied);
         }
         Ok(())
-    }
-
-    #[tracing::instrument]
-    pub fn get_all_permissions(&self) -> &'static [Permission] {
-        ALL_PERMISSIONS
     }
 
     #[tracing::instrument]
