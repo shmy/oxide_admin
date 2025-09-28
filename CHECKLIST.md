@@ -1,4 +1,3 @@
-[ ] 删除一些单元测试 通过集成测试来保证
 [ ] 独立代码生成器
 [ ] tower-circuit-breaker
 [ ] Frontend code generation
