@@ -87,7 +87,38 @@ Authorization: Bearer {{access_token}}
 {
   "id": "{{user_id}}",
   "enabled": false,
-  "name": "Test1"
+  "name": "Test1",
+  "portrait": "/static/images/avatar.webp"
+}
+HTTP 200
+[Captures]
+user_id: jsonpath "$.data"
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+jsonpath "$.data" matches ".{24}"
+
+# Should success when update portrait given previously created user
+PUT {{base_url}}/api/users/{{user_id}}
+Authorization: Bearer {{access_token}}
+{
+  "id": "{{user_id}}",
+  "portrait": "/static/images/avatar2.webp"
+}
+HTTP 200
+[Captures]
+user_id: jsonpath "$.data"
+[Asserts]
+jsonpath "$.status" == 0
+jsonpath "$.msg" == "OK"
+jsonpath "$.data" matches ".{24}"
+
+# Should success when remove portrait given previously created user
+PUT {{base_url}}/api/users/{{user_id}}
+Authorization: Bearer {{access_token}}
+{
+  "id": "{{user_id}}",
+  "portrait": null
 }
 HTTP 200
 [Captures]

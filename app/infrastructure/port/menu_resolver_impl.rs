@@ -113,3 +113,107 @@ struct RoleRecord {
     privileged: bool,
     menus: Vec<Menu>,
 }
+
+#[cfg(test)]
+mod tests {
+    use domain::{
+        iam::{
+            entity::{role::Role, user::User},
+            value_object::hashed_password::HashedPassword,
+        },
+        shared::port::domain_repository::DomainRepository as _,
+    };
+
+    use crate::{
+        repository::iam::{
+            role_repository::RoleRepositoryImpl, user_repository::UserRepositoryImpl,
+        },
+        shared::chrono_tz::ChronoTz,
+        test_utils::{setup_database, setup_kvdb},
+    };
+
+    use super::*;
+
+    async fn build_menu_resolver(pool: PgPool) -> MenuResolverImpl {
+        setup_database(pool.clone()).await;
+        let kvdb = setup_kvdb().await;
+        MenuResolverImpl::builder()
+            .pool(pool.clone())
+            .kvdb(kvdb)
+            .build()
+    }
+
+    #[sqlx::test]
+    async fn test_resolve_privileged_user(pool: PgPool) {
+        #[derive(FromRow)]
+        struct UserRow {
+            id: UserId,
+        }
+        let menu_resolver = build_menu_resolver(pool.clone()).await;
+        let row: UserRow =
+            sqlx::query_as(r#"SELECT id from _users WHERE privileged = true LIMIT 1"#)
+                .fetch_one(&pool)
+                .await
+                .unwrap();
+        let group = menu_resolver.resolve(&row.id).await;
+        assert!(!group.is_empty());
+        let group = menu_resolver.resolve(&UserId::generate()).await;
+        assert!(group.is_empty());
+    }
+
+    #[sqlx::test]
+    async fn test_resolve_non_privileged_user(pool: PgPool) {
+        #[derive(FromRow)]
+        struct RoleRow {
+            id: RoleId,
+        }
+        let menu_resolver = build_menu_resolver(pool.clone()).await;
+        let role = Role::builder()
+            .id(RoleId::generate())
+            .name("test".to_string())
+            .enabled(true)
+            .privileged(false)
+            .menus(vec![Menu::new(1), Menu::new(2)])
+            .permissions(vec![])
+            .build();
+        let user = User::builder()
+            .id(UserId::generate())
+            .account("test".to_string())
+            .password(HashedPassword::try_new("123456".to_string()).unwrap())
+            .name("Test".to_string())
+            .enabled(true)
+            .privileged(false)
+            .role_ids(vec![role.id.clone()])
+            .build();
+        let role_repository = RoleRepositoryImpl::builder()
+            .pool(pool.clone())
+            .ct(ChronoTz::default())
+            .build();
+        let user_repository = UserRepositoryImpl::builder()
+            .pool(pool.clone())
+            .ct(ChronoTz::default())
+            .build();
+        let mut user = user_repository.save(user).await.unwrap();
+        let group = menu_resolver.resolve(&user.id).await;
+        assert!(group.is_empty());
+        assert!(role_repository.save(role).await.is_ok());
+        let group = menu_resolver.resolve(&user.id).await;
+        assert!(group.is_empty()); // because cached
+        assert!(menu_resolver.refresh().await.is_ok()); // refresh cache
+        let group = menu_resolver.resolve(&user.id).await;
+        assert!(!group.is_empty());
+        // add privileged user to the user
+        let row: RoleRow =
+            sqlx::query_as(r#"SELECT id from _roles WHERE privileged = true LIMIT 1"#)
+                .fetch_one(&pool)
+                .await
+                .unwrap();
+        let mut role_ids = user.role_ids.clone();
+        role_ids.extend_from_slice(&[row.id]);
+        user.update_role_ids(role_ids);
+        let user = user_repository.save(user).await.unwrap();
+        assert!(menu_resolver.refresh().await.is_ok()); // refresh cache
+        let group = menu_resolver.resolve(&user.id).await;
+        assert!(!group.is_empty());
+    }
+}

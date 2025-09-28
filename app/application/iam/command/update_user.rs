@@ -11,12 +11,15 @@ use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use object_storage_kit::{ObjectStorage, ObjectStorageReader as _};
 use serde::Deserialize;
+use serde_with::serde_as;
 use utoipa::ToSchema;
 
+#[serde_as]
 #[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct UpdateUserCommand {
     id: UserId,
     account: Option<String>,
+    #[serde(default, with = "::serde_with::rust::double_option")]
     portrait: Option<Option<String>>,
     name: Option<String>,
     role_ids: Option<Vec<RoleId>>,
