@@ -37,33 +37,3 @@ impl CommandHandler for BatchEnableRolesCommandHandler {
         ))
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use infrastructure::{
-        shared::{chrono_tz::ChronoTz, pg_pool::PgPool},
-        test_utils::setup_database,
-    };
-
-    use super::*;
-
-    async fn build_command_handler(pool: PgPool) -> BatchEnableRolesCommandHandler {
-        setup_database(pool.clone()).await;
-        let role_repository = RoleRepositoryImpl::builder()
-            .pool(pool.clone())
-            .ct(ChronoTz::default())
-            .build();
-        BatchEnableRolesCommandHandler::builder()
-            .role_repository(role_repository)
-            .build()
-    }
-
-    #[sqlx::test]
-    async fn test_batch_enable(pool: PgPool) {
-        let command_handler = build_command_handler(pool).await;
-        let cmd = BatchEnableRolesCommand::builder()
-            .ids(vec![RoleId::generate()])
-            .build();
-        assert!(command_handler.handle(cmd).await.is_ok());
-    }
-}

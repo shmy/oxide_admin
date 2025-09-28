@@ -26,6 +26,19 @@ jsonpath "$.status" == 1
 jsonpath "$.msg" == "角色不存在"
 jsonpath "$.data" not exists
 
+# Should error when create role given invalid json body
+POST {{base_url}}/api/roles
+Authorization: Bearer {{access_token}}
+{
+  "enabled": true,
+  "menus": [],
+  "permissions": []
+}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 1
+jsonpath "$.msg" contains "Failed to deserialize the JSON body"
+
 # Should success when create role given valid token
 POST {{base_url}}/api/roles
 Authorization: Bearer {{access_token}}

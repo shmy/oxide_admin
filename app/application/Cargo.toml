@@ -21,7 +21,6 @@ object_storage_kit = { workspace = true }
 paste = { workspace = true }
 sched_kit = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-serde_json = { workspace = true, features = ["std"] }
 serde_with = { workspace = true, features = ["alloc", "macros", "chrono_0_4"] }
 single_flight = { workspace = true }
 

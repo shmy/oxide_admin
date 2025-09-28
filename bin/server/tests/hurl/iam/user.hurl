@@ -26,6 +26,17 @@ jsonpath "$.status" == 1
 jsonpath "$.msg" == "用户不存在"
 jsonpath "$.data" not exists
 
+# Should error when create user given invalid json body
+POST {{base_url}}/api/users
+Authorization: Bearer {{access_token}}
+{
+ 
+}
+HTTP 200
+[Asserts]
+jsonpath "$.status" == 1
+jsonpath "$.msg" contains "Failed to deserialize the JSON body"
+
 # Should success when create user given valid token
 POST {{base_url}}/api/users
 Authorization: Bearer {{access_token}}

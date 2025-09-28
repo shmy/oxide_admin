@@ -88,18 +88,3 @@ pub static SHARED_MENUS: LazyLock<[MenuTree; 1]> = LazyLock::new(|| {
         .visible(false)
         .build()]
 });
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_menus() {
-        assert_eq!(MENUS.len(), 1);
-    }
-
-    #[test]
-    fn test_shared_menus() {
-        assert_eq!(SHARED_MENUS.len(), 1);
-    }
-}

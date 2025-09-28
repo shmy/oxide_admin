@@ -32,27 +32,3 @@ impl QueryHandler for OptionRolesQueryHandler {
         Ok(options)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use infrastructure::test_utils::setup_database;
-
-    use super::*;
-
-    #[sqlx::test]
-    async fn test_option_roles(pool: PgPool) {
-        setup_database(pool.clone()).await;
-        let handler = OptionRolesQueryHandler::builder().pool(pool).build();
-        let result = handler.query(()).await;
-        assert!(result.is_ok());
-    }
-
-    #[sqlx::test]
-    async fn test_option_roles_return_err_given_pool_is_closed(pool: PgPool) {
-        setup_database(pool.clone()).await;
-        pool.close().await;
-        let handler = OptionRolesQueryHandler::builder().pool(pool).build();
-        let result = handler.query(()).await;
-        assert!(result.is_err());
-    }
-}

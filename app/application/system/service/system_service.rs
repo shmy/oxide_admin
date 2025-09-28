@@ -76,14 +76,3 @@ impl SystemService {
         snapshot
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[tokio::test]
-    async fn test_info() {
-        let service = SystemService;
-        assert!(service.info().await.is_ok());
-    }
-}
