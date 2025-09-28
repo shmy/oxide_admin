@@ -15,7 +15,12 @@ use application::{
 };
 use axum::{Json, extract::{Path, Query}};
 use domain::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
-use domain::iam::value_object::permission_code::{{(module ~ "_" ~ entity) | uppercase}};
+use domain::iam::value_object::permission::{
+    {{(module ~ "_" ~ entity) | uppercase}}_READ,
+    {{(module ~ "_" ~ entity) | uppercase}}_CREATE,
+    {{(module ~ "_" ~ entity) | uppercase}}_UPDATE,
+    {{(module ~ "_" ~ entity) | uppercase}}_DELETE,
+};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -123,9 +128,9 @@ async fn update(
 
 pub fn routing() -> OpenApiRouter<WebState> {
     OpenApiRouter::new()
-        .routes(routes!(search).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}})))
-        .routes(routes!(retrieve).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}})))
-        .routes(routes!(create).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}})))
-        .routes(routes!(update).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}})))
-        .routes(routes!(batch_delete).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}})))
+        .routes(routes!(search).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}}_READ)))
+        .routes(routes!(retrieve).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}}_READ)))
+        .routes(routes!(create).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}}_CREATE)))
+        .routes(routes!(update).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}}_UPDATE)))
+        .routes(routes!(batch_delete).permit_all(perms!({{(module ~ "_" ~ entity) | uppercase}}_DELETE)))
 }
