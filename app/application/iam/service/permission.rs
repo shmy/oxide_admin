@@ -7,6 +7,7 @@ use domain::iam::value_object::permission::{
     SYSTEM_USER_DELETE, SYSTEM_USER_DISABLE, SYSTEM_USER_ENABLE, SYSTEM_USER_READ,
     SYSTEM_USER_UPDATE, SYSTEM_USER_UPDATE_PASSWORD,
 };
+use paste::paste;
 use serde::Serialize;
 use utoipa::ToSchema;
 
@@ -20,27 +21,29 @@ pub struct PermissionTree {
     children: Option<Vec<PermissionTree>>,
 }
 
+macro_rules! with_crud {
+    ($prefix:ident, $( $extra:expr ),* ) => {
+        {
+            paste! {
+                let mut v = vec![
+                    PermissionTree::builder().label("读取").value([<$prefix _READ>]).build(),
+                    PermissionTree::builder().label("创建").value([<$prefix _CREATE>]).build(),
+                    PermissionTree::builder().label("更新").value([<$prefix _UPDATE>]).build(),
+                    PermissionTree::builder().label("删除").value([<$prefix _DELETE>]).build(),
+                ];
+                $( v.push($extra); )*
+                v
+            }
+        }
+    };
+}
+
 pub static PERMISSIONS: LazyLock<[PermissionTree; 3]> = LazyLock::new(|| {
     [
         PermissionTree::builder()
             .label("用户")
-            .children(vec![
-                PermissionTree::builder()
-                    .label("读取")
-                    .value(SYSTEM_USER_READ)
-                    .build(),
-                PermissionTree::builder()
-                    .label("创建")
-                    .value(SYSTEM_USER_CREATE)
-                    .build(),
-                PermissionTree::builder()
-                    .label("更新")
-                    .value(SYSTEM_USER_UPDATE)
-                    .build(),
-                PermissionTree::builder()
-                    .label("删除")
-                    .value(SYSTEM_USER_DELETE)
-                    .build(),
+            .children(with_crud!(
+                SYSTEM_USER,
                 PermissionTree::builder()
                     .label("启用")
                     .value(SYSTEM_USER_ENABLE)
@@ -52,28 +55,13 @@ pub static PERMISSIONS: LazyLock<[PermissionTree; 3]> = LazyLock::new(|| {
                 PermissionTree::builder()
                     .label("修改密码")
                     .value(SYSTEM_USER_UPDATE_PASSWORD)
-                    .build(),
-            ])
+                    .build()
+            ))
             .build(),
         PermissionTree::builder()
             .label("角色")
-            .children(vec![
-                PermissionTree::builder()
-                    .label("读取")
-                    .value(SYSTEM_ROLE_READ)
-                    .build(),
-                PermissionTree::builder()
-                    .label("创建")
-                    .value(SYSTEM_ROLE_CREATE)
-                    .build(),
-                PermissionTree::builder()
-                    .label("更新")
-                    .value(SYSTEM_ROLE_UPDATE)
-                    .build(),
-                PermissionTree::builder()
-                    .label("删除")
-                    .value(SYSTEM_ROLE_DELETE)
-                    .build(),
+            .children(with_crud!(
+                SYSTEM_ROLE,
                 PermissionTree::builder()
                     .label("启用")
                     .value(SYSTEM_ROLE_ENABLE)
@@ -81,8 +69,8 @@ pub static PERMISSIONS: LazyLock<[PermissionTree; 3]> = LazyLock::new(|| {
                 PermissionTree::builder()
                     .label("禁用")
                     .value(SYSTEM_ROLE_DISABLE)
-                    .build(),
-            ])
+                    .build()
+            ))
             .build(),
         PermissionTree::builder()
             .label("其他")
