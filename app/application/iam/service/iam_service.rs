@@ -6,6 +6,7 @@ use crate::system::service::upload_service::UploadService;
 use bon::Builder;
 use domain::iam::value_object::menu::NONE;
 use domain::iam::value_object::menu_group::MenuGroup;
+use domain::iam::value_object::permission::{ALL_PERMISSIONS, Permission};
 use domain::iam::value_object::permission_group::PermissionChecker;
 use domain::iam::value_object::user_id::UserId;
 use domain::shared::port::menu_resolver::MenuResolver;
@@ -70,8 +71,8 @@ impl IamService {
     }
 
     #[tracing::instrument]
-    pub async fn get_available_pages(&self, user_id: UserId) -> [MenuTree; 2] {
-        let group = self.menu_resolver.resolve(&user_id).await;
+    pub async fn get_available_pages(&self, user_id: &UserId) -> [MenuTree; 2] {
+        let group = self.menu_resolver.resolve(user_id).await;
         let mut pages = Self::get_available_pages_by_group(MENUS.as_ref(), &group);
         pages.extend_from_slice(&*SHARED_MENUS);
         [
@@ -82,6 +83,12 @@ impl IamService {
                 .build(),
             MenuTree::builder().key(NONE).children(pages).build(),
         ]
+    }
+
+    #[tracing::instrument]
+    pub async fn get_available_permissions(&self, user_id: &UserId) -> Vec<&'static Permission> {
+        let group = self.permission_resolver.resolve(user_id).await;
+        ALL_PERMISSIONS.iter().filter(|p| group.permit(p)).collect()
     }
 
     #[tracing::instrument]

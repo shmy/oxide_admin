@@ -57,14 +57,19 @@ async fn current(
     Inject(iam_service): Inject<IamService>,
     Inject(query_handler): Inject<RetrieveUserQueryHandler>,
 ) -> JsonResponseType<response::CurrentResponse> {
-    let (mut user, pages) = tokio::try_join!(
+    let (mut user, pages, permissions) = tokio::try_join!(
         query_handler.query(RetrieveUserQuery::builder().id(id.clone()).build()),
-        async { Ok(iam_service.get_available_pages(id).await) }
+        async { Ok(iam_service.get_available_pages(&id).await) },
+        async { Ok(iam_service.get_available_permissions(&id).await) }
     )?;
     iam_service
         .replenish_user_portrait(std::slice::from_mut(&mut user))
         .await;
-    JsonResponse::ok(response::CurrentResponse { user, pages })
+    JsonResponse::ok(response::CurrentResponse {
+        user,
+        pages,
+        permissions,
+    })
 }
 
 #[utoipa::path(
@@ -105,6 +110,7 @@ mod request {
 }
 mod response {
     use application::iam::{dto::user::UserDto, service::menu::MenuTree};
+    use domain::iam::value_object::permission::Permission;
     use serde::Serialize;
     use utoipa::ToSchema;
 
@@ -112,6 +118,7 @@ mod response {
     pub struct CurrentResponse {
         pub user: UserDto,
         pub pages: [MenuTree; 2],
+        pub permissions: Vec<&'static Permission>,
     }
 }
 
