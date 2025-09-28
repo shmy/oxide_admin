@@ -1,4 +1,5 @@
 use axum::Json;
+use bon::Builder;
 use serde::Serialize;
 use utoipa::ToSchema;
 
@@ -13,7 +14,7 @@ pub struct PagingResponse<T> {
     pub items: Vec<T>,
 }
 
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Serialize, Builder, ToSchema)]
 pub struct JsonResponse<T = ()> {
     status: u8,
     msg: String,

@@ -1,3 +1,4 @@
+pub mod api_error;
 mod common;
 pub mod perm_router_ext;
 pub mod rate_limit_ext;

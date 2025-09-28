@@ -15,12 +15,14 @@ application = { workspace = true }
 axum = { workspace = true, features = ["http1", "tokio", "json", "query"] }
 axum-tracing-opentelemetry = { workspace = true, optional = true }
 axum_typed_multipart = { workspace = true, features = ["tempfile_3"] }
+bon = { workspace = true }
 domain = { workspace = true }
 governor = { workspace = true }
 include_dir = { workspace = true }
 mime_guess = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true, features = ["std"] }
 serde_urlencoded = { workspace = true }
 tempfile = { workspace = true }
 thiserror = { workspace = true }

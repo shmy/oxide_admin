@@ -1,6 +1,9 @@
 use utoipa_axum::router::OpenApiRouter;
 
-use crate::{WebState, shared::middleware::user_authn_required::user_authn_required};
+use crate::{
+    WebState,
+    shared::middleware::{api_error::api_error, user_authn_required::user_authn_required},
+};
 
 mod auth;
 mod option;
@@ -27,5 +30,5 @@ pub fn routing(state: WebState) -> OpenApiRouter<WebState> {
     let router = router
         .layer(axum_tracing_opentelemetry::middleware::OtelInResponseLayer)
         .layer(axum_tracing_opentelemetry::middleware::OtelAxumLayer::default());
-    router
+    router.layer(axum::middleware::from_fn(api_error))
 }
