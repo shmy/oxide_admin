@@ -8,11 +8,13 @@ use crate::{
 mod authn;
 mod profile;
 mod system;
+mod upload;
 
 pub fn routing(state: WebState) -> OpenApiRouter<WebState> {
     let router = OpenApiRouter::new()
-        .nest("/system", system::routing())
         .nest("/profile", profile::routing())
+        .nest("/system", system::routing())
+        .nest("/uploads", upload::routing())
         .layer(axum::middleware::from_fn_with_state(
             state.clone(),
             user_authn_required,

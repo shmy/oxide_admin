@@ -10,11 +10,11 @@ use tokio::task::JoinHandle;
 async fn api_integration_test() {
     let (handle, base_url, _container) = setup_server().await;
     let variables = get_access_token(&base_url).await;
-    run_hurl("auth", &variables).await;
-    run_hurl("option", &variables).await;
-    run_hurl("iam/user", &variables).await;
-    run_hurl("iam/role", &variables).await;
-    run_hurl("system", &variables).await;
+    run_hurl("authn", &variables).await;
+    run_hurl("system/user", &variables).await;
+    run_hurl("system/role", &variables).await;
+    run_hurl("system/option", &variables).await;
+    run_hurl("system/stat", &variables).await;
     run_hurl("upload", &variables).await;
     run_hurl("last", &variables).await;
     handle.abort();
@@ -64,7 +64,7 @@ async fn run_hurl(filename: &str, variables: &TestVariables) {
 }
 
 async fn get_access_token(base_url: &str) -> TestVariables {
-    let res = reqwest::get(format!("{}/api/auth/refresh_captcha", base_url))
+    let res = reqwest::get(format!("{}/api/authn/refresh_captcha", base_url))
         .await
         .unwrap();
     let captcha_id = res
@@ -75,7 +75,7 @@ async fn get_access_token(base_url: &str) -> TestVariables {
         .unwrap()
         .to_string();
     let res = reqwest::Client::new()
-        .post(format!("{}/api/auth/sign_in", base_url))
+        .post(format!("{}/api/authn/sign_in", base_url))
         .json(&serde_json::json!({
             "account": "admin",
             "password": "123456",

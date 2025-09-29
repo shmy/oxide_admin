@@ -13,7 +13,7 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data" == null
 
 # Should success when refresh token given valid refresh token
-POST {{base_url}}/api/auth/refresh_token
+POST {{base_url}}/api/authn/refresh_token
 {
     "refresh_token": "{{refresh_token}}"
 }

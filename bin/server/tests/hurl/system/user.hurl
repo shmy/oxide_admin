@@ -1,6 +1,6 @@
 
 # Should error when fetch users without token
-GET {{base_url}}/api/users
+GET {{base_url}}/api/system/users
 HTTP 401
 [Asserts]
 jsonpath "$.status" == 1
@@ -8,7 +8,7 @@ jsonpath "$.msg" == "请提供 Token"
 jsonpath "$.data" not exists
 
 # Should success when fetch users given valid token
-GET {{base_url}}/api/users
+GET {{base_url}}/api/system/users
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
@@ -18,7 +18,7 @@ jsonpath "$.data.items" count == 1
 jsonpath "$.data.total" == 1
 
 # Should error when fetch user without token
-GET {{base_url}}/api/users/fake_user
+GET {{base_url}}/api/system/users/fake_user
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
@@ -27,7 +27,7 @@ jsonpath "$.msg" == "用户不存在"
 jsonpath "$.data" not exists
 
 # Should error when create user given invalid json body
-POST {{base_url}}/api/users
+POST {{base_url}}/api/system/users
 Authorization: Bearer {{access_token}}
 {
  
@@ -38,7 +38,7 @@ jsonpath "$.status" == 1
 jsonpath "$.msg" contains "Failed to deserialize the JSON body"
 
 # Should success when create user given valid token
-POST {{base_url}}/api/users
+POST {{base_url}}/api/system/users
 Authorization: Bearer {{access_token}}
 {
   "account": "test",
@@ -57,7 +57,7 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data" matches ".{24}"
 
 # Should success when fetch user given previously created user
-GET {{base_url}}/api/users/{{user_id}}
+GET {{base_url}}/api/system/users/{{user_id}}
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
@@ -69,7 +69,7 @@ jsonpath "$.data.enabled" == true
 jsonpath "$.data.portrait" == null
 
 # Should success when update user password given previously created user
-PUT {{base_url}}/api/users/{{user_id}}/password
+PUT {{base_url}}/api/system/users/{{user_id}}/password
 Authorization: Bearer {{access_token}}
 {
   "confirm_new_password": "123456",
@@ -82,7 +82,7 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data" == null
 
 # Should success when update user given previously created user
-PUT {{base_url}}/api/users/{{user_id}}
+PUT {{base_url}}/api/system/users/{{user_id}}
 Authorization: Bearer {{access_token}}
 {
   "id": "{{user_id}}",
@@ -99,7 +99,7 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data" matches ".{24}"
 
 # Should success when update portrait given previously created user
-PUT {{base_url}}/api/users/{{user_id}}
+PUT {{base_url}}/api/system/users/{{user_id}}
 Authorization: Bearer {{access_token}}
 {
   "id": "{{user_id}}",
@@ -114,7 +114,7 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data" matches ".{24}"
 
 # Should success when fetch users given valid token
-GET {{base_url}}/api/users
+GET {{base_url}}/api/system/users
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
@@ -124,7 +124,7 @@ jsonpath "$.data.items" count == 2
 jsonpath "$.data.total" == 2
 
 # Should success when remove portrait given previously created user
-PUT {{base_url}}/api/users/{{user_id}}
+PUT {{base_url}}/api/system/users/{{user_id}}
 Authorization: Bearer {{access_token}}
 {
   "id": "{{user_id}}",
@@ -139,7 +139,7 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data" matches ".{24}"
 
 # Should success when enable user given previously created user
-POST {{base_url}}/api/users/batch/enable
+POST {{base_url}}/api/system/users/batch/enable
 Authorization: Bearer {{access_token}}
 {
   "ids": ["{{user_id}}"]
@@ -151,7 +151,7 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data" == null
 
 # Should success when fetch user given previously created user
-GET {{base_url}}/api/users/{{user_id}}
+GET {{base_url}}/api/system/users/{{user_id}}
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
@@ -161,7 +161,7 @@ jsonpath "$.data.id" == {{user_id}}
 jsonpath "$.data.enabled" == true
 
 # Should success when disable user given previously created user
-POST {{base_url}}/api/users/batch/disable
+POST {{base_url}}/api/system/users/batch/disable
 Authorization: Bearer {{access_token}}
 {
   "ids": ["{{user_id}}"]
@@ -173,7 +173,7 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data" == null
 
 # Should success when fetch user given previously created user
-GET {{base_url}}/api/users/{{user_id}}
+GET {{base_url}}/api/system/users/{{user_id}}
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
@@ -183,7 +183,7 @@ jsonpath "$.data.id" == {{user_id}}
 jsonpath "$.data.enabled" == false
 
 # Should success when delete user given previously created user
-POST {{base_url}}/api/users/batch/delete
+POST {{base_url}}/api/system/users/batch/delete
 Authorization: Bearer {{access_token}}
 {
   "ids": ["{{user_id}}"]
@@ -195,7 +195,7 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data" == null
 
 # Should success when fetch user given previously created user
-GET {{base_url}}/api/users/{{user_id}}
+GET {{base_url}}/api/system/users/{{user_id}}
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]

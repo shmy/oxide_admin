@@ -16,7 +16,7 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data.user.account" == "admin"
 
 # Should error when sign in with invalid account
-POST {{base_url}}/api/auth/sign_in
+POST {{base_url}}/api/authn/sign_in
 {
     "account": "fake_account",
     "password": "123456"

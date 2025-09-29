@@ -1,5 +1,5 @@
 # Should error when fetch system info without token
-GET {{base_url}}/api/systems/info
+GET {{base_url}}/api/system/stats
 HTTP 401
 [Asserts]
 jsonpath "$.status" == 1
@@ -7,7 +7,7 @@ jsonpath "$.msg" == "请提供 Token"
 jsonpath "$.data" not exists
 
 # Should success when fetch system info given valid token
-GET {{base_url}}/api/systems/info
+GET {{base_url}}/api/system/stats
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
