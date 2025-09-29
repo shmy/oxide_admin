@@ -22,7 +22,7 @@ export const refreshToken = (http: XiorInstance) => {
   }
   if (!refreshTokenPromise) {
     refreshTokenPromise = http
-      .post<{ data: TokenData }>("/auth/refresh_token", {
+      .post<{ data: TokenData }>("/authn/refresh_token", {
         refresh_token: latestRefreshToken,
       })
       .then((response) => {

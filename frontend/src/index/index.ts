@@ -81,7 +81,6 @@ const schemas = {
     method: "get",
     url: "/profile/current",
     adaptor: (response: any) => {
-      console.log(amisScoped);
       window._permissions = new Set(response.data.permissions);
       window._hasPermission = (permission: number) => window._permissions.has(permission);
       return response;

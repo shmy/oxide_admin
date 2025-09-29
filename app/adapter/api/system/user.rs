@@ -50,7 +50,7 @@ use crate::{
     params(SearchUsersQuery),
     path = "/",
     summary = "Search users",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponse<PagingResponse<UserDto>>))
     )
@@ -70,7 +70,7 @@ async fn search(
     get,
     path = "/{id}",
     summary = "Retrieve user",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponse<UserDto>))
     )
@@ -94,7 +94,7 @@ async fn retrieve(
     post,
     path = "/batch/delete",
     summary = "Batch delete users",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
@@ -112,7 +112,7 @@ async fn batch_delete(
     post,
     path = "/batch/enable",
     summary = "Batch enable users",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
@@ -130,7 +130,7 @@ async fn batch_enable(
     post,
     path = "/batch/disable",
     summary = "Batch disable users",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
@@ -148,7 +148,7 @@ async fn batch_disable(
     post,
     path = "/",
     summary = "Create user",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
@@ -166,7 +166,7 @@ async fn create(
     put,
     path = "/{id}",
     summary = "Update user",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
@@ -185,7 +185,7 @@ async fn update(
     put,
     path = "/{id}/password",
     summary = "Update user password",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )

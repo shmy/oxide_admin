@@ -5,10 +5,10 @@ import { PERMISSIONS } from "../../lib/permissions";
 import { buildCrudTable } from "../../lib/table";
 
 export { };
-const endpoint = "/users";
+const endpoint = "/system/users";
 const roleEndpoint = {
   method: "get",
-  url: "/options/roles",
+  url: "/system/options/role",
   cache: 10000,
 };
 
@@ -92,7 +92,7 @@ const buildDrawer = (isAdd = true) => {
             type: "select",
             name: "role_ids",
             label: "角色列表",
-            source: "/options/roles",
+            source: roleEndpoint,
             multiple: true,
             joinValues: false,
             extractValue: true,
@@ -127,7 +127,7 @@ const buildUpdatePasswordDrawer = () => {
       body: {
         type: "form",
         canAccessSuperData: false,
-        api: "put:/users/${id}/password",
+        api: "put:/system/users/${id}/password",
         body: [
           {
             type: "input-password",

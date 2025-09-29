@@ -48,7 +48,7 @@ use crate::{
     params(SearchRolesQuery),
     path = "/",
     summary = "Search roles",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponse<PagingResponse<RoleDto>>))
     )
@@ -66,7 +66,7 @@ async fn search(
     get,
     path = "/{id}",
     summary = "Retrieve role",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponse<RoleDto>))
     )
@@ -86,7 +86,7 @@ async fn retrieve(
     post,
     path = "/batch/delete",
     summary = "Batch delete roles",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
@@ -104,7 +104,7 @@ async fn batch_delete(
     post,
     path = "/batch/enable",
     summary = "Batch enable roles",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
@@ -122,7 +122,7 @@ async fn batch_enable(
     post,
     path = "/batch/disable",
     summary = "Batch disable roles",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
@@ -140,7 +140,7 @@ async fn batch_disable(
     post,
     path = "/",
     summary = "Create role",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
@@ -158,7 +158,7 @@ async fn create(
     put,
     path = "/{id}",
     summary = "Update role",
-    tag = "Iam",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )

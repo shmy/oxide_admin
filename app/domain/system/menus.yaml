@@ -14,7 +14,7 @@ private:
       - key: 4
         label: 系统信息
         icon: fas fa-info
-        url: /system/info
+        url: /system/stat
       - key: 5
         label: 示例页面
         icon: fas fa-hexagon-nodes

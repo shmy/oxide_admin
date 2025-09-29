@@ -2,6 +2,7 @@
 [ ] tower-circuit-breaker
 [ ] Frontend code generation
 [ ] l10n
+[ ] 删除有延迟
 [x] json query path multi 请求报错处理
 [-] Redis 支持 Tls
 [-] Postgresql 支持 Tls

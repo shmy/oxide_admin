@@ -13,7 +13,7 @@ use crate::{
 
 #[utoipa::path(
     get,
-    path = "/info",
+    path = "/",
     summary = "System stat",
     tag = "System",
     responses(

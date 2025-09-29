@@ -1,4 +1,4 @@
-export {};
+export { };
 
 const schema = {
   type: "page",
@@ -6,7 +6,7 @@ const schema = {
     {
       type: "form",
       title: "",
-      initApi: "/systems/info",
+      initApi: "/system/stats",
       static: true,
       body: [
         {

@@ -15,9 +15,9 @@ use crate::{
 
 #[utoipa::path(
     get,
-    path = "/roles",
-    summary = "Roles",
-    tag = "Options",
+    path = "/role",
+    summary = "List roles as option",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponse<Vec<OptionStringDto>>))
     )
@@ -32,9 +32,9 @@ async fn roles(
 
 #[utoipa::path(
     get,
-    path = "/menus",
-    summary = "menus",
-    tag = "Options",
+    path = "/menu",
+    summary = "List menu tree",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponse<Vec<MenuTree>>))
     )
@@ -47,9 +47,9 @@ async fn menus(Inject(service): Inject<IamService>) -> JsonResponseType<&'static
 
 #[utoipa::path(
     get,
-    path = "/permissions",
-    summary = "permissions",
-    tag = "Options",
+    path = "/permission",
+    summary = "List permission tree",
+    tag = "System",
     responses(
         (status = 200, body = inline(JsonResponse<Vec<PermissionTree>>))
     )

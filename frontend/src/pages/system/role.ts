@@ -4,10 +4,15 @@ import { PERMISSIONS } from "../../lib/permissions";
 import { buildCrudTable } from "../../lib/table";
 
 export { };
-const endpoint = "/roles";
+const endpoint = "/system/roles";
 const menuEndpoint = {
   method: "get",
-  url: "/options/menus",
+  url: "/system/options/menu",
+  cache: 10000,
+};
+const permissionEndpoint = {
+  method: "get",
+  url: "/system/options/permission",
   cache: 10000,
 };
 
@@ -66,7 +71,7 @@ const buildDrawer = (isAdd = true) => {
             type: "tree-select",
             name: "menus",
             label: "角色菜单",
-            source: "/options/menus",
+            source: menuEndpoint,
             labelField: "label",
             valueField: "key",
             multiple: true,
@@ -86,8 +91,7 @@ const buildDrawer = (isAdd = true) => {
             inline: false,
             joinValues: false,
             extractValue: true,
-            source: "/options/permissions",
-            value: "${permissions || []}",
+            source: permissionEndpoint,
           },
           {
             type: "hidden",

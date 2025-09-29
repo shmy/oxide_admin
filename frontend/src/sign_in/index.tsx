@@ -60,7 +60,7 @@ const refreshCaptcha = () => {
 
   setRefreshing(true);
   xior
-    .get("/api/auth/refresh_captcha", {
+    .get("/api/authn/refresh_captcha", {
       responseType: "blob"
     })
     .then((res) => {
@@ -88,7 +88,7 @@ formEl?.addEventListener(
     setError("");
     setSubmitting(true);
     xior
-      .post("/api/auth/sign_in", {
+      .post("/api/authn/sign_in", {
         account,
         password,
         captcha_key,
