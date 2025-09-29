@@ -1,5 +1,9 @@
 use application::{
-    iam::{
+    shared::{
+        command_handler::CommandHandler, paging_result::PagingResult,
+        query_handler::QueryHandler as _,
+    },
+    system::{
         command::{
             batch_delete_roles::{BatchDeleteRolesCommand, BatchDeleteRolesCommandHandler},
             batch_disable_roles::{BatchDisableRolesCommand, BatchDisableRolesCommandHandler},
@@ -12,10 +16,6 @@ use application::{
             retrieve_role::{RetrieveRoleQuery, RetrieveRoleQueryHandler},
             search_roles::{SearchRolesQuery, SearchRolesQueryHandler},
         },
-    },
-    shared::{
-        command_handler::CommandHandler, paging_result::PagingResult,
-        query_handler::QueryHandler as _,
     },
 };
 use axum::{

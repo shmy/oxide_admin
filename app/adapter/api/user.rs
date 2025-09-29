@@ -1,5 +1,9 @@
 use application::{
-    iam::{
+    shared::{
+        command_handler::CommandHandler, paging_result::PagingResult,
+        query_handler::QueryHandler as _,
+    },
+    system::{
         command::{
             batch_delete_users::{BatchDeleteUsersCommand, BatchDeleteUsersCommandHandler},
             batch_disable_users::{BatchDisableUsersCommand, BatchDisableUsersCommandHandler},
@@ -14,10 +18,6 @@ use application::{
             search_users::{SearchUsersQuery, SearchUsersQueryHandler},
         },
         service::iam_service::IamService,
-    },
-    shared::{
-        command_handler::CommandHandler, paging_result::PagingResult,
-        query_handler::QueryHandler as _,
     },
 };
 use axum::{

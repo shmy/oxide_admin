@@ -1,12 +1,12 @@
 use std::time::Duration;
 
 use application::{
-    iam::command::{
+    shared::command_handler::CommandHandler,
+    system::command::{
         refresh_captcha::{RefreshCaptchaCommand, RefreshCaptchaCommandHandler},
         refresh_token::{RefreshTokenCommand, RefreshTokenCommandHandler},
         sign_in::{SignInCommand, SignInCommandHandler},
     },
-    shared::command_handler::CommandHandler,
 };
 use axum::{
     Json,

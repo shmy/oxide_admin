@@ -1,6 +1,6 @@
 use crate::{
-    iam::query::{search_roles::SearchRolesQueryHandler, search_users::SearchUsersQueryHandler},
     shared::event::Event,
+    system::query::{search_roles::SearchRolesQueryHandler, search_users::SearchUsersQueryHandler},
     system::service::file_service::FileService,
 };
 use bon::Builder;
@@ -14,7 +14,7 @@ use nject::injectable;
 
 #[derive(Clone, Builder)]
 #[injectable]
-pub struct IamEventSubscriber {
+pub struct SystemEventSubscriber {
     permission_resolver: PermissionResolverImpl,
     menu_resolver: MenuResolverImpl,
     search_user_query_handler: SearchUsersQueryHandler,
@@ -22,7 +22,7 @@ pub struct IamEventSubscriber {
     file_service: FileService,
 }
 
-impl IamEventSubscriber {
+impl SystemEventSubscriber {
     fn is_users_changed(event: &SystemEvent) -> bool {
         matches!(
             event,
@@ -51,7 +51,7 @@ impl IamEventSubscriber {
     }
 }
 
-impl EventSubscriber<Event> for IamEventSubscriber {
+impl EventSubscriber<Event> for SystemEventSubscriber {
     async fn on_received(&self, event: Event) -> InfrastructureResult<()> {
         #[allow(irrefutable_let_patterns)]
         if let Event::Iam(e) = event {

@@ -1,5 +1,5 @@
-use crate::iam::dto::user::UserDto;
 use crate::shared::query_handler::QueryHandler;
+use crate::system::dto::user::UserDto;
 use bon::Builder;
 use domain::system::value_object::user_id::UserId;
 use domain::system::{error::SystemError, value_object::role_id::RoleId};

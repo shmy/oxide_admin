@@ -12,7 +12,7 @@ use utoipa::IntoParams;
 
 use crate::{
     error::ApplicationResult,
-    iam::dto::user::UserDto,
+    system::dto::user::UserDto,
     shared::{
         cache_provider::CacheProvider, paging_query::PagingQuery, paging_result::PagingResult,
         query_handler::QueryHandler,

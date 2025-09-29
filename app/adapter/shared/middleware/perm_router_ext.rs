@@ -1,7 +1,7 @@
 use crate::WebState;
 use crate::shared::error::WebError;
 use crate::shared::extractor::valid_user::ValidUser;
-use application::iam::service::iam_service::IamService;
+use application::system::service::iam_service::IamService;
 use axum::extract::Request;
 use axum::middleware;
 use axum::middleware::Next;

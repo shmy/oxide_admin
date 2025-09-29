@@ -1,5 +1,5 @@
-use crate::iam::command::sign_out::{SignOutCommand, SignOutCommandHandler};
 use crate::shared::command_handler::{CommandHandler, CommandResult};
+use crate::system::command::sign_out::{SignOutCommand, SignOutCommandHandler};
 use bon::Builder;
 use domain::system::port::user_repository::UserRepository;
 use domain::system::{error::SystemError, event::SystemEvent, value_object::user_id::UserId};
