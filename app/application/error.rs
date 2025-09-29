@@ -21,7 +21,7 @@ pub enum ApplicationError {
     PermissionDenied,
 
     #[error("{0}")]
-    Iam(#[from] SystemError),
+    System(#[from] SystemError),
 
     #[error("{0}")]
     Sqlx(#[from] sqlx::Error),

@@ -54,7 +54,7 @@ impl SystemEventSubscriber {
 impl EventSubscriber<Event> for SystemEventSubscriber {
     async fn on_received(&self, event: Event) -> InfrastructureResult<()> {
         #[allow(irrefutable_let_patterns)]
-        if let Event::Iam(e) = event {
+        if let Event::System(e) = event {
             if Self::is_permission_changed(&e) {
                 if let Err(err) = self.permission_resolver.refresh().await {
                     tracing::error!(?e, error = %err, "权限刷新失败");

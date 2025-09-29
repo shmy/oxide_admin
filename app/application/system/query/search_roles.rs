@@ -13,11 +13,11 @@ use utoipa::IntoParams;
 
 use crate::{
     error::ApplicationResult,
-    system::dto::role::RoleDto,
     shared::{
         cache_provider::CacheProvider, paging_query::PagingQuery, paging_result::PagingResult,
         query_handler::QueryHandler,
     },
+    system::dto::role::RoleDto,
 };
 
 #[serde_as]
@@ -45,7 +45,7 @@ pub struct SearchRolesQuery {
 #[injectable]
 pub struct SearchRolesQueryHandler {
     pool: PgPool,
-    #[inject(|kvdb: Kvdb| CacheProvider::builder().key("iam_search_roles:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
+    #[inject(|kvdb: Kvdb| CacheProvider::builder().key("system_search_roles:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
     cache_provider: CacheProvider,
 }
 

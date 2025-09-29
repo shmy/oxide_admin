@@ -7,11 +7,11 @@ pub static EVENT_BUS: LazyLock<EventBus<Event>> = LazyLock::new(|| EventBus::new
 
 #[derive(Debug, Clone)]
 pub enum Event {
-    Iam(SystemEvent),
+    System(SystemEvent),
 }
 
 impl From<SystemEvent> for Event {
     fn from(value: SystemEvent) -> Self {
-        Self::Iam(value)
+        Self::System(value)
     }
 }

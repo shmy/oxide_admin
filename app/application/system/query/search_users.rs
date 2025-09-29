@@ -12,11 +12,11 @@ use utoipa::IntoParams;
 
 use crate::{
     error::ApplicationResult,
-    system::dto::user::UserDto,
     shared::{
         cache_provider::CacheProvider, paging_query::PagingQuery, paging_result::PagingResult,
         query_handler::QueryHandler,
     },
+    system::dto::user::UserDto,
 };
 
 #[serde_as]
@@ -42,7 +42,7 @@ pub struct SearchUsersQuery {
 #[injectable]
 pub struct SearchUsersQueryHandler {
     pool: PgPool,
-    #[inject(|kvdb: Kvdb| CacheProvider::builder().key("iam_search_users:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
+    #[inject(|kvdb: Kvdb| CacheProvider::builder().key("system_search_users:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
     cache_provider: CacheProvider,
 }
 
