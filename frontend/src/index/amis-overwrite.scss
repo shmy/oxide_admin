@@ -22,6 +22,10 @@
     }
 
     .antd-CheckboxesControl-group .antd-CheckboxesControl-group {
-        margin-left: 24px;
+        margin-left: var(--fonts-size-4);
+    }
+
+    .antd-AppBcn {
+        font-size: var(--fonts-size-8);
     }
 }
