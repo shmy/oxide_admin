@@ -1,6 +1,6 @@
 use crate::{
-    system::value_object::user_id::UserId,
     shared::{event_util::UpdatedEvent, port::domain_repository::DomainRepository},
+    system::value_object::user_id::UserId,
 };
 
 pub trait UserRepository: DomainRepository {

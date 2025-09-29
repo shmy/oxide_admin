@@ -14,14 +14,14 @@ use crate::{
 #[utoipa::path(
     get,
     path = "/info",
-    summary = "System info",
+    summary = "System stat",
     tag = "System",
     responses(
         (status = 200, body = inline(JsonResponse<SystemSnapshot>))
     )
 )]
 #[tracing::instrument]
-pub async fn system_info(
+pub async fn system_stat(
     Inject(service): Inject<SystemService>,
 ) -> JsonResponseType<&'static SystemSnapshot> {
     let info = service.info().await?;
@@ -29,5 +29,5 @@ pub async fn system_info(
 }
 
 pub fn routing() -> OpenApiRouter<WebState> {
-    OpenApiRouter::new().routes(routes!(system_info))
+    OpenApiRouter::new().routes(routes!(system_stat))
 }
