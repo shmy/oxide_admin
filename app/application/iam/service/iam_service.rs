@@ -1,12 +1,13 @@
 use crate::error::{ApplicationError, ApplicationResult};
 use crate::iam::dto::user::UserDto;
 use crate::iam::service::menu::{MENUS, MenuTree, SHARED_MENUS};
-use crate::iam::service::permission::{PERMISSIONS, PermissionTree};
 use crate::system::service::upload_service::UploadService;
 use bon::Builder;
 use domain::iam::value_object::menu::NONE;
 use domain::iam::value_object::menu_group::MenuGroup;
-use domain::iam::value_object::permission::{ALL_PERMISSIONS, Permission};
+use domain::iam::value_object::permission::{
+    ALL_PERMISSIONS, PERMISSION_TREE, Permission, PermissionTree,
+};
 use domain::iam::value_object::permission_group::PermissionChecker;
 use domain::iam::value_object::user_id::UserId;
 use domain::shared::port::menu_resolver::MenuResolver;
@@ -67,7 +68,7 @@ impl IamService {
 
     #[tracing::instrument]
     pub fn get_permission_tree(&self) -> &'static [PermissionTree] {
-        PERMISSIONS.as_ref()
+        PERMISSION_TREE.as_ref()
     }
 
     #[tracing::instrument]

@@ -16,3 +16,8 @@ tempoid = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 utoipa = { workspace = true, features = ["macros"] }
+
+[build-dependencies]
+serde_yaml = { version = "0.9.34-deprecated", default-features = false }
+serde = { workspace = true, features = ["derive"] }
+cruet = { workspace = true }

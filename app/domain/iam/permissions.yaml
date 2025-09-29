@@ -1,0 +1,54 @@
+- key: system
+  label: 系统
+  children:
+    - label: 用户
+      key: user
+      children:
+        - key: read
+          label: 读取
+          value: 100
+        - key: create
+          label: 创建
+          value: 101
+        - key: update
+          label: 更新
+          value: 102
+        - key: delete
+          label: 删除
+          value: 103
+        - key: enable
+          label: 启用
+          value: 104
+        - key: disable
+          label: 禁用
+          value: 105
+        - key: update_password
+          label: 修改密码
+          value: 106
+    - key: role
+      label: 角色
+      children:
+        - key: read
+          label: 读取
+          value: 200
+        - key: create
+          label: 创建
+          value: 201
+        - key: update
+          label: 更新
+          value: 202
+        - key: delete
+          label: 删除
+          value: 203
+        - key: enable
+          label: 启用
+          value: 204
+        - key: disable
+          label: 禁用
+          value: 205
+    - key: file
+      label: 文件
+      children:
+        - key: upload
+          label: 上传
+          value: 300

@@ -3,7 +3,7 @@ use application::system::service::upload_service::{
 };
 use axum::{Json, extract::DefaultBodyLimit};
 use axum_typed_multipart::TypedMultipart;
-use domain::iam::value_object::permission::SYSTEM_UPLOAD_FILE;
+use domain::iam::value_object::permission::SYSTEM_FILE_UPLOAD;
 use utoipa_axum::{
     router::{OpenApiRouter, UtoipaMethodRouterExt},
     routes,
@@ -175,5 +175,5 @@ pub fn routing() -> OpenApiRouter<WebState> {
         .routes(routes!(chunk).layer(DefaultBodyLimit::max(3 * 1024 * 1024)))
         .routes(routes!(start_chunk))
         .routes(routes!(finish_chunk))
-        .permit_all(perms!(SYSTEM_UPLOAD_FILE))
+        .permit_all(perms!(SYSTEM_FILE_UPLOAD))
 }

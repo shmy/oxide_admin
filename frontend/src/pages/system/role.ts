@@ -1,6 +1,6 @@
 import { ifElementAuthorized } from "../../lib/authn";
 import { enabledStatuses } from "../../lib/options";
-import { SYSTEM_ROLE_CREATE, SYSTEM_ROLE_DELETE, SYSTEM_ROLE_DISABLE, SYSTEM_ROLE_ENABLE, SYSTEM_ROLE_READ, SYSTEM_ROLE_UPDATE } from "../../lib/permissions";
+import { PERMISSIONS } from "../../lib/permissions";
 import { buildCrudTable } from "../../lib/table";
 
 export { };
@@ -132,10 +132,10 @@ const schema = {
       },
     ],
     headerToolbar: [
-      ...ifElementAuthorized(SYSTEM_ROLE_CREATE, buildDrawer()),
+      ...ifElementAuthorized(PERMISSIONS.SYSTEM.ROLE.CREATE, buildDrawer()),
     ],
     bulkActions: [
-      ...ifElementAuthorized(SYSTEM_ROLE_ENABLE, {
+      ...ifElementAuthorized(PERMISSIONS.SYSTEM.ROLE.ENABLE, {
         label: "启用",
         icon: "fas fa-check",
         level: "success",
@@ -150,7 +150,7 @@ const schema = {
         },
         confirmText: "确定要批量将状态设为启用?",
       }),
-      ...ifElementAuthorized(SYSTEM_ROLE_DISABLE, {
+      ...ifElementAuthorized(PERMISSIONS.SYSTEM.ROLE.DISABLE, {
         label: "禁用",
         icon: "fas fa-close",
         level: "warning",
@@ -167,9 +167,9 @@ const schema = {
       }),
     ],
     operations: [
-      ...ifElementAuthorized(SYSTEM_ROLE_UPDATE, buildDrawer(false)),
+      ...ifElementAuthorized(PERMISSIONS.SYSTEM.ROLE.UPDATE, buildDrawer(false)),
     ],
-    deletable: _hasPermission(SYSTEM_ROLE_DELETE),
+    deletable: _hasPermission(PERMISSIONS.SYSTEM.ROLE.DELETE),
     itemDeletableOn: "this.privileged",
     itemCheckableOn: "!this.privileged",
     columns: [
