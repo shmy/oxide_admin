@@ -1,4 +1,6 @@
+import { ifElementAuthorized } from "../../lib/authn";
 import { enabledStatuses } from "../../lib/options";
+import { SYSTEM_ROLE_CREATE, SYSTEM_ROLE_DELETE, SYSTEM_ROLE_DISABLE, SYSTEM_ROLE_ENABLE, SYSTEM_ROLE_READ, SYSTEM_ROLE_UPDATE } from "../../lib/permissions";
 import { buildCrudTable } from "../../lib/table";
 
 export { };
@@ -129,9 +131,11 @@ const schema = {
         valueField: "key",
       },
     ],
-    headerToolbar: [buildDrawer()],
+    headerToolbar: [
+      ...ifElementAuthorized(SYSTEM_ROLE_CREATE, buildDrawer()),
+    ],
     bulkActions: [
-      {
+      ...ifElementAuthorized(SYSTEM_ROLE_ENABLE, {
         label: "启用",
         icon: "fas fa-check",
         level: "success",
@@ -145,8 +149,8 @@ const schema = {
           },
         },
         confirmText: "确定要批量将状态设为启用?",
-      },
-      {
+      }),
+      ...ifElementAuthorized(SYSTEM_ROLE_DISABLE, {
         label: "禁用",
         icon: "fas fa-close",
         level: "warning",
@@ -160,9 +164,12 @@ const schema = {
           },
         },
         confirmText: "确定要批量将状态设为禁用?",
-      },
+      }),
     ],
-    operations: [buildDrawer(false)],
+    operations: [
+      ...ifElementAuthorized(SYSTEM_ROLE_UPDATE, buildDrawer(false)),
+    ],
+    deletable: _hasPermission(SYSTEM_ROLE_DELETE),
     itemDeletableOn: "this.privileged",
     itemCheckableOn: "!this.privileged",
     columns: [

@@ -1,5 +1,7 @@
+import { ifElementAuthorized } from "../../lib/authn";
 import { logoUrl } from "../../lib/constant";
 import { enabledStatuses } from "../../lib/options";
+import { SYSTEM_USER_CREATE, SYSTEM_USER_DELETE, SYSTEM_USER_DISABLE, SYSTEM_USER_ENABLE, SYSTEM_USER_UPDATE, SYSTEM_USER_UPDATE_PASSWORD } from "../../lib/permissions";
 import { buildCrudTable } from "../../lib/table";
 
 export { };
@@ -184,9 +186,11 @@ const schema = {
         source: roleEndpoint,
       },
     ],
-    headerToolbar: [buildDrawer()],
+    headerToolbar: [
+      ...ifElementAuthorized(SYSTEM_USER_CREATE, buildDrawer()),
+    ],
     bulkActions: [
-      {
+      ...ifElementAuthorized(SYSTEM_USER_ENABLE, {
         label: "启用",
         icon: "fas fa-check",
         level: "success",
@@ -200,8 +204,8 @@ const schema = {
           },
         },
         confirmText: "确定要批量将状态设为启用?",
-      },
-      {
+      }),
+      ...ifElementAuthorized(SYSTEM_USER_DISABLE, {
         label: "禁用",
         icon: "fas fa-close",
         level: "warning",
@@ -215,10 +219,15 @@ const schema = {
           },
         },
         confirmText: "确定要批量将状态设为禁用?",
-      },
+      }),
     ],
-    operations: [buildDrawer(false)],
-    subOperations: [buildUpdatePasswordDrawer()],
+    operations: [
+      ...ifElementAuthorized(SYSTEM_USER_UPDATE, buildDrawer(false)),
+    ],
+    subOperations: [
+      ...ifElementAuthorized(SYSTEM_USER_UPDATE_PASSWORD, buildUpdatePasswordDrawer()),
+    ],
+    deletable: _hasPermission(SYSTEM_USER_DELETE),
     itemDeletableOn: "this.privileged",
     itemCheckableOn: "!this.privileged",
     columns: [

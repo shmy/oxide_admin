@@ -70,3 +70,8 @@ export const updateToken = (data: TokenData) => {
   window.localStorage.setItem(accessTokenKey, latestAccessToken);
   window.localStorage.setItem(refreshTokenKey, latestRefreshToken);
 };
+
+type Elem<T> = T | T[];
+
+export const ifElementAuthorized = <T>(permission: number, elem: Elem<T>): T[] =>
+  _hasPermission(permission) ? ([] as T[]).concat(elem) : [];

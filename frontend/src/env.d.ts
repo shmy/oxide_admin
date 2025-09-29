@@ -11,4 +11,6 @@ declare module '*.svg?react' {
 }
 
 declare var amisRequire: (name: string) => any;
+declare var _permissions: Set<number>;
+declare var _hasPermission: (permission: number) => boolean;
 declare var _j: (schema: Record<string, unknown>) => void;

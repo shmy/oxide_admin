@@ -1,0 +1,14 @@
+export const SYSTEM_USER_READ = 100;
+export const SYSTEM_USER_CREATE = 101;
+export const SYSTEM_USER_UPDATE = 102;
+export const SYSTEM_USER_DELETE = 103;
+export const SYSTEM_USER_ENABLE = 104;
+export const SYSTEM_USER_DISABLE = 105;
+export const SYSTEM_USER_UPDATE_PASSWORD = 106;
+export const SYSTEM_ROLE_READ = 200;
+export const SYSTEM_ROLE_CREATE = 201;
+export const SYSTEM_ROLE_UPDATE = 202;
+export const SYSTEM_ROLE_DELETE = 203;
+export const SYSTEM_ROLE_ENABLE = 204;
+export const SYSTEM_ROLE_DISABLE = 205;
+export const SYSTEM_UPLOAD_FILE = 300;
