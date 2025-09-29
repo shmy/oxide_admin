@@ -16,7 +16,7 @@ fn hash_encode(query: &impl Hash) -> u64 {
     hasher.finish()
 }
 
-pub const CACHE_PREFIX: &str = "CACHE:";
+pub const CACHE_PREFIX: &str = "cache:";
 #[derive(Debug, Clone, Builder)]
 pub struct CacheProvider {
     key: &'static str,
