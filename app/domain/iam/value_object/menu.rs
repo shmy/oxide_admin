@@ -1,5 +1,6 @@
 use std::ops::Deref;
 
+use bon::Builder;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -21,36 +22,31 @@ impl Deref for Menu {
     }
 }
 
-macro_rules! define_menus {
-    ( $( $name:ident = $value:expr ),* $(,)? ) => {
-        $(
-            pub const $name: Menu = Menu::new($value);
-        )*
-
-        pub const ALL_MENUS: &[Menu] = &[
-            $( $name ),*
-        ];
-    };
-
+#[derive(Debug, Clone, Serialize, Builder, ToSchema)]
+pub struct MenuTree {
+    pub key: Menu,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<&'static str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub icon: Option<&'static str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub url: Option<&'static str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link: Option<&'static str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub redirect: Option<&'static str>,
+    #[serde(rename = "schemaApi", skip_serializing_if = "Option::is_none")]
+    pub schema_api: Option<&'static str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(no_recursion)]
+    pub children: Option<Vec<MenuTree>>,
+    #[serde(skip_serializing_if = "is_true")]
+    #[builder(default = true)]
+    pub visible: bool,
 }
 
-define_menus! {
-    NONE = 0,
-    SYSTEM = 1,
-    SYSTEM_USER = 2,
-    SYSTEM_ROLE = 3,
-    SYSTEM_STAT = 4,
-    SYSTEM_EXAMPLE = 5,
+fn is_true(b: &bool) -> bool {
+    *b
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_new() {
-        let key = Menu::new(100);
-        assert_eq!(key.0, 100);
-        assert_eq!(*key, 100);
-    }
-}
+include!(concat!(env!("OUT_DIR"), "/menus.rs"));

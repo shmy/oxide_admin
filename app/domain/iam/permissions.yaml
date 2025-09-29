@@ -1,8 +1,8 @@
 - key: system
   label: 系统
   children:
-    - label: 用户
-      key: user
+    - key: user
+      label: 用户
       children:
         - key: read
           label: 读取

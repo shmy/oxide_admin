@@ -109,8 +109,8 @@ mod request {
     }
 }
 mod response {
-    use application::iam::{dto::user::UserDto, service::menu::MenuTree};
-    use domain::iam::value_object::permission::Permission;
+    use application::iam::dto::user::UserDto;
+    use domain::iam::value_object::{menu::MenuTree, permission::Permission};
     use serde::Serialize;
     use utoipa::ToSchema;
 

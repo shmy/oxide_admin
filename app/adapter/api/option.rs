@@ -1,11 +1,8 @@
 use application::{
-    iam::{
-        query::option_roles::OptionRolesQueryHandler,
-        service::{iam_service::IamService, menu::MenuTree},
-    },
+    iam::{query::option_roles::OptionRolesQueryHandler, service::iam_service::IamService},
     shared::{dto::OptionStringDto, query_handler::QueryHandler as _},
 };
-use domain::iam::value_object::permission::PermissionTree;
+use domain::iam::value_object::{menu::MenuTree, permission::PermissionTree};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -44,7 +41,7 @@ async fn roles(
 )]
 #[tracing::instrument]
 async fn menus(Inject(service): Inject<IamService>) -> JsonResponseType<&'static [MenuTree]> {
-    let pages = service.get_all_pages();
+    let pages = service.get_all_privated_pages();
     JsonResponse::ok(pages)
 }
 

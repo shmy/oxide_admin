@@ -1,0 +1,27 @@
+private:
+  - key: 1
+    label: 系统管理
+    icon: fas fa-screwdriver-wrench
+    children:
+      - key: 2
+        label: 用户管理
+        icon: fas fa-user
+        url: /system/user
+      - key: 3
+        label: 角色管理
+        icon: fas fa-people-group
+        url: /system/role
+      - key: 4
+        label: 系统信息
+        icon: fas fa-info
+        url: /system/info
+      - key: 5
+        label: 示例页面
+        icon: fas fa-hexagon-nodes
+        url: /system/example
+
+public:
+  - key: 0
+    label: 修改密码
+    visible: false
+    url: /profile/update_password

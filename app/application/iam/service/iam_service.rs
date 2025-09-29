@@ -1,9 +1,8 @@
 use crate::error::{ApplicationError, ApplicationResult};
 use crate::iam::dto::user::UserDto;
-use crate::iam::service::menu::{MENUS, MenuTree, SHARED_MENUS};
 use crate::system::service::upload_service::UploadService;
 use bon::Builder;
-use domain::iam::value_object::menu::NONE;
+use domain::iam::value_object::menu::{Menu, MenuTree, PRIVATE_MENU_TREE, PUBLIC_MENU_TREE};
 use domain::iam::value_object::menu_group::MenuGroup;
 use domain::iam::value_object::permission::{
     ALL_PERMISSIONS, PERMISSION_TREE, Permission, PermissionTree,
@@ -62,27 +61,30 @@ impl IamService {
     }
 
     #[tracing::instrument]
-    pub fn get_all_pages(&self) -> &'static [MenuTree] {
-        MENUS.as_ref()
+    pub fn get_all_privated_pages(&self) -> &'static [MenuTree] {
+        PRIVATE_MENU_TREE.as_ref()
     }
 
     #[tracing::instrument]
     pub fn get_permission_tree(&self) -> &'static [PermissionTree] {
-        PERMISSION_TREE.as_ref()
+        PERMISSION_TREE
     }
 
     #[tracing::instrument]
     pub async fn get_available_pages(&self, user_id: &UserId) -> [MenuTree; 2] {
         let group = self.menu_resolver.resolve(user_id).await;
-        let mut pages = Self::get_available_pages_by_group(MENUS.as_ref(), &group);
-        pages.extend_from_slice(&*SHARED_MENUS);
+        let mut pages = Self::get_available_pages_by_group(PRIVATE_MENU_TREE.as_ref(), &group);
+        pages.extend_from_slice(&*PUBLIC_MENU_TREE);
         [
             MenuTree::builder()
-                .key(NONE)
+                .key(Menu::new(0))
                 .url("/")
                 .maybe_redirect(Self::find_default_path(&pages))
                 .build(),
-            MenuTree::builder().key(NONE).children(pages).build(),
+            MenuTree::builder()
+                .key(Menu::new(0))
+                .children(pages)
+                .build(),
         ]
     }
 
