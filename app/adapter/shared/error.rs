@@ -2,7 +2,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use domain::iam::error::IamError;
+use domain::system::error::IamError;
 
 use super::response::JsonResponse;
 

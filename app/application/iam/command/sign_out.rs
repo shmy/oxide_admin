@@ -1,8 +1,8 @@
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::iam::error::IamError;
-use domain::iam::event::IamEvent;
-use domain::iam::value_object::user_id::UserId;
+use domain::system::error::IamError;
+use domain::system::event::IamEvent;
+use domain::system::value_object::user_id::UserId;
 use domain::shared::port::domain_repository::DomainRepository;
 use domain::shared::port::token_store::TokenStoreTrait;
 use infrastructure::port::token_store_impl::TokenStoreImpl;

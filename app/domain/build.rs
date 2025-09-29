@@ -45,8 +45,8 @@ fn default_visible() -> bool {
 
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed=iam/permissions.yaml");
-    println!("cargo:rerun-if-changed=iam/menus.yaml");
+    println!("cargo:rerun-if-changed=system/permissions.yaml");
+    println!("cargo:rerun-if-changed=system/menus.yaml");
     generate_permissions();
     generate_menus();
 }
@@ -169,7 +169,7 @@ fn generate_permissions() {
         }
     }
 
-    let content = fs::read("iam/permissions.yaml").unwrap();
+    let content = fs::read("system/permissions.yaml").unwrap();
     let tree: Vec<PermissionItem> = serde_yaml::from_slice(&content).unwrap();
 
     generate_rust(&tree);
@@ -265,7 +265,7 @@ fn generate_menus() {
         }
     }
 
-    let content = fs::read("iam/menus.yaml").unwrap();
+    let content = fs::read("system/menus.yaml").unwrap();
     let menu: Menu = serde_yaml::from_slice(&content).unwrap();
     let mut rs = String::new();
     rs.push_str("use std::sync::LazyLock;\n");

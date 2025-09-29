@@ -1,16 +1,16 @@
 use bon::Builder;
 use chrono::NaiveDateTime;
-use domain::iam::value_object::role_id::RoleId;
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::to_inner_vec::ToInnerVec;
+use domain::system::value_object::role_id::RoleId;
 use domain::{
-    iam::{
+    shared::port::domain_repository::DomainRepository,
+    system::{
         entity::user::User,
         error::IamError,
         port::user_repository::UserRepository,
         value_object::{hashed_password::HashedPassword, user_id::UserId},
     },
-    shared::port::domain_repository::DomainRepository,
 };
 use nject::injectable;
 use sqlx::prelude::FromRow;

@@ -1,10 +1,10 @@
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::iam::error::IamError;
-use domain::iam::event::IamEvent;
-use domain::iam::{entity::user::User, value_object::user_id::UserId};
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::port::domain_repository::DomainRepository;
+use domain::system::error::IamError;
+use domain::system::event::IamEvent;
+use domain::system::{entity::user::User, value_object::user_id::UserId};
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;

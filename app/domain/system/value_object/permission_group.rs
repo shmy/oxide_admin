@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 
-use crate::iam::value_object::permission::Permission;
+use crate::system::value_object::permission::Permission;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PermissionGroup(HashSet<Permission>);

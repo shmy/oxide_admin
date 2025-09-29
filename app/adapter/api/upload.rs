@@ -3,7 +3,7 @@ use application::system::service::upload_service::{
 };
 use axum::{Json, extract::DefaultBodyLimit};
 use axum_typed_multipart::TypedMultipart;
-use domain::iam::value_object::permission::SYSTEM_FILE_UPLOAD;
+use domain::system::value_object::permission::SYSTEM_FILE_UPLOAD;
 use utoipa_axum::{
     router::{OpenApiRouter, UtoipaMethodRouterExt},
     routes,

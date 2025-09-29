@@ -110,7 +110,7 @@ mod request {
 }
 mod response {
     use application::iam::dto::user::UserDto;
-    use domain::iam::value_object::{menu::MenuTree, permission::Permission};
+    use domain::system::value_object::{menu::MenuTree, permission::Permission};
     use serde::Serialize;
     use utoipa::ToSchema;
 

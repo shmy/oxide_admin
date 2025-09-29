@@ -1,4 +1,4 @@
-use domain::iam::value_object::role_id::RoleId;
+use domain::system::value_object::role_id::RoleId;
 use serde::{Deserialize, Serialize};
 use sqlx::{prelude::FromRow, types::chrono::NaiveDateTime};
 use utoipa::ToSchema;

@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use bon::Builder;
-use domain::iam::{error::IamError, value_object::role_id::RoleId};
+use domain::system::{error::IamError, value_object::role_id::RoleId};
 use infrastructure::shared::pg_pool::PgPool;
 use kvdb_kit::Kvdb;
 use nject::injectable;

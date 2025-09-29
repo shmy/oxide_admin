@@ -1,10 +1,10 @@
 use crate::iam::dto::role::RoleDto;
 use crate::shared::query_handler::QueryHandler;
 use bon::Builder;
-use domain::iam::error::IamError;
-use domain::iam::value_object::menu::Menu;
-use domain::iam::value_object::permission::Permission;
-use domain::iam::value_object::role_id::RoleId;
+use domain::system::error::IamError;
+use domain::system::value_object::menu::Menu;
+use domain::system::value_object::permission::Permission;
+use domain::system::value_object::role_id::RoleId;
 use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
 use serde::Deserialize;

@@ -1,6 +1,6 @@
 use bon::Builder;
-use domain::iam::port::user_repository::UserRepository;
-use domain::iam::{error::IamError, event::IamEvent, value_object::user_id::UserId};
+use domain::system::port::user_repository::UserRepository;
+use domain::system::{error::IamError, event::IamEvent, value_object::user_id::UserId};
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;

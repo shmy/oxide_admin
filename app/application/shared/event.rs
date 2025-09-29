@@ -1,6 +1,6 @@
 use std::sync::LazyLock;
 
-use domain::iam::event::IamEvent;
+use domain::system::event::IamEvent;
 use infrastructure::shared::event_bus::EventBus;
 
 pub static EVENT_BUS: LazyLock<EventBus<Event>> = LazyLock::new(|| EventBus::new(64));

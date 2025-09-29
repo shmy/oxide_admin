@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::fmt::Display;
 
-use crate::iam::value_object::menu_group::MenuGroup;
-use crate::iam::value_object::user_id::UserId;
+use crate::system::value_object::menu_group::MenuGroup;
+use crate::system::value_object::user_id::UserId;
 
 pub type MenunMap = HashMap<UserId, MenuGroup>;
 

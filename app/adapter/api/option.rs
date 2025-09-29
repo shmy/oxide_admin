@@ -2,7 +2,7 @@ use application::{
     iam::{query::option_roles::OptionRolesQueryHandler, service::iam_service::IamService},
     shared::{dto::OptionStringDto, query_handler::QueryHandler as _},
 };
-use domain::iam::value_object::{menu::MenuTree, permission::PermissionTree};
+use domain::system::value_object::{menu::MenuTree, permission::PermissionTree};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{

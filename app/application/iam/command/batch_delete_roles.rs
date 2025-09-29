@@ -1,6 +1,6 @@
 use bon::Builder;
 use domain::{
-    iam::{error::IamError, event::IamEvent, value_object::role_id::RoleId},
+    system::{error::IamError, event::IamEvent, value_object::role_id::RoleId},
     shared::port::domain_repository::DomainRepository,
 };
 use infrastructure::repository::system::role_repository::RoleRepositoryImpl;

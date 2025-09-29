@@ -22,7 +22,7 @@ use axum::{
     Json,
     extract::{Path, Query},
 };
-use domain::iam::value_object::{
+use domain::system::value_object::{
     permission::{
         SYSTEM_ROLE_CREATE, SYSTEM_ROLE_DELETE, SYSTEM_ROLE_DISABLE, SYSTEM_ROLE_ENABLE,
         SYSTEM_ROLE_READ, SYSTEM_ROLE_UPDATE,

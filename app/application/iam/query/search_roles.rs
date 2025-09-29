@@ -1,5 +1,5 @@
 use bon::Builder;
-use domain::iam::{
+use domain::system::{
     error::IamError, value_object::menu::Menu, value_object::permission::Permission,
 };
 use infrastructure::shared::pg_pool::PgPool;

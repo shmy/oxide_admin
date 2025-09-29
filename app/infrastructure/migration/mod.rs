@@ -1,10 +1,10 @@
 use std::ops::Deref;
 
 use crate::error::InfrastructureResult;
-use domain::iam::entity::user::User;
-use domain::iam::value_object::hashed_password::HashedPassword;
-use domain::iam::value_object::user_id::UserId;
-use domain::iam::{entity::role::Role, value_object::role_id::RoleId};
+use domain::system::entity::user::User;
+use domain::system::value_object::hashed_password::HashedPassword;
+use domain::system::value_object::user_id::UserId;
+use domain::system::{entity::role::Role, value_object::role_id::RoleId};
 use domain::shared::port::domain_repository::DomainRepository;
 use tracing::info;
 

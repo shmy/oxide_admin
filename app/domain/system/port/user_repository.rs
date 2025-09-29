@@ -1,5 +1,5 @@
 use crate::{
-    iam::value_object::user_id::UserId,
+    system::value_object::user_id::UserId,
     shared::{event_util::UpdatedEvent, port::domain_repository::DomainRepository},
 };
 

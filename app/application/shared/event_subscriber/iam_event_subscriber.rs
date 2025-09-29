@@ -5,7 +5,7 @@ use crate::{
 };
 use bon::Builder;
 use domain::shared::port::menu_resolver::MenuResolver;
-use domain::{iam::event::IamEvent, shared::port::permission_resolver::PermissionResolver};
+use domain::{system::event::IamEvent, shared::port::permission_resolver::PermissionResolver};
 use infrastructure::{error::InfrastructureResult, port::menu_resolver_impl::MenuResolverImpl};
 use infrastructure::{
     port::permission_resolver_impl::PermissionResolverImpl, shared::event_bus::EventSubscriber,

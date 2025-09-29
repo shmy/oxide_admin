@@ -1,8 +1,8 @@
 use crate::iam::dto::user::UserDto;
 use crate::shared::query_handler::QueryHandler;
 use bon::Builder;
-use domain::iam::value_object::user_id::UserId;
-use domain::iam::{error::IamError, value_object::role_id::RoleId};
+use domain::system::value_object::user_id::UserId;
+use domain::system::{error::IamError, value_object::role_id::RoleId};
 use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
 use serde::Deserialize;

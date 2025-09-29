@@ -1,7 +1,7 @@
 use bon::Builder;
 use captcha_kit::CaptchaTrait as _;
 use domain::{
-    iam::error::IamError,
+    system::error::IamError,
     shared::{
         id_generator::IdGenerator,
         port::captcha_issuer::{Captcha, CaptchaIssuerTrait},

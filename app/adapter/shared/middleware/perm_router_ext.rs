@@ -6,7 +6,7 @@ use axum::extract::Request;
 use axum::middleware;
 use axum::middleware::Next;
 use axum::response::Response;
-use domain::iam::value_object::permission_group::{PermissionChecker, PermissionGroup};
+use domain::system::value_object::permission_group::{PermissionChecker, PermissionGroup};
 use utoipa_axum::router::{OpenApiRouter, UtoipaMethodRouter};
 
 pub trait PermissonRouteExt {
@@ -87,6 +87,6 @@ impl PermissonRouteExt for OpenApiRouter<WebState> {
 #[macro_export]
 macro_rules! perms {
     ($($p:expr),*) => {
-        domain::iam::value_object::permission_group::PermissionGroup::new(std::collections::HashSet::from([$($p),*]))
+        domain::system::value_object::permission_group::PermissionGroup::new(std::collections::HashSet::from([$($p),*]))
     };
 }

@@ -1,4 +1,4 @@
-use crate::iam::{
+use crate::system::{
     error::IamError,
     value_object::{hashed_password::HashedPassword, role_id::RoleId, user_id::UserId},
 };
@@ -77,7 +77,7 @@ mod tests {
     use std::time::Duration;
 
     use super::*;
-    use crate::iam::value_object::{hashed_password::PasswordError, role_id::RoleId};
+    use crate::system::value_object::{hashed_password::PasswordError, role_id::RoleId};
 
     #[test]
     fn test_update_account() {

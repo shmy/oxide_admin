@@ -24,7 +24,7 @@ use axum::{
     Json,
     extract::{Path, Query},
 };
-use domain::iam::value_object::{
+use domain::system::value_object::{
     permission::{
         SYSTEM_USER_CREATE, SYSTEM_USER_DELETE, SYSTEM_USER_DISABLE, SYSTEM_USER_ENABLE,
         SYSTEM_USER_READ, SYSTEM_USER_UPDATE, SYSTEM_USER_UPDATE_PASSWORD,

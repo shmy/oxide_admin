@@ -1,4 +1,4 @@
-use crate::iam::value_object::hashed_password::PasswordError;
+use crate::system::value_object::hashed_password::PasswordError;
 
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum IamError {

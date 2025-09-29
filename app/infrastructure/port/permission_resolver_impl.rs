@@ -1,10 +1,10 @@
 use crate::error::{InfrastructureError, InfrastructureResult};
 use bon::Builder;
-use domain::iam::error::IamError;
-use domain::iam::value_object::permission::{ALL_PERMISSIONS, Permission};
-use domain::iam::value_object::permission_group::PermissionGroup;
-use domain::iam::value_object::role_id::RoleId;
-use domain::iam::value_object::user_id::UserId;
+use domain::system::error::IamError;
+use domain::system::value_object::permission::{ALL_PERMISSIONS, Permission};
+use domain::system::value_object::permission_group::PermissionGroup;
+use domain::system::value_object::role_id::RoleId;
+use domain::system::value_object::user_id::UserId;
 use domain::shared::port::permission_resolver::PermissionResolver;
 use domain::shared::to_inner_vec::ToInnerVec as _;
 use kvdb_kit::{Kvdb, KvdbTrait as _};
@@ -115,7 +115,7 @@ struct RoleRecord {
 #[cfg(test)]
 mod tests {
     use domain::{
-        iam::{
+        system::{
             entity::{role::Role, user::User},
             value_object::hashed_password::HashedPassword,
         },

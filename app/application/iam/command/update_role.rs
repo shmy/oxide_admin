@@ -1,9 +1,9 @@
 use bon::Builder;
-use domain::iam::error::IamError;
-use domain::iam::value_object::menu::Menu;
-use domain::iam::value_object::permission::Permission;
-use domain::iam::value_object::role_id::RoleId;
-use domain::iam::{entity::role::Role, event::IamEvent};
+use domain::system::error::IamError;
+use domain::system::value_object::menu::Menu;
+use domain::system::value_object::permission::Permission;
+use domain::system::value_object::role_id::RoleId;
+use domain::system::{entity::role::Role, event::IamEvent};
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::system::role_repository::RoleRepositoryImpl;

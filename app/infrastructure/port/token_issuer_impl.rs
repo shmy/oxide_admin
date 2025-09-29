@@ -1,6 +1,6 @@
 use bon::Builder;
 use domain::{
-    iam::error::IamError,
+    system::error::IamError,
     shared::port::token_issuer::{TokenIssuerOutput, TokenIssuerTrait, UserClaims},
 };
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};

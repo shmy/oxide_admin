@@ -1,4 +1,4 @@
-use domain::iam::error::IamError;
+use domain::system::error::IamError;
 use infrastructure::error::InfrastructureError;
 use kvdb_kit::error::KvdbError;
 use object_storage_kit::error::ObjectStorageError;

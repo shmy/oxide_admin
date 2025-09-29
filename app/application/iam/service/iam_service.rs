@@ -2,13 +2,13 @@ use crate::error::{ApplicationError, ApplicationResult};
 use crate::iam::dto::user::UserDto;
 use crate::system::service::upload_service::UploadService;
 use bon::Builder;
-use domain::iam::value_object::menu::{Menu, MenuTree, PRIVATE_MENU_TREE, PUBLIC_MENU_TREE};
-use domain::iam::value_object::menu_group::MenuGroup;
-use domain::iam::value_object::permission::{
+use domain::system::value_object::menu::{Menu, MenuTree, PRIVATE_MENU_TREE, PUBLIC_MENU_TREE};
+use domain::system::value_object::menu_group::MenuGroup;
+use domain::system::value_object::permission::{
     ALL_PERMISSIONS, PERMISSION_TREE, Permission, PermissionTree,
 };
-use domain::iam::value_object::permission_group::PermissionChecker;
-use domain::iam::value_object::user_id::UserId;
+use domain::system::value_object::permission_group::PermissionChecker;
+use domain::system::value_object::user_id::UserId;
 use domain::shared::port::menu_resolver::MenuResolver;
 use domain::shared::port::permission_resolver::PermissionResolver;
 use domain::shared::port::token_issuer::{TokenIssuerTrait, UserClaims};

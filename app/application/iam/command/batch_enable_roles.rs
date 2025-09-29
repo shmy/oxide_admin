@@ -1,8 +1,8 @@
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::iam::port::role_repository::RoleRepository;
-use domain::iam::value_object::role_id::RoleId;
-use domain::iam::{error::IamError, event::IamEvent};
+use domain::system::port::role_repository::RoleRepository;
+use domain::system::value_object::role_id::RoleId;
+use domain::system::{error::IamError, event::IamEvent};
 use infrastructure::repository::system::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;

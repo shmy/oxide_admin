@@ -1,5 +1,5 @@
 use bon::Builder;
-use domain::iam::error::IamError;
+use domain::system::error::IamError;
 use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
 use single_flight::single_flight;

@@ -1,6 +1,6 @@
 use bon::Builder;
 
-use crate::iam::{
+use crate::system::{
     error::IamError,
     value_object::{menu::Menu, permission::Permission, role_id::RoleId},
 };
@@ -44,7 +44,7 @@ impl Role {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::iam::value_object::permission::Permission;
+    use crate::system::value_object::permission::Permission;
 
     #[test]
     fn test_update_name() {

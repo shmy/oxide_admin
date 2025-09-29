@@ -1,8 +1,8 @@
 use bon::Builder;
-use domain::iam::error::IamError;
-use domain::iam::event::IamEvent;
-use domain::iam::value_object::role_id::RoleId;
-use domain::iam::{
+use domain::system::error::IamError;
+use domain::system::event::IamEvent;
+use domain::system::value_object::role_id::RoleId;
+use domain::system::{
     entity::user::User, value_object::hashed_password::HashedPassword,
     value_object::user_id::UserId,
 };
