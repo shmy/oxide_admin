@@ -3,6 +3,7 @@ use cruet::Inflector as _;
 use minijinja::Value;
 use proc_macro2::Span;
 use quote::quote;
+use serde::{Deserialize, Serialize};
 use std::{fs, path::Path};
 use syn::{Ident, Item, ItemEnum, parse_file, parse_str};
 
@@ -33,6 +34,15 @@ pub async fn generate_domain(context: Value) -> Result<()> {
             .join("domain")
             .join(&module)
             .join("event.rs")
+            .as_path(),
+        &module,
+        &entity,
+    )?;
+    append_permissions(
+        APP_DIR
+            .join("domain")
+            .join("system")
+            .join("permissions.yaml")
             .as_path(),
         &module,
         &entity,
@@ -181,4 +191,81 @@ fn append_event(path: &Path, module: &str, entity: &str) -> Result<()> {
     fs::write(path, format!("{}\n{}", import_code.join("\n"), formatted))?;
 
     Ok(())
+}
+
+fn append_permissions(path: &Path, module: &str, entity: &str) -> Result<()> {
+    let content = fs::read(path)?;
+    fn insert_permission(item: &mut PermissionItem) {
+        let value = 1000;
+        item.children.extend_from_slice(&[
+            PermissionItem {
+                label: "读取".to_string(),
+                key: "read".to_string(),
+                value: Some(value),
+                children: vec![],
+            },
+            PermissionItem {
+                label: "创建".to_string(),
+                key: "create".to_string(),
+                value: Some(value + 1),
+                children: vec![],
+            },
+            PermissionItem {
+                label: "更新".to_string(),
+                key: "update".to_string(),
+                value: Some(value + 2),
+                children: vec![],
+            },
+            PermissionItem {
+                label: "删除".to_string(),
+                key: "delete".to_string(),
+                value: Some(value + 3),
+                children: vec![],
+            },
+        ]);
+    }
+
+    fn insert_entity(items: &mut Vec<PermissionItem>, module: &str, entity: &str) {
+        items.push(PermissionItem {
+            label: module.to_pascal_case(),
+            key: module.to_string(),
+            value: None,
+            children: vec![PermissionItem {
+                label: entity.to_pascal_case(),
+                key: entity.to_string(),
+                value: None,
+                children: vec![],
+            }],
+        });
+    }
+    let mut tree: Vec<PermissionItem> = serde_yaml::from_slice(&content)?;
+    let mut exisit: bool = false;
+    for ele in tree.iter_mut() {
+        if ele.key == module {
+            for ele in ele.children.iter_mut() {
+                if ele.key == entity {
+                    insert_permission(ele);
+                    exisit = true;
+                    break;
+                }
+            }
+        }
+    }
+    if !exisit {
+        insert_entity(&mut tree, module, entity);
+        insert_permission(tree.last_mut().unwrap().children.last_mut().unwrap());
+    }
+    let content = serde_yaml::to_string(&tree)?;
+    fs::write(path, content)?;
+    Ok(())
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PermissionItem {
+    label: String,
+    key: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    value: Option<i32>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    children: Vec<PermissionItem>,
 }

@@ -18,7 +18,7 @@ clap = { workspace = true, features = [
 ] }
 cruet = { version = "0.15", default-features = false }
 dotenvy = { workspace = true }
-inquire = { version = "0.8", default-features = false, features = [
+inquire = { version = "0.9", default-features = false, features = [
     "crossterm",
 ] }
 minijinja = { version = "2.11", default-features = false, features = [
@@ -26,6 +26,8 @@ minijinja = { version = "2.11", default-features = false, features = [
     "loader",
     "builtins",
 ] }
+
+serde_yaml = { version = "0.9.34-deprecated", default-features = false }
 
 prettyplease = { version = "0.2", default-features = false }
 proc-macro2 = { version = "1.0", default-features = false }
