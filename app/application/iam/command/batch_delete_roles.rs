@@ -1,7 +1,7 @@
 use bon::Builder;
 use domain::{
     shared::port::domain_repository::DomainRepository,
-    system::{error::SystemError, event::IamEvent, value_object::role_id::RoleId},
+    system::{error::SystemError, event::SystemEvent, value_object::role_id::RoleId},
 };
 use infrastructure::repository::system::role_repository::RoleRepositoryImpl;
 use nject::injectable;
@@ -24,7 +24,7 @@ pub struct BatchDeleteRolesCommandHandler {
 impl CommandHandler for BatchDeleteRolesCommandHandler {
     type Command = BatchDeleteRolesCommand;
     type Output = ();
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
 
     #[tracing::instrument]
@@ -35,7 +35,7 @@ impl CommandHandler for BatchDeleteRolesCommandHandler {
         let items = self.role_repository.batch_delete(&cmd.ids).await?;
         Ok(CommandResult::with_event(
             (),
-            IamEvent::RolesDeleted { items },
+            SystemEvent::RolesDeleted { items },
         ))
     }
 }

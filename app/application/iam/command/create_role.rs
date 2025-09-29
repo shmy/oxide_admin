@@ -1,7 +1,7 @@
 use bon::Builder;
 use domain::shared::port::domain_repository::DomainRepository;
 use domain::system::error::SystemError;
-use domain::system::event::IamEvent;
+use domain::system::event::SystemEvent;
 use domain::system::value_object::menu::Menu;
 use domain::system::value_object::permission::Permission;
 use domain::system::{entity::role::Role, value_object::role_id::RoleId};
@@ -29,7 +29,7 @@ pub struct CreateRoleCommandHandler {
 impl CommandHandler for CreateRoleCommandHandler {
     type Command = CreateRoleCommand;
     type Output = Role;
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
 
     #[tracing::instrument]
@@ -48,7 +48,7 @@ impl CommandHandler for CreateRoleCommandHandler {
         let role = self.role_repository.save(role).await?;
         Ok(CommandResult::with_event(
             role.clone(),
-            IamEvent::RolesCreated { items: vec![role] },
+            SystemEvent::RolesCreated { items: vec![role] },
         ))
     }
 }

@@ -1,7 +1,7 @@
 use bon::Builder;
 use domain::{
     shared::port::domain_repository::DomainRepository,
-    system::{error::SystemError, event::IamEvent, value_object::user_id::UserId},
+    system::{error::SystemError, event::SystemEvent, value_object::user_id::UserId},
 };
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
@@ -24,7 +24,7 @@ pub struct BatchDeleteUsersCommandHandler {
 impl CommandHandler for BatchDeleteUsersCommandHandler {
     type Command = BatchDeleteUsersCommand;
     type Output = ();
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
 
     #[tracing::instrument]
@@ -35,7 +35,7 @@ impl CommandHandler for BatchDeleteUsersCommandHandler {
         let items = self.user_repository.batch_delete(&cmd.ids).await?;
         Ok(CommandResult::with_event(
             (),
-            IamEvent::UsersDeleted { items },
+            SystemEvent::UsersDeleted { items },
         ))
     }
 }

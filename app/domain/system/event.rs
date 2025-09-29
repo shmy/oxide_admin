@@ -1,13 +1,13 @@
 use crate::{
+    shared::event_util::UpdatedEvent,
     system::{
         entity::{role::Role, user::User},
         value_object::user_id::UserId,
     },
-    shared::event_util::UpdatedEvent,
 };
 
 #[derive(Debug, Clone)]
-pub enum IamEvent {
+pub enum SystemEvent {
     UsersCreated { items: Vec<User> },
     UsersUpdated { items: Vec<UpdatedEvent<User>> },
     UsersDeleted { items: Vec<User> },

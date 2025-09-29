@@ -2,7 +2,7 @@ use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::system::port::role_repository::RoleRepository;
 use domain::system::value_object::role_id::RoleId;
-use domain::system::{error::SystemError, event::IamEvent};
+use domain::system::{error::SystemError, event::SystemEvent};
 use infrastructure::repository::system::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
@@ -22,7 +22,7 @@ pub struct BatchEnableRolesCommandHandler {
 impl CommandHandler for BatchEnableRolesCommandHandler {
     type Command = BatchEnableRolesCommand;
     type Output = ();
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
 
     #[tracing::instrument]
@@ -33,7 +33,7 @@ impl CommandHandler for BatchEnableRolesCommandHandler {
         let items = self.role_repository.toggle_enabled(&cmd.ids, true).await?;
         Ok(CommandResult::with_event(
             (),
-            IamEvent::RolesUpdated { items },
+            SystemEvent::RolesUpdated { items },
         ))
     }
 }

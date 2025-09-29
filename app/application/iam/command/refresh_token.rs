@@ -3,7 +3,7 @@ use bon::Builder;
 use domain::shared::port::domain_repository::DomainRepository;
 use domain::shared::port::token_issuer::TokenIssuerTrait;
 use domain::shared::port::token_store::TokenStoreTrait;
-use domain::system::event::IamEvent;
+use domain::system::event::SystemEvent;
 use domain::system::port::user_repository::UserRepository;
 use domain::{shared::port::token_issuer::TokenIssuerOutput, system::error::SystemError};
 use infrastructure::port::token_issuer_impl::TokenIssuerImpl;
@@ -29,7 +29,7 @@ pub struct RefreshTokenCommandHandler {
 impl CommandHandler for RefreshTokenCommandHandler {
     type Command = RefreshTokenCommand;
     type Output = TokenIssuerOutput;
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
     #[tracing::instrument]
     async fn execute(
@@ -58,7 +58,7 @@ impl CommandHandler for RefreshTokenCommandHandler {
         )?;
         Ok(CommandResult::with_event(
             token_output,
-            IamEvent::UserRefreshTokenSucceeded { id },
+            SystemEvent::UserRefreshTokenSucceeded { id },
         ))
     }
 }

@@ -3,7 +3,7 @@ use bon::Builder;
 use domain::shared::port::domain_repository::DomainRepository;
 use domain::shared::port::token_store::TokenStoreTrait;
 use domain::system::error::SystemError;
-use domain::system::event::IamEvent;
+use domain::system::event::SystemEvent;
 use domain::system::value_object::user_id::UserId;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
@@ -25,7 +25,7 @@ pub struct SignOutCommandHandler {
 impl CommandHandler for SignOutCommandHandler {
     type Command = SignOutCommand;
     type Output = ();
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
 
     #[tracing::instrument]
@@ -44,7 +44,7 @@ impl CommandHandler for SignOutCommandHandler {
         }
         Ok(CommandResult::with_event(
             (),
-            IamEvent::UserLogoutSucceeded { id },
+            SystemEvent::UserLogoutSucceeded { id },
         ))
     }
 }

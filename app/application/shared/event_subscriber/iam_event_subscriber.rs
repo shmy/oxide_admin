@@ -5,7 +5,7 @@ use crate::{
 };
 use bon::Builder;
 use domain::shared::port::menu_resolver::MenuResolver;
-use domain::{system::event::IamEvent, shared::port::permission_resolver::PermissionResolver};
+use domain::{shared::port::permission_resolver::PermissionResolver, system::event::SystemEvent};
 use infrastructure::{error::InfrastructureResult, port::menu_resolver_impl::MenuResolverImpl};
 use infrastructure::{
     port::permission_resolver_impl::PermissionResolverImpl, shared::event_bus::EventSubscriber,
@@ -23,30 +23,30 @@ pub struct IamEventSubscriber {
 }
 
 impl IamEventSubscriber {
-    fn is_users_changed(event: &IamEvent) -> bool {
+    fn is_users_changed(event: &SystemEvent) -> bool {
         matches!(
             event,
-            IamEvent::UsersCreated { .. }
-                | IamEvent::UsersUpdated { .. }
-                | IamEvent::UsersDeleted { .. }
+            SystemEvent::UsersCreated { .. }
+                | SystemEvent::UsersUpdated { .. }
+                | SystemEvent::UsersDeleted { .. }
         )
     }
 
-    fn is_roles_changed(event: &IamEvent) -> bool {
+    fn is_roles_changed(event: &SystemEvent) -> bool {
         matches!(
             event,
-            IamEvent::RolesCreated { .. }
-                | IamEvent::RolesUpdated { .. }
-                | IamEvent::RolesDeleted { .. }
+            SystemEvent::RolesCreated { .. }
+                | SystemEvent::RolesUpdated { .. }
+                | SystemEvent::RolesDeleted { .. }
         )
     }
-    fn is_permission_changed(event: &IamEvent) -> bool {
+    fn is_permission_changed(event: &SystemEvent) -> bool {
         matches!(
             event,
-            IamEvent::UsersUpdated { .. }
-                | IamEvent::UsersDeleted { .. }
-                | IamEvent::RolesUpdated { .. }
-                | IamEvent::RolesDeleted { .. }
+            SystemEvent::UsersUpdated { .. }
+                | SystemEvent::UsersDeleted { .. }
+                | SystemEvent::RolesUpdated { .. }
+                | SystemEvent::RolesDeleted { .. }
         )
     }
 }
@@ -70,7 +70,7 @@ impl EventSubscriber<Event> for IamEventSubscriber {
                 let _ = self.search_role_query_handler.clean_cache().await;
             }
             match e {
-                IamEvent::UsersCreated { items } => {
+                SystemEvent::UsersCreated { items } => {
                     let paths = items
                         .into_iter()
                         .filter_map(|item| item.portrait.clone())
@@ -79,7 +79,7 @@ impl EventSubscriber<Event> for IamEventSubscriber {
                         tracing::error!(error = %err, "UsersCreated: failed to set files used");
                     }
                 }
-                IamEvent::UsersUpdated { items } => {
+                SystemEvent::UsersUpdated { items } => {
                     let (mut unused_paths, mut used_paths) = (Vec::new(), Vec::new());
 
                     for item in items {
@@ -105,7 +105,7 @@ impl EventSubscriber<Event> for IamEventSubscriber {
                         tracing::error!(error = %err, "UsersUpdated: failed to set files used");
                     }
                 }
-                IamEvent::UsersDeleted { items } => {
+                SystemEvent::UsersDeleted { items } => {
                     let paths = items
                         .into_iter()
                         .filter_map(|item| item.portrait.clone())

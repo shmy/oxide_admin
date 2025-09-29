@@ -3,7 +3,7 @@ use bon::Builder;
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::port::domain_repository::DomainRepository;
 use domain::system::error::SystemError;
-use domain::system::event::IamEvent;
+use domain::system::event::SystemEvent;
 use domain::system::{entity::user::User, value_object::user_id::UserId};
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
@@ -26,7 +26,7 @@ pub struct UpdateUserSelfPasswordCommandHandler {
 impl CommandHandler for UpdateUserSelfPasswordCommandHandler {
     type Command = UpdateUserSelfPasswordCommand;
     type Output = User;
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
 
     #[tracing::instrument]
@@ -52,7 +52,7 @@ impl CommandHandler for UpdateUserSelfPasswordCommandHandler {
         let user = self.user_repository.save(user).await?;
         Ok(CommandResult::with_event(
             user.clone(),
-            IamEvent::UsersUpdated {
+            SystemEvent::UsersUpdated {
                 items: vec![UpdatedEvent {
                     before,
                     after: user,

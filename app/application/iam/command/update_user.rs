@@ -4,7 +4,7 @@ use bon::Builder;
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::port::domain_repository::DomainRepository;
 use domain::system::error::SystemError;
-use domain::system::event::IamEvent;
+use domain::system::event::SystemEvent;
 use domain::system::value_object::role_id::RoleId;
 use domain::system::{entity::user::User, value_object::user_id::UserId};
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
@@ -37,7 +37,7 @@ pub struct UpdateUserCommandHandler {
 impl CommandHandler for UpdateUserCommandHandler {
     type Command = UpdateUserCommand;
     type Output = User;
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
 
     #[tracing::instrument]
@@ -76,7 +76,7 @@ impl CommandHandler for UpdateUserCommandHandler {
         }
         Ok(CommandResult::with_event(
             user.clone(),
-            IamEvent::UsersUpdated {
+            SystemEvent::UsersUpdated {
                 items: vec![UpdatedEvent {
                     before,
                     after: user,

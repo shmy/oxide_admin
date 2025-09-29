@@ -4,7 +4,7 @@ use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::shared::port::captcha_issuer::{Captcha, CaptchaIssuerTrait as _};
 use domain::system::error::SystemError;
-use domain::system::event::IamEvent;
+use domain::system::event::SystemEvent;
 use infrastructure::port::captcha_issuer_impl::CaptchaIssuerImpl;
 use nject::injectable;
 use serde::Deserialize;
@@ -20,7 +20,7 @@ pub struct RefreshCaptchaCommandHandler {
 impl CommandHandler for RefreshCaptchaCommandHandler {
     type Command = RefreshCaptchaCommand;
     type Output = Captcha;
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
     #[tracing::instrument]
     async fn execute(

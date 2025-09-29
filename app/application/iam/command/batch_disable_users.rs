@@ -2,7 +2,7 @@ use crate::iam::command::sign_out::{SignOutCommand, SignOutCommandHandler};
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::system::port::user_repository::UserRepository;
-use domain::system::{error::SystemError, event::IamEvent, value_object::user_id::UserId};
+use domain::system::{error::SystemError, event::SystemEvent, value_object::user_id::UserId};
 use futures_util::StreamExt as _;
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
@@ -23,7 +23,7 @@ pub struct BatchDisableUsersCommandHandler {
 impl CommandHandler for BatchDisableUsersCommandHandler {
     type Command = BatchDisableUsersCommand;
     type Output = ();
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
 
     #[tracing::instrument]
@@ -43,7 +43,7 @@ impl CommandHandler for BatchDisableUsersCommandHandler {
             .await;
         Ok(CommandResult::with_event(
             (),
-            IamEvent::UsersUpdated { items },
+            SystemEvent::UsersUpdated { items },
         ))
     }
 }

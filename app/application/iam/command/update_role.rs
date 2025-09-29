@@ -5,7 +5,7 @@ use domain::system::error::SystemError;
 use domain::system::value_object::menu::Menu;
 use domain::system::value_object::permission::Permission;
 use domain::system::value_object::role_id::RoleId;
-use domain::system::{entity::role::Role, event::IamEvent};
+use domain::system::{entity::role::Role, event::SystemEvent};
 use infrastructure::repository::system::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
@@ -31,7 +31,7 @@ pub struct UpdateRoleCommandHandler {
 impl CommandHandler for UpdateRoleCommandHandler {
     type Command = UpdateRoleCommand;
     type Output = Role;
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
 
     #[tracing::instrument]
@@ -60,7 +60,7 @@ impl CommandHandler for UpdateRoleCommandHandler {
         let role = self.role_repository.save(role).await?;
         Ok(CommandResult::with_event(
             role.clone(),
-            IamEvent::RolesUpdated {
+            SystemEvent::RolesUpdated {
                 items: vec![UpdatedEvent {
                     before,
                     after: role,

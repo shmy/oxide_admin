@@ -7,7 +7,7 @@ use domain::shared::port::domain_repository::DomainRepository;
 use domain::shared::port::token_issuer::{TokenIssuerOutput, TokenIssuerTrait};
 use domain::shared::port::token_store::TokenStoreTrait;
 use domain::system::error::SystemError;
-use domain::system::event::IamEvent;
+use domain::system::event::SystemEvent;
 use domain::system::port::user_repository::UserRepository;
 use infrastructure::port::captcha_issuer_impl::CaptchaIssuerImpl;
 use infrastructure::port::token_issuer_impl::TokenIssuerImpl;
@@ -48,7 +48,7 @@ pub struct SignInCommandHandler {
 impl CommandHandler for SignInCommandHandler {
     type Command = SignInCommand;
     type Output = TokenIssuerOutput;
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
 
     #[tracing::instrument]
@@ -78,7 +78,7 @@ impl CommandHandler for SignInCommandHandler {
         )?;
         Ok(CommandResult::with_event(
             token_output,
-            IamEvent::UserLoginSucceeded { id },
+            SystemEvent::UserLoginSucceeded { id },
         ))
     }
 }

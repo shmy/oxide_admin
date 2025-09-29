@@ -1,7 +1,7 @@
 use bon::Builder;
 use domain::shared::port::domain_repository::DomainRepository;
 use domain::system::error::SystemError;
-use domain::system::event::IamEvent;
+use domain::system::event::SystemEvent;
 use domain::system::value_object::role_id::RoleId;
 use domain::system::{
     entity::user::User, value_object::hashed_password::HashedPassword,
@@ -35,7 +35,7 @@ pub struct CreateUserCommandHandler {
 impl CommandHandler for CreateUserCommandHandler {
     type Command = CreateUserCommand;
     type Output = User;
-    type Event = IamEvent;
+    type Event = SystemEvent;
     type Error = SystemError;
 
     #[tracing::instrument]
@@ -57,7 +57,7 @@ impl CommandHandler for CreateUserCommandHandler {
         let user = self.user_repository.save(user).await?;
         Ok(CommandResult::with_event(
             user.clone(),
-            IamEvent::UsersCreated { items: vec![user] },
+            SystemEvent::UsersCreated { items: vec![user] },
         ))
     }
 }
