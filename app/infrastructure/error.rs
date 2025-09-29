@@ -1,4 +1,4 @@
-use domain::system::{error::IamError, value_object::hashed_password::PasswordError};
+use domain::system::{error::SystemError, value_object::hashed_password::PasswordError};
 use kvdb_kit::error::KvdbError;
 
 pub type InfrastructureResult<T> = std::result::Result<T, InfrastructureError>;
@@ -15,7 +15,7 @@ pub enum InfrastructureError {
     Migrate(#[from] sqlx::migrate::MigrateError),
 
     #[error("{0}")]
-    Iam(#[from] IamError),
+    System(#[from] SystemError),
 
     #[error("{0}")]
     Password(#[from] PasswordError),

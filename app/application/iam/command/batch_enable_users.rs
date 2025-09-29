@@ -1,6 +1,6 @@
 use bon::Builder;
 use domain::system::port::user_repository::UserRepository;
-use domain::system::{error::IamError, event::IamEvent, value_object::user_id::UserId};
+use domain::system::{error::SystemError, event::IamEvent, value_object::user_id::UserId};
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
@@ -23,7 +23,7 @@ impl CommandHandler for BatchEnableUsersCommandHandler {
     type Command = BatchEnableUsersCommand;
     type Output = ();
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(

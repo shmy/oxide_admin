@@ -1,6 +1,6 @@
 use bon::Builder;
 use domain::system::{
-    error::IamError, value_object::menu::Menu, value_object::permission::Permission,
+    error::SystemError, value_object::menu::Menu, value_object::permission::Permission,
 };
 use infrastructure::shared::pg_pool::PgPool;
 use kvdb_kit::Kvdb;
@@ -52,11 +52,11 @@ pub struct SearchRolesQueryHandler {
 impl QueryHandler for SearchRolesQueryHandler {
     type Query = SearchRolesQuery;
     type Output = PagingResult<RoleDto>;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[single_flight]
     #[tracing::instrument]
-    async fn query(&self, query: SearchRolesQuery) -> Result<PagingResult<RoleDto>, IamError> {
+    async fn query(&self, query: SearchRolesQuery) -> Result<PagingResult<RoleDto>, SystemError> {
         let total_future = sqlx::query_scalar!(
             r#"
             SELECT COUNT(*) AS "count!"
@@ -114,7 +114,7 @@ impl SearchRolesQueryHandler {
     pub async fn query_cached(
         &self,
         query: SearchRolesQuery,
-    ) -> Result<PagingResult<RoleDto>, IamError> {
+    ) -> Result<PagingResult<RoleDto>, SystemError> {
         self.cache_provider.get_with(query, |q| self.query(q)).await
     }
 }

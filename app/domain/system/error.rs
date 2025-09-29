@@ -1,7 +1,7 @@
 use crate::system::value_object::hashed_password::PasswordError;
 
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
-pub enum IamError {
+pub enum SystemError {
     #[error("用户不存在")]
     UserNotFound,
     #[error("用户已禁用")]
@@ -47,7 +47,7 @@ pub enum IamError {
     Sqlx(String),
 }
 
-impl From<sqlx::Error> for IamError {
+impl From<sqlx::Error> for SystemError {
     fn from(err: sqlx::Error) -> Self {
         tracing::error!(%err, "sqlx error");
         let message = err.to_string();
@@ -60,8 +60,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_iam_error() {
-        let err = IamError::from(sqlx::Error::RowNotFound);
-        assert_eq!(err, IamError::Sqlx(sqlx::Error::RowNotFound.to_string()));
+    fn test_system_error() {
+        let err = SystemError::from(sqlx::Error::RowNotFound);
+        assert_eq!(err, SystemError::Sqlx(sqlx::Error::RowNotFound.to_string()));
     }
 }

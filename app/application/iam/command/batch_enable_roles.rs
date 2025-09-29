@@ -2,7 +2,7 @@ use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::system::port::role_repository::RoleRepository;
 use domain::system::value_object::role_id::RoleId;
-use domain::system::{error::IamError, event::IamEvent};
+use domain::system::{error::SystemError, event::IamEvent};
 use infrastructure::repository::system::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
@@ -23,7 +23,7 @@ impl CommandHandler for BatchEnableRolesCommandHandler {
     type Command = BatchEnableRolesCommand;
     type Output = ();
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(

@@ -2,9 +2,9 @@ use std::time::Duration;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::system::error::IamError;
-use domain::system::event::IamEvent;
 use domain::shared::port::captcha_issuer::{Captcha, CaptchaIssuerTrait as _};
+use domain::system::error::SystemError;
+use domain::system::event::IamEvent;
 use infrastructure::port::captcha_issuer_impl::CaptchaIssuerImpl;
 use nject::injectable;
 use serde::Deserialize;
@@ -21,7 +21,7 @@ impl CommandHandler for RefreshCaptchaCommandHandler {
     type Command = RefreshCaptchaCommand;
     type Output = Captcha;
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
     #[tracing::instrument]
     async fn execute(
         &self,

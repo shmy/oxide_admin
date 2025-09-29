@@ -1,5 +1,5 @@
 use bon::Builder;
-use domain::{system::error::IamError, shared::port::token_store::TokenStoreTrait};
+use domain::{shared::port::token_store::TokenStoreTrait, system::error::SystemError};
 use kvdb_kit::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 use sqlx::types::chrono::{DateTime, Utc};
@@ -10,7 +10,7 @@ pub struct TokenStoreImpl {
     kvdb: Kvdb,
 }
 impl TokenStoreTrait for TokenStoreImpl {
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn store(
@@ -23,7 +23,7 @@ impl TokenStoreTrait for TokenStoreImpl {
         self.kvdb
             .set_with_ex_at(&key, token, ex_at.timestamp())
             .await
-            .map_err(|_| IamError::AccessTokenSaveFailed)?;
+            .map_err(|_| SystemError::AccessTokenSaveFailed)?;
         Ok(())
     }
 

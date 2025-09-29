@@ -1,7 +1,7 @@
 use bon::Builder;
 use domain::{
-    system::{error::IamError, event::IamEvent, value_object::role_id::RoleId},
     shared::port::domain_repository::DomainRepository,
+    system::{error::SystemError, event::IamEvent, value_object::role_id::RoleId},
 };
 use infrastructure::repository::system::role_repository::RoleRepositoryImpl;
 use nject::injectable;
@@ -25,7 +25,7 @@ impl CommandHandler for BatchDeleteRolesCommandHandler {
     type Command = BatchDeleteRolesCommand;
     type Output = ();
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(

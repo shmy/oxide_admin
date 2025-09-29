@@ -2,7 +2,7 @@ use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::port::domain_repository::DomainRepository;
-use domain::system::error::IamError;
+use domain::system::error::SystemError;
 use domain::system::event::IamEvent;
 use domain::system::{entity::user::User, value_object::user_id::UserId};
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
@@ -27,7 +27,7 @@ impl CommandHandler for UpdateUserSelfPasswordCommandHandler {
     type Command = UpdateUserSelfPasswordCommand;
     type Output = User;
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(
@@ -38,10 +38,10 @@ impl CommandHandler for UpdateUserSelfPasswordCommandHandler {
         let new_password = cmd.new_password.trim();
         let confirm_new_password = cmd.confirm_new_password.trim();
         if new_password != confirm_new_password {
-            return Err(IamError::PasswordMismatch);
+            return Err(SystemError::PasswordMismatch);
         }
         if new_password == password {
-            return Err(IamError::PasswordUnchanged);
+            return Err(SystemError::PasswordUnchanged);
         }
         let mut user = self.user_repository.by_id(&cmd.id).await?;
         let before = user.clone();

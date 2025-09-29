@@ -1,12 +1,12 @@
 use crate::iam::command::sign_out::{SignOutCommand, SignOutCommandHandler};
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::system::error::IamError;
+use domain::shared::event_util::UpdatedEvent;
+use domain::shared::port::domain_repository::DomainRepository;
+use domain::system::error::SystemError;
 use domain::system::event::IamEvent;
 use domain::system::value_object::role_id::RoleId;
 use domain::system::{entity::user::User, value_object::user_id::UserId};
-use domain::shared::event_util::UpdatedEvent;
-use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use object_storage_kit::{ObjectStorage, ObjectStorageReader as _};
@@ -38,7 +38,7 @@ impl CommandHandler for UpdateUserCommandHandler {
     type Command = UpdateUserCommand;
     type Output = User;
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(
@@ -48,7 +48,7 @@ impl CommandHandler for UpdateUserCommandHandler {
         let id = cmd.id;
         let mut user = self.user_repository.by_id(&id).await?;
         if user.privileged {
-            return Err(IamError::UserPrivilegedImmutable);
+            return Err(SystemError::UserPrivilegedImmutable);
         }
         let before = user.clone();
         if let Some(account) = cmd.account {

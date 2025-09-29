@@ -1,12 +1,12 @@
 use bon::Builder;
-use domain::system::error::IamError;
+use domain::shared::port::domain_repository::DomainRepository;
+use domain::system::error::SystemError;
 use domain::system::event::IamEvent;
 use domain::system::value_object::role_id::RoleId;
 use domain::system::{
     entity::user::User, value_object::hashed_password::HashedPassword,
     value_object::user_id::UserId,
 };
-use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use object_storage_kit::{ObjectStorage, ObjectStorageReader as _};
@@ -36,7 +36,7 @@ impl CommandHandler for CreateUserCommandHandler {
     type Command = CreateUserCommand;
     type Output = User;
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(

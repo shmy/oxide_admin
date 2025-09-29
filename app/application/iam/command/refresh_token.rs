@@ -1,11 +1,11 @@
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::system::event::IamEvent;
-use domain::system::port::user_repository::UserRepository;
 use domain::shared::port::domain_repository::DomainRepository;
 use domain::shared::port::token_issuer::TokenIssuerTrait;
 use domain::shared::port::token_store::TokenStoreTrait;
-use domain::{system::error::IamError, shared::port::token_issuer::TokenIssuerOutput};
+use domain::system::event::IamEvent;
+use domain::system::port::user_repository::UserRepository;
+use domain::{shared::port::token_issuer::TokenIssuerOutput, system::error::SystemError};
 use infrastructure::port::token_issuer_impl::TokenIssuerImpl;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
@@ -30,7 +30,7 @@ impl CommandHandler for RefreshTokenCommandHandler {
     type Command = RefreshTokenCommand;
     type Output = TokenIssuerOutput;
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
     #[tracing::instrument]
     async fn execute(
         &self,

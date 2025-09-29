@@ -1,7 +1,7 @@
 use crate::iam::dto::role::RoleDto;
 use crate::shared::query_handler::QueryHandler;
 use bon::Builder;
-use domain::system::error::IamError;
+use domain::system::error::SystemError;
 use domain::system::value_object::menu::Menu;
 use domain::system::value_object::permission::Permission;
 use domain::system::value_object::role_id::RoleId;
@@ -24,10 +24,10 @@ pub struct RetrieveRoleQueryHandler {
 impl QueryHandler for RetrieveRoleQueryHandler {
     type Query = RetrieveRoleQuery;
     type Output = RoleDto;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[single_flight]
-    async fn query(&self, query: RetrieveRoleQuery) -> Result<RoleDto, IamError> {
+    async fn query(&self, query: RetrieveRoleQuery) -> Result<RoleDto, SystemError> {
         let row_opt = sqlx::query_as!(
             RoleDto,
             r#"
@@ -40,6 +40,6 @@ impl QueryHandler for RetrieveRoleQueryHandler {
         )
         .fetch_optional(&self.pool)
         .await?;
-        row_opt.ok_or(IamError::RoleNotFound)
+        row_opt.ok_or(SystemError::RoleNotFound)
     }
 }

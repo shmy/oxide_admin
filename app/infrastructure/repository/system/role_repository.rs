@@ -6,7 +6,7 @@ use domain::system::port::role_repository::RoleRepository;
 use domain::system::value_object::menu::Menu;
 use domain::system::value_object::permission::Permission;
 use domain::system::value_object::role_id::RoleId;
-use domain::system::{entity::role::Role, error::IamError};
+use domain::system::{entity::role::Role, error::SystemError};
 use nject::injectable;
 use sqlx::prelude::FromRow;
 
@@ -26,7 +26,7 @@ impl DomainRepository for RoleRepositoryImpl {
 
     type EntityId = RoleId;
 
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, Self::Error> {
@@ -40,7 +40,7 @@ impl DomainRepository for RoleRepositoryImpl {
         )
         .fetch_optional(&self.pool)
         .await?;
-        row_opt.map(Into::into).ok_or(IamError::RoleNotFound)
+        row_opt.map(Into::into).ok_or(SystemError::RoleNotFound)
     }
 
     #[tracing::instrument]
@@ -71,9 +71,9 @@ impl DomainRepository for RoleRepositoryImpl {
         .execute(&self.pool)
         .await.map_err(|e| {
             if is_unique_constraint_error(&e, "_roles", "name") {
-                return IamError::RoleDuplicated;
+                return SystemError::RoleDuplicated;
             }
-            IamError::from(e)
+            SystemError::from(e)
         })?;
         Ok(entity)
     }
@@ -305,7 +305,7 @@ mod tests {
             .build();
         assert_eq!(
             role_repository.save(role).await.err(),
-            Some(IamError::RoleDuplicated)
+            Some(SystemError::RoleDuplicated)
         );
     }
 }

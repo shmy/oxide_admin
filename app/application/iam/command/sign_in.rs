@@ -2,13 +2,13 @@ use std::fmt::Debug;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::system::error::IamError;
-use domain::system::event::IamEvent;
-use domain::system::port::user_repository::UserRepository;
 use domain::shared::port::captcha_issuer::CaptchaIssuerTrait as _;
 use domain::shared::port::domain_repository::DomainRepository;
 use domain::shared::port::token_issuer::{TokenIssuerOutput, TokenIssuerTrait};
 use domain::shared::port::token_store::TokenStoreTrait;
+use domain::system::error::SystemError;
+use domain::system::event::IamEvent;
+use domain::system::port::user_repository::UserRepository;
 use infrastructure::port::captcha_issuer_impl::CaptchaIssuerImpl;
 use infrastructure::port::token_issuer_impl::TokenIssuerImpl;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
@@ -49,7 +49,7 @@ impl CommandHandler for SignInCommandHandler {
     type Command = SignInCommand;
     type Output = TokenIssuerOutput;
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(

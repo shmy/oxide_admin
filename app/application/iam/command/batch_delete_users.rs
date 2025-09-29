@@ -1,7 +1,7 @@
 use bon::Builder;
 use domain::{
-    system::{error::IamError, event::IamEvent, value_object::user_id::UserId},
     shared::port::domain_repository::DomainRepository,
+    system::{error::SystemError, event::IamEvent, value_object::user_id::UserId},
 };
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
@@ -25,7 +25,7 @@ impl CommandHandler for BatchDeleteUsersCommandHandler {
     type Command = BatchDeleteUsersCommand;
     type Output = ();
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(

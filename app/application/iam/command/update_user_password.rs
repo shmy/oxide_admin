@@ -1,10 +1,10 @@
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::system::error::IamError;
-use domain::system::event::IamEvent;
-use domain::system::{entity::user::User, value_object::user_id::UserId};
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::port::domain_repository::DomainRepository;
+use domain::system::error::SystemError;
+use domain::system::event::IamEvent;
+use domain::system::{entity::user::User, value_object::user_id::UserId};
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
@@ -26,7 +26,7 @@ impl CommandHandler for UpdateUserPasswordCommandHandler {
     type Command = UpdateUserPasswordCommand;
     type Output = User;
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(
@@ -36,16 +36,16 @@ impl CommandHandler for UpdateUserPasswordCommandHandler {
         let new_password = cmd.new_password.trim();
         let confirm_new_password = cmd.confirm_new_password.trim();
         if new_password != confirm_new_password {
-            return Err(IamError::PasswordMismatch);
+            return Err(SystemError::PasswordMismatch);
         }
         let mut user = self.user_repository.by_id(&cmd.id).await?;
         if user.privileged {
-            return Err(IamError::UserPrivilegedImmutable);
+            return Err(SystemError::UserPrivilegedImmutable);
         }
         let before = user.clone();
         user.assert_activated()?;
         if user.password.verify(new_password).is_ok() {
-            return Err(IamError::PasswordUnchanged);
+            return Err(SystemError::PasswordUnchanged);
         }
         user.update_password(new_password.to_string())?;
 

@@ -1,12 +1,12 @@
 use crate::error::{InfrastructureError, InfrastructureResult};
 use bon::Builder;
-use domain::system::error::IamError;
+use domain::shared::port::menu_resolver::MenuResolver;
+use domain::shared::to_inner_vec::ToInnerVec;
+use domain::system::error::SystemError;
 use domain::system::value_object::menu::{ALL_MENUS, Menu};
 use domain::system::value_object::menu_group::MenuGroup;
 use domain::system::value_object::role_id::RoleId;
 use domain::system::value_object::user_id::UserId;
-use domain::shared::port::menu_resolver::MenuResolver;
-use domain::shared::to_inner_vec::ToInnerVec;
 use kvdb_kit::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 use single_flight::single_flight;
@@ -71,7 +71,7 @@ impl MenuResolver for MenuResolverImpl {
 
 impl MenuResolverImpl {
     #[single_flight]
-    pub async fn find_from_db(&self, id: UserId) -> Result<MenuGroup, IamError> {
+    pub async fn find_from_db(&self, id: UserId) -> Result<MenuGroup, SystemError> {
         let user_record = sqlx::query!(
             r#"SELECT privileged, role_ids as "role_ids: Vec<RoleId>" from _users WHERE id = $1"#,
             &id
@@ -117,11 +117,11 @@ struct RoleRecord {
 #[cfg(test)]
 mod tests {
     use domain::{
+        shared::port::domain_repository::DomainRepository as _,
         system::{
             entity::{role::Role, user::User},
             value_object::hashed_password::HashedPassword,
         },
-        shared::port::domain_repository::DomainRepository as _,
     };
 
     use crate::{

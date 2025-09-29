@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use bon::Builder;
-use domain::system::{error::IamError, value_object::role_id::RoleId};
+use domain::system::{error::SystemError, value_object::role_id::RoleId};
 use infrastructure::shared::pg_pool::PgPool;
 use kvdb_kit::Kvdb;
 use nject::injectable;
@@ -49,11 +49,11 @@ pub struct SearchUsersQueryHandler {
 impl QueryHandler for SearchUsersQueryHandler {
     type Query = SearchUsersQuery;
     type Output = PagingResult<UserDto>;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[single_flight]
     #[tracing::instrument]
-    async fn query(&self, query: SearchUsersQuery) -> Result<PagingResult<UserDto>, IamError> {
+    async fn query(&self, query: SearchUsersQuery) -> Result<PagingResult<UserDto>, SystemError> {
         let total_future = sqlx::query_scalar!(
             r#"
             SELECT COUNT(*) as "count!"
@@ -124,7 +124,7 @@ impl SearchUsersQueryHandler {
     pub async fn query_cached(
         &self,
         query: SearchUsersQuery,
-    ) -> Result<PagingResult<UserDto>, IamError> {
+    ) -> Result<PagingResult<UserDto>, SystemError> {
         self.cache_provider.get_with(query, |q| self.query(q)).await
     }
 }

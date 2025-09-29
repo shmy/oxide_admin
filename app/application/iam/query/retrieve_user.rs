@@ -2,7 +2,7 @@ use crate::iam::dto::user::UserDto;
 use crate::shared::query_handler::QueryHandler;
 use bon::Builder;
 use domain::system::value_object::user_id::UserId;
-use domain::system::{error::IamError, value_object::role_id::RoleId};
+use domain::system::{error::SystemError, value_object::role_id::RoleId};
 use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
 use serde::Deserialize;
@@ -22,11 +22,11 @@ pub struct RetrieveUserQueryHandler {
 impl QueryHandler for RetrieveUserQueryHandler {
     type Query = RetrieveUserQuery;
     type Output = UserDto;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[single_flight]
     #[tracing::instrument]
-    async fn query(&self, query: RetrieveUserQuery) -> Result<UserDto, IamError> {
+    async fn query(&self, query: RetrieveUserQuery) -> Result<UserDto, SystemError> {
         let row_opt = sqlx::query_as!(
             UserDto,
             r#"
@@ -51,6 +51,6 @@ impl QueryHandler for RetrieveUserQueryHandler {
         )
         .fetch_optional(&self.pool)
         .await?;
-        row_opt.ok_or(IamError::UserNotFound)
+        row_opt.ok_or(SystemError::UserNotFound)
     }
 }

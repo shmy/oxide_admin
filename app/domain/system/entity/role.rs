@@ -1,7 +1,7 @@
 use bon::Builder;
 
 use crate::system::{
-    error::IamError,
+    error::SystemError,
     value_object::{menu::Menu, permission::Permission, role_id::RoleId},
 };
 
@@ -33,9 +33,9 @@ impl Role {
         self.enabled = enabled;
     }
 
-    pub fn assert_activated(&self) -> Result<(), IamError> {
+    pub fn assert_activated(&self) -> Result<(), SystemError> {
         if !self.enabled {
-            return Err(IamError::RoleDisabled);
+            return Err(SystemError::RoleDisabled);
         }
         Ok(())
     }

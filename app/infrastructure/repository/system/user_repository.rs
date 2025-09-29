@@ -7,7 +7,7 @@ use domain::{
     shared::port::domain_repository::DomainRepository,
     system::{
         entity::user::User,
-        error::IamError,
+        error::SystemError,
         port::user_repository::UserRepository,
         value_object::{hashed_password::HashedPassword, user_id::UserId},
     },
@@ -31,7 +31,7 @@ impl DomainRepository for UserRepositoryImpl {
 
     type EntityId = UserId;
 
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn by_id(&self, id: &Self::EntityId) -> Result<Self::Entity, Self::Error> {
@@ -45,7 +45,7 @@ impl DomainRepository for UserRepositoryImpl {
         )
         .fetch_optional(&self.pool)
         .await?;
-        row_opt.map(Into::into).ok_or(IamError::UserNotFound)
+        row_opt.map(Into::into).ok_or(SystemError::UserNotFound)
     }
 
     #[tracing::instrument]
@@ -83,9 +83,9 @@ impl DomainRepository for UserRepositoryImpl {
         .execute(&self.pool)
         .await.map_err(|e| {
             if is_unique_constraint_error(&e, "_users", "account") {
-                return IamError::UserDuplicated;
+                return SystemError::UserDuplicated;
             }
-            IamError::from(e)
+            SystemError::from(e)
         })?;
         Ok(entity)
     }
@@ -123,7 +123,7 @@ impl UserRepository for UserRepositoryImpl {
         )
         .fetch_optional(&self.pool)
         .await?;
-        row_opt.map(Into::into).ok_or(IamError::UserNotFound)
+        row_opt.map(Into::into).ok_or(SystemError::UserNotFound)
     }
 
     #[tracing::instrument]
@@ -138,7 +138,7 @@ impl UserRepository for UserRepositoryImpl {
         )
         .fetch_optional(&self.pool)
         .await?;
-        row_opt.map(Into::into).ok_or(IamError::UserNotFound)
+        row_opt.map(Into::into).ok_or(SystemError::UserNotFound)
     }
 
     #[tracing::instrument]
@@ -396,7 +396,7 @@ mod tests {
             .build();
         assert_eq!(
             user_repository.save(user).await.err(),
-            Some(IamError::UserDuplicated)
+            Some(SystemError::UserDuplicated)
         );
     }
 }

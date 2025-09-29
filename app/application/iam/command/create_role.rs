@@ -1,10 +1,10 @@
 use bon::Builder;
-use domain::system::error::IamError;
+use domain::shared::port::domain_repository::DomainRepository;
+use domain::system::error::SystemError;
 use domain::system::event::IamEvent;
 use domain::system::value_object::menu::Menu;
 use domain::system::value_object::permission::Permission;
 use domain::system::{entity::role::Role, value_object::role_id::RoleId};
-use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::system::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
@@ -30,7 +30,7 @@ impl CommandHandler for CreateRoleCommandHandler {
     type Command = CreateRoleCommand;
     type Output = Role;
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(

@@ -2,7 +2,7 @@ use crate::iam::command::sign_out::{SignOutCommand, SignOutCommandHandler};
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::system::port::user_repository::UserRepository;
-use domain::system::{error::IamError, event::IamEvent, value_object::user_id::UserId};
+use domain::system::{error::SystemError, event::IamEvent, value_object::user_id::UserId};
 use futures_util::StreamExt as _;
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
@@ -24,7 +24,7 @@ impl CommandHandler for BatchDisableUsersCommandHandler {
     type Command = BatchDisableUsersCommand;
     type Output = ();
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(

@@ -1,4 +1,4 @@
-use domain::system::error::IamError;
+use domain::system::error::SystemError;
 use infrastructure::error::InfrastructureError;
 use kvdb_kit::error::KvdbError;
 use object_storage_kit::error::ObjectStorageError;
@@ -21,7 +21,7 @@ pub enum ApplicationError {
     PermissionDenied,
 
     #[error("{0}")]
-    Iam(#[from] IamError),
+    Iam(#[from] SystemError),
 
     #[error("{0}")]
     Sqlx(#[from] sqlx::Error),

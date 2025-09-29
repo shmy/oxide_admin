@@ -1,11 +1,11 @@
 use bon::Builder;
-use domain::system::error::IamError;
+use domain::shared::event_util::UpdatedEvent;
+use domain::shared::port::domain_repository::DomainRepository;
+use domain::system::error::SystemError;
 use domain::system::value_object::menu::Menu;
 use domain::system::value_object::permission::Permission;
 use domain::system::value_object::role_id::RoleId;
 use domain::system::{entity::role::Role, event::IamEvent};
-use domain::shared::event_util::UpdatedEvent;
-use domain::shared::port::domain_repository::DomainRepository;
 use infrastructure::repository::system::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
@@ -32,7 +32,7 @@ impl CommandHandler for UpdateRoleCommandHandler {
     type Command = UpdateRoleCommand;
     type Output = Role;
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(
@@ -42,7 +42,7 @@ impl CommandHandler for UpdateRoleCommandHandler {
         let id = cmd.id;
         let mut role = self.role_repository.by_id(&id).await?;
         if role.privileged {
-            return Err(IamError::RolePrivilegedImmutable);
+            return Err(SystemError::RolePrivilegedImmutable);
         }
         let before = role.clone();
         if let Some(name) = cmd.name {

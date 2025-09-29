@@ -2,7 +2,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use domain::system::error::IamError;
+use domain::system::error::SystemError;
 
 use super::response::JsonResponse;
 
@@ -18,7 +18,7 @@ pub enum WebError {
     ValidUserNotFound,
 
     #[error("{0}")]
-    IamError(#[from] IamError),
+    System(#[from] SystemError),
 }
 
 impl IntoResponse for WebError {

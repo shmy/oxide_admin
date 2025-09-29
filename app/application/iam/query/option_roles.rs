@@ -1,5 +1,5 @@
 use bon::Builder;
-use domain::system::error::IamError;
+use domain::system::error::SystemError;
 use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
 use single_flight::single_flight;
@@ -15,11 +15,11 @@ pub struct OptionRolesQueryHandler {
 impl QueryHandler for OptionRolesQueryHandler {
     type Query = ();
     type Output = Vec<OptionStringDto>;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[single_flight]
     #[tracing::instrument]
-    async fn query(&self, _query: ()) -> Result<Vec<OptionStringDto>, IamError> {
+    async fn query(&self, _query: ()) -> Result<Vec<OptionStringDto>, SystemError> {
         let options = sqlx::query_as!(
             OptionStringDto,
             r#"

@@ -1,5 +1,5 @@
 use crate::system::{
-    error::IamError,
+    error::SystemError,
     value_object::{hashed_password::HashedPassword, role_id::RoleId, user_id::UserId},
 };
 use bon::Builder;
@@ -41,7 +41,7 @@ impl User {
         self.name = name;
     }
 
-    pub fn update_password(&mut self, password: String) -> Result<(), IamError> {
+    pub fn update_password(&mut self, password: String) -> Result<(), SystemError> {
         self.password = HashedPassword::try_new(password)?;
         Ok(())
     }
@@ -55,18 +55,18 @@ impl User {
         self.refresh_token_expired_at = refresh_token_expired_at;
     }
 
-    pub fn assert_activated(&self) -> Result<(), IamError> {
+    pub fn assert_activated(&self) -> Result<(), SystemError> {
         if !self.enabled {
-            return Err(IamError::UserDisabled);
+            return Err(SystemError::UserDisabled);
         }
         Ok(())
     }
-    pub fn assert_refresh_token_valid_period(&self) -> Result<(), IamError> {
+    pub fn assert_refresh_token_valid_period(&self) -> Result<(), SystemError> {
         let Some(refresh_token_expired_at) = self.refresh_token_expired_at else {
-            return Err(IamError::RefreshTokenExpired);
+            return Err(SystemError::RefreshTokenExpired);
         };
         if refresh_token_expired_at.and_utc() < Utc::now() {
-            return Err(IamError::RefreshTokenExpired);
+            return Err(SystemError::RefreshTokenExpired);
         }
         Ok(())
     }
@@ -181,7 +181,7 @@ mod tests {
             .build();
         assert_eq!(
             user.update_password("1234".to_string()),
-            Err(IamError::Password(PasswordError::TooShort))
+            Err(SystemError::Password(PasswordError::TooShort))
         );
     }
 
@@ -225,7 +225,7 @@ mod tests {
             .role_ids(vec![])
             .enabled(false)
             .build();
-        assert_eq!(user.assert_activated(), Err(IamError::UserDisabled));
+        assert_eq!(user.assert_activated(), Err(SystemError::UserDisabled));
     }
 
     #[test]
@@ -240,7 +240,7 @@ mod tests {
             .enabled(true)
             .build();
         let result = user.assert_refresh_token_valid_period();
-        assert_eq!(result, Err(IamError::RefreshTokenExpired));
+        assert_eq!(result, Err(SystemError::RefreshTokenExpired));
     }
 
     #[test]
@@ -259,7 +259,7 @@ mod tests {
             })
             .build();
         let result = user.assert_refresh_token_valid_period();
-        assert_eq!(result, Err(IamError::RefreshTokenExpired));
+        assert_eq!(result, Err(SystemError::RefreshTokenExpired));
     }
 
     #[test]

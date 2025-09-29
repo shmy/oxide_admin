@@ -1,10 +1,10 @@
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::system::error::IamError;
-use domain::system::event::IamEvent;
-use domain::system::value_object::user_id::UserId;
 use domain::shared::port::domain_repository::DomainRepository;
 use domain::shared::port::token_store::TokenStoreTrait;
+use domain::system::error::SystemError;
+use domain::system::event::IamEvent;
+use domain::system::value_object::user_id::UserId;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
 use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
@@ -26,7 +26,7 @@ impl CommandHandler for SignOutCommandHandler {
     type Command = SignOutCommand;
     type Output = ();
     type Event = IamEvent;
-    type Error = IamError;
+    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(
