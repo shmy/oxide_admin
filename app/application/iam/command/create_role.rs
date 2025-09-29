@@ -5,7 +5,7 @@ use domain::iam::value_object::menu::Menu;
 use domain::iam::value_object::permission::Permission;
 use domain::iam::{entity::role::Role, value_object::role_id::RoleId};
 use domain::shared::port::domain_repository::DomainRepository;
-use infrastructure::repository::iam::role_repository::RoleRepositoryImpl;
+use infrastructure::repository::system::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 use utoipa::ToSchema;

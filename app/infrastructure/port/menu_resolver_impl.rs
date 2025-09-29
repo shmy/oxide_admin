@@ -125,7 +125,7 @@ mod tests {
     };
 
     use crate::{
-        repository::iam::{
+        repository::system::{
             role_repository::RoleRepositoryImpl, user_repository::UserRepositoryImpl,
         },
         shared::chrono_tz::ChronoTz,

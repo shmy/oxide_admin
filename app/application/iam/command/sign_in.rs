@@ -12,7 +12,7 @@ use domain::shared::port::token_store::TokenStoreTrait;
 use infrastructure::port::captcha_issuer_impl::CaptchaIssuerImpl;
 use infrastructure::port::token_issuer_impl::TokenIssuerImpl;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
-use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
+use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 use utoipa::ToSchema;

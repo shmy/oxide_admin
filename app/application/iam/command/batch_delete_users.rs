@@ -3,7 +3,7 @@ use domain::{
     iam::{error::IamError, event::IamEvent, value_object::user_id::UserId},
     shared::port::domain_repository::DomainRepository,
 };
-use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
+use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 use utoipa::ToSchema;

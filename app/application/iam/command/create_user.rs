@@ -7,7 +7,7 @@ use domain::iam::{
     value_object::user_id::UserId,
 };
 use domain::shared::port::domain_repository::DomainRepository;
-use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
+use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use object_storage_kit::{ObjectStorage, ObjectStorageReader as _};
 use serde::Deserialize;

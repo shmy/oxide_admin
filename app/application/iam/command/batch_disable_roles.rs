@@ -3,7 +3,7 @@ use bon::Builder;
 use domain::iam::port::role_repository::RoleRepository;
 use domain::iam::value_object::role_id::RoleId;
 use domain::iam::{error::IamError, event::IamEvent};
-use infrastructure::repository::iam::role_repository::RoleRepositoryImpl;
+use infrastructure::repository::system::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 use utoipa::ToSchema;

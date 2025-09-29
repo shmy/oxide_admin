@@ -6,7 +6,7 @@ use domain::iam::value_object::user_id::UserId;
 use domain::shared::port::domain_repository::DomainRepository;
 use domain::shared::port::token_store::TokenStoreTrait;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
-use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
+use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 

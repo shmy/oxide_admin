@@ -4,7 +4,7 @@ use bon::Builder;
 use domain::iam::port::user_repository::UserRepository;
 use domain::iam::{error::IamError, event::IamEvent, value_object::user_id::UserId};
 use futures_util::StreamExt as _;
-use infrastructure::repository::iam::user_repository::UserRepositoryImpl;
+use infrastructure::repository::system::user_repository::UserRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 use utoipa::ToSchema;

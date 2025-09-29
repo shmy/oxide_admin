@@ -6,7 +6,7 @@ use domain::iam::value_object::role_id::RoleId;
 use domain::iam::{entity::role::Role, event::IamEvent};
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::port::domain_repository::DomainRepository;
-use infrastructure::repository::iam::role_repository::RoleRepositoryImpl;
+use infrastructure::repository::system::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 use utoipa::ToSchema;

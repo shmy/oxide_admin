@@ -8,8 +8,8 @@ use domain::iam::{entity::role::Role, value_object::role_id::RoleId};
 use domain::shared::port::domain_repository::DomainRepository;
 use tracing::info;
 
-use crate::repository::iam::role_repository::RoleRepositoryImpl;
-use crate::repository::iam::user_repository::UserRepositoryImpl;
+use crate::repository::system::role_repository::RoleRepositoryImpl;
+use crate::repository::system::user_repository::UserRepositoryImpl;
 use crate::shared::pg_pool::PgPool;
 
 pub async fn migrate(
