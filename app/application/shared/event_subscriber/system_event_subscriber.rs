@@ -55,6 +55,12 @@ impl EventSubscriber<Event> for SystemEventSubscriber {
     async fn on_received(&self, event: Event) -> InfrastructureResult<()> {
         #[allow(irrefutable_let_patterns)]
         if let Event::System(e) = event {
+            if Self::is_users_changed(&e) {
+                let _ = self.search_user_query_handler.clean_cache().await;
+            }
+            if Self::is_roles_changed(&e) {
+                let _ = self.search_role_query_handler.clean_cache().await;
+            }
             if Self::is_permission_changed(&e) {
                 if let Err(err) = self.permission_resolver.refresh().await {
                     tracing::error!(?e, error = %err, "Failed to refresh permissions");
@@ -62,12 +68,6 @@ impl EventSubscriber<Event> for SystemEventSubscriber {
                 if let Err(err) = self.menu_resolver.refresh().await {
                     tracing::error!(?e, error = %err, "Failed to refresh menus");
                 }
-            }
-            if Self::is_users_changed(&e) {
-                let _ = self.search_user_query_handler.clean_cache().await;
-            }
-            if Self::is_roles_changed(&e) {
-                let _ = self.search_role_query_handler.clean_cache().await;
             }
             match e {
                 SystemEvent::UsersCreated { items } => {
