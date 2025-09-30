@@ -9,7 +9,6 @@ pub struct Inject<T>(pub T);
 
 impl<T> FromRequestParts<WebState> for Inject<T>
 where
-    // 对任何可能的 'prov，只要 T 能从 &'prov Provider 注入即可
     for<'prov> T: Injectable<'prov, T, Provider>,
 {
     type Rejection = WebError;

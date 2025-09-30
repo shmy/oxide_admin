@@ -71,7 +71,7 @@ impl CommandHandler for UpdateUserCommandHandler {
         if !user.enabled {
             let command = SignOutCommand::builder().id(id.clone()).build();
             if let Err(err) = self.sign_out_command_handler.handle(command).await {
-                tracing::error!(%err, "注销用户失败");
+                tracing::error!(%err, "Faild to sign out user");
             }
         }
         Ok(CommandResult::with_event(

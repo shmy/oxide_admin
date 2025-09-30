@@ -11,13 +11,11 @@ pub(crate) fn generate(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let block = &input.block;
     let fn_name = &sig.ident;
 
-    // 模块作用域 static 名称
     let static_ident = format_ident!(
         "SINGLE_FLIGHT_{}",
         fn_name.to_string().to_screaming_snake_case()
     );
 
-    // 参数列表用于生成 key
     let args_idents: Vec<_> = sig
         .inputs
         .iter()
@@ -27,7 +25,6 @@ pub(crate) fn generate(_attr: TokenStream, item: TokenStream) -> TokenStream {
         })
         .collect();
 
-    // key 表达式
     let key_expr = if args_idents.is_empty() {
         quote! { () }
     } else if args_idents.len() == 1 {
@@ -37,7 +34,6 @@ pub(crate) fn generate(_attr: TokenStream, item: TokenStream) -> TokenStream {
         quote! { (#(#args_idents.clone(),)*) }
     };
 
-    // key 类型
     let key_ty = if args_idents.is_empty() {
         quote! { () }
     } else {
@@ -57,16 +53,13 @@ pub(crate) fn generate(_attr: TokenStream, item: TokenStream) -> TokenStream {
         }
     };
 
-    // 返回类型
     let output_ty = match &sig.output {
         syn::ReturnType::Type(_, ty) => quote! { #ty },
         _ => panic!("async fn must have a return type"),
     };
 
-    // 生成宏展开内容
     let expanded = quote! {
         #vis #sig where #output_ty: Clone {
-            // 函数作用域 static
             static #static_ident: std::sync::LazyLock<single_flight::SingleFlight<#key_ty, #output_ty>> =
                            std::sync::LazyLock::new(single_flight::SingleFlight::new);
 

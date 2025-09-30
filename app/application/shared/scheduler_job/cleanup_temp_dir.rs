@@ -13,7 +13,7 @@ pub struct CleanupTempDir {
     workspace: WorkspaceRef,
 }
 
-/// 每日凌晨0点删除两天前的临时目录
+/// Delete the temporary directory from two days ago at midnight every day.
 impl ScheduledJob for CleanupTempDir {
     const SCHEDULER: &'static str = "at 00:01 every day";
 
@@ -21,7 +21,6 @@ impl ScheduledJob for CleanupTempDir {
         let now = SystemTime::now();
 
         if let Ok(dir) = fs::read_dir(self.workspace.temp_dir()).await {
-            // 直接流式遍历，无需 Vec 缓存
             let stream = tokio_stream::wrappers::ReadDirStream::new(dir);
 
             stream

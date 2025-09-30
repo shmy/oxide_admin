@@ -140,7 +140,7 @@ impl IamService {
                     if let Ok(url) = upload_service.presign_url(portrait).await {
                         dto.portrait = Some(url);
                     } else {
-                        dto.portrait = None; // 失败设为空
+                        dto.portrait = None;
                     }
                 }
             })

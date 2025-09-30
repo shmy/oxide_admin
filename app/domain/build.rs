@@ -61,14 +61,12 @@ fn generate_permissions() {
             write_flat_rust(&mut rs, t, Vec::new(), &mut all_permissions);
         }
 
-        // 生成 ALL_PERMISSIONS
         rs.push_str("\npub const ALL_PERMISSIONS: &[Permission] = &[\n");
         for code in all_permissions.iter() {
             writeln!(rs, "    {},", code).unwrap();
         }
         rs.push_str("];\n\n");
 
-        // 生成 PERMISSION_TREE
         rs.push_str("pub const PERMISSION_TREE: &[PermissionTree] = &[\n");
         for t in tree {
             write_tree_to_rust(&mut rs, t, Vec::new());
@@ -81,7 +79,6 @@ fn generate_permissions() {
         fs::write(out_path, rs).unwrap();
     }
 
-    // 平铺生成 Permission 常量
     fn write_flat_rust(
         rs: &mut String,
         node: &PermissionItem,
@@ -107,7 +104,6 @@ fn generate_permissions() {
         }
     }
 
-    // 递归生成 PERMISSION_TREE
     fn write_tree_to_rust(rs: &mut String, node: &PermissionItem, path: Vec<String>) {
         let indent = "    ".repeat(path.len() + 1);
         let key = node.key.to_screaming_snake_case();
@@ -140,7 +136,6 @@ fn generate_permissions() {
         }
     }
 
-    // 生成 JS 对象
     fn generate_javascript(tree: &Vec<PermissionItem>) {
         let mut js = String::new();
         js.push_str("export const PERMISSIONS = {\n");
@@ -219,7 +214,6 @@ fn generate_menus() {
         );
         rs.push_str(&content);
     }
-    // 平铺生成 Permission 常量
     fn write_flat_rust(rs: &mut String, node: &MenuItem) {
         rs.push_str(&format!("Menu::new({}),", node.key));
         if !node.children.is_empty() {

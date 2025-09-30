@@ -18,7 +18,7 @@ file: file,upload.hurl;
 HTTP 200
 [Asserts]
 jsonpath "$.status" == 1
-jsonpath "$.msg" == "不支持的图片格式"
+jsonpath "$.msg" == "Unsupported image format"
 jsonpath "$.data" not exists
 
 # Should success when upload image file given valid file

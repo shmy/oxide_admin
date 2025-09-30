@@ -49,14 +49,5 @@ impl RateLimitRouterExt for UtoipaMethodRouter<WebState> {
 // }
 
 fn error_handler(err: GovernorError) -> Response<Body> {
-    match err {
-        GovernorError::TooManyRequests { wait_time, .. } => {
-            JsonResponse::<()>::err(format!("请求过快，请等待{wait_time}秒"))
-        }
-        GovernorError::UnableToExtractKey => JsonResponse::<()>::err("无法提取限流密钥"),
-        GovernorError::Other { code, msg, .. } => {
-            JsonResponse::<()>::err(format!("限流错误：{code}: {msg:?}"))
-        }
-    }
-    .into_response()
+    JsonResponse::<()>::err(err.to_string()).into_response()
 }

@@ -14,7 +14,7 @@ pub enum WebError {
     #[error("{0}")]
     InvalidHeaderValue(#[from] axum::http::header::InvalidHeaderValue),
 
-    #[error("授权用户不存在")]
+    #[error("Authorized user does not exist")]
     ValidUserNotFound,
 
     #[error("{0}")]

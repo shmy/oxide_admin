@@ -229,7 +229,7 @@ impl SupportedFormat {
     ) -> ApplicationResult<impl Read + Seek> {
         if let SupportedFormat::Webp = format {
             let data = tokio::fs::read(file.path()).await?;
-            return Ok(Cursor::new(data)); // Cursor 实现了 Read + Seek
+            return Ok(Cursor::new(data));
         }
         tokio::task::spawn_blocking(move || {
             file.rewind()?;

@@ -9,15 +9,15 @@ pub type ApplicationResult<T> = std::result::Result<T, ApplicationError>;
 
 #[derive(Debug, Error)]
 pub enum ApplicationError {
-    #[error("不支持的图片格式")]
+    #[error("Unsupported image format")]
     UnsupportedImageFormat,
-    #[error("非法的 Token")]
+    #[error("Illegal token")]
     IllegalToken,
 
-    #[error("已回收的 Token")]
+    #[error("Recycled token")]
     RecycledToken,
 
-    #[error("权限不足")]
+    #[error("Permission denied")]
     PermissionDenied,
 
     #[error("{0}")]

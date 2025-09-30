@@ -817,11 +817,13 @@ dependencies = [
 
 [[package]]
 name = "croner"
-version = "2.2.0"
+version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c344b0690c1ad1c7176fe18eb173e0c927008fdaaa256e40dfd43ddd149c0843"
+checksum = "4c007081651a19b42931f86f7d4f74ee1c2a7d0cd2c6636a81695b5ffd4e9990"
 dependencies = [
  "chrono",
+ "derive_builder 0.20.2",
+ "strum",
 ]
 
 [[package]]
@@ -1047,7 +1049,16 @@ version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d67778784b508018359cbc8696edb3db78160bab2c2a28ba7f56ef6932997f8"
 dependencies = [
- "derive_builder_macro",
+ "derive_builder_macro 0.12.0",
+]
+
+[[package]]
+name = "derive_builder"
+version = "0.20.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "507dfb09ea8b7fa618fcf76e953f4f5e192547945816d5358edffe39f6f94947"
+dependencies = [
+ "derive_builder_macro 0.20.2",
 ]
 
 [[package]]
@@ -1063,13 +1074,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "derive_builder_core"
+version = "0.20.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2d5bcf7b024d6835cfb3d473887cd966994907effbe9227e8c8219824d06c4e8"
+dependencies = [
+ "darling 0.20.11",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.106",
+]
+
+[[package]]
 name = "derive_builder_macro"
 version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ebcda35c7a396850a55ffeac740804b40ffec779b98fffbb1738f4033f0ee79e"
 dependencies = [
- "derive_builder_core",
+ "derive_builder_core 0.12.0",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "derive_builder_macro"
+version = "0.20.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ab63b0e2bf4d5928aff72e83a7dace85d7bba5fe12dcc3c5a572d78caffd3f3c"
+dependencies = [
+ "derive_builder_core 0.20.2",
+ "syn 2.0.106",
 ]
 
 [[package]]
@@ -1264,7 +1297,7 @@ checksum = "6ce911bdc3ddf3e4ce0c74039ec605454a61d44e6dbd8a3008775f64c391e284"
 dependencies = [
  "async-trait",
  "chrono",
- "derive_builder",
+ "derive_builder 0.12.0",
  "fnv",
  "hostname",
  "num-bigint",
@@ -4808,11 +4841,12 @@ dependencies = [
 
 [[package]]
 name = "tokio-cron-scheduler"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c71ce8f810abc9fabebccc30302a952f9e89c6cf246fafaf170fef164063141"
+checksum = "bb73c4033ddcbbf81fd828293fd41a0145cde2cbc30dd782227c5081a523214d"
 dependencies = [
  "chrono",
+ "chrono-tz",
  "croner",
  "english-to-cron",
  "num-derive",

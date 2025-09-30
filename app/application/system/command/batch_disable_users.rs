@@ -37,7 +37,7 @@ impl CommandHandler for BatchDisableUsersCommandHandler {
             .for_each_concurrent(5, |id| async move {
                 let command = SignOutCommand::builder().id(id).build();
                 if let Err(err) = self.sign_out_command_handler.handle(command).await {
-                    tracing::error!(%err, "注销用户失败");
+                    tracing::error!(%err, "Failed to sign out user");
                 }
             })
             .await;

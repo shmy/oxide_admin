@@ -12,7 +12,7 @@ pub struct CleanupUnusedFile {
     upload_service: UploadService,
 }
 
-/// 每日凌晨1点删除未使用的文件
+/// Delete unused files at 1 a.m. every day.
 impl ScheduledJob for CleanupUnusedFile {
     const SCHEDULER: &'static str = "at 01:01 every day";
 
@@ -20,7 +20,6 @@ impl ScheduledJob for CleanupUnusedFile {
         let file_service = &self.file_service;
         let upload_service = &self.upload_service;
 
-        // 收集所有需要删除的文件
         let mut paths = Vec::new();
         let mut stream = file_service.unused_2days_ago();
         while let Some(Ok(row)) = stream.next().await {
@@ -32,7 +31,6 @@ impl ScheduledJob for CleanupUnusedFile {
             return Ok(());
         }
 
-        // 先批量标记/删除数据库记录
         match file_service.delete_files(&paths).await {
             Ok(_) => {
                 tracing::info!("Deleting {} unused files", paths.len());

@@ -136,7 +136,6 @@ impl KvdbTrait for RedisKvdb {
         let mut conn = self.pool.get().await?;
         let mut cursor: u64 = 0;
         loop {
-            // 使用 SCAN 匹配 key
             let (next_cursor, keys): (u64, Vec<String>) = cmd("SCAN")
                 .cursor_arg(cursor)
                 .arg("MATCH")
@@ -147,7 +146,6 @@ impl KvdbTrait for RedisKvdb {
                 .await?;
 
             if !keys.is_empty() {
-                // 批量删除
                 let _: () = conn.del(keys).await?;
             }
 

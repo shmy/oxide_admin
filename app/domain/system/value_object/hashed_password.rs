@@ -15,15 +15,15 @@ static ARGON2: LazyLock<Argon2> = LazyLock::new(|| {
 
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 pub enum PasswordError {
-    #[error("密码太短")]
+    #[error("Password too short")]
     TooShort,
-    #[error("密码太长")]
+    #[error("Password too long")]
     TooLong,
-    #[error("密码加密失败")]
+    #[error("Failed to encode password")]
     EncodeFailed,
-    #[error("密码解密失败")]
+    #[error("Failed to decode password")]
     DecodeFailed,
-    #[error("密码错误")]
+    #[error("Incorrect password")]
     Incorrect,
 }
 #[derive(Clone, PartialEq, Eq, sqlx::Type)]

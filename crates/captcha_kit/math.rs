@@ -107,7 +107,7 @@ impl MathCaptcha {
     fn rand_color(&self) -> Rgba<u8> {
         let r: u8 = rand::random_range(0..255);
         let g: u8 = rand::random_range(0..255);
-        let b; // 未定义，可省略mut
+        let b;
         let a: u8 = rand::random_range(0..255);
         let sum_rg = u16::from(r) + u16::from(g);
         if sum_rg > 400 {
@@ -131,7 +131,7 @@ impl MathCaptcha {
     }
 
     fn rand_dark_color(&self) -> Rgba<u8> {
-        let base = rand::random_range(0..=60); // 越小越黑
+        let base = rand::random_range(0..=60);
         let r = base + rand::random_range(0..=40);
         let g = base + rand::random_range(0..=40);
         let b = base + rand::random_range(0..=40);
@@ -139,13 +139,12 @@ impl MathCaptcha {
     }
 
     fn draw_text_png(&self, text: &str) -> Result<Vec<u8>> {
-        let padding = 10.0; // 左右各保留10像素
+        let padding = 10.0;
         let available_width = self.width as f32 - padding * 2.0;
         let font_width = available_width / text.len() as f32;
         let background_color = self.rand_dark_color();
         let mut img =
             ImageBuffer::from_pixel(self.width as u32, self.height as u32, background_color);
-        // 绘制干扰点
         for _ in 0..100 {
             let size = rand::random_range(1..=2);
             let x = rand::random_range(0..=(self.width - size)) as u32;
@@ -163,9 +162,8 @@ impl MathCaptcha {
                 }
             }
         }
-        // 绘制验证码
         let font_size = 26;
-        let char_width = font_width.min(self.width as f32); // 防止太宽
+        let char_width = font_width.min(self.width as f32);
         let char_height = font_size as u32;
 
         for (i, c) in text.chars().enumerate() {
@@ -174,7 +172,6 @@ impl MathCaptcha {
                 .saturating_sub(rand::random_range(0..=(self.height / 5)))
                 as i32;
 
-            // 安全边界控制
             x = x.clamp(0, self.width as i32 - char_width as i32);
             y = y.clamp(0, self.height as i32 - char_height as i32);
 

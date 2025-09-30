@@ -1,5 +1,5 @@
-[ ] Frontend code generation
 [ ] l10n
+[ ] Frontend code generation
 [-] 删除有延迟
 [-] 主题切换
 [-] Redis 支持 Tls

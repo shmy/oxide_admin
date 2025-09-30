@@ -57,10 +57,10 @@ impl EventSubscriber<Event> for SystemEventSubscriber {
         if let Event::System(e) = event {
             if Self::is_permission_changed(&e) {
                 if let Err(err) = self.permission_resolver.refresh().await {
-                    tracing::error!(?e, error = %err, "权限刷新失败");
+                    tracing::error!(?e, error = %err, "Failed to refresh permissions");
                 }
                 if let Err(err) = self.menu_resolver.refresh().await {
-                    tracing::error!(?e, error = %err, "菜单刷新失败");
+                    tracing::error!(?e, error = %err, "Failed to refresh menus");
                 }
             }
             if Self::is_users_changed(&e) {
@@ -85,17 +85,17 @@ impl EventSubscriber<Event> for SystemEventSubscriber {
                     for item in items {
                         match (&item.before.portrait, &item.after.portrait) {
                             (Some(before), Some(after)) if before != after => {
-                                // 用户修改了头像
+                                // User changed portrait
                                 unused_paths.push(before.clone());
                                 used_paths.push(after.clone());
                             }
                             (Some(before), None) => {
-                                unused_paths.push(before.clone()); // 用户删除了头像
+                                unused_paths.push(before.clone()); // User deleted portrait
                             }
                             (None, Some(after)) => {
-                                used_paths.push(after.clone()); // 用户新增了头像
+                                used_paths.push(after.clone()); // User added portrait
                             }
-                            _ => {} // 没有变化的情况，不操作
+                            _ => {} // No change
                         }
                     }
                     if let Err(err) = self.file_service.set_files_unused(&unused_paths).await {

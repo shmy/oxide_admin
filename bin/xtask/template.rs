@@ -8,14 +8,12 @@ use walkdir::WalkDir;
 
 use crate::util::append_to_mod_file;
 
-/// 模板引擎
 pub struct TemplateEngine {
     template_dir: PathBuf,
     context: Value,
 }
 
 impl TemplateEngine {
-    /// 创建模板引擎，模板路径为 xtask/templates/{subdir}
     pub fn from(subdir: &str) -> Self {
         let template_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("templates")
@@ -23,17 +21,15 @@ impl TemplateEngine {
 
         Self {
             template_dir,
-            context: context! {}, // 默认空上下文
+            context: context! {},
         }
     }
 
-    /// 设置渲染上下文
     pub fn with_context(mut self, context: Value) -> Self {
         self.context = context;
         self
     }
 
-    /// 渲染所有 `.j2` 模板并输出到指定目录（保持目录结构）
     pub async fn render_to(&self, output_dir: impl AsRef<Path>) -> Result<()> {
         let mut env = Self::build_env();
         env.set_loader(path_loader(&self.template_dir));
@@ -46,7 +42,7 @@ impl TemplateEngine {
                 continue;
             }
 
-            let rel_path = path.strip_prefix(&self.template_dir)?; // 去掉 `.j2`
+            let rel_path = path.strip_prefix(&self.template_dir)?;
             let output_path = output_dir.as_ref().join(rel_path.with_extension(""));
 
             let output_path =
@@ -55,7 +51,7 @@ impl TemplateEngine {
             if let Some(parent) = output_path.parent() {
                 fs::create_dir_all(parent).await?;
             }
-            let template_name = rel_path.to_string_lossy().replace("\\", "/"); // 兼容 Windows 路径
+            let template_name = rel_path.to_string_lossy().replace("\\", "/");
 
             let rendered = env
                 .get_template(&template_name)?
@@ -97,12 +93,21 @@ impl TemplateEngine {
 fn is_copy_type(ty: &str) -> bool {
     matches!(
         ty.trim(),
-        "i8" | "i16" | "i32" | "i64" | "i128"
-        | "u8" | "u16" | "u32" | "u64" | "u128"
-        | "usize" | "isize"
-        | "bool" | "char"
-        // 可选加浮点
-        | "f32" | "f64"
+        "i8" | "i16"
+            | "i32"
+            | "i64"
+            | "i128"
+            | "u8"
+            | "u16"
+            | "u32"
+            | "u64"
+            | "u128"
+            | "usize"
+            | "isize"
+            | "bool"
+            | "char"
+            | "f32"
+            | "f64"
     )
 }
 

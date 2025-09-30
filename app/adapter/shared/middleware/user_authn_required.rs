@@ -17,7 +17,7 @@ pub async fn user_authn_required(
     let maybe_token = get_access_token_from_header(&header_map)
         .or_else(|| get_access_token_from_query(request.uri()));
     let Some(access_token) = maybe_token else {
-        return unauthorized("请提供 Token");
+        return unauthorized("Access token is required");
     };
     let service = state.provider().provide::<IamService>();
     let id = match service.verify_token(&access_token).await {

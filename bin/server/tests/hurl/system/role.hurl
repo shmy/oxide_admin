@@ -4,7 +4,7 @@ GET {{base_url}}/api/system/roles
 HTTP 401
 [Asserts]
 jsonpath "$.status" == 1
-jsonpath "$.msg" == "请提供 Token"
+jsonpath "$.msg" == "Access token is required"
 jsonpath "$.data" not exists
 
 # Should success when fetch roles given valid token
@@ -23,7 +23,7 @@ Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.status" == 1
-jsonpath "$.msg" == "角色不存在"
+jsonpath "$.msg" == "Role not found"
 jsonpath "$.data" not exists
 
 # Should error when create role given invalid json body
@@ -145,5 +145,5 @@ Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.status" == 1
-jsonpath "$.msg" == "角色不存在"
+jsonpath "$.msg" == "Role not found"
 jsonpath "$.data" not exists

@@ -2,42 +2,42 @@ use crate::system::value_object::hashed_password::PasswordError;
 
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum SystemError {
-    #[error("用户不存在")]
+    #[error("User not found")]
     UserNotFound,
-    #[error("用户已禁用")]
+    #[error("User disabled")]
     UserDisabled,
-    #[error("用户已存在")]
+    #[error("User duplicated")]
     UserDuplicated,
-    #[error("两次密码不一致")]
+    #[error("Password mismatch")]
     PasswordMismatch,
-    #[error("新密码不能与原密码相同")]
+    #[error("Password unchanged")]
     PasswordUnchanged,
-    #[error("无法修改特权用户")]
+    #[error("Privileged user immutable")]
     UserPrivilegedImmutable,
 
-    #[error("角色不存在")]
+    #[error("Role not found")]
     RoleNotFound,
-    #[error("角色已禁用")]
+    #[error("Role disabled")]
     RoleDisabled,
-    #[error("角色已存在")]
+    #[error("Role duplicated")]
     RoleDuplicated,
-    #[error("无法修改特权角色")]
+    #[error("Privileged role immutable")]
     RolePrivilegedImmutable,
 
-    #[error("验证码生成失败")]
+    #[error("Captcha generation failed")]
     CaptchaGenerationFailed,
-    #[error("验证码无效")]
+    #[error("Invalid captcha")]
     CaptchaInvalid,
-    #[error("验证码错误")]
+    #[error("Incorrect captcha")]
     CaptchaIncorrect,
 
-    #[error("访问 Token 签名错误")]
+    #[error("Failed to generate access token")]
     AccessTokenSignFailed,
-    #[error("访问 Token 解析错误")]
+    #[error("Failed to verify access token")]
     AccessTokenVerifyFailed,
-    #[error("访问 Token 保存错误")]
+    #[error("Failed to save access token")]
     AccessTokenSaveFailed,
-    #[error("Refresh Token 已过期")]
+    #[error("Refresh token expired")]
     RefreshTokenExpired,
 
     #[error("{0}")]

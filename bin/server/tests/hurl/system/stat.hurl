@@ -3,7 +3,7 @@ GET {{base_url}}/api/system/stats
 HTTP 401
 [Asserts]
 jsonpath "$.status" == 1
-jsonpath "$.msg" == "请提供 Token"
+jsonpath "$.msg" == "Access token is required"
 jsonpath "$.data" not exists
 
 # Should success when fetch system info given valid token

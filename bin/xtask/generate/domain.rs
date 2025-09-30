@@ -82,7 +82,7 @@ fn append_error(path: &Path, module: &str, entity: &str) -> Result<()> {
         &format!("{}NotFound", entity.to_pascal_case()),
         Span::call_site(),
     );
-    let notfound_error_message = format!("{}不存在", entity.to_pascal_case());
+    let notfound_error_message = format!("{} not exists", entity.to_pascal_case());
 
     for item in &mut syntax.items {
         if let Item::Enum(ItemEnum {
@@ -199,25 +199,25 @@ fn append_permissions(path: &Path, module: &str, entity: &str) -> Result<()> {
         let value = 1000;
         item.children.extend_from_slice(&[
             PermissionItem {
-                label: "读取".to_string(),
+                label: "Read".to_string(),
                 key: "read".to_string(),
                 value: Some(value),
                 children: vec![],
             },
             PermissionItem {
-                label: "创建".to_string(),
+                label: "Create".to_string(),
                 key: "create".to_string(),
                 value: Some(value + 1),
                 children: vec![],
             },
             PermissionItem {
-                label: "更新".to_string(),
+                label: "Update".to_string(),
                 key: "update".to_string(),
                 value: Some(value + 2),
                 children: vec![],
             },
             PermissionItem {
-                label: "删除".to_string(),
+                label: "Delete".to_string(),
                 key: "delete".to_string(),
                 value: Some(value + 3),
                 children: vec![],

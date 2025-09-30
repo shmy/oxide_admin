@@ -3,7 +3,7 @@ GET {{base_url}}/api/profile/current
 HTTP 401
 [Asserts]
 jsonpath "$.status" == 1
-jsonpath "$.msg" == "请提供 Token"
+jsonpath "$.msg" == "Access token is required"
 jsonpath "$.data" not exists
 
 # Should success when fetch current user given valid token
@@ -24,5 +24,5 @@ POST {{base_url}}/api/authn/sign_in
 HTTP 200
 [Asserts]
 jsonpath "$.status" == 1
-jsonpath "$.msg" contains "请求过快"
+jsonpath "$.msg" contains "Too Many Requests"
 jsonpath "$.data" not exists

@@ -4,7 +4,7 @@ GET {{base_url}}/api/system/users
 HTTP 401
 [Asserts]
 jsonpath "$.status" == 1
-jsonpath "$.msg" == "请提供 Token"
+jsonpath "$.msg" == "Access token is required"
 jsonpath "$.data" not exists
 
 # Should success when fetch users given valid token
@@ -23,7 +23,7 @@ Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.status" == 1
-jsonpath "$.msg" == "用户不存在"
+jsonpath "$.msg" == "User not found"
 jsonpath "$.data" not exists
 
 # Should error when create user given invalid json body
@@ -200,5 +200,5 @@ Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.status" == 1
-jsonpath "$.msg" == "用户不存在"
+jsonpath "$.msg" == "User not found"
 jsonpath "$.data" not exists
