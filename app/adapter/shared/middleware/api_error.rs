@@ -19,6 +19,9 @@ pub async fn api_error(request: Request, next: Next) -> Response {
         .unwrap_or(false);
 
     let status = response.status();
+    if status.is_redirection() {
+        return response;
+    }
     if !status.is_success() && !is_json_content_type {
         let body_bytes = to_bytes(response.into_body(), usize::MAX)
             .await

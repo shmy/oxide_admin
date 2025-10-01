@@ -1,3 +1,4 @@
+import { getAccessToken } from "../../lib/authn";
 import { usedStatuses } from "../../lib/options";
 import { buildCrudTable } from "../../lib/table";
 
@@ -31,6 +32,18 @@ const schema = {
 
     ],
     showUpdatedAt: false,
+    operations: [
+      {
+        icon: "fas fa-download",
+        actionType: "url",
+        type: "button",
+        align: "right",
+        tooltip: "下载",
+        level: "link",
+        url: "/api/system/files/download/$path?access_token=" + getAccessToken(),
+        blank: true,
+      }
+    ],
     columns: [
       {
         name: "name",

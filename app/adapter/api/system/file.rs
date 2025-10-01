@@ -3,9 +3,14 @@ use application::{
     system::{
         dto::file::FileDto,
         query::search_files::{SearchFilesQuery, SearchFilesQueryHandler},
+        service::upload_service::UploadService,
     },
 };
-use axum::extract::Query;
+use axum::{
+    extract::{Path, Query},
+    http::StatusCode,
+    response::{IntoResponse, Redirect},
+};
 use domain::system::value_object::permission::SYSTEM_FILE_READ;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -37,6 +42,28 @@ async fn search(
     JsonResponse::ok(PagingResponse { total, items })
 }
 
+#[utoipa::path(
+    get,
+    path = "/download/{*path}",
+    summary = "Download file",
+    tag = "System",
+    responses(
+        (status = 200)
+    )
+)]
+#[tracing::instrument]
+async fn download(
+    Inject(service): Inject<UploadService>,
+    Path(path): Path<String>,
+) -> impl IntoResponse {
+    if let Ok(url) = service.presign_url(path).await {
+        return Redirect::temporary(&url).into_response();
+    }
+    StatusCode::BAD_REQUEST.into_response()
+}
+
 pub fn routing() -> OpenApiRouter<WebState> {
-    OpenApiRouter::new().routes(routes!(search).permit_all(perms!(SYSTEM_FILE_READ)))
+    OpenApiRouter::new()
+        .routes(routes!(search).permit_all(perms!(SYSTEM_FILE_READ)))
+        .routes(routes!(download).permit_all(perms!(SYSTEM_FILE_READ)))
 }

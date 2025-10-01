@@ -9,8 +9,8 @@ path = "lib.rs"
 [dependencies]
 argon2 = { workspace = true, features = ["std"] }
 bon = { workspace = true }
-readonly = { workspace = true }
 chrono = { workspace = true }
+readonly = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 sqlx = { workspace = true, features = ["macros", "chrono"] }
 tempoid = { workspace = true }
