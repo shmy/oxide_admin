@@ -26,6 +26,8 @@ pub struct SearchRolesQuery {
     #[serde(flatten)]
     #[param(inline)]
     paging: PagingQuery,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
     name: Option<String>,
     #[serde_as(as = "NoneAsEmptyString")]
     #[serde(default)]

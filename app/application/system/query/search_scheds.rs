@@ -12,7 +12,7 @@ use infrastructure::shared::pg_pool::PgPool;
 use kvdb_kit::Kvdb;
 use nject::injectable;
 use serde::Deserialize;
-use serde_with::serde_as;
+use serde_with::{NoneAsEmptyString, serde_as};
 use single_flight::single_flight;
 use std::time::Duration;
 use utoipa::IntoParams;
@@ -23,6 +23,15 @@ pub struct SearchSchedsQuery {
     #[serde(flatten)]
     #[param(inline)]
     paging: PagingQuery,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
+    key: Option<String>,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
+    name: Option<String>,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
+    succeed: Option<bool>,
 }
 
 #[derive(Debug, Clone)]
@@ -45,7 +54,13 @@ impl QueryHandler for SearchSchedsQueryHandler {
             r#"
             SELECT COUNT(*) AS "count!"
             FROM _scheds
+            WHERE ($1::text IS NULL OR key = $1)
+            AND ($2::text IS NULL OR name LIKE CONCAT('%', $2, '%'))
+            AND ($3::boolean IS NULL OR succeed = $3)
             "#,
+            query.key,
+            query.name,
+            query.succeed,
         )
         .fetch_one(&self.pool);
         let page = query.paging.page();
@@ -56,8 +71,14 @@ impl QueryHandler for SearchSchedsQueryHandler {
             r#"
         SELECT id, key, name, schedule, succeed, result, run_at, duration_ms, created_at, updated_at
         FROM _scheds
-        ORDER BY created_at DESC LIMIT $1 OFFSET $2
+        WHERE ($1::text IS NULL OR key = $1)
+            AND ($2::text IS NULL OR name LIKE CONCAT('%', $2, '%'))
+            AND ($3::boolean IS NULL OR succeed = $3)
+        ORDER BY created_at DESC LIMIT $4 OFFSET $5
         "#,
+            query.key,
+            query.name,
+            query.succeed,
             page_size,
             offset,
         )

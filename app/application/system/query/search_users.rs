@@ -25,7 +25,11 @@ pub struct SearchUsersQuery {
     #[serde(flatten)]
     #[param(inline)]
     paging: PagingQuery,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
     account: Option<String>,
+    #[serde_as(as = "NoneAsEmptyString")]
+    #[serde(default)]
     name: Option<String>,
     #[serde_as(as = "NoneAsEmptyString")]
     #[serde(default)]

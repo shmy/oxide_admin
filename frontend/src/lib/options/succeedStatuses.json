@@ -1,0 +1,10 @@
+[
+  {
+    "label": "已成功",
+    "value": true
+  },
+  {
+    "label": "已失败",
+    "value": false
+  }
+]
