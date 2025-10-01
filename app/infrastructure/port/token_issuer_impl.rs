@@ -70,7 +70,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
     }
 
     #[tracing::instrument(skip(access_token, secret))]
-    fn verify<T: DeserializeOwned>(
+    fn verify<T: DeserializeOwned + Clone>(
         &self,
         access_token: &str,
         secret: &[u8],
@@ -85,7 +85,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
     }
 
     #[tracing::instrument(skip(access_token))]
-    fn decode_without_validation<T: DeserializeOwned>(
+    fn decode_without_validation<T: DeserializeOwned + Clone>(
         &self,
         access_token: &str,
     ) -> Result<T, Self::Error> {
@@ -121,7 +121,7 @@ mod tests {
     async fn test_generate_access_token_and_verify_ok(
         #[future(awt)] token_issuer: TokenIssuerImpl,
     ) {
-        #[derive(Debug, Serialize, Deserialize)]
+        #[derive(Debug, Clone, Serialize, Deserialize)]
         struct UserClaims {
             sub: String,
             iat: i64,
@@ -152,7 +152,7 @@ mod tests {
     async fn test_generate_access_token_and_verify_err(
         #[future(awt)] token_issuer: TokenIssuerImpl,
     ) {
-        #[derive(Debug, Serialize, Deserialize)]
+        #[derive(Debug, Clone, Serialize, Deserialize)]
         struct UserClaims {
             sub: String,
             iat: i64,
@@ -196,7 +196,7 @@ mod tests {
     #[rstest]
     #[tokio::test]
     async fn test_generate(#[future(awt)] token_issuer: TokenIssuerImpl) {
-        #[derive(Debug, Serialize, Deserialize)]
+        #[derive(Debug, Clone, Serialize, Deserialize)]
         struct UserClaims {
             sub: String,
             iat: i64,
@@ -215,7 +215,7 @@ mod tests {
     #[rstest]
     #[tokio::test]
     async fn test_decode_without_validation_err(#[future(awt)] token_issuer: TokenIssuerImpl) {
-        #[derive(Debug, Serialize, Deserialize)]
+        #[derive(Debug, Clone, Serialize, Deserialize)]
         struct UserClaims {
             sub: String,
             iat: i64,

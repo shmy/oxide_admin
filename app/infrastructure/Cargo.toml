@@ -34,7 +34,7 @@ chrono-tz = { workspace = true, features = ["std"] }
 
 domain = { workspace = true }
 flag_kit = { workspace = true }
-jsonwebtoken = { workspace = true }
+jsonwebtoken = { workspace = true, features = ["rust_crypto"] }
 kvdb_kit = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 object_storage_kit = { workspace = true }

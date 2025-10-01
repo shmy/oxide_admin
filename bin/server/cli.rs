@@ -11,144 +11,144 @@ use infrastructure::shared::config::{Config, ConfigRef, Database, Jwt, Log, Open
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
-    /// 日志级别: trace debug info warn error
+    /// Log level: trace, debug, info, warn, error
     #[arg(long, default_value = "info", env = "LOG_LEVEL")]
     pub log_level: String,
 
     #[cfg(feature = "trace_rolling")]
-    /// 日志文件滚动周期: minutely hourly daily never
+    /// Log file rotation strategy: minutely, hourly, daily, never
     #[arg(long, default_value = "daily", env = "LOG_ROLLING_KIND")]
     pub log_rolling_kind: String,
 
     #[cfg(feature = "trace_otlp")]
-    /// OpenTelemetry 服务名称
+    /// OTLP reporting service name
     #[arg(long, default_value = "oxide_admin", env = "OTLP_SERVICE_NAME")]
     pub otlp_service_name: String,
 
     #[cfg(feature = "trace_otlp")]
-    /// OpenTelemetry grpc 导出端点
+    /// OTLP gRPC collector endpoint
     #[arg(long, default_value = "http://localhost:4317", env = "OTLP_ENDPOINT")]
     pub otlp_endpoint: String,
 
     #[cfg(feature = "trace_otlp")]
-    /// OpenTelemetry grpc metadata
+    /// OTLP gRPC metadata (JSON format)
     #[arg(long, default_value = "{}", env = "OTLP_METADATA")]
     pub otlp_metadata: String,
 
-    /// 时区
+    /// Time zone
     #[arg(long, default_value = "Asia/Shanghai", env = "TIMEZONE")]
     pub timezone: Tz,
 
-    /// 是否启用 OpenAPI
+    /// Enable OpenAPI documentation
     #[arg(long, action = clap::ArgAction::Set, default_value_t = true, env = "OPENAPI_ENABLED")]
     pub openapi_enabled: bool,
 
-    /// 数据库连接地址
+    /// Database connection DSN
     #[arg(long, env = "DATABASE_URL")]
     pub database_url: String,
 
-    /// 数据库最大连接数
+    /// Maximum number of database connections
     #[arg(long, default_value = "100", env = "DATABASE_MAX_CONNECTIONS")]
     pub database_max_connections: u32,
 
-    /// 数据库最小连接数
+    /// Minimum number of database connections
     #[arg(long, default_value = "1", env = "DATABASE_MIN_CONNECTIONS")]
     pub database_min_connections: u32,
 
-    /// 数据库最大存活时间
+    /// Maximum lifetime of a database connection
     #[arg(long, default_value = "15min", env = "DATABASE_MAX_LIFETIME")]
     pub database_max_lifetime: String,
 
-    /// 数据库最大空闲时间
+    /// Maximum idle timeout of a database connection
     #[arg(long, default_value = "5min", env = "DATABASE_IDLE_TIMEOUT")]
     pub database_idle_timeout: String,
 
-    /// 数据库最大等待时间
+    /// Maximum wait time to acquire a database connection
     #[arg(long, default_value = "3s", env = "DATABASE_ACQUIRE_TIMEOUT")]
     pub database_acquire_timeout: String,
 
     #[cfg(feature = "kv_redis")]
-    /// Redis连接地址
+    /// Redis connection DSN
     #[arg(long, env = "REDIS_URL")]
     pub redis_url: String,
 
     #[cfg(feature = "kv_redis")]
-    /// Redis连接超时时间
+    /// Redis connection establishment timeout
     #[arg(long, default_value = "10s", env = "REDIS_CONNECTION_TIMEOUT")]
     pub redis_connection_timeout: String,
 
     #[cfg(feature = "kv_redis")]
-    /// Redis最大连接数
+    /// Maximum number of Redis connections
     #[arg(long, default_value = "100", env = "REDIS_MAX_SIZE")]
     pub redis_max_size: u32,
 
     #[cfg(feature = "kv_redis")]
-    /// Redis最小空闲连接数
+    /// Minimum number of idle Redis connections
     #[arg(long, default_value = "1", env = "REDIS_MIN_IDLE")]
     pub redis_min_idle: u32,
 
     #[cfg(feature = "kv_redis")]
-    /// Redis最大存活时间
+    /// Maximum lifetime of a Redis connection
     #[arg(long, default_value = "15min", env = "REDIS_MAX_LIFETIME")]
     pub redis_max_lifetime: String,
 
     #[cfg(feature = "kv_redis")]
-    /// Redis最大空闲时间
+    /// Maximum idle timeout of a Redis connection
     #[arg(long, default_value = "5min", env = "REDIS_IDLE_TIMEOUT")]
     pub redis_idle_timeout: String,
 
     #[cfg(feature = "bg_faktory")]
-    /// Faktory 地址
-    #[arg(long, env = "FAKTORY_URL")]
-    pub faktory_url: String,
+    /// Faktory server URL
+    #[arg(long, env = "FAKTORY_ENDPOINT")]
+    pub faktory_endpoint: String,
 
     #[cfg(feature = "bg_faktory")]
-    /// Faktory 队列名称
+    /// Faktory queue name
     #[arg(long, default_value = "oxide-admin", env = "FAKTORY_QUEUE")]
     pub faktory_queue: String,
 
-    /// 绑定的主机地址
+    /// Server bind address
     #[arg(long, default_value = "127.0.0.1", env = "SERVER_BIND")]
     pub server_bind: String,
 
-    /// 绑定的端口号
+    /// Server bind port
     #[arg(long, default_value = "8080", env = "SERVER_PORT")]
     pub server_port: u16,
 
-    /// JWT 访问令牌密钥
+    /// JWT access token secret
     #[arg(long, env = "JWT_ACCESS_TOKEN_SECRET")]
     pub jwt_access_token_secret: String,
 
-    /// JWT 访问令牌有效期
+    /// JWT access token validity period
     #[arg(long, default_value = "1h", env = "JWT_ACCESS_TOKEN_PERIOD")]
     pub jwt_access_token_period: String,
 
-    /// JWT 刷新令牌有效期
+    /// JWT refresh token validity period
     #[arg(long, default_value = "7d", env = "JWT_REFRESH_TOKEN_PERIOD")]
     pub jwt_refresh_token_period: String,
 
     #[cfg(feature = "object_storage_fs")]
-    /// 上传文件链接签名的密钥
+    /// File storage link signing secret
     #[arg(long, env = "FS_HMAC_SECRET")]
     pub fs_hmac_secret: String,
 
     #[cfg(feature = "object_storage_fs")]
-    /// 上传文件链接访问有效期
+    /// File storage link validity period
     #[arg(long, default_value = "1min", env = "FS_LINK_PERIOD")]
     pub fs_link_period: String,
 
     #[cfg(feature = "object_storage_s3")]
-    /// S3 服务器地址
+    /// S3 endpoint
     #[arg(long, env = "S3_ENDPOINT")]
     pub s3_endpoint: String,
 
     #[cfg(feature = "object_storage_s3")]
-    /// S3 Bucket 名称
+    /// S3 bucket name
     #[arg(long, env = "S3_BUCKET")]
     pub s3_bucket: String,
 
     #[cfg(feature = "object_storage_s3")]
-    /// S3 access key id
+    /// S3 access key ID
     #[arg(long, env = "S3_ACCESS_KEY_ID")]
     pub s3_access_key_id: String,
 
@@ -161,18 +161,21 @@ pub struct Cli {
     /// S3 region
     #[arg(long, env = "S3_REGION")]
     pub s3_region: String,
+
     #[cfg(feature = "flag_flipt")]
-    /// Flip 服务器地址
-    #[arg(long, env = "FLIP_ENDPOINT")]
-    pub flip_endpoint: String,
+    /// Flipt endpoint
+    #[arg(long, env = "FLIPT_ENDPOINT")]
+    pub flipt_endpoint: String,
+
     #[cfg(feature = "flag_flipt")]
-    /// Flip 环境名称
-    #[arg(long, env = "FLIP_ENVIRONMENT")]
-    pub flip_environment: String,
+    /// Flipt environment
+    #[arg(long, env = "FLIPT_ENVIRONMENT")]
+    pub flipt_environment: String,
+
     #[cfg(feature = "flag_flipt")]
-    /// Flip 命名空间
-    #[arg(long, env = "FLIP_NAMESPACE")]
-    pub flip_namespace: String,
+    /// Flipt namespace
+    #[arg(long, env = "FLIPT_NAMESPACE")]
+    pub flipt_namespace: String,
 }
 
 #[derive(Debug, Clone, Subcommand)]
@@ -180,7 +183,7 @@ pub enum Commands {
     /// Start web server
     Serve,
     #[cfg(not(feature = "serve_with_sched"))]
-    /// Start sched server
+    /// Start scheduled task server
     Sched,
 }
 
@@ -245,7 +248,7 @@ impl TryFrom<Cli> for ConfigRef {
         #[cfg(feature = "bg_faktory")]
         let builder = builder.faktory(
             infrastructure::shared::config::Faktory::builder()
-                .url(value.faktory_url)
+                .endpoint(value.faktory_endpoint)
                 .queue(value.faktory_queue)
                 .build(),
         );
@@ -262,11 +265,11 @@ impl TryFrom<Cli> for ConfigRef {
         };
 
         #[cfg(feature = "flag_flipt")]
-        let builder = builder.flip(
-            infrastructure::shared::config::Flip::builder()
-                .endpoint(value.flip_endpoint)
-                .environment(value.flip_environment)
-                .namespace(value.flip_namespace)
+        let builder = builder.flipt(
+            infrastructure::shared::config::Flipt::builder()
+                .endpoint(value.flipt_endpoint)
+                .environment(value.flipt_environment)
+                .namespace(value.flipt_namespace)
                 .build(),
         );
         Ok(Arc::new(builder.build()))

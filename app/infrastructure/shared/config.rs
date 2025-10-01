@@ -22,7 +22,7 @@ pub struct Config {
     #[cfg(feature = "object_storage_s3")]
     pub s3: StorageS3,
     #[cfg(feature = "flag_flipt")]
-    pub flip: Flip,
+    pub flipt: Flipt,
 }
 
 impl Debug for Config {
@@ -72,7 +72,7 @@ pub struct Redis {
 #[derive(Clone, Builder)]
 #[readonly::make]
 pub struct Faktory {
-    pub url: String,
+    pub endpoint: String,
     pub queue: String,
 }
 
@@ -113,7 +113,7 @@ pub struct StorageS3 {
 #[cfg(feature = "flag_flipt")]
 #[derive(Clone, Builder)]
 #[readonly::make]
-pub struct Flip {
+pub struct Flipt {
     pub endpoint: String,
     pub environment: String,
     pub namespace: String,

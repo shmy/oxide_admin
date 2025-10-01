@@ -29,9 +29,9 @@ impl FeatureFlag {
         let mut api = OpenFeature::singleton_mut().await;
         api.set_provider(FliptProvider::try_new(
             FliptProviderConfig::builder()
-                .endpoint(config.flip.endpoint.to_string())
-                .environment(config.flip.environment.to_string())
-                .namespace(config.flip.namespace.to_string())
+                .endpoint(config.flipt.endpoint.to_string())
+                .environment(config.flipt.environment.to_string())
+                .namespace(config.flipt.namespace.to_string())
                 .build(),
         )?)
         .await;
