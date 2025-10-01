@@ -26,7 +26,7 @@ export default defineConfig(async () => {
     plugins: [pluginReact(), pluginSass()],
     source: {
       entry: {
-        index: "./src/index/index.ts",
+        index: "./src/index/index.tsx",
         sign_in: "./src/sign_in/index.tsx",
         ...entry,
       },

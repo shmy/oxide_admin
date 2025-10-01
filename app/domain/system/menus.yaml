@@ -12,10 +12,14 @@ private:
         icon: fas fa-people-group
         url: /system/role
       - key: 4
+        label: 文件管理
+        icon: fas fa-folder
+        url: /system/file
+      - key: 5
         label: 系统信息
         icon: fas fa-info
         url: /system/stat
-      - key: 5
+      - key: 6
         label: 示例页面
         icon: fas fa-hexagon-nodes
         url: /system/example

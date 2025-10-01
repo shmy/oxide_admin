@@ -18,7 +18,9 @@ export const PERMISSIONS = {
       DISABLE: 205,
     },
     FILE: {
-      UPLOAD: 300,
+      READ: 300,
+      UPLOAD: 301,
+      DOWNLOAD: 302,
     },
   },
 };

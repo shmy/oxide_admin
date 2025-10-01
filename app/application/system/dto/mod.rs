@@ -1,4 +1,5 @@
 pub mod cpu;
+pub mod file;
 pub mod process_info;
 pub mod role;
 pub mod system_info;

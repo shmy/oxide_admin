@@ -1,0 +1,10 @@
+[
+  {
+    "label": "使用中",
+    "value": true
+  },
+  {
+    "label": "未使用",
+    "value": false
+  }
+]

@@ -7,8 +7,8 @@ import {
 } from "../lib/amis_router";
 import { getAccessToken, redirectToSignIn, signOut } from "../lib/authn";
 import http from "../lib/http";
-import { lazy } from "react";
 import { logoUrl } from "../lib/constant";
+import { registerComponents } from "../lib/component";
 
 if (!getAccessToken()) {
   redirectToSignIn();
@@ -16,15 +16,7 @@ if (!getAccessToken()) {
 
 const amisLib = amisRequire("amis");
 const amis = amisRequire("amis/embed");
-amisLib.Renderer({
-  type: "react-test",
-  autoVar: true,
-})(lazy(() => import("../components/react-test")));
-
-amisLib.FormItem({
-  type: "byte-display",
-  autoVar: true,
-})(lazy(() => import("../components/byte-display")));
+registerComponents(amisLib);
 
 const buildDropdown = () => {
   return {

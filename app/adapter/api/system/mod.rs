@@ -2,6 +2,7 @@ use utoipa_axum::router::OpenApiRouter;
 
 use crate::WebState;
 
+mod file;
 mod option;
 mod role;
 mod stat;
@@ -12,5 +13,6 @@ pub fn routing() -> OpenApiRouter<WebState> {
         .nest("/users", user::routing())
         .nest("/roles", role::routing())
         .nest("/options", option::routing())
+        .nest("/files", file::routing())
         .nest("/stats", stat::routing())
 }
