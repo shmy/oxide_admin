@@ -96,7 +96,7 @@ impl QueryHandler for SearchUsersQueryHandler {
             AND ($4::boolean IS NULL OR u.enabled = $4)
             AND ($5::text IS NULL OR $5 = ANY(u.role_ids))
         GROUP BY u.id
-        ORDER BY u.updated_at DESC
+        ORDER BY u.created_at DESC
         LIMIT $6 OFFSET $7
 
         "#,

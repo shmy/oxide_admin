@@ -87,7 +87,7 @@ impl QueryHandler for SearchRolesQueryHandler {
             AND ($3::boolean IS NULL OR enabled = $3)
             AND ($4::integer IS NULL OR $4 = ANY(menus))
             AND ($5::integer IS NULL OR $5 = ANY(permissions))
-        ORDER BY updated_at DESC
+        ORDER BY created_at DESC
         LIMIT $6 OFFSET $7
         "#,
             query.name,
