@@ -58,3 +58,12 @@
         - label: 下载
           key: download
           value: 302
+    - label: 定时任务
+      key: sched
+      children:
+        - label: 读取
+          key: read
+          value: 400
+        - label: 删除
+          key: delete
+          value: 401

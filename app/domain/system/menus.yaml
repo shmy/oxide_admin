@@ -16,10 +16,14 @@ private:
         icon: fas fa-folder
         url: /system/file
       - key: 5
+        label: 定时任务
+        icon: fas fa-clock
+        url: /system/sched
+      - key: 6
         label: 系统信息
         icon: fas fa-info
         url: /system/stat
-      - key: 6
+      - key: 7
         label: 示例页面
         icon: fas fa-hexagon-nodes
         url: /system/example

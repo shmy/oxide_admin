@@ -52,6 +52,8 @@ type buildCrudTableProps = {
   deletable?: boolean;
   itemDeletableOn?: string;
   itemCheckableOn?: string;
+  showCreatedAt?: boolean;
+  showUpdatedAt?: boolean;
 };
 
 export const buildCrudTable = (props: buildCrudTableProps) => {
@@ -106,6 +108,24 @@ export const buildCrudTable = (props: buildCrudTableProps) => {
       buttons: buttons,
     });
   }
+
+  const columns = [...props.columns];
+  if (props.showCreatedAt ?? true) {
+    columns.push({
+      name: "created_at",
+      label: "创建时间",
+      // "sortable": sortable,
+      type: "datetime",
+    });
+  }
+  if (props.showUpdatedAt ?? true) {
+    columns.push({
+      name: "updated_at",
+      label: "更新时间",
+      // "sortable": sortable,
+      type: "datetime",
+    });
+  }
   const data = {
     type: "crud",
     id: props.componentId,
@@ -131,21 +151,7 @@ export const buildCrudTable = (props: buildCrudTableProps) => {
     ],
     bulkActions: bulkActions,
     itemCheckableOn: props.itemCheckableOn,
-    columns: [
-      ...props.columns,
-      {
-        name: "created_at",
-        label: "创建时间",
-        // "sortable": sortable,
-        type: "datetime",
-      },
-      {
-        name: "updated_at",
-        label: "更新时间",
-        // "sortable": sortable,
-        type: "datetime",
-      },
-    ],
+    columns,
   };
   if (operationButtons.length > 0) {
     data.columns.push({

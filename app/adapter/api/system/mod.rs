@@ -5,6 +5,7 @@ use crate::WebState;
 mod file;
 mod option;
 mod role;
+mod sched;
 mod stat;
 mod user;
 
@@ -14,5 +15,6 @@ pub fn routing() -> OpenApiRouter<WebState> {
         .nest("/roles", role::routing())
         .nest("/options", option::routing())
         .nest("/files", file::routing())
+        .nest("/scheds", sched::routing())
         .nest("/stats", stat::routing())
 }

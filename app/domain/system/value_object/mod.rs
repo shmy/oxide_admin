@@ -5,4 +5,5 @@ pub mod menu_group;
 pub mod permission;
 pub mod permission_group;
 pub mod role_id;
+pub mod sched_id;
 pub mod user_id;

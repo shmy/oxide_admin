@@ -105,6 +105,7 @@ dependencies = [
  "axum",
  "bg_worker_kit",
  "bon",
+ "chrono",
  "cruet",
  "domain",
  "filetime",
@@ -1229,6 +1230,7 @@ version = "0.1.0"
 dependencies = [
  "argon2",
  "bon",
+ "chrono",
  "cruet",
  "readonly",
  "serde",

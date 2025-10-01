@@ -7,7 +7,7 @@ CREATE TABLE
         name VARCHAR(256) NOT NULL,
         schedule VARCHAR(256) NOT NULL,
         succeed BOOLEAN NOT NULL,
-        output TEXT,
+        output TEXT NOT NULL,
         run_at TIMESTAMP NOT NULL,
         duration_ms BIGINT NOT NULL,
         created_at TIMESTAMP NOT NULL,

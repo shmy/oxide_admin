@@ -22,5 +22,9 @@ export const PERMISSIONS = {
       UPLOAD: 301,
       DOWNLOAD: 302,
     },
+    SCHED: {
+      READ: 400,
+      DELETE: 401,
+    },
   },
 };

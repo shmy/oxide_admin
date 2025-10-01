@@ -41,6 +41,8 @@ pub enum SystemError {
     Sqlx(String),
     #[error("File not exists")]
     FileNotFound,
+    #[error("Sched not exists")]
+    SchedNotFound,
 }
 impl From<sqlx::Error> for SystemError {
     fn from(err: sqlx::Error) -> Self {

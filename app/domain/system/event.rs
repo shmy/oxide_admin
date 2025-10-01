@@ -1,4 +1,5 @@
 use crate::system::entity::file::File;
+use crate::system::entity::sched::Sched;
 use crate::{
     shared::event_util::UpdatedEvent,
     system::{
@@ -20,4 +21,7 @@ pub enum SystemEvent {
     FilesCreated { items: Vec<File> },
     FilesUpdated { items: Vec<UpdatedEvent<File>> },
     FilesDeleted { items: Vec<File> },
+    SchedsCreated { items: Vec<Sched> },
+    SchedsUpdated { items: Vec<UpdatedEvent<Sched>> },
+    SchedsDeleted { items: Vec<Sched> },
 }

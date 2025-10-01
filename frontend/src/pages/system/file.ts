@@ -30,6 +30,7 @@ const schema = {
     bulkActions: [
 
     ],
+    showUpdatedAt: false,
     columns: [
       {
         name: "name",
