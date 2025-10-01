@@ -2,7 +2,9 @@
 CREATE TABLE
     _files (
         id CHAR(24) PRIMARY KEY NOT NULL,
+        name VARCHAR(256) NOT NULL,
         path VARCHAR(64) NOT NULL,
+        size BIGINT NOT NULL,
         used BOOLEAN NOT NULL,
         created_at TIMESTAMP NOT NULL,
         updated_at TIMESTAMP NOT NULL

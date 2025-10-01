@@ -31,13 +31,15 @@ impl FileService {
     }
 
     #[tracing::instrument]
-    pub async fn create(&self, relative_path: &str) -> ApplicationResult<()> {
+    pub async fn create(&self, name: &str, size: u64, path: &str) -> ApplicationResult<()> {
         let now = self.ct.now();
         let id = IdGenerator::primary_id();
         let _ = sqlx::query!(
-            "INSERT INTO _files (id, path, used, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
+            "INSERT INTO _files (id, name, size, path, used, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7)",
             id,
-            relative_path,
+            name,
+            size as i64,
+            path,
             false,
             now,
             now,

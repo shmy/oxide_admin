@@ -60,7 +60,9 @@ async fn image(
     Inject(service): Inject<UploadService>,
     TypedMultipart(request): TypedMultipart<request::UploadRequest>,
 ) -> JsonResponseType<FinishResponse> {
-    let resp = service.image(request.file.contents).await?;
+    let resp = service
+        .image(request.file.metadata.file_name, request.file.contents)
+        .await?;
     JsonResponse::ok(resp)
 }
 
@@ -121,7 +123,12 @@ async fn finish_chunk(
     Json(request): Json<request::FinishChunkRequest>,
 ) -> JsonResponseType<FinishResponse> {
     let resp = service
-        .finish_chunk(request.key, request.upload_id, request.part_list)
+        .finish_chunk(
+            request.filename,
+            request.key,
+            request.upload_id,
+            request.part_list,
+        )
         .await?;
     JsonResponse::ok(resp)
 }
@@ -160,6 +167,7 @@ mod request {
 
     #[derive(Debug, Deserialize, ToSchema)]
     pub(crate) struct FinishChunkRequest {
+        pub filename: String,
         pub key: String,
         #[serde(rename = "uploadId")]
         pub upload_id: String,

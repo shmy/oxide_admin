@@ -2,7 +2,7 @@ use crate::error::{ApplicationError, ApplicationResult};
 use axum::http::Uri;
 use bon::Builder;
 use domain::shared::id_generator::IdGenerator;
-use futures_util::{StreamExt, TryFutureExt, stream};
+use futures_util::{StreamExt, stream};
 use image::{ImageFormat, ImageReader};
 use imageformat::detect_image_format;
 use infrastructure::shared::chrono_tz::{ChronoTz, Datelike as _};
@@ -34,41 +34,48 @@ pub struct UploadService {
 }
 
 impl UploadService {
-    #[tracing::instrument(skip(file))]
-    pub async fn image(&self, mut file: NamedTempFile) -> ApplicationResult<FinishResponse> {
-        let Some(format) = SupportedFormat::validate_image_type(&mut file) else {
+    #[tracing::instrument(skip_all)]
+    pub async fn image(
+        &self,
+        file_name: Option<String>,
+        mut file_contents: NamedTempFile,
+    ) -> ApplicationResult<FinishResponse> {
+        let Some(format) = SupportedFormat::validate_image_type(&mut file_contents) else {
             return Err(ApplicationError::UnsupportedImageFormat);
         };
+
         let filename = IdGenerator::filename().to_lowercase();
         let relative_path = self.build_relative_path(format!("{}.{}", filename, "webp"));
-        let reader = SupportedFormat::convert_to_webp(format, file).await?;
-        tokio::try_join!(
-            self.object_storage
-                .write(&relative_path, reader)
-                .map_err(Into::into),
-            self.file_service.create(&relative_path)
-        )?;
+        let reader = SupportedFormat::convert_to_webp(format, file_contents).await?;
+        let original_filename = file_name.unwrap_or_default();
+
+        let file_size = self.object_storage.write(&relative_path, reader).await?;
+        self.file_service
+            .create(&original_filename, file_size, &relative_path)
+            .await?;
         Ok(FinishResponse {
             url: self.object_storage.presign_url(&relative_path).await?,
             value: relative_path,
         })
     }
 
-    #[tracing::instrument(skip(file))]
+    #[tracing::instrument(skip_all)]
     pub async fn single(
         &self,
-        filename: Option<String>,
-        file: NamedTempFile,
+        file_name: Option<String>,
+        file_contents: NamedTempFile,
     ) -> ApplicationResult<FinishResponse> {
-        let extension = Self::extract_extension(filename);
+        let extension = Self::extract_extension(file_name.clone());
         let filename = IdGenerator::filename().to_lowercase();
         let relative_path = self.build_relative_path(format!("{filename}{extension}"));
-        tokio::try_join!(
-            self.object_storage
-                .write(&relative_path, file)
-                .map_err(Into::into),
-            self.file_service.create(&relative_path)
-        )?;
+        let original_filename = file_name.unwrap_or_default();
+        let file_size = self
+            .object_storage
+            .write(&relative_path, file_contents)
+            .await?;
+        self.file_service
+            .create(&original_filename, file_size, &relative_path)
+            .await?;
         Ok(FinishResponse {
             url: self.object_storage.presign_url(&relative_path).await?,
             value: relative_path,
@@ -103,6 +110,7 @@ impl UploadService {
     #[tracing::instrument]
     pub async fn finish_chunk(
         &self,
+        filename: String,
         key: String,
         upload_id: String,
         part_list: Vec<PartItem>,
@@ -117,15 +125,13 @@ impl UploadService {
                 Ok::<_, ObjectStorageError>(reader)
             }
         });
-        tokio::try_join!(
-            async {
-                self.object_storage
-                    .write_stream(&relative_path, pin::pin!(stream))
-                    .await
-                    .map_err(Into::into)
-            },
-            self.file_service.create(&relative_path)
-        )?;
+        let file_size = self
+            .object_storage
+            .write_stream(&relative_path, pin::pin!(stream))
+            .await?;
+        self.file_service
+            .create(&filename, file_size, &relative_path)
+            .await?;
         Ok(FinishResponse {
             url: self.object_storage.presign_url(&relative_path).await?,
             value: relative_path,

@@ -1,4 +1,4 @@
-use futures_util::{SinkExt as _, Stream, StreamExt as _, TryStreamExt as _};
+use futures_util::{SinkExt as _, Stream, StreamExt as _};
 use std::io::{Read, Seek};
 
 use crate::error::Result;
@@ -32,7 +32,7 @@ pub trait ObjectStorageWriter: ObjectStorageTrait {
         &self,
         path: impl AsRef<str>,
         mut stream: impl Stream<Item = Result<ReaderStream<File>>> + Unpin,
-    ) -> impl Future<Output = Result<()>> {
+    ) -> impl Future<Output = Result<u64>> {
         async move {
             let writer = self
                 .operator()
@@ -40,14 +40,19 @@ pub trait ObjectStorageWriter: ObjectStorageTrait {
                 .concurrent(8)
                 .await?;
             let mut sink = writer.into_bytes_sink();
+            let mut total_size: u64 = 0;
 
             while let Some(rs) = stream.next().await {
-                let rs = rs?;
-                sink.send_all(&mut rs.map_ok(|b| b)).await?;
+                let mut rs = rs?;
+                while let Some(chunk) = rs.next().await {
+                    let chunk = chunk?;
+                    total_size += chunk.len() as u64;
+                    sink.send(chunk).await?;
+                }
             }
 
             sink.close().await?;
-            Ok(())
+            Ok(total_size)
         }
     }
 
@@ -55,13 +60,14 @@ pub trait ObjectStorageWriter: ObjectStorageTrait {
         &self,
         path: impl AsRef<str>,
         mut reader: impl Read + Seek,
-    ) -> impl Future<Output = Result<()>> {
+    ) -> impl Future<Output = Result<u64>> {
         async move {
             reader.rewind()?;
             let mut buf = Vec::new();
             reader.read_to_end(&mut buf)?;
+            let total_size = buf.len() as u64;
             let _ = self.operator().write(path.as_ref(), buf).await?;
-            Ok(())
+            Ok(total_size)
         }
     }
 

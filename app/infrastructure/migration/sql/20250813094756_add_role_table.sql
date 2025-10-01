@@ -4,8 +4,8 @@ CREATE TABLE
         id CHAR(24) PRIMARY KEY NOT NULL,
         name VARCHAR(32) UNIQUE NOT NULL,
         privileged BOOLEAN NOT NULL,
-        permissions INTEGER[] NOT NULL,
         menus INTEGER[] NOT NULL,
+        permissions INTEGER[] NOT NULL,
         enabled BOOLEAN NOT NULL,
         created_at TIMESTAMP NOT NULL,
         updated_at TIMESTAMP NOT NULL
