@@ -20,7 +20,7 @@ impl sched_kit::ScheduledJobReceiver for SchedReceiverImpl {
             .name(params.name)
             .schedule(params.schedule)
             .succeed(params.succeed)
-            .output(params.output)
+            .result(params.result)
             .run_at(params.run_at)
             .duration_ms(params.duration_ms)
             .build();

@@ -28,26 +28,27 @@ const schema = {
         label: "任务名称",
       },
       {
-        name: "schedule",
-        label: "运行周期",
-      },
-      {
         name: "succeed",
         label: "是否成功",
         type: "status",
       },
       {
-        name: "output",
+        name: "schedule",
+        label: "运行周期",
+      },
+      {
+        name: "result",
         label: "运行结果",
+      },
+      {
+        name: "run_at",
+        label: "运行时间",
+        type: "datetime",
       },
       {
         name: "duration_ms",
         label: "运行时长",
-      },
-      {
-        name: "run_at",
-        label: "开始时间",
-        type: "datetime",
+        type: "pretty-ms",
       },
     ],
   }),

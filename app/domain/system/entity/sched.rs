@@ -10,7 +10,7 @@ pub struct Sched {
     pub name: String,
     pub schedule: String,
     pub succeed: bool,
-    pub output: String,
+    pub result: String,
     pub run_at: chrono::NaiveDateTime,
     pub duration_ms: i64,
 }
@@ -28,8 +28,8 @@ impl Sched {
     pub fn update_succeed(&mut self, succeed: bool) {
         self.succeed = succeed;
     }
-    pub fn update_output(&mut self, output: String) {
-        self.output = output;
+    pub fn update_result(&mut self, result: String) {
+        self.result = result;
     }
     pub fn update_run_at(&mut self, run_at: chrono::NaiveDateTime) {
         self.run_at = run_at;

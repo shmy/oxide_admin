@@ -9,7 +9,7 @@ pub struct SchedDto {
     pub name: String,
     pub schedule: String,
     pub succeed: bool,
-    pub output: String,
+    pub result: String,
     pub run_at: chrono::NaiveDateTime,
     pub duration_ms: i64,
     pub created_at: chrono::NaiveDateTime,

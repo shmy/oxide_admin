@@ -54,9 +54,9 @@ impl QueryHandler for SearchSchedsQueryHandler {
         let rows_future = sqlx::query_as!(
             SchedDto,
             r#"
-        SELECT id, key, name, schedule, succeed, output, run_at, duration_ms, created_at, updated_at
+        SELECT id, key, name, schedule, succeed, result, run_at, duration_ms, created_at, updated_at
         FROM _scheds
-        LIMIT $1 OFFSET $2
+        ORDER BY created_at DESC LIMIT $1 OFFSET $2
         "#,
             page_size,
             offset,

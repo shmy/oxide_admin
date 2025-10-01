@@ -49,12 +49,12 @@ const schema = {
               value: "${system.cpus.length}",
             },
             {
-              type: "byte-display",
+              type: "pretty-bytes",
               label: "系统总内存",
               name: "system.total_memory",
             },
             {
-              type: "byte-display",
+              type: "pretty-bytes",
               label: "系统总交换内存",
               name: "system.total_swap",
             },

@@ -21,7 +21,7 @@ pub struct JobCallbackParams {
     pub name: String,
     pub schedule: String,
     pub succeed: bool,
-    pub output: String,
+    pub result: String,
     pub run_at: NaiveDateTime,
     pub duration_ms: i64,
 }

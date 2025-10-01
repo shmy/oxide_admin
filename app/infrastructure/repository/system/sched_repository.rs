@@ -29,7 +29,7 @@ impl DomainRepository for SchedRepositoryImpl {
         let row_opt = sqlx::query_as!(
             SchedDto,
             r#"
-        SELECT id as "id: SchedId", key, name, schedule, succeed, output, run_at, duration_ms FROM _scheds WHERE id = $1
+        SELECT id as "id: SchedId", key, name, schedule, succeed, result, run_at, duration_ms FROM _scheds WHERE id = $1
         "#,
             id
         )
@@ -44,14 +44,14 @@ impl DomainRepository for SchedRepositoryImpl {
 
         sqlx::query!(
             r#"
-            INSERT INTO _scheds (id, key, name, schedule, succeed, output, run_at, duration_ms, created_at, updated_at)
+            INSERT INTO _scheds (id, key, name, schedule, succeed, result, run_at, duration_ms, created_at, updated_at)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             ON CONFLICT (id) DO UPDATE SET
                 key = EXCLUDED.key,
                 name = EXCLUDED.name,
                 schedule = EXCLUDED.schedule,
                 succeed = EXCLUDED.succeed,
-                output = EXCLUDED.output,
+                result = EXCLUDED.result,
                 run_at = EXCLUDED.run_at,
                 duration_ms = EXCLUDED.duration_ms,
                 updated_at = EXCLUDED.updated_at
@@ -61,7 +61,7 @@ impl DomainRepository for SchedRepositoryImpl {
             &entity.name,
             &entity.schedule,
             &entity.succeed,
-            &entity.output,
+            &entity.result,
             &entity.run_at,
             &entity.duration_ms,
             &now,
@@ -80,7 +80,7 @@ impl DomainRepository for SchedRepositoryImpl {
         let items = sqlx::query_as!(
             SchedDto,
             r#"
-            DELETE FROM _scheds WHERE id = ANY($1) RETURNING id as "id: SchedId", key, name, schedule, succeed, output, run_at, duration_ms
+            DELETE FROM _scheds WHERE id = ANY($1) RETURNING id as "id: SchedId", key, name, schedule, succeed, result, run_at, duration_ms
             "#,
             &ids.inner_vec()
         )
@@ -100,7 +100,7 @@ struct SchedDto {
     name: String,
     schedule: String,
     succeed: bool,
-    output: String,
+    result: String,
     run_at: chrono::NaiveDateTime,
     duration_ms: i64,
 }
@@ -113,7 +113,7 @@ impl From<SchedDto> for Sched {
             .name(value.name)
             .schedule(value.schedule)
             .succeed(value.succeed)
-            .output(value.output)
+            .result(value.result)
             .run_at(value.run_at)
             .duration_ms(value.duration_ms)
             .build()

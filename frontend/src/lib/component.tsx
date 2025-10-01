@@ -1,7 +1,8 @@
 import { lazy, Suspense } from "react";
 
 const LazyReactTest = lazy(() => import("../components/react-test"));
-const LazyByteDisplay = lazy(() => import("../components/byte-display"));
+const PrettyBytes = lazy(() => import("../components/pretty-bytes"));
+const PrettyMs = lazy(() => import("../components/pretty-ms"));
 
 export const registerComponents = (amisLib: any) => {
 
@@ -11,9 +12,13 @@ export const registerComponents = (amisLib: any) => {
     })(withSuspense(LazyReactTest));
 
     amisLib.FormItem({
-        type: "byte-display",
+        type: "pretty-bytes",
         autoVar: true,
-    })(withSuspense(LazyByteDisplay));
+    })(withSuspense(PrettyBytes));
+    amisLib.FormItem({
+        type: "pretty-ms",
+        autoVar: true,
+    })(withSuspense(PrettyMs));
 
 };
 

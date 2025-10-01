@@ -7,13 +7,13 @@ CREATE TABLE
         name VARCHAR(256) NOT NULL,
         schedule VARCHAR(256) NOT NULL,
         succeed BOOLEAN NOT NULL,
-        output TEXT NOT NULL,
+        result TEXT NOT NULL,
         run_at TIMESTAMP NOT NULL,
         duration_ms BIGINT NOT NULL,
         created_at TIMESTAMP NOT NULL,
         updated_at TIMESTAMP NOT NULL
     );
 
-CREATE INDEX idx_scheds_key_created_at ON _scheds (key, created_at DESC);
+CREATE INDEX idx_scheds_key ON _scheds (key);
 
-CREATE INDEX idx_scheds_succeed_created_at ON _scheds (succeed, created_at DESC);
+CREATE INDEX idx_scheds_succeed_run_at ON _scheds (succeed, run_at DESC);

@@ -43,7 +43,7 @@ impl<R: ScheduledJobReceiver> TokioCronScheduler<R> {
                             name: T::NAME.to_string(),
                             schedule: T::SCHEDULER.to_string(),
                             succeed: output.is_ok(),
-                            output: format!("{:?}", output),
+                            result: format!("{:?}", output),
                             run_at: now,
                             duration_ms: instant.elapsed().as_millis() as i64,
                         };

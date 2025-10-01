@@ -37,7 +37,7 @@ const schema = {
         label: "文件名称",
       },
       {
-        type: "byte-display",
+        type: "pretty-bytes",
         label: "文件大小",
         name: "size",
       },

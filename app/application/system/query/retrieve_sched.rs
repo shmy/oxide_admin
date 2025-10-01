@@ -30,7 +30,7 @@ impl QueryHandler for RetrieveSchedQueryHandler {
         let row_opt = sqlx::query_as!(
             SchedDto,
             r#"
-            SELECT id, key, name, schedule, succeed, output, run_at, duration_ms, created_at, updated_at
+            SELECT id, key, name, schedule, succeed, result, run_at, duration_ms, created_at, updated_at
             FROM _scheds
             WHERE id = $1
         "#,
