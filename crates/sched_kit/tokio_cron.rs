@@ -59,6 +59,7 @@ mod tests {
 
         impl ScheduledJob for TestJob {
             const SCHEDULER: &'static str = "every 1 second";
+            const NAME: &'static str = "test job";
 
             async fn run(&self) -> Result<()> {
                 info!("test job running");
