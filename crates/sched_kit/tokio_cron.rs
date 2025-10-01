@@ -1,30 +1,53 @@
-use crate::error::Result;
+use crate::{JobCallbackParams, error::Result};
+use chrono::Utc;
+use tokio::time::Instant;
 use tokio_cron_scheduler::{Job, JobScheduler};
-use tracing::error;
 
-use crate::ScheduledJob;
+use crate::{ScheduledJob, ScheduledJobReceiver};
+use std::future::Future;
 
-pub struct TokioCronScheduler {
+pub struct TokioCronScheduler<R: ScheduledJobReceiver> {
     sched: tokio_cron_scheduler::JobScheduler,
+    receiver: R,
 }
 
-impl TokioCronScheduler {
-    pub async fn try_new() -> Result<Self> {
+impl<R: ScheduledJobReceiver> TokioCronScheduler<R> {
+    pub async fn try_new(receiver: R) -> Result<Self> {
         let sched = JobScheduler::new().await?;
-        Ok(Self { sched })
+        Ok(Self { sched, receiver })
     }
 
-    pub async fn add<T: ScheduledJob>(&self, job: T, timezone: chrono_tz::Tz) -> Result<()> {
+    pub async fn add<T: ScheduledJob>(
+        &self,
+        key: &str,
+        job: T,
+        timezone: chrono_tz::Tz,
+    ) -> Result<()> {
+        let receiver = self.receiver.clone();
+        let key = key.to_string();
+
         self.sched
             .add(Job::new_async_tz(
                 T::SCHEDULER,
                 timezone,
                 move |_uuid, _l| {
+                    let receiver = receiver.clone();
                     let job = job.clone();
+                    let key = key.clone();
                     Box::pin(async move {
-                        if let Err(err) = job.run().await {
-                            error!(%err, "Failed to run job");
-                        }
+                        let now = Utc::now().with_timezone(&timezone).naive_local();
+                        let instant = Instant::now();
+                        let output = job.run().await;
+                        let params = JobCallbackParams {
+                            key,
+                            name: T::NAME.to_string(),
+                            schedule: T::SCHEDULER.to_string(),
+                            succeed: output.is_ok(),
+                            output: format!("{:?}", output),
+                            run_at: now,
+                            duration_ms: instant.elapsed().as_millis() as i64,
+                        };
+                        receiver.receive(params).await;
                     })
                 },
             )?)
@@ -66,9 +89,19 @@ mod tests {
                 Ok(())
             }
         }
-        let mut sched = TokioCronScheduler::try_new().await.unwrap();
+        #[derive(Clone)]
+        struct TestJobReceiver;
 
-        sched.add(TestJob, chrono_tz::Asia::Shanghai).await.unwrap();
+        impl ScheduledJobReceiver for TestJobReceiver {
+            async fn receive(&self, _params: JobCallbackParams) {}
+        }
+
+        let mut sched = TokioCronScheduler::try_new(TestJobReceiver).await.unwrap();
+
+        sched
+            .add("test_job", TestJob, chrono_tz::Asia::Shanghai)
+            .await
+            .unwrap();
         assert!(
             sched
                 .run_with_signal(tokio::time::sleep(std::time::Duration::from_secs(2)))

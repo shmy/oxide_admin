@@ -188,11 +188,13 @@ use sched_kit::tokio_cron::TokioCronScheduler;
 #[allow(unused_imports)]
 use sched_kit::ScheduledJob;
 #[allow(unused_imports)]
+use infrastructure::port::sched_receiver_impl::SchedReceiverImpl;
+#[allow(unused_imports)]
 use infrastructure::shared::config::ConfigRef;
 
 pub async fn register_scheduled_jobs(
     #[allow(unused)]
-    scheduler_job: &TokioCronScheduler,
+    scheduler_job: &TokioCronScheduler<SchedReceiverImpl>,
     #[allow(unused)]
     provider: &Provider,
 ) -> ApplicationResult<()> {
@@ -201,7 +203,7 @@ pub async fn register_scheduled_jobs(
     {%- for job in jobs %}
 
     let job = provider.provide::<crate::shared::scheduler_job::{{job}}::{{job | pascal_case}}>();
-    scheduler_job.add(job, config.timezone).await?;
+    scheduler_job.add("{{job}}", job, config.timezone).await?;
     tracing::info!("Scheduled job [{{job | pascal_case}}]({}) has been registered", crate::shared::scheduler_job::{{job}}::{{job | pascal_case}}::SCHEDULER);
     {%- endfor %}
     Ok(())

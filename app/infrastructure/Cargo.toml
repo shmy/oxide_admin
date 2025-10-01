@@ -41,6 +41,7 @@ object_storage_kit = { workspace = true }
 open-feature = { workspace = true }
 readonly = { workspace = true }
 rstest = { workspace = true, optional = true }
+sched_kit = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
 single_flight = { workspace = true }

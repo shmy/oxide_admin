@@ -11,13 +11,16 @@ use application::{
 use axum::Router;
 use bg_worker_kit::queuer::Queuer;
 use bg_worker_kit::worker_manager::WorkerManager;
-use infrastructure::shared::{
-    chrono_tz::ChronoTz,
-    config::{ConfigRef, Log, Server},
-    feature_flag::FeatureFlag,
-    pg_pool,
-};
 use infrastructure::{migration, shared::pg_pool::PgPool, shared::provider::Provider};
+use infrastructure::{
+    port::sched_receiver_impl::SchedReceiverImpl,
+    shared::{
+        chrono_tz::ChronoTz,
+        config::{ConfigRef, Log, Server},
+        feature_flag::FeatureFlag,
+        pg_pool,
+    },
+};
 use kvdb_kit::{Kvdb, KvdbTrait as _};
 use object_storage_kit::ObjectStorage;
 use std::{
@@ -220,8 +223,10 @@ async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
 
 async fn build_scheduler_job(
     provider: &Provider,
-) -> Result<sched_kit::tokio_cron::TokioCronScheduler> {
-    let scheduler = sched_kit::tokio_cron::TokioCronScheduler::try_new().await?;
+) -> Result<sched_kit::tokio_cron::TokioCronScheduler<SchedReceiverImpl>> {
+    let scheduler =
+        sched_kit::tokio_cron::TokioCronScheduler::try_new(provider.provide::<SchedReceiverImpl>())
+            .await?;
     register_scheduled_jobs(&scheduler, provider).await?;
     Ok(scheduler)
 }
@@ -248,7 +253,7 @@ async fn start_http_server(listener: TcpListener, app: Router, notify: Arc<Notif
 }
 
 async fn start_scheduler_job(
-    mut scheduler_job: sched_kit::tokio_cron::TokioCronScheduler,
+    mut scheduler_job: sched_kit::tokio_cron::TokioCronScheduler<SchedReceiverImpl>,
     notify: Arc<Notify>,
 ) -> Result<()> {
     let shutdown = async move {

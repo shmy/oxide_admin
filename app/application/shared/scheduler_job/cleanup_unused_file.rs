@@ -14,7 +14,8 @@ pub struct CleanupUnusedFile {
 
 /// Delete unused files at 1 a.m. every day.
 impl ScheduledJob for CleanupUnusedFile {
-    const SCHEDULER: &'static str = "at 01:01 every day";
+    // const SCHEDULER: &'static str = "at 01:01 every day";
+    const SCHEDULER: &'static str = "every 3 seconds";
     const NAME: &'static str = "Delete unused files";
 
     async fn run(&self) -> Result<()> {

@@ -2282,6 +2282,7 @@ dependencies = [
  "open-feature",
  "readonly",
  "rstest",
+ "sched_kit",
  "serde",
  "serde_json",
  "single_flight",
@@ -4050,6 +4051,7 @@ dependencies = [
 name = "sched_kit"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "chrono-tz",
  "thiserror 2.0.17",
  "tokio",
