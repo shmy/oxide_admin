@@ -79,6 +79,7 @@ jsonpath "$.data" exists
 POST {{base_url}}/api/uploads/finish_chunk
 Authorization: Bearer {{access_token}}
 {
+  "filename": "test.data",
   "key": "{{key}}",
   "partList": [
     {

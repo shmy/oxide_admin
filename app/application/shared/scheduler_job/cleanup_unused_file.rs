@@ -96,8 +96,10 @@ mod tests {
         // Insert a 2-day-old file
         let now = Utc::now() - Duration::days(3);
         let id = IdGenerator::primary_id();
-        let insert = sqlx::query("INSERT INTO _files (id, path, used, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)")
+        let insert = sqlx::query("INSERT INTO _files (id, name, size, path, used, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7)")
             .bind(id)
+            .bind("test3.txt")
+            .bind(125)
             .bind("/test/test3.txt")
             .bind(false)
             .bind(now)
