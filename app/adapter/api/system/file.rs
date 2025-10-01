@@ -11,7 +11,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Redirect},
 };
-use domain::system::value_object::permission::SYSTEM_FILE_READ;
+use domain::system::value_object::permission::{SYSTEM_FILE_DOWNLOAD, SYSTEM_FILE_READ};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -65,5 +65,5 @@ async fn download(
 pub fn routing() -> OpenApiRouter<WebState> {
     OpenApiRouter::new()
         .routes(routes!(search).permit_all(perms!(SYSTEM_FILE_READ)))
-        .routes(routes!(download).permit_all(perms!(SYSTEM_FILE_READ)))
+        .routes(routes!(download).permit_all(perms!(SYSTEM_FILE_DOWNLOAD)))
 }

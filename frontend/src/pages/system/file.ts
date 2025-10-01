@@ -1,5 +1,6 @@
-import { getAccessToken } from "../../lib/authn";
+import { getAccessToken, ifElementAuthorized } from "../../lib/authn";
 import { usedStatuses } from "../../lib/options";
+import { PERMISSIONS } from "../../lib/permissions";
 import { buildCrudTable } from "../../lib/table";
 
 export { };
@@ -33,7 +34,7 @@ const schema = {
     ],
     showUpdatedAt: false,
     operations: [
-      {
+      ...ifElementAuthorized(PERMISSIONS.SYSTEM.FILE.DOWNLOAD, {
         icon: "fas fa-download",
         actionType: "url",
         type: "button",
@@ -42,7 +43,8 @@ const schema = {
         level: "link",
         url: "/api/system/files/download/$path?access_token=" + getAccessToken(),
         blank: true,
-      }
+      }),
+
     ],
     columns: [
       {
