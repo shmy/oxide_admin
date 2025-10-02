@@ -1,5 +1,7 @@
-[ ] 测试代码生成
+[ ] 拆分organization与system
 [ ] 部门管理
+[ ] 清除缓存
+[ ] 测试代码生成
 [ ] 后台任务记录
 [ ] 审计日志 diff
 [ ] Frontend code generation

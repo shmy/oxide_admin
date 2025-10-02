@@ -1,29 +1,41 @@
 private:
   - key: 1
+    label: 组织架构
+    icon: fas fa-sitemap
+    children:
+      - key: 100
+        label: 部门管理
+        icon: fas fa-building
+        url: /organization/department
+      - key: 101
+        label: 用户管理
+        icon: fas fa-user
+        url: /organization/user
+      - key: 102
+        label: 角色管理
+        icon: fas fa-people-group
+        url: /organization/role
+  - key: 2
     label: 系统管理
     icon: fas fa-screwdriver-wrench
     children:
-      - key: 2
-        label: 用户管理
-        icon: fas fa-user
-        url: /system/user
-      - key: 3
-        label: 角色管理
-        icon: fas fa-people-group
-        url: /system/role
-      - key: 4
+      - key: 200
         label: 文件管理
         icon: fas fa-folder
         url: /system/file
-      - key: 5
+      - key: 201
         label: 定时任务
         icon: fas fa-clock
         url: /system/sched
-      - key: 6
+      - key: 202
+        label: 后台任务
+        icon: fas fa-bell-concierge
+        url: /system/bgworker
+      - key: 203
         label: 系统信息
         icon: fas fa-info
         url: /system/stat
-      - key: 7
+      - key: 204
         label: 示例页面
         icon: fas fa-hexagon-nodes
         url: /system/example
