@@ -1,4 +1,7 @@
-use domain::system::{error::SystemError, value_object::hashed_password::PasswordError};
+use domain::{
+    organization::{error::OrganizationError, value_object::hashed_password::PasswordError},
+    system::error::SystemError,
+};
 use kvdb_kit::error::KvdbError;
 
 pub type InfrastructureResult<T> = std::result::Result<T, InfrastructureError>;
@@ -16,6 +19,9 @@ pub enum InfrastructureError {
 
     #[error("{0}")]
     System(#[from] SystemError),
+
+    #[error("{0}")]
+    Organization(#[from] OrganizationError),
 
     #[error("{0}")]
     Password(#[from] PasswordError),

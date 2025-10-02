@@ -1,0 +1,71 @@
+use bon::Builder;
+use domain::organization::error::OrganizationError;
+use domain::organization::value_object::role_id::RoleId;
+use domain::organization::{entity::role::Role, event::OrganizationEvent};
+use domain::shared::event_util::UpdatedEvent;
+use domain::shared::port::domain_repository::DomainRepository;
+use domain::system::value_object::menu::Menu;
+use domain::system::value_object::permission::Permission;
+use infrastructure::repository::organization::role_repository::RoleRepositoryImpl;
+use nject::injectable;
+use serde::Deserialize;
+use utoipa::ToSchema;
+
+use crate::shared::command_handler::{CommandHandler, CommandResult};
+
+#[derive(Debug, Deserialize, Builder, ToSchema)]
+pub struct UpdateRoleCommand {
+    id: RoleId,
+    name: Option<String>,
+    menus: Option<Vec<Menu>>,
+    permissions: Option<Vec<Permission>>,
+    enabled: Option<bool>,
+}
+
+#[derive(Debug, Builder)]
+#[injectable]
+pub struct UpdateRoleCommandHandler {
+    role_repository: RoleRepositoryImpl,
+}
+
+impl CommandHandler for UpdateRoleCommandHandler {
+    type Command = UpdateRoleCommand;
+    type Output = Role;
+    type Event = OrganizationEvent;
+    type Error = OrganizationError;
+
+    #[tracing::instrument]
+    async fn execute(
+        &self,
+        cmd: Self::Command,
+    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+        let id = cmd.id;
+        let mut role = self.role_repository.by_id(&id).await?;
+        if role.privileged {
+            return Err(OrganizationError::RolePrivilegedImmutable);
+        }
+        let before = role.clone();
+        if let Some(name) = cmd.name {
+            role.update_name(name);
+        }
+        if let Some(menus) = cmd.menus {
+            role.update_menus(menus);
+        }
+        if let Some(permissions) = cmd.permissions {
+            role.update_permissions(permissions);
+        }
+        if let Some(enabled) = cmd.enabled {
+            role.update_enabled(enabled);
+        }
+        let role = self.role_repository.save(role).await?;
+        Ok(CommandResult::with_event(
+            role.clone(),
+            OrganizationEvent::RolesUpdated {
+                items: vec![UpdatedEvent {
+                    before,
+                    after: role,
+                }],
+            },
+        ))
+    }
+}

@@ -2,7 +2,7 @@ use crate::WebState;
 use crate::shared::error::WebError;
 use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
-use domain::system::value_object::user_id::UserId;
+use domain::organization::value_object::user_id::UserId;
 
 #[derive(Clone)]
 pub struct ValidUser(pub UserId);

@@ -3,7 +3,7 @@ use crate::shared::extractor::valid_user::ValidUser;
 use crate::shared::middleware::common::{
     get_access_token_from_header, get_access_token_from_query, unauthorized,
 };
-use application::system::service::iam_service::IamService;
+use application::organization::service::iam_service::IamService;
 use axum::extract::State;
 use axum::http::HeaderMap;
 use axum::{extract::Request, middleware::Next, response::Response};

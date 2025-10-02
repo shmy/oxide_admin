@@ -5,7 +5,7 @@ import { PERMISSIONS } from "../../lib/permissions";
 import { buildCrudTable } from "../../lib/table";
 
 export { };
-const endpoint = "/system/users";
+const endpoint = "/organization/users";
 const roleEndpoint = {
   method: "get",
   url: "/system/options/role",

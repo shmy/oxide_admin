@@ -2,7 +2,7 @@
 pub async fn setup_database(pool: sqlx::PgPool) {
     use crate::{
         migration::migrate,
-        repository::system::{
+        repository::organization::{
             role_repository::RoleRepositoryImpl, user_repository::UserRepositoryImpl,
         },
         shared::chrono_tz::ChronoTz,

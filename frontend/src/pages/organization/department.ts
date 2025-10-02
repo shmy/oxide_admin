@@ -1,8 +1,8 @@
 import { buildCrudTable } from "../../lib/table";
 
-export {};
+export { };
 
-const endpoint = "/departments";
+const endpoint = "/organization/departments";
 
 const buildDrawer = (isAdd = true) => {
   const label = isAdd ? "Create department" : null;

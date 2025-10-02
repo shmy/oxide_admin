@@ -1,4 +1,4 @@
-use domain::system::error::SystemError;
+use domain::{organization::error::OrganizationError, system::error::SystemError};
 use infrastructure::error::InfrastructureError;
 use kvdb_kit::error::KvdbError;
 use object_storage_kit::error::ObjectStorageError;
@@ -22,6 +22,9 @@ pub enum ApplicationError {
 
     #[error("{0}")]
     System(#[from] SystemError),
+
+    #[error("{0}")]
+    Organization(#[from] OrganizationError),
 
     #[error("{0}")]
     Sqlx(#[from] sqlx::Error),
