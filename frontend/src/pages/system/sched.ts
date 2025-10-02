@@ -21,14 +21,6 @@ const buildRecord = () => {
         deleteEndpoint: `${endpoint}/records`,
         columns: [
           {
-            name: "key",
-            label: "任务标识",
-          },
-          {
-            name: "name",
-            label: "任务名称",
-          },
-          {
             name: "expr",
             label: "运行周期",
           },
