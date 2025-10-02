@@ -1,10 +1,10 @@
 use crate::error::Result;
 use chrono::Utc;
+use cron_tab::AsyncCron;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::fmt::Debug;
 use std::{path::Path, sync::Arc, time::Duration};
 use tokio::sync::Mutex;
-use tokio_cron_scheduler::{Job, JobScheduler};
 use tracing::{debug, error, info};
 
 use redb::{Database, ReadableDatabase as _, ReadableTable as _, TableDefinition};
@@ -15,7 +15,7 @@ const TABLE_NAME: TableDefinition<&str, &[u8]> = TableDefinition::new("app_data"
 
 pub struct RedbKvdb {
     db: Arc<Database>,
-    sched: Arc<Mutex<JobScheduler>>,
+    sched: Arc<Mutex<AsyncCron<Utc>>>,
 }
 
 impl Debug for RedbKvdb {
@@ -29,7 +29,7 @@ impl RedbKvdb {
         let db_path = path.as_ref();
         let db = Database::create(db_path)?;
         info!("Redb {} connected", db_path.display());
-        let sched = JobScheduler::new().await?;
+        let sched = AsyncCron::new(Utc);
 
         let instance = Self {
             db: Arc::new(db),
@@ -56,20 +56,20 @@ impl Clone for RedbKvdb {
 
 impl RedbKvdb {
     async fn start_scheduler(&self) -> Result<()> {
-        let guard = self.sched.lock().await;
+        let mut guard = self.sched.lock().await;
         let self_clone = self.clone();
         // every hour
         guard
-            .add(Job::new_async("0 0 * * * *", move |_uuid, _l| {
+            .add_fn("0 0 * * * *", move || {
                 let self_inner = self_clone.clone();
                 Box::pin(async move {
                     if let Err(err) = self_inner.delete_expired().await {
                         error!(%err, "Delete expired failed");
                     }
                 })
-            })?)
+            })
             .await?;
-        guard.start().await?;
+        guard.start().await;
         Ok(())
     }
 
@@ -233,10 +233,8 @@ impl KvdbTrait for RedbKvdb {
     }
 
     async fn close(&self) {
-        let mut guard = self.sched.lock().await;
-        if let Err(err) = guard.shutdown().await {
-            error!(%err, "Failed to shutdown scheduler");
-        }
+        let guard = self.sched.lock().await;
+        guard.stop().await;
     }
 }
 

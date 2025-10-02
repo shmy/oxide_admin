@@ -2,11 +2,11 @@ use chrono::NaiveDateTime;
 
 use crate::error::Result;
 
+pub mod cron_tab;
 pub mod error;
-pub mod tokio_cron;
 
 pub trait ScheduledJob: Clone + Send + Sync + 'static {
-    const SCHEDULER: &'static str;
+    const EXPR: &'static str;
     const NAME: &'static str;
     fn run(&self) -> impl Future<Output = Result<()>> + Send;
 }
@@ -19,7 +19,7 @@ pub trait ScheduledJobReceiver: Clone + Send + Sync + 'static {
 pub struct JobCallbackParams {
     pub key: String,
     pub name: String,
-    pub schedule: String,
+    pub expr: String,
     pub succeed: bool,
     pub result: String,
     pub run_at: NaiveDateTime,

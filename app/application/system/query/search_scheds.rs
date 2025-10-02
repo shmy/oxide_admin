@@ -1,20 +1,18 @@
+use std::collections::HashMap;
+
+use crate::shared::paging_query::PagingQuery;
+use crate::shared::paging_result::PagingResult;
 use crate::shared::query_handler::QueryHandler;
-use crate::{
-    error::ApplicationResult,
-    shared::{
-        cache_provider::CacheProvider, paging_query::PagingQuery, paging_result::PagingResult,
-    },
-    system::dto::sched::SchedDto,
-};
+use crate::shared::scheduler_job_impl::SCHEDULER_JOBS;
+use crate::system::dto::sched::SchedDto;
 use bon::Builder;
 use domain::system::error::SystemError;
+use infrastructure::shared::config::ConfigRef;
 use infrastructure::shared::pg_pool::PgPool;
-use kvdb_kit::Kvdb;
 use nject::injectable;
+use sched_kit::cron_tab::next_tick;
 use serde::Deserialize;
-use serde_with::{NoneAsEmptyString, serde_as};
-use single_flight::single_flight;
-use std::time::Duration;
+use serde_with::serde_as;
 use utoipa::IntoParams;
 
 #[serde_as]
@@ -23,23 +21,13 @@ pub struct SearchSchedsQuery {
     #[serde(flatten)]
     #[param(inline)]
     paging: PagingQuery,
-    #[serde_as(as = "NoneAsEmptyString")]
-    #[serde(default)]
-    key: Option<String>,
-    #[serde_as(as = "NoneAsEmptyString")]
-    #[serde(default)]
-    name: Option<String>,
-    #[serde_as(as = "NoneAsEmptyString")]
-    #[serde(default)]
-    succeed: Option<bool>,
 }
 
 #[derive(Debug, Clone)]
 #[injectable]
 pub struct SearchSchedsQueryHandler {
     pool: PgPool,
-    #[inject(|kvdb: Kvdb| CacheProvider::builder().key("system_search_scheds:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
-    cache_provider: CacheProvider,
+    config: ConfigRef,
 }
 
 impl QueryHandler for SearchSchedsQueryHandler {
@@ -47,58 +35,51 @@ impl QueryHandler for SearchSchedsQueryHandler {
     type Output = PagingResult<SchedDto>;
     type Error = SystemError;
 
-    #[single_flight]
     #[tracing::instrument]
     async fn query(&self, query: SearchSchedsQuery) -> Result<PagingResult<SchedDto>, SystemError> {
-        let total_future = sqlx::query_scalar!(
-            r#"
-            SELECT COUNT(*) AS "count!"
-            FROM _scheds
-            WHERE ($1::text IS NULL OR key = $1)
-            AND ($2::text IS NULL OR name LIKE CONCAT('%', $2, '%'))
-            AND ($3::boolean IS NULL OR succeed = $3)
-            "#,
-            query.key,
-            query.name,
-            query.succeed,
-        )
-        .fetch_one(&self.pool);
+        let total = SCHEDULER_JOBS.len();
         let page = query.paging.page();
         let page_size = query.paging.page_size();
-        let offset = (page - 1) * page_size;
-        let rows_future = sqlx::query_as!(
-            SchedDto,
+        let start = (((page - 1) * page_size) as usize).min(total);
+        let end = (start + page_size as usize).min(total);
+        let page_jobs = &SCHEDULER_JOBS[start..end];
+        let keys = page_jobs
+            .iter()
+            .map(|x| x.key.to_string())
+            .collect::<Vec<_>>();
+
+        let record = sqlx::query!(
             r#"
-        SELECT id, key, name, schedule, succeed, result, run_at, duration_ms, created_at, updated_at
-        FROM _scheds
-        WHERE ($1::text IS NULL OR key = $1)
-            AND ($2::text IS NULL OR name LIKE CONCAT('%', $2, '%'))
-            AND ($3::boolean IS NULL OR succeed = $3)
-        ORDER BY created_at DESC LIMIT $4 OFFSET $5
-        "#,
-            query.key,
-            query.name,
-            query.succeed,
-            page_size,
-            offset,
+            SELECT DISTINCT ON (key) 
+                key, succeed, result, run_at, duration_ms
+            FROM _scheds
+            WHERE key = ANY($1)
+            ORDER BY key, run_at DESC
+            "#,
+            &keys,
         )
-        .fetch_all(&self.pool);
-        let (total, rows) = tokio::try_join!(total_future, rows_future)?;
-        Ok(PagingResult { total, items: rows })
-    }
-}
-
-impl SearchSchedsQueryHandler {
-    #[tracing::instrument]
-    pub async fn clean_cache(&self) -> ApplicationResult<()> {
-        self.cache_provider.clear().await
-    }
-
-    #[tracing::instrument]
-    pub async fn query_cached(
-        &self,
-        query: SearchSchedsQuery,
-    ) -> Result<PagingResult<SchedDto>, SystemError> {
-        self.cache_provider.get_with(query, |q| self.query(q)).await
+        .fetch_all(&self.pool)
+        .await?;
+        let record_map = record
+            .into_iter()
+            .map(|row| (row.key.to_string(), row))
+            .collect::<HashMap<_, _>>();
+        let items = page_jobs
+            .iter()
+            .map(|job| SchedDto {
+                key: job.key.to_string(),
+                name: job.name.to_string(),
+                expr: job.expr.to_string(),
+                last_succeed: record_map.get(job.key).map(|row| row.succeed),
+                last_result: record_map.get(job.key).map(|row| row.result.clone()),
+                last_run_at: record_map.get(job.key).map(|row| row.run_at),
+                next_run_at: next_tick(job.expr, self.config.timezone).map(|d| d.naive_local()),
+                last_duration_ms: record_map.get(job.key).map(|row| row.duration_ms),
+            })
+            .collect();
+        Ok(PagingResult {
+            total: total as i64,
+            items,
+        })
     }
 }

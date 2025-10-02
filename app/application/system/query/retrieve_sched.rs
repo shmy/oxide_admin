@@ -27,17 +27,18 @@ impl QueryHandler for RetrieveSchedQueryHandler {
     #[single_flight]
     #[tracing::instrument]
     async fn query(&self, query: RetrieveSchedQuery) -> Result<SchedDto, SystemError> {
-        let row_opt = sqlx::query_as!(
-            SchedDto,
-            r#"
-            SELECT id, key, name, schedule, succeed, result, run_at, duration_ms, created_at, updated_at
-            FROM _scheds
-            WHERE id = $1
-        "#,
-            &query.id,
-        )
-        .fetch_optional(&self.pool)
-        .await?;
-        row_opt.ok_or(SystemError::SchedNotFound)
+        // let row_opt = sqlx::query_as!(
+        //     SchedDto,
+        //     r#"
+        //     SELECT id, key, name, schedule, succeed, result, run_at, duration_ms, created_at, updated_at
+        //     FROM _scheds
+        //     WHERE id = $1
+        // "#,
+        //     &query.id,
+        // )
+        // .fetch_optional(&self.pool)
+        // .await?;
+        // row_opt.ok_or(SystemError::SchedNotFound)
+        todo!()
     }
 }

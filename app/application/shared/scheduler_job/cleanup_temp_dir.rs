@@ -13,9 +13,8 @@ pub struct CleanupTempDir {
     workspace: WorkspaceRef,
 }
 
-/// Delete the temporary directory from two days ago at midnight every day.
 impl ScheduledJob for CleanupTempDir {
-    const SCHEDULER: &'static str = "at 00:01 every day";
+    const EXPR: &'static str = "at 11:36";
     const NAME: &'static str = "Delete the temporary directory";
 
     async fn run(&self) -> Result<()> {

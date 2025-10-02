@@ -18,5 +18,12 @@ pub mod event_subscriber_impl {
 }
 
 pub mod scheduler_job_impl {
+
+    #[derive(Debug, Clone)]
+    pub struct SchedulerJob {
+        pub key: &'static str,
+        pub name: &'static str,
+        pub expr: &'static str,
+    }
     include!(concat!(env!("OUT_DIR"), "/scheduler_job.rs"));
 }

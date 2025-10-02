@@ -223,11 +223,12 @@ async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
 
 async fn build_scheduler_job(
     provider: &Provider,
-) -> Result<sched_kit::tokio_cron::TokioCronScheduler<SchedReceiverImpl>> {
-    let scheduler =
-        sched_kit::tokio_cron::TokioCronScheduler::try_new(provider.provide::<SchedReceiverImpl>())
-            .await?;
-    register_scheduled_jobs(&scheduler, provider).await?;
+) -> Result<sched_kit::cron_tab::CronTab<SchedReceiverImpl>> {
+    let mut scheduler = sched_kit::cron_tab::CronTab::new(
+        provider.provide::<SchedReceiverImpl>(),
+        provider.provide::<ConfigRef>().timezone,
+    );
+    register_scheduled_jobs(&mut scheduler, provider).await?;
     Ok(scheduler)
 }
 
@@ -253,7 +254,7 @@ async fn start_http_server(listener: TcpListener, app: Router, notify: Arc<Notif
 }
 
 async fn start_scheduler_job(
-    mut scheduler_job: sched_kit::tokio_cron::TokioCronScheduler<SchedReceiverImpl>,
+    mut scheduler_job: sched_kit::cron_tab::CronTab<SchedReceiverImpl>,
     notify: Arc<Notify>,
 ) -> Result<()> {
     let shutdown = async move {

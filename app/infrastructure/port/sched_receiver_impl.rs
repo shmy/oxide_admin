@@ -18,7 +18,7 @@ impl sched_kit::ScheduledJobReceiver for SchedReceiverImpl {
             .id(SchedId::generate())
             .key(params.key)
             .name(params.name)
-            .schedule(params.schedule)
+            .expr(params.expr)
             .succeed(params.succeed)
             .result(params.result)
             .run_at(params.run_at)

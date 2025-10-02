@@ -5,7 +5,7 @@ CREATE TABLE
         id CHAR(24) PRIMARY KEY NOT NULL,
         key VARCHAR(128) NOT NULL,
         name VARCHAR(256) NOT NULL,
-        schedule VARCHAR(256) NOT NULL,
+        expr VARCHAR(256) NOT NULL,
         succeed BOOLEAN NOT NULL,
         result TEXT NOT NULL,
         run_at TIMESTAMP NOT NULL,

@@ -29,7 +29,7 @@ impl DomainRepository for SchedRepositoryImpl {
         let row_opt = sqlx::query_as!(
             SchedDto,
             r#"
-        SELECT id as "id: SchedId", key, name, schedule, succeed, result, run_at, duration_ms FROM _scheds WHERE id = $1
+        SELECT id as "id: SchedId", key, name, expr, succeed, result, run_at, duration_ms FROM _scheds WHERE id = $1
         "#,
             id
         )
@@ -44,12 +44,12 @@ impl DomainRepository for SchedRepositoryImpl {
 
         sqlx::query!(
             r#"
-            INSERT INTO _scheds (id, key, name, schedule, succeed, result, run_at, duration_ms, created_at, updated_at)
+            INSERT INTO _scheds (id, key, name, expr, succeed, result, run_at, duration_ms, created_at, updated_at)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             ON CONFLICT (id) DO UPDATE SET
                 key = EXCLUDED.key,
                 name = EXCLUDED.name,
-                schedule = EXCLUDED.schedule,
+                expr = EXCLUDED.expr,
                 succeed = EXCLUDED.succeed,
                 result = EXCLUDED.result,
                 run_at = EXCLUDED.run_at,
@@ -59,7 +59,7 @@ impl DomainRepository for SchedRepositoryImpl {
             &entity.id,
             &entity.key,
             &entity.name,
-            &entity.schedule,
+            &entity.expr,
             &entity.succeed,
             &entity.result,
             &entity.run_at,
@@ -80,7 +80,7 @@ impl DomainRepository for SchedRepositoryImpl {
         let items = sqlx::query_as!(
             SchedDto,
             r#"
-            DELETE FROM _scheds WHERE id = ANY($1) RETURNING id as "id: SchedId", key, name, schedule, succeed, result, run_at, duration_ms
+            DELETE FROM _scheds WHERE id = ANY($1) RETURNING id as "id: SchedId", key, name, expr, succeed, result, run_at, duration_ms
             "#,
             &ids.inner_vec()
         )
@@ -98,7 +98,7 @@ struct SchedDto {
     id: SchedId,
     key: String,
     name: String,
-    schedule: String,
+    expr: String,
     succeed: bool,
     result: String,
     run_at: chrono::NaiveDateTime,
@@ -111,7 +111,7 @@ impl From<SchedDto> for Sched {
             .id(value.id)
             .key(value.key)
             .name(value.name)
-            .schedule(value.schedule)
+            .expr(value.expr)
             .succeed(value.succeed)
             .result(value.result)
             .run_at(value.run_at)

@@ -1,12 +1,14 @@
+use cron_tab::CronError;
 use thiserror::Error;
-use tokio_cron_scheduler::JobSchedulerError;
 
 pub type Result<T> = std::result::Result<T, SchedError>;
 
 #[derive(Debug, Error)]
 pub enum SchedError {
+    #[error("Failed to convert to cron")]
+    EnglishToCron,
     #[error("{0}")]
-    JobScheduler(#[from] JobSchedulerError),
+    Cron(#[from] CronError),
     #[error("{0}")]
     Custom(String),
 }

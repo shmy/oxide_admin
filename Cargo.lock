@@ -823,14 +823,28 @@ dependencies = [
 ]
 
 [[package]]
-name = "croner"
-version = "3.0.0"
+name = "cron"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c007081651a19b42931f86f7d4f74ee1c2a7d0cd2c6636a81695b5ffd4e9990"
+checksum = "5877d3fbf742507b66bc2a1945106bd30dd8504019d596901ddd012a4dd01740"
 dependencies = [
  "chrono",
- "derive_builder 0.20.2",
- "strum",
+ "once_cell",
+ "winnow",
+]
+
+[[package]]
+name = "cron_tab"
+version = "0.2.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9345fe8bfaf11574bd9824a2207eb431c622ca71fe7ba26ba37704026f808fb0"
+dependencies = [
+ "chrono",
+ "cron",
+ "crossbeam-channel",
+ "futures",
+ "thiserror 2.0.17",
+ "tokio",
 ]
 
 [[package]]
@@ -1095,16 +1109,7 @@ version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d67778784b508018359cbc8696edb3db78160bab2c2a28ba7f56ef6932997f8"
 dependencies = [
- "derive_builder_macro 0.12.0",
-]
-
-[[package]]
-name = "derive_builder"
-version = "0.20.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "507dfb09ea8b7fa618fcf76e953f4f5e192547945816d5358edffe39f6f94947"
-dependencies = [
- "derive_builder_macro 0.20.2",
+ "derive_builder_macro",
 ]
 
 [[package]]
@@ -1120,35 +1125,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "derive_builder_core"
-version = "0.20.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2d5bcf7b024d6835cfb3d473887cd966994907effbe9227e8c8219824d06c4e8"
-dependencies = [
- "darling 0.20.11",
- "proc-macro2",
- "quote",
- "syn 2.0.106",
-]
-
-[[package]]
 name = "derive_builder_macro"
 version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ebcda35c7a396850a55ffeac740804b40ffec779b98fffbb1738f4033f0ee79e"
 dependencies = [
- "derive_builder_core 0.12.0",
+ "derive_builder_core",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "derive_builder_macro"
-version = "0.20.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab63b0e2bf4d5928aff72e83a7dace85d7bba5fe12dcc3c5a572d78caffd3f3c"
-dependencies = [
- "derive_builder_core 0.20.2",
- "syn 2.0.106",
 ]
 
 [[package]]
@@ -1403,7 +1386,7 @@ checksum = "6ce911bdc3ddf3e4ce0c74039ec605454a61d44e6dbd8a3008775f64c391e284"
 dependencies = [
  "async-trait",
  "chrono",
- "derive_builder 0.12.0",
+ "derive_builder",
  "fnv",
  "hostname",
  "num-bigint",
@@ -2400,13 +2383,13 @@ dependencies = [
  "bb8-redis",
  "bon",
  "chrono",
+ "cron_tab",
  "redb",
  "rmp-serde",
  "serde",
  "tempfile",
  "thiserror 2.0.17",
  "tokio",
- "tokio-cron-scheduler",
  "tracing",
 ]
 
@@ -2803,17 +2786,6 @@ name = "num-conv"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "51d515d32fb182ee37cda2ccdcb92950d6a3c2893aa280e540671c2cd0f3b1d9"
-
-[[package]]
-name = "num-derive"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed3955f1a9c7c0c15e092f9c887db08b1fc683305fdf6eb6684f22555355e202"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.106",
-]
 
 [[package]]
 name = "num-integer"
@@ -3939,7 +3911,7 @@ dependencies = [
  "once_cell",
  "ring",
  "rustls-pki-types",
- "rustls-webpki 0.103.6",
+ "rustls-webpki 0.103.7",
  "subtle",
  "zeroize",
 ]
@@ -4001,9 +3973,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-webpki"
-version = "0.103.6"
+version = "0.103.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8572f3c2cb9934231157b45499fc41e1f58c589fdfb81a844ba873265e80f8eb"
+checksum = "e10b3f4191e8a80e6b43eebabfac91e5dcecebb27a71f04e820c47ec41d314bf"
 dependencies = [
  "ring",
  "rustls-pki-types",
@@ -4055,9 +4027,11 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "chrono-tz",
+ "cron",
+ "cron_tab",
+ "english-to-cron",
  "thiserror 2.0.17",
  "tokio",
- "tokio-cron-scheduler",
  "tracing",
  "tracing-test",
 ]
@@ -5038,23 +5012,6 @@ dependencies = [
  "socket2 0.6.0",
  "tokio-macros",
  "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "tokio-cron-scheduler"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb73c4033ddcbbf81fd828293fd41a0145cde2cbc30dd782227c5081a523214d"
-dependencies = [
- "chrono",
- "chrono-tz",
- "croner",
- "english-to-cron",
- "num-derive",
- "num-traits",
- "tokio",
- "tracing",
- "uuid",
 ]
 
 [[package]]
@@ -6225,6 +6182,15 @@ name = "windows_x86_64_msvc"
 version = "0.53.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "271414315aff87387382ec3d271b52d7ae78726f5d44ac98b4f4030c91880486"
+
+[[package]]
+name = "winnow"
+version = "0.6.26"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e90edd2ac1aa278a5c4599b1d89cf03074b610800f866d4026dc199d7929a28"
+dependencies = [
+ "memchr",
+]
 
 [[package]]
 name = "wit-bindgen"

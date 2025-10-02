@@ -1,4 +1,3 @@
-import { succeedStatuses } from "../../lib/options";
 import { buildCrudTable } from "../../lib/table";
 
 export { };
@@ -10,28 +9,7 @@ const schema = {
   body: buildCrudTable({
     endpoint,
     filters: [
-      {
-        type: "input-text",
-        name: "key",
-        label: "任务标识",
-        placeholder: "请输入任务标识",
-        clearable: true,
-      },
-      {
-        type: "input-text",
-        name: "name",
-        label: "任务名称",
-        placeholder: "请输入任务名称",
-        clearable: true,
-      },
-      {
-        type: "select",
-        name: "succeed",
-        label: "是否成功",
-        placeholder: "请选择是否成功",
-        clearable: true,
-        options: succeedStatuses,
-      },
+
     ],
     headerToolbar: [],
     bulkActions: [
@@ -40,6 +18,7 @@ const schema = {
     operations: [],
     showCreatedAt: false,
     showUpdatedAt: false,
+    deletable: false,
     columns: [
       {
         name: "key",
@@ -50,27 +29,32 @@ const schema = {
         label: "任务名称",
       },
       {
-        name: "succeed",
-        label: "是否成功",
-        type: "status",
-      },
-      {
-        name: "schedule",
+        name: "expr",
         label: "运行周期",
       },
       {
-        name: "result",
-        label: "运行结果",
+        name: "last_succeed",
+        label: "上次运行状态",
+        type: "status",
       },
       {
-        name: "run_at",
-        label: "运行时间",
+        name: "last_result",
+        label: "上次运行结果",
+      },
+      {
+        name: "last_run_at",
+        label: "上次运行时间",
         type: "datetime",
       },
       {
-        name: "duration_ms",
-        label: "运行时长",
+        name: "last_duration_ms",
+        label: "上次运行时长",
         type: "pretty-ms",
+      },
+      {
+        name: "next_run_at",
+        label: "下次运行时间",
+        type: "datetime",
       },
     ],
   }),

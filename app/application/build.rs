@@ -184,7 +184,7 @@ use crate::error::ApplicationResult;
 #[allow(unused_imports)]
 use infrastructure::shared::provider::Provider;
 #[allow(unused_imports)]
-use sched_kit::tokio_cron::TokioCronScheduler;
+use sched_kit::cron_tab::CronTab;
 #[allow(unused_imports)]
 use sched_kit::ScheduledJob;
 #[allow(unused_imports)]
@@ -192,19 +192,27 @@ use infrastructure::port::sched_receiver_impl::SchedReceiverImpl;
 #[allow(unused_imports)]
 use infrastructure::shared::config::ConfigRef;
 
+pub const SCHEDULER_JOBS: &[SchedulerJob] = &[
+{%- for job in jobs %}
+    SchedulerJob {
+        key: "{{job}}",
+        name: crate::shared::scheduler_job::{{job}}::{{job | pascal_case}}::NAME,
+        expr: crate::shared::scheduler_job::{{job}}::{{job | pascal_case}}::EXPR,
+    },
+{%- endfor %}
+];
+
 pub async fn register_scheduled_jobs(
     #[allow(unused)]
-    scheduler_job: &TokioCronScheduler<SchedReceiverImpl>,
+    cron_tab: &mut CronTab<SchedReceiverImpl>,
     #[allow(unused)]
     provider: &Provider,
 ) -> ApplicationResult<()> {
-    let config = provider.provide::<ConfigRef>();
 
     {%- for job in jobs %}
 
     let job = provider.provide::<crate::shared::scheduler_job::{{job}}::{{job | pascal_case}}>();
-    scheduler_job.add("{{job}}", job, config.timezone).await?;
-    tracing::info!("Scheduled job [{{job | pascal_case}}]({}) has been registered", crate::shared::scheduler_job::{{job}}::{{job | pascal_case}}::SCHEDULER);
+    cron_tab.add("{{job}}", job).await?;
     {%- endfor %}
     Ok(())
 }

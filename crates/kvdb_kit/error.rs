@@ -24,9 +24,8 @@ pub enum KvdbError {
     #[error("{0}")]
     RedbCommit(#[from] redb::CommitError),
 
-    #[cfg(feature = "redb")]
     #[error("{0}")]
-    JobScheduler(#[from] tokio_cron_scheduler::JobSchedulerError),
+    CronTab(#[from] cron_tab::CronError),
 
     #[cfg(feature = "redis")]
     #[error("{0}")]
