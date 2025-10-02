@@ -5,7 +5,7 @@ use crate::{
     shared::middleware::{api_error::api_error, user_authn_required::user_authn_required},
 };
 
-mod authn;
+mod auth;
 mod option;
 mod organization;
 mod profile;
@@ -23,7 +23,7 @@ pub fn routing(state: WebState) -> OpenApiRouter<WebState> {
             state.clone(),
             user_authn_required,
         ))
-        .nest("/authn", authn::routing());
+        .nest("/auth", auth::routing());
     #[cfg(feature = "trace_otlp")]
     let router = router
         .layer(axum_tracing_opentelemetry::middleware::OtelInResponseLayer)

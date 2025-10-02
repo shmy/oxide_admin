@@ -35,7 +35,7 @@ const CAPTCHA_CONTENT_TYPE: HeaderValue = HeaderValue::from_static("image/png");
     post,
     path = "/sign_in",
     summary = "Sign in",
-    tag = "Authn",
+    tag = "Auth",
     responses(
         (status = 200, body = inline(JsonResponse<response::SignInResponse>))
     )
@@ -56,7 +56,7 @@ async fn sign_in(
     post,
     path = "/refresh_token",
     summary = "Refresh Token",
-    tag = "Authn",
+    tag = "Auth",
     responses(
         (status = 200, body = inline(JsonResponse<response::SignInResponse>))
     )
@@ -77,7 +77,7 @@ async fn refresh_token(
     get,
     path = "/refresh_captcha",
     summary = "Refresh captcha",
-    tag = "Authn",
+    tag = "Auth",
     responses(
         (status = 200, body = inline(Vec<u8>))
     )
