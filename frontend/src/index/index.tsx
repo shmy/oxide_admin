@@ -71,7 +71,7 @@ const schemas = {
   logo: assetPrefix + "/static/image/logo.png",
   api: {
     method: "get",
-    url: "/profile/current",
+    url: "/profile",
     adaptor: (response: any) => {
       window._permissions = new Set(response.data.permissions);
       window._hasPermission = (permission: number) => window._permissions.has(permission);

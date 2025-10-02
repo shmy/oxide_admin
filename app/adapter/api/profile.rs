@@ -44,7 +44,7 @@ async fn sign_out(
 
 #[utoipa::path(
     get,
-    path = "/current",
+    path = "/",
     summary = "Current user",
     tag = "Profile",
     responses(

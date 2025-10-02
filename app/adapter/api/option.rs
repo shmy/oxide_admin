@@ -19,7 +19,7 @@ use crate::{
     get,
     path = "/role",
     summary = "List roles as option",
-    tag = "System",
+    tag = "Option",
     responses(
         (status = 200, body = inline(JsonResponse<Vec<OptionStringDto>>))
     )
@@ -36,7 +36,7 @@ async fn roles(
     get,
     path = "/menu",
     summary = "List menu tree",
-    tag = "System",
+    tag = "Option",
     responses(
         (status = 200, body = inline(JsonResponse<Vec<MenuTree>>))
     )
@@ -51,7 +51,7 @@ async fn menus(Inject(service): Inject<IamService>) -> JsonResponseType<&'static
     get,
     path = "/permission",
     summary = "List permission tree",
-    tag = "System",
+    tag = "Option",
     responses(
         (status = 200, body = inline(JsonResponse<Vec<PermissionTree>>))
     )

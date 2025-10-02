@@ -7,12 +7,12 @@ export { };
 const endpoint = "/organization/roles";
 const menuEndpoint = {
   method: "get",
-  url: "/system/options/menu",
+  url: "/options/menu",
   cache: 10000,
 };
 const permissionEndpoint = {
   method: "get",
-  url: "/system/options/permission",
+  url: "/options/permission",
   cache: 10000,
 };
 

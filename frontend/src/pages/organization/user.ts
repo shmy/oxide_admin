@@ -8,7 +8,7 @@ export { };
 const endpoint = "/organization/users";
 const roleEndpoint = {
   method: "get",
-  url: "/system/options/role",
+  url: "/options/role",
   cache: 10000,
 };
 

@@ -6,6 +6,7 @@ use crate::{
 };
 
 mod authn;
+mod option;
 mod organization;
 mod profile;
 mod system;
@@ -17,6 +18,7 @@ pub fn routing(state: WebState) -> OpenApiRouter<WebState> {
         .nest("/organization", organization::routing())
         .nest("/system", system::routing())
         .nest("/uploads", upload::routing())
+        .nest("/options", option::routing())
         .layer(axum::middleware::from_fn_with_state(
             state.clone(),
             user_authn_required,

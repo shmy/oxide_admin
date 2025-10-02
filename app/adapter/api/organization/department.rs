@@ -48,7 +48,7 @@ use crate::{
     params(SearchDepartmentsQuery),
     path = "/",
     summary = "Search departments",
-    tag = "System",
+    tag = "Organization",
     responses(
         (status = 200, body = inline(JsonResponse<PagingResponse<DepartmentDto>>))
     )
@@ -66,7 +66,7 @@ async fn search(
     get,
     path = "/{id}",
     summary = "Retrieve department",
-    tag = "System",
+    tag = "Organization",
     responses(
         (status = 200, body = inline(JsonResponse<DepartmentDto>))
     )
@@ -86,7 +86,7 @@ async fn retrieve(
     post,
     path = "/batch/delete",
     summary = "Batch delete departments",
-    tag = "System",
+    tag = "Organization",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
@@ -104,7 +104,7 @@ async fn batch_delete(
     post,
     path = "/",
     summary = "Create department",
-    tag = "System",
+    tag = "Organization",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
@@ -122,7 +122,7 @@ async fn create(
     put,
     path = "/{id}",
     summary = "Update department",
-    tag = "System",
+    tag = "Organization",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
