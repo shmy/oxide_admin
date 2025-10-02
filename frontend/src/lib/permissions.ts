@@ -26,5 +26,11 @@ export const PERMISSIONS = {
       READ: 400,
       DELETE: 401,
     },
+    DEPARTMENT: {
+      READ: 500,
+      CREATE: 501,
+      UPDATE: 502,
+      DELETE: 503,
+    },
   },
 };

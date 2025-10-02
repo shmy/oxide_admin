@@ -67,3 +67,18 @@
         - label: 删除
           key: delete
           value: 401
+    - label: 部门
+      key: department
+      children:
+        - label: 读取
+          key: read
+          value: 500
+        - label: 创建
+          key: create
+          value: 501
+        - label: 更新
+          key: update
+          value: 502
+        - label: 删除
+          key: delete
+          value: 503

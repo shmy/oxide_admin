@@ -24,6 +24,9 @@ sqlx_prepare:
     cargo clean
     cargo sqlx prepare -- --package server
 
+sqlx_add name:
+    sqlx migrate add {{name}} --source app/infrastructure/migration/sql
+
 build_frontend:
     #! /bin/sh
     set -e

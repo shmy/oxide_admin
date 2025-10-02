@@ -195,65 +195,73 @@ fn append_event(path: &Path, module: &str, entity: &str) -> Result<()> {
 
 fn append_permissions(path: &Path, module: &str, entity: &str) -> Result<()> {
     let content = fs::read(path)?;
-    fn insert_permission(item: &mut PermissionItem) {
+    fn insert_entity(item: &mut PermissionItem, entity: &str) {
         let value = 1000;
-        item.children.extend_from_slice(&[
-            PermissionItem {
-                label: "Read".to_string(),
-                key: "read".to_string(),
-                value: Some(value),
-                children: vec![],
-            },
-            PermissionItem {
-                label: "Create".to_string(),
-                key: "create".to_string(),
-                value: Some(value + 1),
-                children: vec![],
-            },
-            PermissionItem {
-                label: "Update".to_string(),
-                key: "update".to_string(),
-                value: Some(value + 2),
-                children: vec![],
-            },
-            PermissionItem {
-                label: "Delete".to_string(),
-                key: "delete".to_string(),
-                value: Some(value + 3),
-                children: vec![],
-            },
-        ]);
+        item.children.extend_from_slice(&[PermissionItem {
+            label: entity.to_pascal_case(),
+            key: entity.to_string(),
+            value: None,
+            children: vec![
+                PermissionItem {
+                    label: "Read".to_string(),
+                    key: "read".to_string(),
+                    value: Some(value),
+                    children: vec![],
+                },
+                PermissionItem {
+                    label: "Create".to_string(),
+                    key: "create".to_string(),
+                    value: Some(value + 1),
+                    children: vec![],
+                },
+                PermissionItem {
+                    label: "Update".to_string(),
+                    key: "update".to_string(),
+                    value: Some(value + 2),
+                    children: vec![],
+                },
+                PermissionItem {
+                    label: "Delete".to_string(),
+                    key: "delete".to_string(),
+                    value: Some(value + 3),
+                    children: vec![],
+                },
+            ],
+        }]);
     }
 
-    fn insert_entity(items: &mut Vec<PermissionItem>, module: &str, entity: &str) {
+    fn insert_module(items: &mut Vec<PermissionItem>, module: &str) {
         items.push(PermissionItem {
             label: module.to_pascal_case(),
             key: module.to_string(),
             value: None,
-            children: vec![PermissionItem {
-                label: entity.to_pascal_case(),
-                key: entity.to_string(),
-                value: None,
-                children: vec![],
-            }],
+            children: vec![],
         });
     }
     let mut tree: Vec<PermissionItem> = serde_yaml::from_slice(&content)?;
-    let mut exisit: bool = false;
+    let mut module_exisit: bool = false;
+    let mut entity_exisit: bool = false;
     for ele in tree.iter_mut() {
         if ele.key == module {
+            module_exisit = true;
             for ele in ele.children.iter_mut() {
                 if ele.key == entity {
-                    insert_permission(ele);
-                    exisit = true;
+                    insert_entity(ele, entity);
+                    entity_exisit = true;
                     break;
                 }
             }
+            if !entity_exisit {
+                insert_entity(ele, entity);
+                entity_exisit = true;
+            }
         }
     }
-    if !exisit {
-        insert_entity(&mut tree, module, entity);
-        insert_permission(tree.last_mut().unwrap().children.last_mut().unwrap());
+    if !module_exisit {
+        insert_module(&mut tree, module);
+    }
+    if !entity_exisit {
+        insert_entity(tree.last_mut().unwrap(), entity);
     }
     let content = serde_yaml::to_string(&tree)?;
     fs::write(path, content)?;

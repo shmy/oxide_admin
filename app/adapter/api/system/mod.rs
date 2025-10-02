@@ -13,8 +13,10 @@ pub fn routing() -> OpenApiRouter<WebState> {
     OpenApiRouter::new()
         .nest("/users", user::routing())
         .nest("/roles", role::routing())
-        .nest("/options", option::routing())
+        .nest("/departments", department::routing())
         .nest("/files", file::routing())
         .nest("/scheds", sched::routing())
+        .nest("/options", option::routing())
         .nest("/stats", stat::routing())
 }
+mod department;
