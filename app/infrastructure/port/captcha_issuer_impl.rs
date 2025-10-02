@@ -1,11 +1,9 @@
 use bon::Builder;
 use captcha_kit::CaptchaTrait as _;
 use domain::{
+    auth::port::captcha_issuer::{Captcha, CaptchaIssuerTrait},
     organization::error::OrganizationError,
-    shared::{
-        id_generator::IdGenerator,
-        port::captcha_issuer::{Captcha, CaptchaIssuerTrait},
-    },
+    shared::id_generator::IdGenerator,
 };
 use kvdb_kit::{Kvdb, KvdbTrait as _};
 use nject::injectable;

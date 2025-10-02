@@ -1,13 +1,11 @@
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
+use domain::auth::port::token_issuer::TokenIssuerTrait;
+use domain::auth::port::token_store::TokenStoreTrait;
 use domain::organization::event::OrganizationEvent;
 use domain::organization::port::user_repository::UserRepository;
 use domain::shared::port::domain_repository::DomainRepository;
-use domain::shared::port::token_issuer::TokenIssuerTrait;
-use domain::shared::port::token_store::TokenStoreTrait;
-use domain::{
-    organization::error::OrganizationError, shared::port::token_issuer::TokenIssuerOutput,
-};
+use domain::{auth::port::token_issuer::TokenIssuerOutput, organization::error::OrganizationError};
 use infrastructure::port::token_issuer_impl::TokenIssuerImpl;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
 use infrastructure::repository::organization::user_repository::UserRepositoryImpl;

@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 
-use crate::system::value_object::menu::Menu;
+use crate::auth::value_object::menu::Menu;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MenuGroup(HashSet<Menu>);

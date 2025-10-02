@@ -2,9 +2,9 @@ use std::time::Duration;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
+use domain::auth::port::captcha_issuer::{Captcha, CaptchaIssuerTrait as _};
 use domain::organization::error::OrganizationError;
 use domain::organization::event::OrganizationEvent;
-use domain::shared::port::captcha_issuer::{Captcha, CaptchaIssuerTrait as _};
 use infrastructure::port::captcha_issuer_impl::CaptchaIssuerImpl;
 use nject::injectable;
 use serde::Deserialize;

@@ -1,10 +1,10 @@
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
+use domain::auth::port::token_store::TokenStoreTrait;
 use domain::organization::error::OrganizationError;
 use domain::organization::event::OrganizationEvent;
 use domain::organization::value_object::user_id::UserId;
 use domain::shared::port::domain_repository::DomainRepository;
-use domain::shared::port::token_store::TokenStoreTrait;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
 use infrastructure::repository::organization::user_repository::UserRepositoryImpl;
 use nject::injectable;

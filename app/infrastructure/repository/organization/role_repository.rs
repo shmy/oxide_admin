@@ -1,12 +1,12 @@
 use bon::Builder;
+use domain::auth::value_object::menu::Menu;
+use domain::auth::value_object::permission::Permission;
 use domain::organization::port::role_repository::RoleRepository;
 use domain::organization::value_object::role_id::RoleId;
 use domain::organization::{entity::role::Role, error::OrganizationError};
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::port::domain_repository::DomainRepository;
 use domain::shared::to_inner_vec::ToInnerVec;
-use domain::system::value_object::menu::Menu;
-use domain::system::value_object::permission::Permission;
 use nject::injectable;
 use sqlx::prelude::FromRow;
 

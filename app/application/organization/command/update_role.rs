@@ -1,11 +1,11 @@
 use bon::Builder;
+use domain::auth::value_object::menu::Menu;
+use domain::auth::value_object::permission::Permission;
 use domain::organization::error::OrganizationError;
 use domain::organization::value_object::role_id::RoleId;
 use domain::organization::{entity::role::Role, event::OrganizationEvent};
 use domain::shared::event_util::UpdatedEvent;
 use domain::shared::port::domain_repository::DomainRepository;
-use domain::system::value_object::menu::Menu;
-use domain::system::value_object::permission::Permission;
 use infrastructure::repository::organization::role_repository::RoleRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;

@@ -2,17 +2,17 @@ use crate::error::{ApplicationError, ApplicationResult};
 use crate::organization::dto::user::UserDto;
 use crate::system::service::upload_service::UploadService;
 use bon::Builder;
-use domain::organization::value_object::user_id::UserId;
-use domain::shared::port::menu_resolver::MenuResolver;
-use domain::shared::port::permission_resolver::PermissionResolver;
-use domain::shared::port::token_issuer::{TokenIssuerTrait, UserClaims};
-use domain::shared::port::token_store::TokenStoreTrait;
-use domain::system::value_object::menu::{Menu, MenuTree, PRIVATE_MENU_TREE, PUBLIC_MENU_TREE};
-use domain::system::value_object::menu_group::MenuGroup;
-use domain::system::value_object::permission::{
+use domain::auth::port::menu_resolver::MenuResolver;
+use domain::auth::port::permission_resolver::PermissionResolver;
+use domain::auth::port::token_issuer::{TokenIssuerTrait, UserClaims};
+use domain::auth::port::token_store::TokenStoreTrait;
+use domain::auth::value_object::menu::{Menu, MenuTree, PRIVATE_MENU_TREE, PUBLIC_MENU_TREE};
+use domain::auth::value_object::menu_group::MenuGroup;
+use domain::auth::value_object::permission::{
     ALL_PERMISSIONS, PERMISSION_TREE, Permission, PermissionTree,
 };
-use domain::system::value_object::permission_group::PermissionChecker;
+use domain::auth::value_object::permission_group::PermissionChecker;
+use domain::organization::value_object::user_id::UserId;
 use futures_util::{StreamExt, stream};
 use infrastructure::port::menu_resolver_impl::MenuResolverImpl;
 use infrastructure::port::permission_resolver_impl::PermissionResolverImpl;

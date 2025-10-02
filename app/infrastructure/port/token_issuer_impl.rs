@@ -1,7 +1,7 @@
 use bon::Builder;
 use domain::{
+    auth::port::token_issuer::{TokenIssuerOutput, TokenIssuerTrait, UserClaims},
     organization::error::OrganizationError,
-    shared::port::token_issuer::{TokenIssuerOutput, TokenIssuerTrait, UserClaims},
 };
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use nject::injectable;

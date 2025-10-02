@@ -13,7 +13,7 @@ use application::{
     },
 };
 use axum::{Json, extract::Query};
-use domain::system::value_object::permission::{SYSTEM_SCHED_DELETE, SYSTEM_SCHED_READ};
+use domain::auth::value_object::permission::{SYSTEM_SCHED_DELETE, SYSTEM_SCHED_READ};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{

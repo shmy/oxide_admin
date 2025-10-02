@@ -24,11 +24,11 @@ use axum::{
     Json,
     extract::{Path, Query},
 };
-use domain::organization::value_object::user_id::UserId;
-use domain::system::value_object::permission::{
+use domain::auth::value_object::permission::{
     SYSTEM_USER_CREATE, SYSTEM_USER_DELETE, SYSTEM_USER_DISABLE, SYSTEM_USER_ENABLE,
     SYSTEM_USER_READ, SYSTEM_USER_UPDATE, SYSTEM_USER_UPDATE_PASSWORD,
 };
+use domain::organization::value_object::user_id::UserId;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{

@@ -6,9 +6,9 @@ use crate::{
     system::service::file_service::FileService,
 };
 use bon::Builder;
-use domain::shared::port::menu_resolver::MenuResolver;
+use domain::auth::port::menu_resolver::MenuResolver;
 use domain::{
-    organization::event::OrganizationEvent, shared::port::permission_resolver::PermissionResolver,
+    auth::port::permission_resolver::PermissionResolver, organization::event::OrganizationEvent,
 };
 use infrastructure::{error::InfrastructureResult, port::menu_resolver_impl::MenuResolverImpl};
 use infrastructure::{

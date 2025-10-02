@@ -1,12 +1,12 @@
 use crate::error::{InfrastructureError, InfrastructureResult};
 use bon::Builder;
+use domain::auth::port::permission_resolver::PermissionResolver;
+use domain::auth::value_object::permission::{ALL_PERMISSIONS, Permission};
+use domain::auth::value_object::permission_group::PermissionGroup;
 use domain::organization::value_object::role_id::RoleId;
 use domain::organization::value_object::user_id::UserId;
-use domain::shared::port::permission_resolver::PermissionResolver;
 use domain::shared::to_inner_vec::ToInnerVec as _;
 use domain::system::error::SystemError;
-use domain::system::value_object::permission::{ALL_PERMISSIONS, Permission};
-use domain::system::value_object::permission_group::PermissionGroup;
 use kvdb_kit::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 use single_flight::single_flight;

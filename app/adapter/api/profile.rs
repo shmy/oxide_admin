@@ -1,10 +1,8 @@
 use application::{
+    auth::command::sign_out::{SignOutCommand, SignOutCommandHandler},
     organization::{
-        command::{
-            sign_out::{SignOutCommand, SignOutCommandHandler},
-            update_user_self_password::{
-                UpdateUserSelfPasswordCommand, UpdateUserSelfPasswordCommandHandler,
-            },
+        command::update_user_self_password::{
+            UpdateUserSelfPasswordCommand, UpdateUserSelfPasswordCommandHandler,
         },
         query::retrieve_user::{RetrieveUserQuery, RetrieveUserQueryHandler},
         service::iam_service::IamService,
@@ -110,7 +108,7 @@ mod request {
 }
 mod response {
     use application::organization::dto::user::UserDto;
-    use domain::system::value_object::{menu::MenuTree, permission::Permission};
+    use domain::auth::value_object::{menu::MenuTree, permission::Permission};
     use serde::Serialize;
     use utoipa::ToSchema;
 

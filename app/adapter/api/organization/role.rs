@@ -23,11 +23,11 @@ use axum::{
     extract::{Path, Query},
 };
 use domain::{
-    organization::value_object::role_id::RoleId,
-    system::value_object::permission::{
+    auth::value_object::permission::{
         SYSTEM_ROLE_CREATE, SYSTEM_ROLE_DELETE, SYSTEM_ROLE_DISABLE, SYSTEM_ROLE_ENABLE,
         SYSTEM_ROLE_READ, SYSTEM_ROLE_UPDATE,
     },
+    organization::value_object::role_id::RoleId,
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 

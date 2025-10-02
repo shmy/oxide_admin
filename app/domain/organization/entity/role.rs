@@ -1,8 +1,8 @@
 use bon::Builder;
 
+use crate::auth::value_object::{menu::Menu, permission::Permission};
 use crate::organization::error::OrganizationError;
 use crate::organization::value_object::role_id::RoleId;
-use crate::system::value_object::{menu::Menu, permission::Permission};
 
 #[derive(Debug, Clone, Builder)]
 #[readonly::make]
@@ -43,7 +43,7 @@ impl Role {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::system::value_object::permission::Permission;
+    use crate::auth::value_object::permission::Permission;
 
     #[test]
     fn test_update_name() {

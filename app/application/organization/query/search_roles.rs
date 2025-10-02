@@ -1,7 +1,7 @@
 use bon::Builder;
 use domain::{
+    auth::value_object::{menu::Menu, permission::Permission},
     organization::error::OrganizationError,
-    system::value_object::{menu::Menu, permission::Permission},
 };
 use infrastructure::shared::pg_pool::PgPool;
 use kvdb_kit::Kvdb;

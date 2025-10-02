@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use application::{
-    organization::command::{
+    auth::command::{
         refresh_captcha::{RefreshCaptchaCommand, RefreshCaptchaCommandHandler},
         refresh_token::{RefreshTokenCommand, RefreshTokenCommandHandler},
         sign_in::{SignInCommand, SignInCommandHandler},

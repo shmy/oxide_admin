@@ -1,10 +1,10 @@
 use crate::organization::dto::role::RoleDto;
 use crate::shared::query_handler::QueryHandler;
 use bon::Builder;
+use domain::auth::value_object::menu::Menu;
+use domain::auth::value_object::permission::Permission;
 use domain::organization::error::OrganizationError;
 use domain::organization::value_object::role_id::RoleId;
-use domain::system::value_object::menu::Menu;
-use domain::system::value_object::permission::Permission;
 use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
 use serde::Deserialize;

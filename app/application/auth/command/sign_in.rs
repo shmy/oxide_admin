@@ -2,13 +2,13 @@ use std::fmt::Debug;
 
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
+use domain::auth::port::captcha_issuer::CaptchaIssuerTrait as _;
+use domain::auth::port::token_issuer::{TokenIssuerOutput, TokenIssuerTrait};
+use domain::auth::port::token_store::TokenStoreTrait;
 use domain::organization::error::OrganizationError;
 use domain::organization::event::OrganizationEvent;
 use domain::organization::port::user_repository::UserRepository;
-use domain::shared::port::captcha_issuer::CaptchaIssuerTrait as _;
 use domain::shared::port::domain_repository::DomainRepository;
-use domain::shared::port::token_issuer::{TokenIssuerOutput, TokenIssuerTrait};
-use domain::shared::port::token_store::TokenStoreTrait;
 use infrastructure::port::captcha_issuer_impl::CaptchaIssuerImpl;
 use infrastructure::port::token_issuer_impl::TokenIssuerImpl;
 use infrastructure::port::token_store_impl::TokenStoreImpl;

@@ -1,4 +1,4 @@
-use domain::system::value_object::{menu::Menu, permission::Permission};
+use domain::auth::value_object::{menu::Menu, permission::Permission};
 use serde::{Deserialize, Serialize};
 use sqlx::{prelude::FromRow, types::chrono::NaiveDateTime};
 use utoipa::ToSchema;

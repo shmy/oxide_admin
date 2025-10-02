@@ -1,4 +1,4 @@
-use crate::organization::command::sign_out::{SignOutCommand, SignOutCommandHandler};
+use crate::auth::command::sign_out::{SignOutCommand, SignOutCommandHandler};
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::organization::error::OrganizationError;

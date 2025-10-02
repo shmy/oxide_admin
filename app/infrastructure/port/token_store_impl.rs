@@ -1,5 +1,5 @@
 use bon::Builder;
-use domain::{organization::error::OrganizationError, shared::port::token_store::TokenStoreTrait};
+use domain::{auth::port::token_store::TokenStoreTrait, organization::error::OrganizationError};
 use kvdb_kit::{Kvdb, KvdbTrait as _};
 use nject::injectable;
 use sqlx::types::chrono::{DateTime, Utc};

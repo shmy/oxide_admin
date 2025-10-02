@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::fmt::Display;
 
+use crate::auth::value_object::permission_group::PermissionGroup;
 use crate::organization::value_object::user_id::UserId;
-use crate::system::value_object::permission_group::PermissionGroup;
 
 pub type PermissionMap = HashMap<UserId, PermissionGroup>;
 
