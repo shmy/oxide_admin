@@ -6,9 +6,9 @@ export { };
 
 const endpoint = "/system/scheds";
 
-const buildRecord = () => {
+const buildRecordDrawer = () => {
   return {
-    icon: "fas fa-eye",
+    icon: "fas fa-clock-rotate-left",
     align: "right",
     tooltip: "执行记录",
     level: "link",
@@ -19,6 +19,7 @@ const buildRecord = () => {
       body: buildCrudTable({
         endpoint: `${endpoint}/records?key=$key&page=$page&page_size=$page_size`,
         deleteEndpoint: `${endpoint}/records`,
+        deletable: _hasPermission(PERMISSIONS.SYSTEM.SCHED.DELETE),
         columns: [
           {
             name: "expr",
@@ -62,7 +63,7 @@ const schema = {
 
     ],
     operations: [
-      ...ifElementAuthorized(PERMISSIONS.SYSTEM.SCHED.READ, buildRecord()),
+      ...ifElementAuthorized(PERMISSIONS.SYSTEM.SCHED.READ, buildRecordDrawer()),
 
     ],
     showCreatedAt: false,
