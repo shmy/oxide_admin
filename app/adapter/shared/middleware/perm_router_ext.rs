@@ -1,7 +1,7 @@
 use crate::WebState;
 use crate::shared::error::WebError;
 use crate::shared::extractor::valid_user::ValidUser;
-use application::organization::service::iam_service::IamService;
+use application::auth::service::auth_service::AuthService;
 use axum::extract::Request;
 use axum::middleware;
 use axum::middleware::Next;
@@ -29,7 +29,7 @@ impl _InternalPermissionExt for UtoipaMethodRouter<WebState> {
                 async move {
                     let (Some(valid_user), Some(iam_service)) = (
                         req.extensions().get::<ValidUser>(),
-                        req.extensions().get::<IamService>(),
+                        req.extensions().get::<AuthService>(),
                     ) else {
                         return Err(WebError::ValidUserNotFound);
                     };
@@ -50,7 +50,7 @@ impl _InternalPermissionExt for OpenApiRouter<WebState> {
             async move {
                 let (Some(valid_user), Some(iam_service)) = (
                     req.extensions().get::<ValidUser>(),
-                    req.extensions().get::<IamService>(),
+                    req.extensions().get::<AuthService>(),
                 ) else {
                     return Err(WebError::ValidUserNotFound);
                 };

@@ -23,7 +23,7 @@ use nject::injectable;
 
 #[derive(Debug, Clone, Builder)]
 #[injectable]
-pub struct IamService {
+pub struct AuthService {
     token_issuer: TokenIssuerImpl,
     token_store: TokenStoreImpl,
     menu_resolver: MenuResolverImpl,
@@ -32,7 +32,7 @@ pub struct IamService {
     upload_service: UploadService,
 }
 
-impl IamService {
+impl AuthService {
     #[tracing::instrument]
     pub async fn verify_token(&self, token: &str) -> ApplicationResult<UserId> {
         let secret = &self.config.jwt.access_token_secret;

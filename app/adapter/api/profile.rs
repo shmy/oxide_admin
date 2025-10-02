@@ -1,11 +1,13 @@
 use application::{
-    auth::command::sign_out::{SignOutCommand, SignOutCommandHandler},
+    auth::{
+        command::sign_out::{SignOutCommand, SignOutCommandHandler},
+        service::auth_service::AuthService,
+    },
     organization::{
         command::update_user_self_password::{
             UpdateUserSelfPasswordCommand, UpdateUserSelfPasswordCommandHandler,
         },
         query::retrieve_user::{RetrieveUserQuery, RetrieveUserQueryHandler},
-        service::iam_service::IamService,
     },
     shared::{command_handler::CommandHandler, query_handler::QueryHandler as _},
 };
@@ -52,15 +54,15 @@ async fn sign_out(
 #[tracing::instrument]
 async fn current(
     ValidUser(id): ValidUser,
-    Inject(iam_service): Inject<IamService>,
+    Inject(service): Inject<AuthService>,
     Inject(query_handler): Inject<RetrieveUserQueryHandler>,
 ) -> JsonResponseType<response::CurrentResponse> {
     let (mut user, pages, permissions) = tokio::try_join!(
         query_handler.query(RetrieveUserQuery::builder().id(id.clone()).build()),
-        async { Ok(iam_service.get_available_pages(&id).await) },
-        async { Ok(iam_service.get_available_permissions(&id).await) }
+        async { Ok(service.get_available_pages(&id).await) },
+        async { Ok(service.get_available_permissions(&id).await) }
     )?;
-    iam_service
+    service
         .replenish_user_portrait(std::slice::from_mut(&mut user))
         .await;
     JsonResponse::ok(response::CurrentResponse {

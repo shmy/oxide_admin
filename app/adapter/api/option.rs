@@ -1,7 +1,6 @@
 use application::{
-    organization::{
-        query::option_roles::OptionRolesQueryHandler, service::iam_service::IamService,
-    },
+    auth::service::auth_service::AuthService,
+    organization::query::option_roles::OptionRolesQueryHandler,
     shared::{dto::OptionStringDto, query_handler::QueryHandler as _},
 };
 use domain::auth::value_object::{menu::MenuTree, permission::PermissionTree};
@@ -42,7 +41,7 @@ async fn roles(
     )
 )]
 #[tracing::instrument]
-async fn menus(Inject(service): Inject<IamService>) -> JsonResponseType<&'static [MenuTree]> {
+async fn menus(Inject(service): Inject<AuthService>) -> JsonResponseType<&'static [MenuTree]> {
     let pages = service.get_all_privated_pages();
     JsonResponse::ok(pages)
 }
@@ -58,7 +57,7 @@ async fn menus(Inject(service): Inject<IamService>) -> JsonResponseType<&'static
 )]
 #[tracing::instrument]
 async fn permissions(
-    Inject(service): Inject<IamService>,
+    Inject(service): Inject<AuthService>,
 ) -> JsonResponseType<&'static [PermissionTree]> {
     let tree = service.get_permission_tree();
     JsonResponse::ok(tree)

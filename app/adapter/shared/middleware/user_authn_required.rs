@@ -3,7 +3,7 @@ use crate::shared::extractor::valid_user::ValidUser;
 use crate::shared::middleware::common::{
     get_access_token_from_header, get_access_token_from_query, unauthorized,
 };
-use application::organization::service::iam_service::IamService;
+use application::auth::service::auth_service::AuthService;
 use axum::extract::State;
 use axum::http::HeaderMap;
 use axum::{extract::Request, middleware::Next, response::Response};
@@ -19,7 +19,7 @@ pub async fn user_authn_required(
     let Some(access_token) = maybe_token else {
         return unauthorized("Access token is required");
     };
-    let service = state.provider().provide::<IamService>();
+    let service = state.provider().provide::<AuthService>();
     let id = match service.verify_token(&access_token).await {
         Ok(admin_id) => admin_id,
         Err(err) => {
@@ -29,6 +29,6 @@ pub async fn user_authn_required(
 
     let extensions_mut = request.extensions_mut();
     extensions_mut.insert::<ValidUser>(ValidUser::new(id));
-    extensions_mut.insert::<IamService>(service);
+    extensions_mut.insert::<AuthService>(service);
     next.run(request).await
 }
