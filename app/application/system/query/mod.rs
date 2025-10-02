@@ -1,6 +1,6 @@
 pub mod option_roles;
+pub mod paging_sched_records;
 pub mod retrieve_role;
-pub mod retrieve_sched;
 pub mod retrieve_user;
 pub mod search_files;
 pub mod search_roles;

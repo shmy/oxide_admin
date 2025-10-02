@@ -14,7 +14,7 @@ pub struct CleanupTempDir {
 }
 
 impl ScheduledJob for CleanupTempDir {
-    const EXPR: &'static str = "at 11:36";
+    const EXPR: &'static str = "at 00:01";
     const NAME: &'static str = "Delete the temporary directory";
 
     async fn run(&self) -> Result<()> {

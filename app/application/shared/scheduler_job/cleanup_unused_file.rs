@@ -13,7 +13,7 @@ pub struct CleanupUnusedFile {
 }
 
 impl ScheduledJob for CleanupUnusedFile {
-    const EXPR: &'static str = "at 11:37";
+    const EXPR: &'static str = "at 01:01";
     const NAME: &'static str = "Delete unused files";
 
     async fn run(&self) -> Result<()> {

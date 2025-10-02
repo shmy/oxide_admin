@@ -13,3 +13,17 @@ pub struct SchedDto {
     pub next_run_at: Option<chrono::NaiveDateTime>,
     pub last_duration_ms: Option<i64>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, FromRow)]
+pub struct SchedRecordDto {
+    pub id: String,
+    pub key: String,
+    pub name: String,
+    pub expr: String,
+    pub succeed: Option<bool>,
+    pub result: Option<String>,
+    pub run_at: Option<chrono::NaiveDateTime>,
+    pub duration_ms: Option<i64>,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
+}

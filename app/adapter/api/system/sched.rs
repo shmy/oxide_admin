@@ -5,19 +5,15 @@ use application::{
     },
     system::{
         command::batch_delete_scheds::{BatchDeleteSchedsCommand, BatchDeleteSchedsCommandHandler},
-        dto::sched::SchedDto,
+        dto::sched::{SchedDto, SchedRecordDto},
         query::{
-            retrieve_sched::{RetrieveSchedQuery, RetrieveSchedQueryHandler},
+            paging_sched_records::{PagingSchedRecordsQuery, PagingSchedRecordsQueryHandler},
             search_scheds::{SearchSchedsQuery, SearchSchedsQueryHandler},
         },
     },
 };
-use axum::{
-    Json,
-    extract::{Path, Query},
-};
+use axum::{Json, extract::Query};
 use domain::system::value_object::permission::{SYSTEM_SCHED_DELETE, SYSTEM_SCHED_READ};
-use domain::system::value_object::sched_id::SchedId;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -53,35 +49,33 @@ async fn search(
 
 #[utoipa::path(
     get,
-    path = "/{id}",
-    summary = "Retrieve sched",
+    path = "/records",
+    summary = "Paging sched records",
     tag = "System",
     responses(
-        (status = 200, body = inline(JsonResponse<SchedDto>))
+        (status = 200, body = inline(JsonResponse<SchedRecordDto>))
     )
 )]
 #[tracing::instrument]
-async fn retrieve(
-    Inject(query_handler): Inject<RetrieveSchedQueryHandler>,
-    Path(id): Path<SchedId>,
-) -> JsonResponseType<SchedDto> {
-    let sched = query_handler
-        .query(RetrieveSchedQuery::builder().id(id).build())
-        .await?;
-    JsonResponse::ok(sched)
+async fn records(
+    Inject(query_handler): Inject<PagingSchedRecordsQueryHandler>,
+    Query(query): Query<PagingSchedRecordsQuery>,
+) -> JsonResponsePagingType<SchedRecordDto> {
+    let PagingResult { total, items } = query_handler.query(query).await?;
+    JsonResponse::ok(PagingResponse { total, items })
 }
 
 #[utoipa::path(
     post,
-    path = "/batch/delete",
-    summary = "Batch delete scheds",
+    path = "/records/batch/delete",
+    summary = "Batch delete sched records",
     tag = "System",
     responses(
         (status = 200, body = inline(JsonResponseEmpty))
     )
 )]
 #[tracing::instrument]
-async fn batch_delete(
+async fn batch_delete_records(
     Inject(command_handler): Inject<BatchDeleteSchedsCommandHandler>,
     Json(command): Json<BatchDeleteSchedsCommand>,
 ) -> JsonResponseType<()> {
@@ -92,6 +86,6 @@ async fn batch_delete(
 pub fn routing() -> OpenApiRouter<WebState> {
     OpenApiRouter::new()
         .routes(routes!(search).permit_all(perms!(SYSTEM_SCHED_READ)))
-        .routes(routes!(retrieve).permit_all(perms!(SYSTEM_SCHED_READ)))
-        .routes(routes!(batch_delete).permit_all(perms!(SYSTEM_SCHED_DELETE)))
+        .routes(routes!(records).permit_all(perms!(SYSTEM_SCHED_READ)))
+        .routes(routes!(batch_delete_records).permit_all(perms!(SYSTEM_SCHED_DELETE)))
 }
