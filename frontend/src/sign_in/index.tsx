@@ -1,4 +1,4 @@
-import { updateToken } from "../lib/authn";
+import { updateToken } from "../lib/auth";
 import xior from "xior";
 import "./index.scss";
 
@@ -60,7 +60,7 @@ const refreshCaptcha = () => {
 
   setRefreshing(true);
   xior
-    .get("/api/authn/refresh_captcha", {
+    .get("/api/auth/refresh_captcha", {
       responseType: "blob"
     })
     .then((res) => {
@@ -88,7 +88,7 @@ formEl?.addEventListener(
     setError("");
     setSubmitting(true);
     xior
-      .post("/api/authn/sign_in", {
+      .post("/api/auth/sign_in", {
         account,
         password,
         captcha_key,

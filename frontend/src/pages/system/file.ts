@@ -1,4 +1,4 @@
-import { getAccessToken, ifElementAuthorized } from "../../lib/authn";
+import { getAccessToken, ifElementAuthorized } from "../../lib/auth";
 import { usedStatuses } from "../../lib/options";
 import { PERMISSIONS } from "../../lib/permissions";
 import { buildCrudTable } from "../../lib/table";

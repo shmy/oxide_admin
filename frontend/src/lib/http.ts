@@ -1,7 +1,7 @@
 import xior, { type XiorRequestConfig } from "xior";
 import uploadDownloadProgressPlugin from "xior/plugins/progress";
 
-import { getAccessToken, redirectToSignIn, refreshToken } from "./authn";
+import { getAccessToken, redirectToSignIn, refreshToken } from "./auth";
 import { attachmentAdpator } from "./attachmentAdpator";
 
 const http = xior.create({

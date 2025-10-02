@@ -1,4 +1,4 @@
-import { ifElementAuthorized } from "../../lib/authn";
+import { ifElementAuthorized } from "../../lib/auth";
 import { PERMISSIONS } from "../../lib/permissions";
 import { buildCrudTable } from "../../lib/table";
 

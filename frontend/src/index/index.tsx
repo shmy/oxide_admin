@@ -5,7 +5,7 @@ import {
   jumpTo,
   updateLocation,
 } from "../lib/amis_router";
-import { getAccessToken, redirectToSignIn, signOut } from "../lib/authn";
+import { getAccessToken, redirectToSignIn, signOut } from "../lib/auth";
 import http from "../lib/http";
 import { logoUrl } from "../lib/constant";
 import { registerComponents } from "../lib/component";

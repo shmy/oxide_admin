@@ -1,4 +1,4 @@
-import { ifElementAuthorized } from "../../lib/authn";
+import { ifElementAuthorized } from "../../lib/auth";
 import { logoUrl } from "../../lib/constant";
 import { enabledStatuses } from "../../lib/options";
 import { PERMISSIONS } from "../../lib/permissions";
