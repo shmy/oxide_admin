@@ -117,7 +117,6 @@ dependencies = [
  "minijinja",
  "nject",
  "object_storage_kit",
- "paste",
  "sched_kit",
  "serde",
  "serde_with",
