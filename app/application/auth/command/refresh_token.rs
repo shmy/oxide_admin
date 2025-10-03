@@ -1,11 +1,13 @@
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
+use domain::auth::error::AuthError;
+use domain::auth::event::AuthEvent;
+use domain::auth::port::token_issuer::TokenIssuerOutput;
 use domain::auth::port::token_issuer::TokenIssuerTrait;
 use domain::auth::port::token_store::TokenStoreTrait;
-use domain::organization::event::OrganizationEvent;
 use domain::organization::port::user_repository::UserRepository;
 use domain::shared::port::domain_repository::DomainRepository;
-use domain::{auth::port::token_issuer::TokenIssuerOutput, organization::error::OrganizationError};
+use futures_util::TryFutureExt;
 use infrastructure::port::token_issuer_impl::TokenIssuerImpl;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
 use infrastructure::repository::organization::user_repository::UserRepositoryImpl;
@@ -29,8 +31,8 @@ pub struct RefreshTokenCommandHandler {
 impl CommandHandler for RefreshTokenCommandHandler {
     type Command = RefreshTokenCommand;
     type Output = TokenIssuerOutput;
-    type Event = OrganizationEvent;
-    type Error = OrganizationError;
+    type Event = AuthEvent;
+    type Error = AuthError;
     #[tracing::instrument]
     async fn execute(
         &self,
@@ -54,11 +56,11 @@ impl CommandHandler for RefreshTokenCommandHandler {
                 token_output.access_token.clone(),
                 token_output.access_token_expires_at,
             ),
-            self.user_repository.save(user),
+            self.user_repository.save(user).map_err(Into::into),
         )?;
         Ok(CommandResult::with_event(
             token_output,
-            OrganizationEvent::UserRefreshTokenSucceeded { id },
+            AuthEvent::UserRefreshTokenSucceeded { id },
         ))
     }
 }

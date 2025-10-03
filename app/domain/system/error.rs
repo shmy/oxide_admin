@@ -1,11 +1,11 @@
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum SystemError {
-    #[error("{0}")]
-    Sqlx(String),
     #[error("File not exists")]
     FileNotFound,
     #[error("Sched not exists")]
     SchedNotFound,
+    #[error("{0}")]
+    Sqlx(String),
 }
 impl From<sqlx::Error> for SystemError {
     fn from(err: sqlx::Error) -> Self {

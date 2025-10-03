@@ -1,6 +1,8 @@
 use crate::organization::value_object::hashed_password::PasswordError;
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum OrganizationError {
+    #[error("Department not exists")]
+    DepartmentNotFound,
     #[error("User not found")]
     UserNotFound,
     #[error("User disabled")]
@@ -21,26 +23,12 @@ pub enum OrganizationError {
     RoleDuplicated,
     #[error("Privileged role immutable")]
     RolePrivilegedImmutable,
-    #[error("Captcha generation failed")]
-    CaptchaGenerationFailed,
-    #[error("Invalid captcha")]
-    CaptchaInvalid,
-    #[error("Incorrect captcha")]
-    CaptchaIncorrect,
-    #[error("Failed to generate access token")]
-    AccessTokenSignFailed,
-    #[error("Failed to verify access token")]
-    AccessTokenVerifyFailed,
-    #[error("Failed to save access token")]
-    AccessTokenSaveFailed,
     #[error("Refresh token expired")]
     RefreshTokenExpired,
     #[error("{0}")]
     Password(#[from] PasswordError),
     #[error("{0}")]
     Sqlx(String),
-    #[error("Department not exists")]
-    DepartmentNotFound,
 }
 impl From<sqlx::Error> for OrganizationError {
     fn from(err: sqlx::Error) -> Self {

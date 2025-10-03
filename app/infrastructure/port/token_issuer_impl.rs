@@ -1,7 +1,7 @@
 use bon::Builder;
 use domain::{
+    auth::error::AuthError,
     auth::port::token_issuer::{TokenIssuerOutput, TokenIssuerTrait, UserClaims},
-    organization::error::OrganizationError,
 };
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use nject::injectable;
@@ -19,7 +19,7 @@ pub struct TokenIssuerImpl {
 }
 
 impl TokenIssuerTrait for TokenIssuerImpl {
-    type Error = OrganizationError;
+    type Error = AuthError;
 
     #[tracing::instrument(skip(claims, secret))]
     fn generate_access_token<T: Serialize>(
@@ -29,7 +29,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
     ) -> Result<String, Self::Error> {
         let header = Header::new(ALGORITHM);
         let token = jsonwebtoken::encode(&header, claims, &EncodingKey::from_secret(secret))
-            .map_err(|_| OrganizationError::AccessTokenSignFailed)?;
+            .map_err(|_| AuthError::AccessTokenSignFailed)?;
         Ok(token)
     }
 
@@ -80,7 +80,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
         validation.leeway = 0;
         let token_data =
             jsonwebtoken::decode::<T>(access_token, &DecodingKey::from_secret(secret), &validation)
-                .map_err(|_| OrganizationError::AccessTokenVerifyFailed)?;
+                .map_err(|_| AuthError::AccessTokenVerifyFailed)?;
         Ok(token_data.claims)
     }
 
@@ -95,7 +95,7 @@ impl TokenIssuerTrait for TokenIssuerImpl {
         validation.leeway = 0;
         let tokendata =
             jsonwebtoken::decode(access_token, &DecodingKey::from_secret(&[]), &validation)
-                .map_err(|_| OrganizationError::AccessTokenVerifyFailed)?;
+                .map_err(|_| AuthError::AccessTokenVerifyFailed)?;
         Ok(tokendata.claims)
     }
 }
@@ -181,15 +181,9 @@ mod tests {
             )
             .unwrap();
         let result = token_issuer.verify::<UserClaims>(&token1, SECRET);
-        assert_eq!(
-            result.err(),
-            Some(OrganizationError::AccessTokenVerifyFailed)
-        );
+        assert_eq!(result.err(), Some(AuthError::AccessTokenVerifyFailed));
         let result = token_issuer.verify::<UserClaims>(&token2, SECRET);
-        assert_eq!(
-            result.err(),
-            Some(OrganizationError::AccessTokenVerifyFailed)
-        );
+        assert_eq!(result.err(), Some(AuthError::AccessTokenVerifyFailed));
     }
 
     #[rstest]
@@ -229,9 +223,6 @@ mod tests {
         }
         let token = "xxxx";
         let result = token_issuer.decode_without_validation::<UserClaims>(token);
-        assert_eq!(
-            result.err(),
-            Some(OrganizationError::AccessTokenVerifyFailed)
-        );
+        assert_eq!(result.err(), Some(AuthError::AccessTokenVerifyFailed));
     }
 }

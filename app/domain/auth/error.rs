@@ -1,12 +1,6 @@
-use crate::organization::value_object::hashed_password::PasswordError;
+use crate::organization::{error::OrganizationError, value_object::hashed_password::PasswordError};
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum AuthError {
-    #[error("Password mismatch")]
-    PasswordMismatch,
-    #[error("Password unchanged")]
-    PasswordUnchanged,
-    #[error("Privileged user immutable")]
-    UserPrivilegedImmutable,
     #[error("Captcha generation failed")]
     CaptchaGenerationFailed,
     #[error("Invalid captcha")]
@@ -19,10 +13,10 @@ pub enum AuthError {
     AccessTokenVerifyFailed,
     #[error("Failed to save access token")]
     AccessTokenSaveFailed,
-    #[error("Refresh token expired")]
-    RefreshTokenExpired,
     #[error("{0}")]
     Password(#[from] PasswordError),
+    #[error("{0}")]
+    Organization(#[from] OrganizationError),
     #[error("{0}")]
     Sqlx(String),
 }

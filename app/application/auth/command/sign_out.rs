@@ -1,10 +1,11 @@
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
+use domain::auth::error::AuthError;
+use domain::auth::event::AuthEvent;
 use domain::auth::port::token_store::TokenStoreTrait;
-use domain::organization::error::OrganizationError;
-use domain::organization::event::OrganizationEvent;
 use domain::organization::value_object::user_id::UserId;
 use domain::shared::port::domain_repository::DomainRepository;
+use futures_util::TryFutureExt;
 use infrastructure::port::token_store_impl::TokenStoreImpl;
 use infrastructure::repository::organization::user_repository::UserRepositoryImpl;
 use nject::injectable;
@@ -25,8 +26,8 @@ pub struct SignOutCommandHandler {
 impl CommandHandler for SignOutCommandHandler {
     type Command = SignOutCommand;
     type Output = ();
-    type Event = OrganizationEvent;
-    type Error = OrganizationError;
+    type Event = AuthEvent;
+    type Error = AuthError;
 
     #[tracing::instrument]
     async fn execute(
@@ -39,12 +40,12 @@ impl CommandHandler for SignOutCommandHandler {
 
             tokio::try_join!(
                 self.token_store.delete(user.id.to_string()),
-                self.user_repository.save(user),
+                self.user_repository.save(user).map_err(Into::into),
             )?;
         }
         Ok(CommandResult::with_event(
             (),
-            OrganizationEvent::UserLogoutSucceeded { id },
+            AuthEvent::UserLogoutSucceeded { id },
         ))
     }
 }

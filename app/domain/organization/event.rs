@@ -1,8 +1,5 @@
 use crate::{
-    organization::{
-        entity::{department::Department, role::Role, user::User},
-        value_object::user_id::UserId,
-    },
+    organization::entity::{department::Department, role::Role, user::User},
     shared::event_util::UpdatedEvent,
 };
 #[derive(Debug, Clone)]
@@ -15,15 +12,6 @@ pub enum OrganizationEvent {
     },
     UsersDeleted {
         items: Vec<User>,
-    },
-    UserLoginSucceeded {
-        id: UserId,
-    },
-    UserLogoutSucceeded {
-        id: UserId,
-    },
-    UserRefreshTokenSucceeded {
-        id: UserId,
     },
     RolesCreated {
         items: Vec<Role>,

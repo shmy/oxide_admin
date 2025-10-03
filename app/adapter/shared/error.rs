@@ -3,7 +3,9 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use domain::{organization::error::OrganizationError, system::error::SystemError};
+use domain::{
+    auth::error::AuthError, organization::error::OrganizationError, system::error::SystemError,
+};
 #[derive(Debug, thiserror::Error)]
 pub enum WebError {
     #[error("{0}")]
@@ -12,6 +14,8 @@ pub enum WebError {
     InvalidHeaderValue(#[from] axum::http::header::InvalidHeaderValue),
     #[error("Authorized user does not exist")]
     ValidUserNotFound,
+    #[error("{0}")]
+    Auth(#[from] AuthError),
     #[error("{0}")]
     Organization(#[from] OrganizationError),
     #[error("{0}")]
