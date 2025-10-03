@@ -1,11 +1,13 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO _files (id, path, used, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
+  "query": "INSERT INTO _files (id, name, size, path, used, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7)",
   "describe": {
     "columns": [],
     "parameters": {
       "Left": [
         "Bpchar",
+        "Varchar",
+        "Int8",
         "Varchar",
         "Bool",
         "Timestamp",
@@ -14,5 +16,5 @@
     },
     "nullable": []
   },
-  "hash": "61752bbe41f8fc145bd15d1157dbd7c9ef1289086038d8c17122bc9cae1c7141"
+  "hash": "89addd40ee49705ef747ccdc78fa71a2f56f1fb5e6d00ab287d78861ed0bb688"
 }

@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT COUNT(*) AS \"count!\"\n            FROM _files\n            WHERE ($1::text IS NULL OR name LIKE CONCAT('%', $1, '%'))\n            AND ($2::boolean IS NULL OR used = $2)\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Bool"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "89736feecf9ba44ab98d8fda68cf4821e528d4f10267045277926cd14554f159"
+}

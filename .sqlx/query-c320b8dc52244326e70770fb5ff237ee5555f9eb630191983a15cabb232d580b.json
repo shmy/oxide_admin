@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO _files (id, name, path, size, used, created_at, updated_at)\n            VALUES ($1, $2, $3, $4, $5, $6, $7)\n            ON CONFLICT (id) DO UPDATE SET\n                name = EXCLUDED.name,\n                path = EXCLUDED.path,\n                size = EXCLUDED.size,\n                used = EXCLUDED.used,\n                updated_at = EXCLUDED.updated_at\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bpchar",
+        "Varchar",
+        "Varchar",
+        "Int8",
+        "Bool",
+        "Timestamp",
+        "Timestamp"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c320b8dc52244326e70770fb5ff237ee5555f9eb630191983a15cabb232d580b"
+}

@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO _scheds (id, key, name, expr, succeed, result, run_at, duration_ms, created_at, updated_at)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)\n            ON CONFLICT (id) DO UPDATE SET\n                key = EXCLUDED.key,\n                name = EXCLUDED.name,\n                expr = EXCLUDED.expr,\n                succeed = EXCLUDED.succeed,\n                result = EXCLUDED.result,\n                run_at = EXCLUDED.run_at,\n                duration_ms = EXCLUDED.duration_ms,\n                updated_at = EXCLUDED.updated_at\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bpchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Bool",
+        "Text",
+        "Timestamp",
+        "Int8",
+        "Timestamp",
+        "Timestamp"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2de44ef56e1cda681d913f6409edf865287f7030a1364d5077ea2810842456a3"
+}

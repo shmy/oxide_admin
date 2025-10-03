@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id as \"id: SchedId\", key, name, expr, succeed, result, run_at, duration_ms FROM _scheds WHERE id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id: SchedId",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "expr",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "succeed",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "result",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "run_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 7,
+        "name": "duration_ms",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bpchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "f786f9de209b5e25d39fd0252a0d3f5113e919d837324bdfc6b20b7bf98cbd20"
+}

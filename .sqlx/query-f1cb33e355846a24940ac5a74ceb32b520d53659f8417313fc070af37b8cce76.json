@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            u.id as id,\n            u.account as account,\n            u.portrait as portrait,\n            u.name as name,\n            u.role_ids as \"role_ids: Vec<RoleId>\",\n            u.privileged as privileged,\n            u.enabled as enabled,\n            u.created_at as created_at,\n            u.updated_at as updated_at,\n            COALESCE(array_agg(r.name) FILTER (WHERE r.name IS NOT NULL), '{}') as \"role_names!: Vec<String>\"\n        FROM _users as u\n        LEFT JOIN _roles as r ON r.id = ANY(u.role_ids)\n        WHERE ($1::text IS NULL OR u.account LIKE CONCAT('%', $1, '%'))\n            AND ($2::text IS NULL OR u.name LIKE CONCAT('%', $2, '%'))\n            AND ($3::boolean IS NULL OR u.privileged = $3)\n            AND ($4::boolean IS NULL OR u.enabled = $4)\n            AND ($5::text IS NULL OR $5 = ANY(u.role_ids))\n        GROUP BY u.id\n        ORDER BY u.updated_at DESC\n        LIMIT $6 OFFSET $7\n\n        ",
+  "query": "\n        SELECT\n            u.id as id,\n            u.account as account,\n            u.portrait as portrait,\n            u.name as name,\n            u.role_ids as \"role_ids: Vec<RoleId>\",\n            u.privileged as privileged,\n            u.enabled as enabled,\n            u.created_at as created_at,\n            u.updated_at as updated_at,\n            COALESCE(array_agg(r.name) FILTER (WHERE r.name IS NOT NULL), '{}') as \"role_names!: Vec<String>\"\n        FROM _users as u\n        LEFT JOIN _roles as r ON r.id = ANY(u.role_ids)\n        WHERE ($1::text IS NULL OR u.account LIKE CONCAT('%', $1, '%'))\n            AND ($2::text IS NULL OR u.name LIKE CONCAT('%', $2, '%'))\n            AND ($3::boolean IS NULL OR u.privileged = $3)\n            AND ($4::boolean IS NULL OR u.enabled = $4)\n            AND ($5::text IS NULL OR $5 = ANY(u.role_ids))\n        GROUP BY u.id\n        ORDER BY u.created_at DESC\n        LIMIT $6 OFFSET $7\n\n        ",
   "describe": {
     "columns": [
       {
@@ -78,5 +78,5 @@
       null
     ]
   },
-  "hash": "bdf7a4379b10f4929ff773552308938bd707c299eacf1ae0de95757df25ead76"
+  "hash": "f1cb33e355846a24940ac5a74ceb32b520d53659f8417313fc070af37b8cce76"
 }
