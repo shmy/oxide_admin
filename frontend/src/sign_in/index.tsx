@@ -60,7 +60,7 @@ const refreshCaptcha = () => {
 
   setRefreshing(true);
   xior
-    .get("/api/auth/refresh_captcha", {
+    .get("/api/auth/captcha", {
       responseType: "blob"
     })
     .then((res) => {

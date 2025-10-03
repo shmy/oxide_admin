@@ -54,7 +54,7 @@ async fn sign_in(
 
 #[utoipa::path(
     post,
-    path = "/refresh_token",
+    path = "/token",
     summary = "Refresh Token",
     tag = "Auth",
     responses(
@@ -75,7 +75,7 @@ async fn refresh_token(
 
 #[utoipa::path(
     get,
-    path = "/refresh_captcha",
+    path = "/captcha",
     summary = "Refresh captcha",
     tag = "Auth",
     responses(

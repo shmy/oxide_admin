@@ -17,7 +17,7 @@ use utoipa::ToSchema;
 
 #[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct RefreshTokenCommand {
-    refresh_token: String,
+    token: String,
 }
 
 #[derive(Debug, Builder)]
@@ -38,10 +38,7 @@ impl CommandHandler for RefreshTokenCommandHandler {
         &self,
         cmd: Self::Command,
     ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
-        let mut user = self
-            .user_repository
-            .by_refresh_token(cmd.refresh_token)
-            .await?;
+        let mut user = self.user_repository.by_refresh_token(cmd.token).await?;
         user.assert_activated()?;
         user.assert_refresh_token_valid_period()?;
         let token_output = self.token_issuer.generate(user.id.to_string())?;
