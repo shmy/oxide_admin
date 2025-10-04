@@ -7,8 +7,8 @@ use application::{
             create_department::{CreateDepartmentCommand, CreateDepartmentCommandHandler},
             update_department::{UpdateDepartmentCommand, UpdateDepartmentCommandHandler},
         },
-        dto::department::{DepartmentDto, DepartmentWithChildren},
-        query::search_departments::{SearchDepartmentsQuery, SearchDepartmentsQueryHandler},
+        dto::department::DepartmentWithChildren,
+        query::tree_departments::{TreeDepartmentsQuery, TreeDepartmentsQueryHandler},
     },
     shared::{command_handler::CommandHandler, query_handler::QueryHandler as _},
 };
@@ -30,24 +30,24 @@ use crate::{
     shared::{
         extractor::inject::Inject,
         middleware::perm_router_ext::PermissonRouteExt as _,
-        response::{JsonResponse, JsonResponseEmpty, JsonResponseType, PagingResponse},
+        response::{JsonResponse, JsonResponseEmpty, JsonResponseType},
     },
 };
 
 #[utoipa::path(
     get,
-    params(SearchDepartmentsQuery),
+    params(TreeDepartmentsQuery),
     path = "/",
-    summary = "Search departments",
+    summary = "Tree departments",
     tag = "Organization",
     responses(
-        (status = 200, body = inline(JsonResponse<PagingResponse<DepartmentDto>>))
+        (status = 200, body = inline(JsonResponse<Vec<DepartmentWithChildren>>))
     )
 )]
 #[tracing::instrument]
-async fn search(
-    Inject(query_handler): Inject<SearchDepartmentsQueryHandler>,
-    Query(query): Query<SearchDepartmentsQuery>,
+async fn tree(
+    Inject(query_handler): Inject<TreeDepartmentsQueryHandler>,
+    Query(query): Query<TreeDepartmentsQuery>,
 ) -> JsonResponseType<Vec<DepartmentWithChildren>> {
     let items = query_handler.query(query).await?;
     JsonResponse::ok(items)
@@ -110,7 +110,7 @@ async fn update(
 
 pub fn routing() -> OpenApiRouter<WebState> {
     OpenApiRouter::new()
-        .routes(routes!(search).permit_all(perms!(SYSTEM_DEPARTMENT_READ)))
+        .routes(routes!(tree).permit_all(perms!(SYSTEM_DEPARTMENT_READ)))
         .routes(routes!(create).permit_all(perms!(SYSTEM_DEPARTMENT_CREATE)))
         .routes(routes!(update).permit_all(perms!(SYSTEM_DEPARTMENT_UPDATE)))
         .routes(routes!(batch_delete).permit_all(perms!(SYSTEM_DEPARTMENT_DELETE)))

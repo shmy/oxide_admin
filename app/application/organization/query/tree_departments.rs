@@ -13,16 +13,16 @@ use utoipa::IntoParams;
 
 #[serde_as]
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, IntoParams, Builder)]
-pub struct SearchDepartmentsQuery {}
+pub struct TreeDepartmentsQuery {}
 
 #[derive(Debug, Clone)]
 #[injectable]
-pub struct SearchDepartmentsQueryHandler {
+pub struct TreeDepartmentsQueryHandler {
     pool: PgPool,
 }
 
-impl QueryHandler for SearchDepartmentsQueryHandler {
-    type Query = SearchDepartmentsQuery;
+impl QueryHandler for TreeDepartmentsQueryHandler {
+    type Query = TreeDepartmentsQuery;
     type Output = Vec<DepartmentWithChildren>;
     type Error = OrganizationError;
 
@@ -30,7 +30,7 @@ impl QueryHandler for SearchDepartmentsQueryHandler {
     #[tracing::instrument]
     async fn query(
         &self,
-        query: SearchDepartmentsQuery,
+        query: TreeDepartmentsQuery,
     ) -> Result<Vec<DepartmentWithChildren>, OrganizationError> {
         let departments = sqlx::query_as!(
             DepartmentDto,
@@ -46,7 +46,7 @@ impl QueryHandler for SearchDepartmentsQueryHandler {
     }
 }
 
-impl SearchDepartmentsQueryHandler {
+impl TreeDepartmentsQueryHandler {
     pub fn build_department_tree(departments: Vec<DepartmentDto>) -> Vec<DepartmentWithChildren> {
         // 先构建 code => Vec<子部门> 的映射
         let mut children_map: HashMap<Option<String>, Vec<DepartmentDto>> = HashMap::new();
