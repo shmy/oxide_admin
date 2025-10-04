@@ -8,8 +8,7 @@ pub struct Department {
     pub id: DepartmentId,
     pub name: String,
     pub code: String,
-    pub parent_id: Option<String>,
-    pub enabled: bool,
+    pub parent_code: Option<String>,
 }
 
 impl Department {
@@ -19,10 +18,7 @@ impl Department {
     pub fn update_code(&mut self, code: String) {
         self.code = code;
     }
-    pub fn update_parent_id(&mut self, parent_id: Option<String>) {
-        self.parent_id = parent_id;
-    }
-    pub fn update_enabled(&mut self, enabled: bool) {
-        self.enabled = enabled;
+    pub fn update_parent_code(&mut self, parent_code: Option<String>) {
+        self.parent_code = parent_code;
     }
 }

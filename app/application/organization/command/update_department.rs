@@ -15,10 +15,6 @@ use crate::shared::command_handler::{CommandHandler, CommandResult};
 pub struct UpdateDepartmentCommand {
     id: DepartmentId,
     name: Option<String>,
-    code: Option<String>,
-    #[serde(default, with = "::serde_with::rust::double_option")]
-    parent_id: Option<Option<String>>,
-    enabled: Option<bool>,
 }
 
 #[derive(Debug)]
@@ -44,15 +40,7 @@ impl CommandHandler for UpdateDepartmentCommandHandler {
         if let Some(name) = cmd.name {
             department.update_name(name);
         }
-        if let Some(code) = cmd.code {
-            department.update_code(code);
-        }
-        if let Some(parent_id) = cmd.parent_id {
-            department.update_parent_id(parent_id);
-        }
-        if let Some(enabled) = cmd.enabled {
-            department.update_enabled(enabled);
-        }
+
         let department = self.department_repo.save(department).await?;
         Ok(CommandResult::with_event(
             department.clone(),

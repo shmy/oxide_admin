@@ -29,7 +29,7 @@ impl DomainRepository for DepartmentRepositoryImpl {
         let row_opt = sqlx::query_as!(
             DepartmentDto,
             r#"
-        SELECT id as "id: DepartmentId", name, code, parent_id, enabled FROM _departments WHERE id = $1
+        SELECT id as "id: DepartmentId", name, code, parent_code FROM _departments WHERE id = $1
         "#,
             id
         )
@@ -46,20 +46,18 @@ impl DomainRepository for DepartmentRepositoryImpl {
 
         sqlx::query!(
             r#"
-            INSERT INTO _departments (id, name, code, parent_id, enabled, created_at, updated_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO _departments (id, name, code, parent_code, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6)
             ON CONFLICT (id) DO UPDATE SET
                 name = EXCLUDED.name,
                 code = EXCLUDED.code,
-                parent_id = EXCLUDED.parent_id,
-                enabled = EXCLUDED.enabled,
+                parent_code = EXCLUDED.parent_code,
                 updated_at = EXCLUDED.updated_at
             "#,
             &entity.id,
             &entity.name,
             &entity.code,
-            entity.parent_id,
-            &entity.enabled,
+            entity.parent_code,
             &now,
             &now,
         )
@@ -76,7 +74,7 @@ impl DomainRepository for DepartmentRepositoryImpl {
         let items = sqlx::query_as!(
             DepartmentDto,
             r#"
-            DELETE FROM _departments WHERE id = ANY($1) RETURNING id as "id: DepartmentId", name, code, parent_id, enabled
+            DELETE FROM _departments WHERE id = ANY($1) RETURNING id as "id: DepartmentId", name, code, parent_code
             "#,
             &ids.inner_vec()
         )
@@ -94,8 +92,7 @@ struct DepartmentDto {
     id: DepartmentId,
     name: String,
     code: String,
-    parent_id: Option<String>,
-    enabled: bool,
+    parent_code: Option<String>,
 }
 
 impl From<DepartmentDto> for Department {
@@ -104,8 +101,7 @@ impl From<DepartmentDto> for Department {
             .id(value.id)
             .name(value.name)
             .code(value.code)
-            .maybe_parent_id(value.parent_id)
-            .enabled(value.enabled)
+            .maybe_parent_code(value.parent_code)
             .build()
     }
 }

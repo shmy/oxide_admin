@@ -7,16 +7,10 @@ use application::{
             create_department::{CreateDepartmentCommand, CreateDepartmentCommandHandler},
             update_department::{UpdateDepartmentCommand, UpdateDepartmentCommandHandler},
         },
-        dto::department::DepartmentDto,
-        query::{
-            retrieve_department::{RetrieveDepartmentQuery, RetrieveDepartmentQueryHandler},
-            search_departments::{SearchDepartmentsQuery, SearchDepartmentsQueryHandler},
-        },
+        dto::department::{DepartmentDto, DepartmentWithChildren},
+        query::search_departments::{SearchDepartmentsQuery, SearchDepartmentsQueryHandler},
     },
-    shared::{
-        command_handler::CommandHandler, paging_result::PagingResult,
-        query_handler::QueryHandler as _,
-    },
+    shared::{command_handler::CommandHandler, query_handler::QueryHandler as _},
 };
 use axum::{
     Json,
@@ -36,10 +30,7 @@ use crate::{
     shared::{
         extractor::inject::Inject,
         middleware::perm_router_ext::PermissonRouteExt as _,
-        response::{
-            JsonResponse, JsonResponseEmpty, JsonResponsePagingType, JsonResponseType,
-            PagingResponse,
-        },
+        response::{JsonResponse, JsonResponseEmpty, JsonResponseType, PagingResponse},
     },
 };
 
@@ -57,29 +48,9 @@ use crate::{
 async fn search(
     Inject(query_handler): Inject<SearchDepartmentsQueryHandler>,
     Query(query): Query<SearchDepartmentsQuery>,
-) -> JsonResponsePagingType<DepartmentDto> {
-    let PagingResult { total, items } = query_handler.query(query).await?;
-    JsonResponse::ok(PagingResponse { total, items })
-}
-
-#[utoipa::path(
-    get,
-    path = "/{id}",
-    summary = "Retrieve department",
-    tag = "Organization",
-    responses(
-        (status = 200, body = inline(JsonResponse<DepartmentDto>))
-    )
-)]
-#[tracing::instrument]
-async fn retrieve(
-    Inject(query_handler): Inject<RetrieveDepartmentQueryHandler>,
-    Path(id): Path<DepartmentId>,
-) -> JsonResponseType<DepartmentDto> {
-    let department = query_handler
-        .query(RetrieveDepartmentQuery::builder().id(id).build())
-        .await?;
-    JsonResponse::ok(department)
+) -> JsonResponseType<Vec<DepartmentWithChildren>> {
+    let items = query_handler.query(query).await?;
+    JsonResponse::ok(items)
 }
 
 #[utoipa::path(
@@ -140,7 +111,6 @@ async fn update(
 pub fn routing() -> OpenApiRouter<WebState> {
     OpenApiRouter::new()
         .routes(routes!(search).permit_all(perms!(SYSTEM_DEPARTMENT_READ)))
-        .routes(routes!(retrieve).permit_all(perms!(SYSTEM_DEPARTMENT_READ)))
         .routes(routes!(create).permit_all(perms!(SYSTEM_DEPARTMENT_CREATE)))
         .routes(routes!(update).permit_all(perms!(SYSTEM_DEPARTMENT_UPDATE)))
         .routes(routes!(batch_delete).permit_all(perms!(SYSTEM_DEPARTMENT_DELETE)))

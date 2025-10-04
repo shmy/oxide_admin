@@ -1,58 +1,68 @@
-import { buildCrudTable } from "../../lib/table";
-
 export { };
-
 const endpoint = "/organization/departments";
 
-const buildDrawer = (isAdd = true) => {
-  const label = isAdd ? "Create department" : null;
-  const title = isAdd ? "Create department" : "Edit department";
-  const level = isAdd ? "primary" : "link";
-  const icon = isAdd ? "fas fa-plus" : "fas fa-edit";
-  const tooltip = isAdd ? null : "Edit";
-
-  const api = isAdd ? `post:${endpoint}` : `put:${endpoint}/$id`;
-  const initApi = isAdd ? null : `get:${endpoint}/$id`;
+const buildDepartment = () => {
 
   return {
-    label: label,
-    icon: icon,
-    tooltip: tooltip,
-    type: "button",
-    align: "right",
-    actionType: "drawer",
-    level: level,
-    drawer: {
-      title: title,
-      size: "md",
-      body: {
-        type: "form",
-        canAccessSuperData: false,
-        api: api,
-        initApi: initApi,
-        body: [
-
-        ],
-      },
+    "id": "department_tree",
+    "type": "input-tree",
+    "name": "department",
+    "source": endpoint,
+    "heightAuto": true,
+    "creatable": true,
+    "removable": true,
+    "editable": true,
+    "required": true,
+    "addApi": `post:${endpoint}`,
+    "editApi": `put:${endpoint}/\${id}`,
+    "deleteApi": {
+      url: `${endpoint}/batch/delete`,
+      method: "POST",
+      data: {
+        "ids": ["\${id}"]
+      }
     },
+    "options": [],
+    "menuTpl": "${label} [${value}]",
+    "addControls": [
+      {
+        "label": "名称",
+        "type": "input-text",
+        "required": true,
+        "name": "name"
+      },
+      {
+        "label": "编号",
+        "type": "input-text",
+        "required": true,
+        "name": "code"
+      },
+    ],
+    "editControls": [
+      {
+        "label": "ID",
+        "type": "hidden",
+        "required": true,
+        "name": "id"
+      },
+      {
+        "label": "名称",
+        "type": "input-text",
+        "required": true,
+        "name": "name",
+        "value": "${label}"
+      },
+    ],
   };
 };
 
 const schema = {
-  type: "page",
-  body: buildCrudTable({
-    endpoint,
-    filters: [
-
-    ],
-    headerToolbar: [buildDrawer()],
-    bulkActions: [
-
-    ],
-    operations: [buildDrawer(false)],
-    columns: [
-
-    ],
-  }),
+  "type": "page",
+  "body": {
+    "type": "panel",
+    "body": [
+      buildDepartment()
+    ]
+  }
 };
 window._j && window._j(schema);

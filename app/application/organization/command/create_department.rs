@@ -15,8 +15,12 @@ use crate::shared::command_handler::{CommandHandler, CommandResult};
 pub struct CreateDepartmentCommand {
     name: String,
     code: String,
-    parent_id: Option<String>,
-    enabled: bool,
+    parent: Option<CreateDepartmentParent>,
+}
+
+#[derive(Debug, Deserialize, Builder, ToSchema)]
+pub struct CreateDepartmentParent {
+    value: String,
 }
 
 #[derive(Debug)]
@@ -40,8 +44,7 @@ impl CommandHandler for CreateDepartmentCommandHandler {
             .id(DepartmentId::generate())
             .name(cmd.name)
             .code(cmd.code)
-            .maybe_parent_id(cmd.parent_id)
-            .enabled(cmd.enabled)
+            .maybe_parent_code(cmd.parent.map(|parent| parent.value))
             .build();
         let department = self.department_repo.save(department).await?;
         Ok(CommandResult::with_event(
