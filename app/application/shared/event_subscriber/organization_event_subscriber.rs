@@ -35,7 +35,6 @@ impl OrganizationEventSubscriber {
                 | OrganizationEvent::UsersDeleted { .. }
         )
     }
-
     fn is_roles_changed(event: &OrganizationEvent) -> bool {
         matches!(
             event,
@@ -57,7 +56,6 @@ impl OrganizationEventSubscriber {
 
 impl EventSubscriber<Event> for OrganizationEventSubscriber {
     async fn on_received(&self, event: Event) -> InfrastructureResult<()> {
-        #[allow(irrefutable_let_patterns)]
         if let Event::Organization(e) = event {
             if Self::is_users_changed(&e) {
                 let _ = self.search_user_query_handler.clean_cache().await;
