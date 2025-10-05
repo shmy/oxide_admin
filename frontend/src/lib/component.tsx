@@ -25,7 +25,7 @@ export const registerComponents = (amisLib: any) => {
 const withSuspense = (Comp: any) => {
     return (props: any) => {
         return (
-            <Suspense fallback={<span>Loading...</span>}>
+            <Suspense>
                 <Comp {...props} />
             </Suspense>
         );
