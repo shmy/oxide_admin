@@ -39,6 +39,11 @@ const buildDrawer = (isAdd = true) => {
         canAccessSuperData: false,
         api: api,
         initApi: initApi,
+        data: {
+          enabled: true,
+          privileged: false,
+          role_ids: [],
+        },
         body: [
           {
             type: "static-text",
@@ -52,7 +57,6 @@ const buildDrawer = (isAdd = true) => {
             type: "switch",
             name: "enabled",
             label: "状态",
-            value: true,
             required: true,
             disabledOn: "this.privileged",
           },
@@ -96,13 +100,11 @@ const buildDrawer = (isAdd = true) => {
             multiple: true,
             joinValues: false,
             extractValue: true,
-            value: "${role_ids || []}",
             disabledOn: "this.privileged",
           },
           {
             type: "hidden",
             name: "privileged",
-            value: false,
             required: true,
           },
         ],

@@ -43,6 +43,12 @@ const buildDrawer = (isAdd = true) => {
         canAccessSuperData: false,
         api: api,
         initApi: initApi,
+        data: {
+          enabled: true,
+          privileged: false,
+          menus: [],
+          permissions: []
+        },
         body: [
           {
             type: "static-text",
@@ -56,7 +62,6 @@ const buildDrawer = (isAdd = true) => {
             type: "switch",
             name: "enabled",
             label: "状态",
-            value: true,
             required: true,
             disabledOn: "this.privileged",
           },
@@ -79,7 +84,6 @@ const buildDrawer = (isAdd = true) => {
             onlyChildren: false,
             joinValues: false,
             extractValue: true,
-            value: "${menus || []}",
             disabledOn: "this.privileged",
           },
           {
@@ -92,11 +96,11 @@ const buildDrawer = (isAdd = true) => {
             joinValues: false,
             extractValue: true,
             source: permissionEndpoint,
+            disabledOn: "this.privileged",
           },
           {
             type: "hidden",
             name: "privileged",
-            value: false,
             required: true,
           },
         ],
