@@ -4,7 +4,6 @@ const endpoint = "/organization/departments";
 const buildDepartment = () => {
 
   return {
-    "id": "department_tree",
     "type": "input-tree",
     "name": "department",
     "source": endpoint,

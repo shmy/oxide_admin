@@ -32,5 +32,9 @@ export const PERMISSIONS = {
       UPDATE: 502,
       DELETE: 503,
     },
+    CACHE: {
+      READ: 600,
+      DELETE: 601,
+    },
   },
 };

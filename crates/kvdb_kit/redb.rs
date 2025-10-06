@@ -9,7 +9,7 @@ use tracing::{debug, error, info};
 
 use redb::{Database, ReadableDatabase as _, ReadableTable as _, TableDefinition};
 
-use crate::{KvdbTrait, serde_util};
+use crate::{IterItem, KvdbTrait, serde_util};
 
 const TABLE_NAME: TableDefinition<&str, &[u8]> = TableDefinition::new("app_data");
 
@@ -204,27 +204,13 @@ impl KvdbTrait for RedbKvdb {
     }
 
     async fn delete_prefix(&self, prefix: &str) -> Result<()> {
-        let tx = self.db.begin_read()?;
-        let table = tx.open_table(TABLE_NAME)?;
-        let iter = table.iter()?;
-        let keys = iter
-            .filter_map(|access| {
-                if let Ok((key, _)) = access {
-                    let key = key.value().to_string();
-                    if key.starts_with(prefix) {
-                        return Some(key);
-                    }
-                }
-                None
-            })
-            .collect::<Vec<_>>();
-        drop(tx);
-        if !keys.is_empty() {
+        let items = self.iter_prefix(prefix).await?;
+        if !items.is_empty() {
             let tx = self.db.begin_write()?;
             {
                 let mut table = tx.open_table(TABLE_NAME)?;
-                for key in keys {
-                    let _ = table.remove(key.as_str());
+                for item in items {
+                    let _ = table.remove(item.key.as_str());
                 }
             }
             tx.commit()?;
@@ -232,6 +218,27 @@ impl KvdbTrait for RedbKvdb {
         Ok(())
     }
 
+    async fn iter_prefix(&self, prefix: &str) -> Result<Vec<IterItem>> {
+        let tx = self.db.begin_read()?;
+        let table = tx.open_table(TABLE_NAME)?;
+        let iter = table.iter()?;
+        let items = iter
+            .filter_map(|access| {
+                if let Ok((key, val)) = access {
+                    let value: KvValue = serde_util::rmp_decode(val.value()).ok()?;
+                    let key = key.value().to_string();
+                    if key.starts_with(prefix) {
+                        return Some(IterItem {
+                            key,
+                            expired_at: value.expires_at,
+                        });
+                    }
+                }
+                None
+            })
+            .collect();
+        Ok(items)
+    }
     async fn close(&self) {
         let guard = self.sched.lock().await;
         guard.stop().await;

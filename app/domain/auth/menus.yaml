@@ -20,17 +20,17 @@ private:
     icon: fas fa-screwdriver-wrench
     children:
       - key: 200
+        label: 缓存管理
+        icon: fas fa-server
+        url: /system/cache
+      - key: 201
         label: 文件管理
         icon: fas fa-folder
         url: /system/file
-      - key: 201
+      - key: 202
         label: 定时任务
         icon: fas fa-clock
         url: /system/sched
-      - key: 202
-        label: 后台任务
-        icon: fas fa-bell-concierge
-        url: /system/bgworker
       - key: 203
         label: 系统信息
         icon: fas fa-info

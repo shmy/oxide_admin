@@ -82,3 +82,12 @@
         - label: 删除
           key: delete
           value: 503
+    - label: 缓存
+      key: cache
+      children:
+        - label: 读取
+          key: read
+          value: 600
+        - label: 删除
+          key: delete
+          value: 601
