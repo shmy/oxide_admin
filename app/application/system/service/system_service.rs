@@ -25,7 +25,7 @@ impl SystemService {
     }
 
     #[tracing::instrument]
-    pub async fn cache(&self) -> ApplicationResult<Vec<CacheTreeItem>> {
+    pub async fn cache_tree(&self) -> ApplicationResult<Vec<CacheTreeItem>> {
         let items = self.kv.iter_prefix(CACHE_PREFIX).await?;
         let mut roots: Vec<CacheTreeItem> = Vec::new();
 
@@ -49,6 +49,17 @@ impl SystemService {
             }
         }
         Ok(roots)
+    }
+
+    #[tracing::instrument]
+    pub async fn retrieve_cache(&self, key: &str) -> Option<RetrieveCacheItem> {
+        self.kv.get_raw(key).await.and_then(|d| {
+            let item = RetrieveCacheItem {
+                value: String::from_utf8_lossy(&d.value).to_string(),
+                expired_at: d.expired_at,
+            };
+            Some(item)
+        })
     }
 
     #[tracing::instrument]
@@ -165,4 +176,10 @@ impl CacheTreeItem {
             self.children.push(node);
         }
     }
+}
+
+#[derive(Debug, Default, Serialize, ToSchema)]
+pub struct RetrieveCacheItem {
+    pub value: String,
+    pub expired_at: Option<i64>,
 }

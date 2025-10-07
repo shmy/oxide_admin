@@ -10,6 +10,9 @@ declare module '*.svg?react' {
   export default ReactComponent;
 }
 
+declare var amisScoped: {
+  doAction: (action: any) => void;
+};
 declare var amisRequire: (name: string) => any;
 declare var _permissions: Set<number>;
 declare var _hasPermission: (permission: number) => boolean;

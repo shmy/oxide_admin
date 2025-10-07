@@ -12,6 +12,7 @@ const buildDepartment = () => {
     "removable": true,
     "editable": true,
     "required": true,
+    "showOutline": true,
     "addApi": `post:${endpoint}`,
     "editApi": `put:${endpoint}/\${id}`,
     "deleteApi": {

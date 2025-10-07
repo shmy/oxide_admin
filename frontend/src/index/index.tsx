@@ -133,3 +133,5 @@ history.listen((state: any) => {
     location: state.location || state,
   });
 });
+
+window.amisScoped = amisScoped;

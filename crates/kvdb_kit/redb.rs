@@ -9,7 +9,7 @@ use tracing::{debug, error, info};
 
 use redb::{Database, ReadableDatabase as _, ReadableTable as _, TableDefinition};
 
-use crate::{IterItem, KvdbTrait, serde_util};
+use crate::{IterItem, KvItem, KvdbTrait, serde_util};
 
 const TABLE_NAME: TableDefinition<&str, &[u8]> = TableDefinition::new("app_data");
 
@@ -122,6 +122,12 @@ pub struct KvValue {
 
 impl KvdbTrait for RedbKvdb {
     async fn get<T: DeserializeOwned>(&self, key: &str) -> Option<T> {
+        self.get_raw(key)
+            .await
+            .and_then(|item| serde_util::rmp_decode::<T>(&item.value).ok())
+    }
+
+    async fn get_raw(&self, key: &str) -> Option<KvItem> {
         let tx = self.db.begin_read().ok()?;
         let table = tx.open_table(TABLE_NAME).ok()?;
         let value_opt = table.get(key).ok()?;
@@ -129,12 +135,18 @@ impl KvdbTrait for RedbKvdb {
             let kv: KvValue = serde_util::rmp_decode(value.value()).ok()?;
             if let Some(expires_at) = kv.expires_at {
                 let now = Utc::now().timestamp();
+                let self_inner = self.clone();
                 if now > expires_at {
+                    tokio::spawn(async move {
+                        let _ = self_inner.delete_expired().await;
+                    });
                     return None;
                 }
             }
-            let val: T = serde_util::rmp_decode(&kv.value).ok()?;
-            return Some(val);
+            return Some(KvItem {
+                value: kv.value,
+                expired_at: kv.expires_at,
+            });
         }
         None
     }

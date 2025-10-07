@@ -3,6 +3,9 @@ use serde::{Serialize, de::DeserializeOwned};
 pub fn json_encode<T: Serialize>(value: &T) -> Vec<u8> {
     serde_json::to_vec(value).unwrap_or_default()
 }
+pub fn json_encode_to_string<T: Serialize>(value: &T) -> String {
+    serde_json::to_string_pretty(value).unwrap_or_default()
+}
 
 pub fn json_decode<T: DeserializeOwned + Default>(bytes: &[u8]) -> T {
     serde_json::from_slice(bytes).unwrap_or_default()

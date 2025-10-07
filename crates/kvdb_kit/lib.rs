@@ -22,8 +22,13 @@ pub struct IterItem {
     pub expired_at: Option<i64>,
 }
 
+pub struct KvItem {
+    pub value: Vec<u8>,
+    pub expired_at: Option<i64>,
+}
 pub trait KvdbTrait: Clone {
     fn get<T: DeserializeOwned>(&self, key: &str) -> impl Future<Output = Option<T>>;
+    fn get_raw(&self, key: &str) -> impl Future<Output = Option<KvItem>>;
     fn set_with_ex<T: Serialize>(
         &self,
         key: &str,

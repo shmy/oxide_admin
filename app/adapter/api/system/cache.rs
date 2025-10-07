@@ -1,5 +1,7 @@
-use application::system::service::system_service::{CacheTreeItem, SystemService};
-use axum::Json;
+use application::system::service::system_service::{
+    CacheTreeItem, RetrieveCacheItem, SystemService,
+};
+use axum::{Json, extract::Path};
 use domain::auth::value_object::permission::{SYSTEM_CACHE_DELETE, SYSTEM_CACHE_READ};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -23,9 +25,27 @@ use crate::{
 )]
 #[tracing::instrument]
 async fn tree(Inject(service): Inject<SystemService>) -> JsonResponseType<Vec<CacheTreeItem>> {
-    let items = service.cache().await?;
+    let items = service.cache_tree().await?;
 
     JsonResponse::ok(items)
+}
+
+#[utoipa::path(
+    get,
+    path = "/{key}",
+    summary = "Retrieve cache",
+    tag = "System",
+    responses(
+        (status = 200, body = inline(JsonResponse<RetrieveCacheItem>))
+    )
+)]
+#[tracing::instrument]
+async fn retrieve(
+    Inject(service): Inject<SystemService>,
+    Path(key): Path<String>,
+) -> JsonResponseType<RetrieveCacheItem> {
+    let item_opt = service.retrieve_cache(&key).await;
+    JsonResponse::ok(item_opt.unwrap_or_default())
 }
 
 #[utoipa::path(
@@ -59,5 +79,6 @@ mod request {
 pub fn routing() -> OpenApiRouter<WebState> {
     OpenApiRouter::new()
         .routes(routes!(tree).permit_all(perms!(SYSTEM_CACHE_READ)))
+        .routes(routes!(retrieve).permit_all(perms!(SYSTEM_CACHE_READ)))
         .routes(routes!(delete).permit_all(perms!(SYSTEM_CACHE_DELETE)))
 }
