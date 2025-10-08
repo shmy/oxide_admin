@@ -1,5 +1,4 @@
 use bon::Builder;
-use domain::organization::error::OrganizationError;
 use domain::organization::event::OrganizationEvent;
 use domain::organization::value_object::role_id::RoleId;
 use domain::organization::{
@@ -13,6 +12,7 @@ use object_storage_kit::{ObjectStorage, ObjectStorageReader as _};
 use serde::Deserialize;
 use utoipa::ToSchema;
 
+use crate::error::ApplicationError;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
 #[derive(Debug, Deserialize, Builder, ToSchema)]
@@ -36,13 +36,12 @@ impl CommandHandler for CreateUserCommandHandler {
     type Command = CreateUserCommand;
     type Output = User;
     type Event = OrganizationEvent;
-    type Error = OrganizationError;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let password = HashedPassword::try_new(cmd.password)?;
         let user = User::builder()
             .id(UserId::generate())

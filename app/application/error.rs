@@ -1,5 +1,7 @@
 use domain::{
-    auth::error::AuthError, organization::error::OrganizationError, system::error::SystemError,
+    auth::error::AuthError,
+    organization::{error::OrganizationError, value_object::hashed_password::PasswordError},
+    system::error::SystemError,
 };
 use infrastructure::error::InfrastructureError;
 use kvdb_kit::error::KvdbError;
@@ -57,4 +59,7 @@ pub enum ApplicationError {
 
     #[error("{0}")]
     Sched(#[from] SchedError),
+
+    #[error("{0}")]
+    Password(#[from] PasswordError),
 }

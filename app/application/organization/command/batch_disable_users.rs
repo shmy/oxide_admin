@@ -1,10 +1,9 @@
 use crate::auth::command::sign_out::{SignOutCommand, SignOutCommandHandler};
+use crate::error::ApplicationError;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::organization::port::user_repository::UserRepository;
-use domain::organization::{
-    error::OrganizationError, event::OrganizationEvent, value_object::user_id::UserId,
-};
+use domain::organization::{event::OrganizationEvent, value_object::user_id::UserId};
 use futures_util::StreamExt as _;
 use infrastructure::repository::organization::user_repository::UserRepositoryImpl;
 use nject::injectable;
@@ -26,13 +25,12 @@ impl CommandHandler for BatchDisableUsersCommandHandler {
     type Command = BatchDisableUsersCommand;
     type Output = ();
     type Event = OrganizationEvent;
-    type Error = OrganizationError;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let items = self.user_repository.toggle_enabled(&cmd.ids, false).await?;
         let ids = cmd.ids.clone();
         tokio_stream::iter(ids)

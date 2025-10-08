@@ -1,6 +1,6 @@
+use crate::error::ApplicationError;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::auth::error::AuthError;
 use domain::auth::event::AuthEvent;
 use domain::auth::port::token_store::TokenStoreTrait;
 use domain::organization::value_object::user_id::UserId;
@@ -27,13 +27,12 @@ impl CommandHandler for SignOutCommandHandler {
     type Command = SignOutCommand;
     type Output = ();
     type Event = AuthEvent;
-    type Error = AuthError;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let id = cmd.id;
         if let Ok(mut user) = self.user_repository.by_id(&id).await {
             user.update_refresh_token(None, None);

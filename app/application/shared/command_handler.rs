@@ -1,6 +1,9 @@
 use std::fmt::Debug;
 
-use crate::shared::event::{EVENT_BUS, Event};
+use crate::{
+    error::ApplicationError,
+    shared::event::{EVENT_BUS, Event},
+};
 
 pub struct CommandResult<T, E> {
     pub output: T,
@@ -34,16 +37,15 @@ pub trait CommandHandler: Debug {
     type Command;
     type Output;
     type Event: Into<Event>;
-    type Error;
     fn execute(
         &self,
         cmd: Self::Command,
-    ) -> impl Future<Output = Result<CommandResult<Self::Output, Self::Event>, Self::Error>>;
+    ) -> impl Future<Output = Result<CommandResult<Self::Output, Self::Event>, ApplicationError>>;
 
     fn handle(
         &self,
         cmd: Self::Command,
-    ) -> impl Future<Output = Result<Self::Output, Self::Error>> {
+    ) -> impl Future<Output = Result<Self::Output, ApplicationError>> {
         async {
             let CommandResult { output, events } = self.execute(cmd).await?;
             for event in events {

@@ -1,5 +1,4 @@
 use bon::Builder;
-use domain::organization::error::OrganizationError;
 use domain::organization::value_object::department_id::DepartmentId;
 use domain::organization::{entity::department::Department, event::OrganizationEvent};
 use domain::shared::event_util::UpdatedEvent;
@@ -9,6 +8,7 @@ use nject::injectable;
 use serde::Deserialize;
 use utoipa::ToSchema;
 
+use crate::error::ApplicationError;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
 #[derive(Debug, Deserialize, Builder, ToSchema)]
@@ -27,13 +27,12 @@ impl CommandHandler for UpdateDepartmentCommandHandler {
     type Command = UpdateDepartmentCommand;
     type Output = Department;
     type Event = OrganizationEvent;
-    type Error = OrganizationError;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let id = cmd.id;
         let mut department = self.department_repo.by_id(&id).await?;
         let before = department.clone();

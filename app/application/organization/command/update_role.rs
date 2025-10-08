@@ -11,6 +11,7 @@ use nject::injectable;
 use serde::Deserialize;
 use utoipa::ToSchema;
 
+use crate::error::ApplicationError;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
 #[derive(Debug, Deserialize, Builder, ToSchema)]
@@ -32,17 +33,16 @@ impl CommandHandler for UpdateRoleCommandHandler {
     type Command = UpdateRoleCommand;
     type Output = Role;
     type Event = OrganizationEvent;
-    type Error = OrganizationError;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let id = cmd.id;
         let mut role = self.role_repository.by_id(&id).await?;
         if role.privileged {
-            return Err(OrganizationError::RolePrivilegedImmutable);
+            return Err(OrganizationError::RolePrivilegedImmutable.into());
         }
         let before = role.clone();
         if let Some(name) = cmd.name {

@@ -1,8 +1,6 @@
 use bon::Builder;
 use domain::{
-    organization::{
-        error::OrganizationError, event::OrganizationEvent, value_object::role_id::RoleId,
-    },
+    organization::{event::OrganizationEvent, value_object::role_id::RoleId},
     shared::port::domain_repository::DomainRepository,
 };
 use infrastructure::repository::organization::role_repository::RoleRepositoryImpl;
@@ -10,7 +8,10 @@ use nject::injectable;
 use serde::Deserialize;
 use utoipa::ToSchema;
 
-use crate::shared::command_handler::{CommandHandler, CommandResult};
+use crate::{
+    error::ApplicationError,
+    shared::command_handler::{CommandHandler, CommandResult},
+};
 
 #[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct BatchDeleteRolesCommand {
@@ -27,13 +28,12 @@ impl CommandHandler for BatchDeleteRolesCommandHandler {
     type Command = BatchDeleteRolesCommand;
     type Output = ();
     type Event = OrganizationEvent;
-    type Error = OrganizationError;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let items = self.role_repository.batch_delete(&cmd.ids).await?;
         Ok(CommandResult::with_event(
             (),

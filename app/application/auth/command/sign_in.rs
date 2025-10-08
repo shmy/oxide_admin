@@ -1,8 +1,8 @@
 use std::fmt::Debug;
 
+use crate::error::ApplicationError;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::auth::error::AuthError;
 use domain::auth::event::AuthEvent;
 use domain::auth::port::captcha_issuer::CaptchaIssuerTrait as _;
 use domain::auth::port::token_issuer::{TokenIssuerOutput, TokenIssuerTrait};
@@ -50,13 +50,12 @@ impl CommandHandler for SignInCommandHandler {
     type Command = SignInCommand;
     type Output = TokenIssuerOutput;
     type Event = AuthEvent;
-    type Error = AuthError;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         self.captcha_issuer
             .verify(&cmd.captcha_key, &cmd.captcha_value)
             .await?;

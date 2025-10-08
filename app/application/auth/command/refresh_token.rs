@@ -1,6 +1,6 @@
+use crate::error::ApplicationError;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::auth::error::AuthError;
 use domain::auth::event::AuthEvent;
 use domain::auth::port::token_issuer::TokenIssuerOutput;
 use domain::auth::port::token_issuer::TokenIssuerTrait;
@@ -32,12 +32,11 @@ impl CommandHandler for RefreshTokenCommandHandler {
     type Command = RefreshTokenCommand;
     type Output = TokenIssuerOutput;
     type Event = AuthEvent;
-    type Error = AuthError;
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let mut user = self.user_repository.by_refresh_token(cmd.token).await?;
         user.assert_activated()?;
         user.assert_refresh_token_valid_period()?;

@@ -1,8 +1,8 @@
 use std::time::Duration;
 
+use crate::error::ApplicationError;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
-use domain::auth::error::AuthError;
 use domain::auth::event::AuthEvent;
 use domain::auth::port::captcha_issuer::{Captcha, CaptchaIssuerTrait as _};
 use infrastructure::port::captcha_issuer_impl::CaptchaIssuerImpl;
@@ -21,12 +21,11 @@ impl CommandHandler for RefreshCaptchaCommandHandler {
     type Command = RefreshCaptchaCommand;
     type Output = Captcha;
     type Event = AuthEvent;
-    type Error = AuthError;
     #[tracing::instrument]
     async fn execute(
         &self,
         _cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let output = self
             .captcha_issuer
             .generate_with_ttl(Duration::from_secs(60))

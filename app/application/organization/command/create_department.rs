@@ -1,6 +1,5 @@
 use bon::Builder;
 use domain::organization::entity::department::Department;
-use domain::organization::error::OrganizationError;
 use domain::organization::event::OrganizationEvent;
 use domain::organization::value_object::department_id::DepartmentId;
 use domain::shared::port::domain_repository::DomainRepository;
@@ -9,7 +8,10 @@ use nject::injectable;
 use serde::Deserialize;
 use utoipa::ToSchema;
 
-use crate::shared::command_handler::{CommandHandler, CommandResult};
+use crate::{
+    error::ApplicationError,
+    shared::command_handler::{CommandHandler, CommandResult},
+};
 
 #[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct CreateDepartmentCommand {
@@ -33,13 +35,12 @@ impl CommandHandler for CreateDepartmentCommandHandler {
     type Command = CreateDepartmentCommand;
     type Output = Department;
     type Event = OrganizationEvent;
-    type Error = OrganizationError;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let department = Department::builder()
             .id(DepartmentId::generate())
             .name(cmd.name)

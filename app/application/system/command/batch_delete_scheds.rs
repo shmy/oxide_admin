@@ -1,13 +1,16 @@
 use bon::Builder;
 use domain::{
     shared::port::domain_repository::DomainRepository,
-    system::{error::SystemError, event::SystemEvent, value_object::sched_id::SchedId},
+    system::{event::SystemEvent, value_object::sched_id::SchedId},
 };
 use infrastructure::repository::system::sched_repository::SchedRepositoryImpl;
 use nject::injectable;
 use serde::Deserialize;
 
-use crate::shared::command_handler::{CommandHandler, CommandResult};
+use crate::{
+    error::ApplicationError,
+    shared::command_handler::{CommandHandler, CommandResult},
+};
 use utoipa::ToSchema;
 
 #[derive(Debug, Deserialize, Builder, ToSchema)]
@@ -25,13 +28,12 @@ impl CommandHandler for BatchDeleteSchedsCommandHandler {
     type Command = BatchDeleteSchedsCommand;
     type Output = ();
     type Event = SystemEvent;
-    type Error = SystemError;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let items = self.sched_repo.batch_delete(&cmd.ids).await?;
         Ok(CommandResult::with_event(
             (),

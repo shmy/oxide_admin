@@ -1,3 +1,4 @@
+use crate::error::ApplicationError;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::organization::error::OrganizationError;
@@ -27,21 +28,20 @@ impl CommandHandler for UpdateUserSelfPasswordCommandHandler {
     type Command = UpdateUserSelfPasswordCommand;
     type Output = User;
     type Event = OrganizationEvent;
-    type Error = OrganizationError;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let password = cmd.password.trim();
         let new_password = cmd.new_password.trim();
         let confirm_new_password = cmd.confirm_new_password.trim();
         if new_password != confirm_new_password {
-            return Err(OrganizationError::PasswordMismatch);
+            return Err(OrganizationError::PasswordMismatch.into());
         }
         if new_password == password {
-            return Err(OrganizationError::PasswordUnchanged);
+            return Err(OrganizationError::PasswordUnchanged.into());
         }
         let mut user = self.user_repository.by_id(&cmd.id).await?;
         let before = user.clone();

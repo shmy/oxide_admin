@@ -1,7 +1,6 @@
 use bon::Builder;
 use domain::auth::value_object::menu::Menu;
 use domain::auth::value_object::permission::Permission;
-use domain::organization::error::OrganizationError;
 use domain::organization::event::OrganizationEvent;
 use domain::organization::{entity::role::Role, value_object::role_id::RoleId};
 use domain::shared::port::domain_repository::DomainRepository;
@@ -10,6 +9,7 @@ use nject::injectable;
 use serde::Deserialize;
 use utoipa::ToSchema;
 
+use crate::error::ApplicationError;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
 #[derive(Debug, Deserialize, Builder, ToSchema)]
@@ -30,13 +30,12 @@ impl CommandHandler for CreateRoleCommandHandler {
     type Command = CreateRoleCommand;
     type Output = Role;
     type Event = OrganizationEvent;
-    type Error = OrganizationError;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let role = Role::builder()
             .id(RoleId::generate())
             .name(cmd.name)

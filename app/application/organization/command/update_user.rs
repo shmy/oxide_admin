@@ -1,4 +1,5 @@
 use crate::auth::command::sign_out::{SignOutCommand, SignOutCommandHandler};
+use crate::error::ApplicationError;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 use bon::Builder;
 use domain::organization::error::OrganizationError;
@@ -38,17 +39,16 @@ impl CommandHandler for UpdateUserCommandHandler {
     type Command = UpdateUserCommand;
     type Output = User;
     type Event = OrganizationEvent;
-    type Error = OrganizationError;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let id = cmd.id;
         let mut user = self.user_repository.by_id(&id).await?;
         if user.privileged {
-            return Err(OrganizationError::UserPrivilegedImmutable);
+            return Err(OrganizationError::UserPrivilegedImmutable.into());
         }
         let before = user.clone();
         if let Some(account) = cmd.account {
