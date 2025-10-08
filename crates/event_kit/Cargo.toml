@@ -7,3 +7,6 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }

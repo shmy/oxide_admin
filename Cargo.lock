@@ -108,6 +108,7 @@ dependencies = [
  "chrono",
  "cruet",
  "domain",
+ "event_kit",
  "filetime",
  "futures-util",
  "image",
@@ -1381,6 +1382,11 @@ dependencies = [
 [[package]]
 name = "event_kit"
 version = "0.1.0"
+dependencies = [
+ "thiserror 2.0.17",
+ "tokio",
+ "tracing",
+]
 
 [[package]]
 name = "faktory"

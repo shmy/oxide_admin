@@ -46,7 +46,7 @@ cron_tab = { version = "0.2", default-features = false, features = [
 cruet = { version = "0.15", default-features = false }
 domain = { path = "app/domain" }
 dotenvy = { version = "0.15", default-features = false }
-event_kit = { path = "app/event_kit" }
+event_kit = { path = "crates/event_kit" }
 flag_kit = { path = "crates/flag_kit" }
 futures-util = { version = "0.3", default-features = false }
 governor = { version = "0.10", default-features = false }

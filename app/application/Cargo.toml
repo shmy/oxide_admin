@@ -12,6 +12,7 @@ bg_worker_kit = { workspace = true }
 bon = { workspace = true }
 chrono = { workspace = true }
 domain = { workspace = true }
+event_kit = { workspace = true }
 futures-util = { workspace = true }
 image = { workspace = true, features = ["png", "webp", "jpeg"] }
 imageformat = { workspace = true }

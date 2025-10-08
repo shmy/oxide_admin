@@ -10,10 +10,9 @@ use domain::auth::port::menu_resolver::MenuResolver;
 use domain::{
     auth::port::permission_resolver::PermissionResolver, organization::event::OrganizationEvent,
 };
-use infrastructure::{error::InfrastructureResult, port::menu_resolver_impl::MenuResolverImpl};
-use infrastructure::{
-    port::permission_resolver_impl::PermissionResolverImpl, shared::event_bus::EventSubscriber,
-};
+use event_kit::{EventSubscriber, error::Result};
+use infrastructure::port::menu_resolver_impl::MenuResolverImpl;
+use infrastructure::port::permission_resolver_impl::PermissionResolverImpl;
 use nject::injectable;
 
 #[derive(Clone, Builder)]
@@ -55,7 +54,7 @@ impl OrganizationEventSubscriber {
 }
 
 impl EventSubscriber<Event> for OrganizationEventSubscriber {
-    async fn on_received(&self, event: Event) -> InfrastructureResult<()> {
+    async fn on_received(&self, event: Event) -> Result<()> {
         if let Event::Organization(e) = event {
             if Self::is_users_changed(&e) {
                 let _ = self.search_user_query_handler.clean_cache().await;

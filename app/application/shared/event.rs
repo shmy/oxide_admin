@@ -1,7 +1,7 @@
 use domain::{
     auth::event::AuthEvent, organization::event::OrganizationEvent, system::event::SystemEvent,
 };
-use infrastructure::shared::event_bus::EventBus;
+use event_kit::EventBus;
 use std::sync::LazyLock;
 pub static EVENT_BUS: LazyLock<EventBus<Event>> = LazyLock::new(|| EventBus::new(64));
 #[derive(Debug, Clone)]
