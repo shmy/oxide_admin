@@ -53,10 +53,10 @@ impl SystemService {
 
     #[tracing::instrument]
     pub async fn retrieve_cache(&self, key: &str) -> Option<RetrieveCacheItem> {
-        self.kv.get_raw(key).await.and_then(|d| {
+        self.kv.get_raw_string(key).await.and_then(|item| {
             let item = RetrieveCacheItem {
-                value: String::from_utf8_lossy(&d.value).to_string(),
-                expired_at: d.expired_at,
+                value: serde_json::to_string_pretty(&item.value).ok()?,
+                expired_at: item.expired_at,
             };
             Some(item)
         })

@@ -15,9 +15,10 @@ bb8-redis = { workspace = true, optional = true }
 bon = { workspace = true }
 chrono = { workspace = true }
 cron_tab = { workspace = true, optional = true }
+minicbor-serde = { workspace = true, features = ["alloc"] }
 redb = { workspace = true, optional = true }
-rmp-serde = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true, features = ["std"] }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"], optional = true }
 tracing = { workspace = true }

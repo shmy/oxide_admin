@@ -36,8 +36,8 @@ pub enum KvdbError {
     RunRedis(#[from] bb8_redis::bb8::RunError<bb8_redis::redis::RedisError>),
 
     #[error("{0}")]
-    RmpEncode(#[from] rmp_serde::encode::Error),
+    CborEncode(#[from] minicbor_serde::error::EncodeError<core::convert::Infallible>),
 
     #[error("{0}")]
-    RmpDecode(#[from] rmp_serde::decode::Error),
+    CborDecode(#[from] minicbor_serde::error::DecodeError),
 }

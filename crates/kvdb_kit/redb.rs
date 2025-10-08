@@ -9,7 +9,7 @@ use tracing::{debug, error, info};
 
 use redb::{Database, ReadableDatabase as _, ReadableTable as _, TableDefinition};
 
-use crate::{IterItem, KvItem, KvdbTrait, serde_util};
+use crate::{IterItem, KvItem, KvJson, KvdbTrait, serde_util};
 
 const TABLE_NAME: TableDefinition<&str, &[u8]> = TableDefinition::new("app_data");
 
@@ -83,7 +83,7 @@ impl RedbKvdb {
                 if let Ok((key, value)) = access {
                     let key = key.value().to_string();
                     let value = value.value().to_vec();
-                    let s = serde_util::rmp_decode::<KvValue>(&value).ok()?;
+                    let s = serde_util::cbor_decode::<KvValue>(&value).ok()?;
                     if let Some(expires_at) = s.expires_at {
                         let now = Utc::now().timestamp();
                         debug!(
@@ -124,7 +124,7 @@ impl KvdbTrait for RedbKvdb {
     async fn get<T: DeserializeOwned>(&self, key: &str) -> Option<T> {
         self.get_raw(key)
             .await
-            .and_then(|item| serde_util::rmp_decode::<T>(&item.value).ok())
+            .and_then(|item| serde_util::cbor_decode::<T>(&item.value).ok())
     }
 
     async fn get_raw(&self, key: &str) -> Option<KvItem> {
@@ -132,7 +132,7 @@ impl KvdbTrait for RedbKvdb {
         let table = tx.open_table(TABLE_NAME).ok()?;
         let value_opt = table.get(key).ok()?;
         if let Some(value) = value_opt {
-            let kv: KvValue = serde_util::rmp_decode(value.value()).ok()?;
+            let kv: KvValue = serde_util::cbor_decode(value.value()).ok()?;
             if let Some(expires_at) = kv.expires_at {
                 let now = Utc::now().timestamp();
                 let self_inner = self.clone();
@@ -151,6 +151,16 @@ impl KvdbTrait for RedbKvdb {
         None
     }
 
+    async fn get_raw_string(&self, key: &str) -> Option<KvJson> {
+        self.get_raw(key).await.and_then(|item| {
+            serde_util::cbor_decode::<serde_json::Value>(&item.value)
+                .ok()
+                .map(|value| KvJson {
+                    value,
+                    expired_at: item.expired_at,
+                })
+        })
+    }
     async fn set_with_ex<T: Serialize>(
         &self,
         key: &str,
@@ -160,8 +170,8 @@ impl KvdbTrait for RedbKvdb {
         let tx = self.db.begin_write()?;
         let now = Utc::now();
         let expires_at = now + duration;
-        let value = serde_util::rmp_encode(&KvValue {
-            value: serde_util::rmp_encode(&value)?,
+        let value = serde_util::cbor_encode(&KvValue {
+            value: serde_util::cbor_encode(&value)?,
             expires_at: Some(expires_at.timestamp()),
         })?;
         {
@@ -179,8 +189,8 @@ impl KvdbTrait for RedbKvdb {
         expires_at: i64,
     ) -> Result<()> {
         let tx = self.db.begin_write()?;
-        let value = serde_util::rmp_encode(&KvValue {
-            value: serde_util::rmp_encode(&value)?,
+        let value = serde_util::cbor_encode(&KvValue {
+            value: serde_util::cbor_encode(&value)?,
             expires_at: Some(expires_at),
         })?;
         {
@@ -193,8 +203,8 @@ impl KvdbTrait for RedbKvdb {
 
     async fn set<T: Serialize>(&self, key: &str, value: T) -> Result<()> {
         let tx = self.db.begin_write()?;
-        let value = serde_util::rmp_encode(&KvValue {
-            value: serde_util::rmp_encode(&value)?,
+        let value = serde_util::cbor_encode(&KvValue {
+            value: serde_util::cbor_encode(&value)?,
             expires_at: None,
         })?;
         {
@@ -237,7 +247,7 @@ impl KvdbTrait for RedbKvdb {
         let items = iter
             .filter_map(|access| {
                 if let Ok((key, val)) = access {
-                    let value: KvValue = serde_util::rmp_decode(val.value()).ok()?;
+                    let value: KvValue = serde_util::cbor_decode(val.value()).ok()?;
                     let key = key.value().to_string();
                     if key.starts_with(prefix) {
                         return Some(IterItem {

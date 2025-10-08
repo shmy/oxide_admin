@@ -15,7 +15,7 @@ const schema = {
       url: `${endpoint}/delete`,
       method: "POST",
       data: {
-        "prefix": "\$value"
+        prefix: "\$value"
       }
     },
     "onEvent": {
@@ -28,8 +28,8 @@ const schema = {
                 actionType: "drawer",
                 args: {
                   drawer: {
-                    title: "详情",
-                    size: "md",
+                    title: props.data.value,
+                    size: "lg",
                     body: [
                       {
                         type: "service",
@@ -41,8 +41,9 @@ const schema = {
                             displayFormat: "过期时间：YYYY-MM-DD HH:mm:ss",
                           },
                           {
-                            type: "static",
+                            type: "code",
                             name: "value",
+                            language: "json",
                           },
                         ]
                       }
