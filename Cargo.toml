@@ -28,7 +28,7 @@ anyhow = { version = "1", default-features = false }
 application = { path = "app/application" }
 argon2 = { version = "0.5", default-features = false }
 axum = { version = "0.8", default-features = false }
-axum-tracing-opentelemetry = { version = "0.30", default-features = false }
+axum-tracing-opentelemetry = { version = "0.32", default-features = false }
 axum_typed_multipart = { version = "0.16", default-features = false }
 
 bb8-redis = { version = "0.24", default-features = false }
@@ -116,7 +116,7 @@ lto = "off"                  # Disable global optimization, reduce compile time
 strip = false                # Keep the symbol table for debugging convenience
 
 [profile.dev.package."*"]
-opt-level = 0
+opt-level = 3
 
 [profile.release]
 debug = 0                   # Do not generate debug information, reduce size
