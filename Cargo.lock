@@ -1379,6 +1379,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "event_kit"
+version = "0.1.0"
+
+[[package]]
 name = "faktory"
 version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
