@@ -52,7 +52,7 @@ impl<R: ScheduledJobReceiver> CronTab<R> {
                 }
             })
             .await?;
-        let next_tick = next_tick(&cron_expr, timezone);
+        let next_tick = next_tick_expr(&cron_expr, timezone);
         info!("[{}] registerd. next tick: {:?}", T::NAME, next_tick);
 
         Ok(())
@@ -68,11 +68,18 @@ impl<R: ScheduledJobReceiver> CronTab<R> {
         Ok(())
     }
 }
-pub fn next_tick(expr: &str, timezone: chrono_tz::Tz) -> Option<DateTime<chrono_tz::Tz>> {
-    if let Ok(cron_expr) = english_to_cron::str_cron_syntax(expr)
-        && let Ok(schedule) = cron::Schedule::from_str(&cron_expr)
-    {
+
+fn next_tick_expr(expr: &str, timezone: chrono_tz::Tz) -> Option<DateTime<chrono_tz::Tz>> {
+    if let Ok(schedule) = cron::Schedule::from_str(expr) {
         return schedule.upcoming(timezone).next();
+    }
+
+    None
+}
+
+pub fn next_tick(expr: &str, timezone: chrono_tz::Tz) -> Option<DateTime<chrono_tz::Tz>> {
+    if let Ok(cron_expr) = english_to_cron::str_cron_syntax(expr) {
+        return next_tick_expr(&cron_expr, timezone);
     }
 
     None
