@@ -10,4 +10,3 @@ proc-macro = true
 [dependencies]
 blake3 = { workspace = true }
 quote = { workspace = true }
-syn = { workspace = true }
