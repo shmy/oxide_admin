@@ -2273,6 +2273,7 @@ dependencies = [
  "include_dir",
  "jsonwebtoken",
  "kvdb_kit",
+ "migrate_kit",
  "nject",
  "object_storage_kit",
  "open-feature",
@@ -2549,6 +2550,16 @@ name = "memo-map"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "38d1115007560874e373613744c6fba374c17688327a71c1476d1a5954cc857b"
+
+[[package]]
+name = "migrate_kit"
+version = "0.1.0"
+dependencies = [
+ "include_dir",
+ "sqlx",
+ "thiserror 2.0.17",
+ "tracing",
+]
 
 [[package]]
 name = "mimalloc"

@@ -37,6 +37,7 @@ flag_kit = { workspace = true }
 include_dir = { workspace = true }
 jsonwebtoken = { workspace = true, features = ["rust_crypto"] }
 kvdb_kit = { workspace = true }
+migrate_kit = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 object_storage_kit = { workspace = true }
 open-feature = { workspace = true }

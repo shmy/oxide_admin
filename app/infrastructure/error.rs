@@ -15,9 +15,6 @@ pub enum InfrastructureError {
     Sqlx(#[from] sqlx::Error),
 
     #[error("{0}")]
-    Migrate(#[from] sqlx::migrate::MigrateError),
-
-    #[error("{0}")]
     System(#[from] SystemError),
 
     #[error("{0}")]
@@ -31,4 +28,7 @@ pub enum InfrastructureError {
 
     #[error("{0}")]
     Flag(#[from] flag_kit::error::FlagError),
+
+    #[error("{0}")]
+    Migrate(#[from] migrate_kit::error::MigrateError),
 }
