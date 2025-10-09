@@ -18,7 +18,7 @@ struct AppliedMigration {
 #[derive(Builder)]
 pub struct Migrator {
     pool: PgPool,
-    #[builder(default = "__migrations")]
+    #[builder(default = "_migrations")]
     table_name: &'static str,
 }
 
