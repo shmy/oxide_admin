@@ -40,9 +40,10 @@ impl WorkerManager {
 
 impl WorkerManager {
     async fn migrate(&self) -> Result<()> {
-        let opt = self.pool.connect_options();
-        let database = opt.get_database();
-        tracing::info!("Choosing database backend: {:?}", database);
+        #[cfg(feature = "sqlite")]
+        tracing::info!("Choosing database backend: SQLite");
+        #[cfg(feature = "postgres")]
+        tracing::info!("Choosing database backend: PosgreSQL");
         StorageBackend::setup(&self.pool).await?;
         Ok(())
     }
