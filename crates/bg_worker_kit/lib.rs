@@ -8,7 +8,13 @@ use apalis::prelude::{Data, Monitor, WorkerBuilder, WorkerFactoryFn as _};
 use apalis_core::codec::json::JsonCodec;
 pub use apalis_core::storage::Storage;
 use serde::{Serialize, de::DeserializeOwned};
+#[cfg(feature = "sqlite")]
+pub type Pool = apalis_sql::sqlite::SqlitePool;
+#[cfg(feature = "postgres")]
 pub type Pool = apalis_sql::postgres::PgPool;
+#[cfg(feature = "sqlite")]
+pub type StorageBackend<T, C = JsonCodec<String>> = apalis_sql::sqlite::SqliteStorage<T, C>;
+#[cfg(feature = "postgres")]
 pub type StorageBackend<T, C = JsonCodec<serde_json::Value>> =
     apalis_sql::postgres::PostgresStorage<T, C>;
 

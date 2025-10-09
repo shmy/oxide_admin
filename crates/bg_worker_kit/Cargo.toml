@@ -7,8 +7,8 @@ edition = "2024"
 path = "lib.rs"
 
 [features]
-default = ["sqlite"]
-sqlite = ["dep:sqlx", "dep:apalis", "dep:apalis-core", "dep:apalis-sql"]
+sqlite = ["apalis-sql/sqlite"]
+postgres = ["apalis-sql/postgres"]
 
 [dependencies]
 
@@ -16,20 +16,14 @@ apalis = { version = "0.7", default-features = false, features = [
     "limit",
     "tracing",
     "retry",
-], optional = true }
-apalis-core = { version = "0.7", default-features = false, optional = true }
+] }
+apalis-core = { version = "0.7", default-features = false }
 apalis-sql = { version = "0.7", default-features = false, features = [
     "migrate",
-    "postgres",
-    "sqlite",
-], optional = true }
+] }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["std"] }
-sqlx = { workspace = true, features = [
-    "runtime-tokio",
-    "derive",
-    "migrate",
-], optional = true }
+sqlx = { workspace = true, features = ["runtime-tokio", "derive", "migrate"] }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 

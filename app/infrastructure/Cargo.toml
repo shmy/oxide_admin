@@ -10,6 +10,7 @@ path = "lib.rs"
 kv_redb = ["kvdb_kit/redb"]
 kv_redis = ["kvdb_kit/redis"]
 bg_sqlite = ["bg_worker_kit/sqlite"]
+bg_postgres = ["bg_worker_kit/postgres"]
 object_storage_fs = ["object_storage_kit/fs"]
 object_storage_s3 = ["object_storage_kit/s3"]
 object_storage_s3_tls = ["object_storage_kit/s3_tls"]
