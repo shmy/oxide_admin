@@ -2567,6 +2567,7 @@ dependencies = [
 name = "migrate_kit"
 version = "0.1.0"
 dependencies = [
+ "bon",
  "include_dir",
  "sqlx",
  "thiserror 2.0.17",

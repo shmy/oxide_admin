@@ -21,7 +21,11 @@ pub async fn migrate(
     user_repository: UserRepositoryImpl,
     role_repository: RoleRepositoryImpl,
 ) -> InfrastructureResult<()> {
-    Migrator::new(pool.clone()).migrate(&MIGRATIONS_DIR).await?;
+    Migrator::builder()
+        .pool(pool.clone())
+        .build()
+        .migrate(&MIGRATIONS_DIR)
+        .await?;
     insert_user_role(&pool, &user_repository, &role_repository).await?;
     Ok(())
 }

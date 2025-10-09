@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
 use crate::error::Result;
+use bon::Builder;
 use include_dir::Dir;
 use sqlx::{Executor, FromRow, PgConnection, PgPool};
 
@@ -14,15 +15,14 @@ struct AppliedMigration {
     version: String,
 }
 
+#[derive(Builder)]
 pub struct Migrator {
     pool: PgPool,
+    #[builder(default = "__migrations")]
+    table_name: &'static str,
 }
 
 impl Migrator {
-    pub fn new(pool: PgPool) -> Self {
-        Self { pool }
-    }
-
     async fn load_migrations(&self, dir: &Dir<'_>) -> Result<Vec<Migration>> {
         let mut migrations = vec![];
 
@@ -48,31 +48,36 @@ impl Migrator {
     }
 
     async fn get_applied_versions(&self, pool: &PgPool) -> Result<HashSet<String>> {
-        let rows: Vec<AppliedMigration> = sqlx::query_as("SELECT version FROM _migrations")
-            .fetch_all(pool)
-            .await?;
+        let rows: Vec<AppliedMigration> =
+            sqlx::query_as(&format!("SELECT version FROM {}", self.table_name))
+                .fetch_all(pool)
+                .await?;
         Ok(rows.into_iter().map(|r| r.version).collect())
     }
 
     async fn apply_migration(&self, conn: &mut PgConnection, migration: &Migration) -> Result<()> {
         conn.execute(&*migration.content).await?;
-        sqlx::query("INSERT INTO _migrations(version) VALUES($1)")
-            .bind(migration.version.to_string())
-            .execute(&mut *conn)
-            .await?;
+        sqlx::query(&format!(
+            "INSERT INTO {}(version) VALUES($1)",
+            self.table_name
+        ))
+        .bind(migration.version.to_string())
+        .execute(&mut *conn)
+        .await?;
         tracing::info!("Applied migration: {}", migration.version);
         Ok(())
     }
 
     pub async fn migrate(&mut self, dir: &Dir<'_>) -> Result<()> {
-        sqlx::query(
+        sqlx::query(&format!(
             r#"
-        CREATE TABLE IF NOT EXISTS _migrations (
+        CREATE TABLE IF NOT EXISTS {} (
             version VARCHAR(64) PRIMARY KEY,
             applied_at TIMESTAMP NOT NULL DEFAULT now()
         )
         "#,
-        )
+            self.table_name
+        ))
         .execute(&self.pool)
         .await?;
 

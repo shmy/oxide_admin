@@ -11,3 +11,4 @@ include_dir = { workspace = true }
 sqlx = { workspace = true, features = ["postgres", "derive", "runtime-tokio"] }
 thiserror = { workspace = true }
 tracing = { workspace = true }
+bon = { workspace = true }

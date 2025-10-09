@@ -12,7 +12,9 @@ async fn main() {
     let pool = sqlx::PgPool::connect(&database_url)
         .await
         .expect("Failed to connect to database");
-    Migrator::new(pool.clone())
+    Migrator::builder()
+        .pool(pool.clone())
+        .build()
         .migrate(&MIGRATIONS_DIR)
         .await
         .expect("Failed to migrate");
