@@ -5,6 +5,7 @@ import "./index.scss";
 const formEl = document.getElementById("form") as HTMLFormElement;
 const submitEl = document.getElementById("submit") as HTMLButtonElement;
 const errorEl = document.getElementById("error") as HTMLDivElement;
+const captchaErrorEl = document.getElementById("captcha-error") as HTMLDivElement;
 const successEl = document.getElementById("success") as HTMLDivElement;
 const captchaWrapperEl = document.getElementById("captcha-wrapper") as HTMLDivElement;
 const captchaKeyEl = document.getElementById("captcha-key") as HTMLInputElement;
@@ -18,6 +19,10 @@ const redirect =
 
 const setError = (error: string) => {
   errorEl.innerText = error;
+};
+
+const setCaptchaError = (error: string) => {
+  captchaErrorEl.innerText = error;
 };
 
 let captchaRefreshing = false;
@@ -63,7 +68,7 @@ const refreshCaptcha = () => {
     return;
   }
 
-  setError("");
+  setCaptchaError("");
   setRefreshing(true);
   xior
     .get("/api/auth/captcha", {
@@ -79,14 +84,14 @@ const refreshCaptcha = () => {
         res.data.text().then((text: string) => {
           try {
             let json = JSON.parse(text);
-            setError(json.msg);
+            setCaptchaError(json.msg);
           } catch (_) {
-            setError(text);
+            setCaptchaError(text);
           }
         });
       }
     }).catch(e => {
-      setError(e.message);
+      setCaptchaError(e.message);
     }).finally(() => {
       setRefreshing(false);
     });
@@ -103,6 +108,7 @@ formEl?.addEventListener(
     const captcha_key = formData.get("captcha-key");
     const captcha_value = formData.get("captcha");
     setError("");
+    setCaptchaError("");
     setSubmitting(true);
     xior
       .post("/api/auth/sign_in", {
