@@ -1,5 +1,5 @@
 # Should success when fetch roles given valid token
-GET {{base_url}}/api/system/options/role
+GET {{base_url}}/api/options/role
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
@@ -8,7 +8,7 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data" count == 1
 
 # Should success when fetch permissions given valid token
-GET {{base_url}}/api/system/options/permission
+GET {{base_url}}/api/options/permission
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
@@ -17,10 +17,10 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data" count == 1
 
 # Should success when fetch menus given valid token
-GET {{base_url}}/api/system/options/menu
+GET {{base_url}}/api/options/menu
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.status" == 0
 jsonpath "$.msg" == "OK"
-jsonpath "$.data" count == 1
+jsonpath "$.data" count == 2

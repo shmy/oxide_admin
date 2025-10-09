@@ -1,5 +1,5 @@
 # Should error when fetch current user without token
-GET {{base_url}}/api/profile/current
+GET {{base_url}}/api/profile
 HTTP 401
 [Asserts]
 jsonpath "$.status" == 1
@@ -7,7 +7,7 @@ jsonpath "$.msg" == "Access token is required"
 jsonpath "$.data" not exists
 
 # Should success when fetch current user given valid token
-GET {{base_url}}/api/profile/current
+GET {{base_url}}/api/profile
 Authorization: Bearer {{access_token}}
 HTTP 200
 [Asserts]
@@ -16,7 +16,7 @@ jsonpath "$.msg" == "OK"
 jsonpath "$.data.user.account" == "admin"
 
 # Should error when sign in with invalid account
-POST {{base_url}}/api/authn/sign_in
+POST {{base_url}}/api/auth/sign_in
 {
     "account": "fake_account",
     "password": "123456"

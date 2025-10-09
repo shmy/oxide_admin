@@ -4,20 +4,25 @@ use serde::Deserialize;
 use server::cli::Cli;
 use testcontainers::{ContainerAsync, ImageExt as _, runners::AsyncRunner as _};
 use testcontainers_modules::postgres::{self, Postgres};
-use tokio::task::JoinHandle;
+use tokio::task::{JoinHandle, LocalSet, spawn_local};
 
 #[tokio::test]
 async fn api_integration_test() {
-    let (handle, base_url, _container) = setup_server().await;
-    let variables = get_access_token(&base_url).await;
-    run_hurl("authn", &variables).await;
-    run_hurl("system/user", &variables).await;
-    run_hurl("system/role", &variables).await;
-    run_hurl("system/option", &variables).await;
-    run_hurl("system/stat", &variables).await;
-    run_hurl("upload", &variables).await;
-    run_hurl("last", &variables).await;
-    handle.abort();
+    let local = LocalSet::new();
+    local
+        .run_until(async {
+            let (handle, base_url, _container) = setup_server().await;
+            let variables = get_access_token(&base_url).await;
+            run_hurl("authn", &variables).await;
+            run_hurl("system/user", &variables).await;
+            run_hurl("system/role", &variables).await;
+            run_hurl("system/option", &variables).await;
+            run_hurl("system/stat", &variables).await;
+            run_hurl("upload", &variables).await;
+            run_hurl("last", &variables).await;
+            handle.abort();
+        })
+        .await;
 }
 
 async fn setup_server() -> (JoinHandle<()>, String, ContainerAsync<Postgres>) {
@@ -34,7 +39,7 @@ async fn setup_server() -> (JoinHandle<()>, String, ContainerAsync<Postgres>) {
     let cli = Cli::parse_from(&["", "--database-url", &connection_string, "serve"]);
     let config: ConfigRef = cli.try_into().unwrap();
     let base_url = format!("http://{}:{}", config.server.bind, config.server.port);
-    let handle = tokio::task::spawn_local(async move {
+    let handle = spawn_local(async move {
         server::serve(config).await.unwrap();
     });
     wait_for_server_health(&format!("{}/health", &base_url), 3).await;
@@ -64,7 +69,7 @@ async fn run_hurl(filename: &str, variables: &TestVariables) {
 }
 
 async fn get_access_token(base_url: &str) -> TestVariables {
-    let res = reqwest::get(format!("{}/api/authn/refresh_captcha", base_url))
+    let res = reqwest::get(format!("{}/api/auth/captcha", base_url))
         .await
         .unwrap();
     let captcha_id = res
@@ -75,7 +80,7 @@ async fn get_access_token(base_url: &str) -> TestVariables {
         .unwrap()
         .to_string();
     let res = reqwest::Client::new()
-        .post(format!("{}/api/authn/sign_in", base_url))
+        .post(format!("{}/api/auth/sign_in", base_url))
         .json(&serde_json::json!({
             "account": "admin",
             "password": "123456",
@@ -102,7 +107,7 @@ async fn wait_for_server_health(url: &str, retries: u32) {
                 return;
             }
         }
-        std::thread::sleep(std::time::Duration::from_secs(1));
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
     }
     panic!("Health check failed {}", url);
 }
