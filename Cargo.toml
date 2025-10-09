@@ -9,6 +9,7 @@ members = [
     "app/application",
     "app/domain",
     "app/infrastructure",
+    "bin/migrate",
     "bin/server",
     "bin/xtask",
     "crates/bg_worker_kit",
@@ -100,9 +101,9 @@ tower-http = { version = "0.6", default-features = false }
 tower_governor = { version = "0.8", default-features = false }
 trace_kit = { path = "crates/trace_kit" }
 tracing = { version = "0.1", default-features = false }
+tracing-subscriber = { version = "0.3", default-features = false }
 tracing-test = { version = "0.2", default-features = false }
 twox-hash = { version = "2.1", default-features = false }
-
 utoipa = { version = "5.4", default-features = false }
 utoipa-axum = { version = "0.2", default-features = false }
 utoipa-scalar = { version = "0.3", default-features = false }

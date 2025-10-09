@@ -33,7 +33,7 @@ serde_json = { workspace = true, optional = true }
 
 tracing-appender = { version = "0.2", default-features = false, optional = true }
 tracing-opentelemetry = { version = "0.32", default-features = false, optional = true }
-tracing-subscriber = { version = "0.3", default-features = false, features = [
+tracing-subscriber = { workspace = true, features = [
     "fmt",
     "ansi",
     "env-filter",

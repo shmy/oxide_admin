@@ -1,0 +1,16 @@
+[package]
+name = "migrate"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "server"
+path = "main.rs"
+
+[dependencies]
+dotenvy = { workspace = true }
+include_dir = { workspace = true }
+migrate_kit = { workspace = true }
+sqlx = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing-subscriber = { workspace = true, features = ["fmt"] }
