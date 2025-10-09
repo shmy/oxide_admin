@@ -4,7 +4,7 @@ use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
 use domain::organization::value_object::user_id::UserId;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ValidUser(pub UserId);
 
 impl ValidUser {

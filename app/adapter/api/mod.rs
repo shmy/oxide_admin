@@ -2,7 +2,9 @@ use utoipa_axum::router::OpenApiRouter;
 
 use crate::{
     WebState,
-    shared::middleware::{api_error::api_error, user_authn_required::user_authn_required},
+    shared::middleware::{
+        access_log::access_log, api_error::api_error, user_authn_required::user_authn_required,
+    },
 };
 
 mod auth;
@@ -19,6 +21,10 @@ pub fn routing(state: WebState) -> OpenApiRouter<WebState> {
         .nest("/system", system::routing())
         .nest("/uploads", upload::routing())
         .nest("/options", option::routing())
+        .layer(axum::middleware::from_fn_with_state(
+            state.clone(),
+            access_log,
+        ))
         .layer(axum::middleware::from_fn_with_state(
             state.clone(),
             user_authn_required,

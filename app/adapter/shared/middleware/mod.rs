@@ -1,3 +1,4 @@
+pub mod access_log;
 pub mod api_error;
 mod common;
 pub mod perm_router_ext;
