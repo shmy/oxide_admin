@@ -1,22 +1,26 @@
-use bg_worker_kit::{Worker, error::Result};
+use bg_worker_kit::Worker;
+use bg_worker_kit::error::Result;
 use bon::Builder;
-use nject::injectable;
 use serde::{Deserialize, Serialize};
+use infrastructure::shared::provider::Provider;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Builder)]
-pub struct {{name | pascal_case}}Params {
-    // Define worker parameters here
+pub struct {{name | pascal_case}} {
+     // Define worker parameters here
 }
 
-#[derive(Clone)]
-#[injectable]
-pub struct {{name | pascal_case}};
-
 impl Worker for {{name | pascal_case}} {
-    const KIND: &'static str = "{{name}}";
-    type Params = {{name | pascal_case}}Params;
+     type State = Provider;
 
-    async fn run(&self, _params: Self::Params) -> Result<()> {
+    const NAME: &'static str = "{{name | snake_case}}";
+
+    const CONCURRENCY: usize = 1;
+
+    const RETRIES: usize = 3;
+
+    const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30);
+
+    async fn execute(_params: Self, _state: &Self::State) -> Result<()> {
 
         Ok(())
     }

@@ -81,6 +81,7 @@ impl TemplateEngine {
         let mut env = Environment::new();
         env.add_filter("pascal_case", |s: String| s.to_pascal_case());
         env.add_filter("uppercase", |s: String| s.to_uppercase());
+        env.add_filter("snake_case", |s: String| s.to_snake_case());
         env.add_filter("pluralize", |s: String| s.to_plural());
         env.add_filter("singular", |s: String| s.to_singular());
         env.add_filter("is_copy_type", |ty: String| -> bool { is_copy_type(&ty) });

@@ -78,12 +78,7 @@ async fn main() -> Result<()> {
             };
             let template = TemplateEngine::from("partials/worker").with_context(context);
             template
-                .render_to(
-                    APP_DIR
-                        .join("application")
-                        .join("shared")
-                        .join("background_worker"),
-                )
+                .render_to(APP_DIR.join("application").join("shared").join("bgworker"))
                 .await?;
             Ok(())
         }
