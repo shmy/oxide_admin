@@ -59,12 +59,11 @@ impl WorkerManager {
         }
     }
 
-    pub fn register<K, R>(&mut self, kind: K, runner: R)
+    pub fn register<R>(&mut self, runner: R)
     where
-        K: Into<String>,
         R: Worker + Clone + Send + Sync + 'static,
     {
-        let kind = kind.into();
+        let kind = R::KIND.to_string();
         self.runners.insert(kind, Arc::new(RunnerWrapper(runner)));
     }
 

@@ -14,6 +14,7 @@ mod sqlite;
 pub use sqlite::*;
 
 pub trait Worker {
+    const KIND: &'static str;
     type Params: Serialize + DeserializeOwned;
     fn run(&self, params: Self::Params) -> impl Future<Output = Result<(), WorkerError>> + Send;
 }

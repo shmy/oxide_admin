@@ -22,7 +22,7 @@ pub struct CreateAccessLogCommand {
     elapsed: i64,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 #[injectable]
 pub struct CreateAccessLogCommandHandler {
     access_log_repo: AccessLogRepositoryImpl,

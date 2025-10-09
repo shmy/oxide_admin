@@ -1,8 +1,9 @@
 use bg_worker_kit::{Worker, error::Result};
+use bon::Builder;
 use nject::injectable;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Builder)]
 pub struct {{name | pascal_case}}Params {
     // Define worker parameters here
 }
@@ -12,6 +13,7 @@ pub struct {{name | pascal_case}}Params {
 pub struct {{name | pascal_case}};
 
 impl Worker for {{name | pascal_case}} {
+    const KIND: &'static str = "{{name}}";
     type Params = {{name | pascal_case}}Params;
 
     async fn run(&self, _params: Self::Params) -> Result<()> {

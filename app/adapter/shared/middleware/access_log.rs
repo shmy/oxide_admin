@@ -1,5 +1,9 @@
 use std::net::SocketAddr;
 
+use application::{
+    re_export::{Queuer, Worker as _},
+    shared::background_worker::record_access_log::{RecordAccessLog, RecordAccessLogParams},
+};
 use axum::{
     extract::{ConnectInfo, Request, State},
     middleware::Next,
@@ -24,19 +28,30 @@ pub async fn access_log(State(state): State<WebState>, request: Request, next: N
         .get::<ConnectInfo<SocketAddr>>()
         .map(|ci| ci.0.ip().to_string());
 
-    let valid_user = request.extensions().get::<ValidUser>().cloned();
+    let valid_user = request
+        .extensions()
+        .get::<ValidUser>()
+        .cloned()
+        .expect("Failed to get valid user");
     let response = next.run(request).await;
     let status = response.status();
     let elapsed = now.elapsed();
-    tracing::info!(
-        method = method,
-        uri = uri,
-        user_agent = user_agent,
-        client_ip = client_ip,
-        status = status.as_u16(),
-        valid_user = valid_user.map(|v| v.0.to_string()),
-        elapsed = elapsed.as_millis(),
-        "Request handled",
-    );
+    let params = RecordAccessLogParams::builder()
+        .user_id(valid_user.0.to_string())
+        .method(method)
+        .uri(uri)
+        .maybe_user_agent(user_agent)
+        .maybe_ip(client_ip)
+        .status(status.as_u16() as i16)
+        .elapsed(elapsed.as_millis() as i64)
+        .build();
+    if let Err(err) = state
+        .provider()
+        .provide::<Queuer>()
+        .enqueue(RecordAccessLog::KIND, params)
+        .await
+    {
+        tracing::error!(error = %err, "Failed to enqueue record_access_log");
+    }
     response
 }

@@ -36,11 +36,11 @@ impl WorkerManager {
         }
     }
 
-    pub fn register<K, P, H>(&mut self, kind: K, runner: H)
+    pub fn register<P, H>(&mut self, runner: H)
     where
-        K: Into<String>,
         H: Worker<Params = P> + Send + Sync + 'static,
     {
+        let kind = H::KIND.to_string();
         let old = std::mem::take(&mut self.worker_builder);
         self.worker_builder = old.register(kind, RunnerWrapper(runner));
     }

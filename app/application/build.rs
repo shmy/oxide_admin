@@ -158,7 +158,7 @@ pub fn register_background_workers(
     provider: &Provider) {
     {%- for job in jobs %}
 
-    worker_manager.register("{{job}}", provider.provide::<crate::shared::background_worker::{{job}}::{{job | pascal_case}}>());
+    worker_manager.register(provider.provide::<crate::shared::background_worker::{{job}}::{{job | pascal_case}}>());
     tracing::info!("Worker [{{job | pascal_case}}] has been registered");
     {%- endfor %}
 
