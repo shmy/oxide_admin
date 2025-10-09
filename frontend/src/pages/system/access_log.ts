@@ -29,12 +29,8 @@ const schema = {
         "label": "状态码",
       },
       {
-        "name": "method",
-        "label": "请求方式",
-      },
-      {
-        "name": "uri",
         "label": "请求路径",
+        "value": "${method} ${uri | raw}",
       },
       {
         "name": "ip",
