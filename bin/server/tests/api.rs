@@ -34,7 +34,7 @@ async fn setup_server() -> (JoinHandle<()>, String, ContainerAsync<Postgres>) {
     let cli = Cli::parse_from(&["", "--database-url", &connection_string, "serve"]);
     let config: ConfigRef = cli.try_into().unwrap();
     let base_url = format!("http://{}:{}", config.server.bind, config.server.port);
-    let handle = tokio::spawn(async move {
+    let handle = tokio::task::spawn_local(async move {
         server::serve(config).await.unwrap();
     });
     wait_for_server_health(&format!("{}/health", &base_url), 3).await;

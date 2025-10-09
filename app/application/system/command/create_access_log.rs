@@ -22,7 +22,7 @@ pub struct CreateAccessLogCommand {
     occurred_at: chrono::NaiveDateTime,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 #[injectable]
 pub struct CreateAccessLogCommandHandler {
     access_log_repo: AccessLogRepositoryImpl,

@@ -10,7 +10,7 @@ use std::result::Result;
 use crate::shared::chrono_tz::ChronoTz;
 use crate::shared::pg_pool::PgPool;
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 #[injectable]
 pub struct AccessLogRepositoryImpl {
     pool: PgPool,
