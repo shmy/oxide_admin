@@ -67,7 +67,7 @@ English | [简体中文](./README_ZH_CN.md)
         <td></td>
     </tr>
     <tr>
-        <td rowspan="3">Background Tasks <b>(choose one only)</b></td>
+        <td rowspan="2">Background Tasks <b>(choose one only)</b></td>
         <td>bg_sqlite</td>
         <td>Use sqlite for background tasks, suitable for monolithic projects</td>
         <td></td>
