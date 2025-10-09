@@ -21,8 +21,8 @@ const schema = {
     showUpdatedAt: false,
     columns: [
       {
-        "name": "user_id",
-        "label": "用户ID",
+        "name": "user_name",
+        "label": "用户名称",
       },
       {
         "name": "status",

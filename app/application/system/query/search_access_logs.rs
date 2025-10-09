@@ -50,9 +50,21 @@ impl QueryHandler for SearchAccessLogsQueryHandler {
         let rows_future = sqlx::query_as!(
             AccessLogDto,
             r#"
-        SELECT id, user_id, method, uri, user_agent, ip, status, elapsed, occurred_at, created_at, updated_at
-        FROM _access_logs
-        ORDER BY occurred_at DESC
+        SELECT a.id as id,
+            a.user_id as user_id,
+            a.method as method, 
+            a.uri as uri,
+            a.user_agent as user_agent,
+            a.ip as ip,
+            a.status as status,
+            a.elapsed as elapsed, 
+            a.occurred_at as occurred_at, 
+            a.created_at as created_at, 
+            a.updated_at as updated_at,
+            u.name as "user_name?"
+        FROM _access_logs as a
+        LEFT JOIN _users as u ON u.id = a.user_id
+        ORDER BY a.occurred_at DESC
         LIMIT $1 OFFSET $2
         "#,
             page_size,

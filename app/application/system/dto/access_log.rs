@@ -6,6 +6,7 @@ use utoipa::ToSchema;
 pub struct AccessLogDto {
     pub id: String,
     pub user_id: String,
+    pub user_name: Option<String>,
     pub method: String,
     pub uri: String,
     pub user_agent: Option<String>,
