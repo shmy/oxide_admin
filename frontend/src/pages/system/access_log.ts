@@ -1,42 +1,8 @@
 import { buildCrudTable } from "../../lib/table";
 
-export {};
+export { };
 
 const endpoint = "/system/access_logs";
-
-const buildDrawer = (isAdd = true) => {
-  const label = isAdd ? "Create access_log" : null;
-  const title = isAdd ? "Create access_log" : "Edit access_log";
-  const level = isAdd ? "primary" : "link";
-  const icon = isAdd ? "fas fa-plus" : "fas fa-edit";
-  const tooltip = isAdd ? null : "Edit";
-
-  const api = isAdd ? `post:${endpoint}` : `put:${endpoint}/$id`;
-  const initApi = isAdd ? null : `get:${endpoint}/$id`;
-
-  return {
-    label: label,
-    icon: icon,
-    tooltip: tooltip,
-    type: "button",
-    align: "right",
-    actionType: "drawer",
-    level: level,
-    drawer: {
-      title: title,
-      size: "md",
-      body: {
-        type: "form",
-        canAccessSuperData: false,
-        api: api,
-        initApi: initApi,
-        body: [
-
-        ],
-      },
-    },
-  };
-};
 
 const schema = {
   type: "page",
@@ -45,13 +11,46 @@ const schema = {
     filters: [
 
     ],
-    headerToolbar: [buildDrawer()],
+    headerToolbar: [],
     bulkActions: [
 
     ],
-    operations: [buildDrawer(false)],
+    operations: [],
+    deletable: false,
     columns: [
-
+      {
+        "name": "user_id",
+        "label": "用户ID",
+      },
+      {
+        "name": "method",
+        "label": "请求方式",
+      },
+      {
+        "name": "uri",
+        "label": "请求路径",
+      },
+      {
+        "name": "ip",
+        "label": "IP地址",
+      },
+      {
+        "name": "ip_region",
+        "label": "IP地区",
+      },
+      {
+        "name": "status",
+        "label": "状态码",
+      },
+      {
+        "name": "elapsed",
+        "label": "请求时长",
+        "type": "pretty-ms",
+      },
+      {
+        "name": "user_agent",
+        "label": "客户端",
+      },
     ],
   }),
 };
