@@ -36,5 +36,14 @@ export const PERMISSIONS = {
       READ: 600,
       DELETE: 601,
     },
+    ACCESS_LOG: {
+      READ: 700,
+      ACCESS_LOG: {
+        READ: 1000,
+        CREATE: 1001,
+        UPDATE: 1002,
+        DELETE: 1003,
+      },
+    },
   },
 };

@@ -60,7 +60,7 @@ impl DomainRepository for {{entity | pascal_case}}RepositoryImpl {
             "#,
             &entity.id,
             {%- for f in domain_fields %}
-            &entity.{{f.name}},
+              {% if f.type[:7] == "Option<" %} entity.{{f.name}}, {%- else %} &entity.{{f.name}}, {%- endif %}
             {%- endfor %}
             &now,
             &now,
@@ -107,7 +107,8 @@ impl From<{{entity | pascal_case}}Dto> for {{entity | pascal_case}} {
         Self::builder()
             .id(value.id)
             {%- for field in domain_fields %}
-            .{{field.name}}(value.{{field.name}})
+              {% if field.type[:7] == "Option<" %} .maybe_{{field.name}}(value.{{field.name}}) {%- else %} .{{field.name}}(value.{{field.name}}) {%- endif %}
+
             {%- endfor %}
             .build()
     }

@@ -1,3 +1,4 @@
+pub mod access_log;
 pub mod cpu;
 pub mod file;
 pub mod process_info;

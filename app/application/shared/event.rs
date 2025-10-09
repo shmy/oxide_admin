@@ -15,13 +15,11 @@ impl From<AuthEvent> for Event {
         Self::Auth(value)
     }
 }
-
 impl From<OrganizationEvent> for Event {
     fn from(value: OrganizationEvent) -> Self {
         Self::Organization(value)
     }
 }
-
 impl From<SystemEvent> for Event {
     fn from(value: SystemEvent) -> Self {
         Self::System(value)

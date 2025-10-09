@@ -41,7 +41,7 @@ pub async fn generate_domain(context: Value) -> Result<()> {
     append_permissions(
         APP_DIR
             .join("domain")
-            .join("system")
+            .join("auth")
             .join("permissions.yaml")
             .as_path(),
         &module,

@@ -2,11 +2,11 @@ import { buildCrudTable } from "../../lib/table";
 
 export {};
 
-const endpoint = "/{{module}}/{{entity | pluralize}}";
+const endpoint = "/system/access_logs";
 
 const buildDrawer = (isAdd = true) => {
-  const label = isAdd ? "Create {{entity}}" : null;
-  const title = isAdd ? "Create {{entity}}" : "Edit {{entity}}";
+  const label = isAdd ? "Create access_log" : null;
+  const title = isAdd ? "Create access_log" : "Edit access_log";
   const level = isAdd ? "primary" : "link";
   const icon = isAdd ? "fas fa-plus" : "fas fa-edit";
   const tooltip = isAdd ? null : "Edit";

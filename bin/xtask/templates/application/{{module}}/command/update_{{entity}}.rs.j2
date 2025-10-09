@@ -1,5 +1,4 @@
 use bon::Builder;
-use domain::{{module}}::error::{{module | pascal_case }}Error;
 use domain::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
 use domain::{{module}}::{entity::{{entity}}::{{entity | pascal_case}}, event::{{module | pascal_case }}Event};
 use domain::shared::port::domain_repository::DomainRepository;
@@ -8,7 +7,7 @@ use infrastructure::repository::{{module}}::{{entity}}_repository::{{entity | pa
 use nject::injectable;
 use serde::Deserialize;
 use utoipa::ToSchema;
-
+use crate::error::ApplicationError;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
 
 #[derive(Debug, Deserialize, Builder, ToSchema)]
@@ -29,13 +28,12 @@ impl CommandHandler for Update{{entity | pascal_case}}CommandHandler {
     type Command = Update{{entity | pascal_case}}Command;
     type Output = {{entity | pascal_case}};
     type Event = {{module | pascal_case }}Event;
-    type Error = {{module | pascal_case }}Error;
 
     #[tracing::instrument]
     async fn execute(
         &self,
         cmd: Self::Command,
-    ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+    ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
         let id = cmd.id;
         let mut {{entity}} = self.{{entity}}_repo.by_id(&id).await?;
         let before = {{entity}}.clone();

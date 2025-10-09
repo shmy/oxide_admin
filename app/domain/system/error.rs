@@ -6,6 +6,8 @@ pub enum SystemError {
     SchedNotFound,
     #[error("{0}")]
     Sqlx(String),
+    #[error("AccessLog not exists")]
+    AccessLogNotFound,
 }
 impl From<sqlx::Error> for SystemError {
     fn from(err: sqlx::Error) -> Self {

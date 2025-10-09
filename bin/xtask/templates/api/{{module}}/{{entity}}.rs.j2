@@ -15,7 +15,7 @@ use application::{
 };
 use axum::{Json, extract::{Path, Query}};
 use domain::{{module}}::value_object::{{entity}}_id::{{entity | pascal_case}}Id;
-use domain::system::value_object::permission::{
+use domain::auth::value_object::permission::{
     {{(module ~ "_" ~ entity) | uppercase}}_READ,
     {{(module ~ "_" ~ entity) | uppercase}}_CREATE,
     {{(module ~ "_" ~ entity) | uppercase}}_UPDATE,
