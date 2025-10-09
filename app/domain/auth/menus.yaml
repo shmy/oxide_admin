@@ -17,7 +17,7 @@ private:
         url: /organization/role
   - key: 2
     label: 系统管理
-    icon: fas fa-screwdriver-wrench
+    icon: fas fa-gear
     children:
       - key: 200
         label: 缓存管理
