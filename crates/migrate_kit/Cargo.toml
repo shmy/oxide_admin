@@ -8,7 +8,7 @@ path = "lib.rs"
 
 [dependencies]
 bon = { workspace = true }
-include_dir = { workspace = true }
 sqlx = { workspace = true, features = ["postgres", "derive", "runtime-tokio"] }
 thiserror = { workspace = true }
 tracing = { workspace = true }
+migrate_kit_macros = { workspace = true }

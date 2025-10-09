@@ -1,4 +1,3 @@
--- 访问日志表（Access Logs）
 CREATE TABLE
     _access_logs (
         id CHAR(24) PRIMARY KEY NOT NULL,
@@ -14,7 +13,6 @@ CREATE TABLE
         updated_at TIMESTAMP NOT NULL
     );
 
--- 索引
 CREATE INDEX idx_access_logs_user_id ON _access_logs (user_id);
 
 CREATE INDEX idx_access_logs_occurred_at ON _access_logs (occurred_at);

@@ -17,7 +17,8 @@ members = [
     "crates/event_kit",
     "crates/flag_kit",
     "crates/kvdb_kit",
-    "crates/migrate_kit",
+    "crates/migrate_kit", 
+    "crates/migrate_kit_macros",
     "crates/object_storage_kit",
     "crates/sched_kit",
     "crates/single_flight",
@@ -62,6 +63,7 @@ infrastructure = { path = "app/infrastructure" }
 jsonwebtoken = { version = "10.0", default-features = false }
 kvdb_kit = { path = "crates/kvdb_kit" }
 migrate_kit = { path = "crates/migrate_kit" }
+migrate_kit_macros = { path = "crates/migrate_kit_macros" }
 mimalloc = { version = "0.1", default-features = false }
 mime_guess = { version = "2.0", default-features = false }
 minicbor-serde = { version = "0.6", default-features = false }
@@ -71,6 +73,7 @@ object_storage_kit = { path = "crates/object_storage_kit" }
 open-feature = { version = "0.2", default-features = false }
 quote = { version = "1.0" }
 readonly = { version = "0.2", default-features = false }
+blake3 = { version = "1.8", default-features = false}
 
 redb = { version = "3", default-features = false }
 

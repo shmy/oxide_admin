@@ -9,12 +9,10 @@ use domain::organization::value_object::hashed_password::HashedPassword;
 use domain::organization::value_object::user_id::UserId;
 use domain::organization::{entity::role::Role, value_object::role_id::RoleId};
 use domain::shared::port::domain_repository::DomainRepository;
-use include_dir::Dir;
-use include_dir::include_dir;
-use migrate_kit::Migrator;
+use migrate_kit::{Migration, Migrator, embed_dir};
 use tracing::info;
 
-const MIGRATIONS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/migration/versions");
+const MIGRATIONS: &[Migration] = embed_dir!("$CARGO_MANIFEST_DIR/migration/versions");
 
 pub async fn migrate(
     pool: PgPool,
@@ -24,7 +22,7 @@ pub async fn migrate(
     Migrator::builder()
         .pool(pool.clone())
         .build()
-        .migrate(&MIGRATIONS_DIR)
+        .migrate(MIGRATIONS)
         .await?;
     insert_user_role(&pool, &user_repository, &role_repository).await?;
     Ok(())

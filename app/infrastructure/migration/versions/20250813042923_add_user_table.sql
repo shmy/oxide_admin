@@ -1,4 +1,3 @@
--- Add migration script here
 CREATE TABLE
     _users (
         id CHAR(24) PRIMARY KEY NOT NULL,

@@ -9,7 +9,6 @@ path = "main.rs"
 
 [dependencies]
 dotenvy = { workspace = true }
-include_dir = { workspace = true }
 migrate_kit = { workspace = true }
 sqlx = { workspace = true }
 tokio = { workspace = true, features = ["full"] }

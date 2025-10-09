@@ -1,18 +1,19 @@
-use std::collections::HashSet;
+use std::collections::HashMap;
 
 use crate::error::Result;
 use bon::Builder;
-use include_dir::Dir;
 use sqlx::{Executor, FromRow, PgConnection, PgPool};
 
 #[derive(Debug, Clone)]
-struct Migration {
-    version: String,
-    content: String,
+pub struct Migration {
+    pub version: &'static str,
+    pub content: &'static str,
+    pub checksum: &'static str,
 }
 #[derive(Debug, Clone, FromRow)]
 struct AppliedMigration {
     version: String,
+    checksum: String,
 }
 
 #[derive(Builder)]
@@ -23,56 +24,36 @@ pub struct Migrator {
 }
 
 impl Migrator {
-    async fn load_migrations(&self, dir: &Dir<'_>) -> Result<Vec<Migration>> {
-        let mut migrations = vec![];
-
-        for file in dir.files() {
-            let name = file
-                .path()
-                .file_stem()
-                .expect("File name must have a stem")
-                .to_string_lossy()
-                .to_string();
-            let content = std::str::from_utf8(file.contents())
-                .expect("File must be utf-8")
-                .to_string();
-
-            migrations.push(Migration {
-                version: name,
-                content,
-            });
-        }
-
-        migrations.sort_by(|a, b| a.version.cmp(&b.version));
-        Ok(migrations)
-    }
-
-    async fn get_applied_versions(&self, pool: &PgPool) -> Result<HashSet<String>> {
-        let rows: Vec<AppliedMigration> =
-            sqlx::query_as(&format!("SELECT version FROM {}", self.table_name))
-                .fetch_all(pool)
-                .await?;
-        Ok(rows.into_iter().map(|r| r.version).collect())
+    async fn get_applied(&self, pool: &PgPool) -> Result<HashMap<String, String>> {
+        let rows: Vec<AppliedMigration> = sqlx::query_as(&format!(
+            "SELECT version, checksum FROM {}",
+            self.table_name
+        ))
+        .fetch_all(pool)
+        .await?;
+        Ok(rows.into_iter().map(|r| (r.version, r.checksum)).collect())
     }
 
     async fn apply_migration(&self, conn: &mut PgConnection, migration: &Migration) -> Result<()> {
         conn.execute(&*migration.content).await?;
         sqlx::query(&format!(
-            "INSERT INTO {}(version) VALUES($1)",
-            self.table_name
+            "INSERT INTO {}(version, checksum) VALUES($1, $2)",
+            self.table_name,
         ))
-        .bind(migration.version.to_string())
+        .bind(migration.version)
+        .bind(migration.checksum)
         .execute(&mut *conn)
         .await?;
         tracing::info!("Applied migration: {}", migration.version);
         Ok(())
     }
 
-    pub async fn migrate(&mut self, dir: &Dir<'_>) -> Result<()> {
+    pub async fn migrate(&mut self, migrations: &[Migration]) -> Result<()> {
         sqlx::query(&format!(
             r#"
         CREATE TABLE IF NOT EXISTS {} (
             version VARCHAR(64) PRIMARY KEY,
+            checksum VARCHAR(64) NOT NULL,
             applied_at TIMESTAMP NOT NULL DEFAULT now()
         )
         "#,
@@ -81,13 +62,19 @@ impl Migrator {
         .execute(&self.pool)
         .await?;
 
-        let migrations = self.load_migrations(dir).await?;
-        let applied = self.get_applied_versions(&self.pool).await?;
+        let applied = self.get_applied(&self.pool).await?;
 
         let pool = self.pool.clone();
         let mut tx = pool.begin().await?;
         for m in migrations {
-            if !applied.contains(&m.version) {
+            if let Some(checksum) = applied.get(m.version) {
+                if checksum != m.checksum {
+                    panic!(
+                        "Migration {} checksum mismatch, local checksum={}, db checksum={:?}",
+                        m.version, m.checksum, checksum
+                    );
+                }
+            } else {
                 self.apply_migration(&mut tx, &m).await?;
             }
         }

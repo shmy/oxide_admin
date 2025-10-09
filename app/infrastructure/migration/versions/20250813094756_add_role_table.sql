@@ -1,4 +1,3 @@
--- Add migration script here
 CREATE TABLE
     _roles (
         id CHAR(24) PRIMARY KEY NOT NULL,

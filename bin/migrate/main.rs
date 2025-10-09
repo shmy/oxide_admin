@@ -1,8 +1,7 @@
-use include_dir::{Dir, include_dir};
-use migrate_kit::Migrator;
+use migrate_kit::{Migration, Migrator, embed_dir};
 
-const MIGRATIONS_DIR: Dir =
-    include_dir!("$CARGO_MANIFEST_DIR/../../app/infrastructure/migration/versions");
+const MIGRATIONS: &[Migration] =
+    embed_dir!("$CARGO_MANIFEST_DIR/../../app/infrastructure/migration/versions");
 
 #[tokio::main]
 async fn main() {
@@ -15,7 +14,7 @@ async fn main() {
     Migrator::builder()
         .pool(pool.clone())
         .build()
-        .migrate(&MIGRATIONS_DIR)
+        .migrate(MIGRATIONS)
         .await
         .expect("Failed to migrate");
 }

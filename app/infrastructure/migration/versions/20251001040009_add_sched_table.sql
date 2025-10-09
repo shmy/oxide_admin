@@ -1,5 +1,3 @@
--- Add migration script here
--- Add migration script here
 CREATE TABLE
     _scheds (
         id CHAR(24) PRIMARY KEY NOT NULL,
