@@ -29,7 +29,7 @@ impl DomainRepository for AccessLogRepositoryImpl {
         let row_opt = sqlx::query_as!(
             AccessLogDto,
             r#"
-        SELECT id as "id: AccessLogId", user_id, method, uri, user_agent, ip, ip_region, status, elapsed FROM _access_logs WHERE id = $1
+        SELECT id as "id: AccessLogId", user_id, method, uri, user_agent, ip, status, elapsed, occurred_at FROM _access_logs WHERE id = $1
         "#,
             id
         )
@@ -46,7 +46,7 @@ impl DomainRepository for AccessLogRepositoryImpl {
 
         sqlx::query!(
             r#"
-            INSERT INTO _access_logs (id, user_id, method, uri, user_agent, ip, ip_region, status, elapsed, created_at, updated_at)
+            INSERT INTO _access_logs (id, user_id, method, uri, user_agent, ip, status, elapsed, occurred_at, created_at, updated_at)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
             ON CONFLICT (id) DO UPDATE SET
                 user_id = EXCLUDED.user_id,
@@ -54,20 +54,20 @@ impl DomainRepository for AccessLogRepositoryImpl {
                 uri = EXCLUDED.uri,
                 user_agent = EXCLUDED.user_agent,
                 ip = EXCLUDED.ip,
-                ip_region = EXCLUDED.ip_region,
                 status = EXCLUDED.status,
                 elapsed = EXCLUDED.elapsed,
+                occurred_at = EXCLUDED.occurred_at,
                 updated_at = EXCLUDED.updated_at
             "#,
             &entity.id,
-               &entity.user_id,
-               &entity.method,
-               &entity.uri,
-               entity.user_agent,
-               entity.ip,
-               entity.ip_region,
-               &entity.status,
-               &entity.elapsed,
+            &entity.user_id,
+            &entity.method,
+            &entity.uri,
+            entity.user_agent,
+            entity.ip,
+            &entity.status,
+            &entity.elapsed,
+            &entity.occurred_at,
             &now,
             &now,
         )
@@ -84,7 +84,7 @@ impl DomainRepository for AccessLogRepositoryImpl {
         let items = sqlx::query_as!(
             AccessLogDto,
             r#"
-            DELETE FROM _access_logs WHERE id = ANY($1) RETURNING id as "id: AccessLogId", user_id, method, uri, user_agent, ip, ip_region, status, elapsed
+            DELETE FROM _access_logs WHERE id = ANY($1) RETURNING id as "id: AccessLogId", user_id, method, uri, user_agent, ip, status, elapsed, occurred_at
             "#,
             &ids.inner_vec()
         )
@@ -105,9 +105,9 @@ struct AccessLogDto {
     uri: String,
     user_agent: Option<String>,
     ip: Option<String>,
-    ip_region: Option<String>,
     status: i16,
     elapsed: i64,
+    occurred_at: chrono::NaiveDateTime,
 }
 
 impl From<AccessLogDto> for AccessLog {
@@ -119,9 +119,9 @@ impl From<AccessLogDto> for AccessLog {
             .uri(value.uri)
             .maybe_user_agent(value.user_agent)
             .maybe_ip(value.ip)
-            .maybe_ip_region(value.ip_region)
             .status(value.status)
             .elapsed(value.elapsed)
+            .occurred_at(value.occurred_at)
             .build()
     }
 }

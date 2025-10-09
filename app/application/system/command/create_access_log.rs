@@ -17,9 +17,9 @@ pub struct CreateAccessLogCommand {
     uri: String,
     user_agent: Option<String>,
     ip: Option<String>,
-    ip_region: Option<String>,
     status: i16,
     elapsed: i64,
+    occurred_at: chrono::NaiveDateTime,
 }
 
 #[derive(Clone, Debug)]
@@ -45,9 +45,9 @@ impl CommandHandler for CreateAccessLogCommandHandler {
             .uri(cmd.uri)
             .maybe_user_agent(cmd.user_agent)
             .maybe_ip(cmd.ip)
-            .maybe_ip_region(cmd.ip_region)
             .status(cmd.status)
             .elapsed(cmd.elapsed)
+            .occurred_at(cmd.occurred_at)
             .build();
         let access_log = self.access_log_repo.save(access_log).await?;
         Ok(CommandResult::with_event(

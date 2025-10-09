@@ -1,7 +1,7 @@
 use std::net::SocketAddr;
 
 use application::{
-    re_export::{Queuer, Worker as _},
+    re_export::{ChronoTz, Queuer, Worker as _},
     shared::background_worker::record_access_log::{RecordAccessLog, RecordAccessLogParams},
 };
 use axum::{
@@ -36,6 +36,7 @@ pub async fn access_log(State(state): State<WebState>, request: Request, next: N
     let response = next.run(request).await;
     let status = response.status();
     let elapsed = now.elapsed();
+    let ct = state.provider().provide::<ChronoTz>();
     let params = RecordAccessLogParams::builder()
         .user_id(valid_user.0.to_string())
         .method(method)
@@ -44,6 +45,7 @@ pub async fn access_log(State(state): State<WebState>, request: Request, next: N
         .maybe_ip(client_ip)
         .status(status.as_u16() as i16)
         .elapsed(elapsed.as_millis() as i64)
+        .occurred_at(ct.now())
         .build();
     if let Err(err) = state
         .provider()

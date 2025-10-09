@@ -20,6 +20,7 @@ pub struct RecordAccessLogParams {
     ip: Option<String>,
     status: i16,
     elapsed: i64,
+    occurred_at: chrono::NaiveDateTime,
 }
 
 #[derive(Clone)]
@@ -41,6 +42,7 @@ impl Worker for RecordAccessLog {
             .maybe_ip(params.ip)
             .status(params.status)
             .elapsed(params.elapsed)
+            .occurred_at(params.occurred_at)
             .build();
         self.command_handler
             .handle(command)

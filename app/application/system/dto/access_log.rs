@@ -10,9 +10,9 @@ pub struct AccessLogDto {
     pub uri: String,
     pub user_agent: Option<String>,
     pub ip: Option<String>,
-    pub ip_region: Option<String>,
     pub status: i16,
     pub elapsed: i64,
+    pub occurred_at: chrono::NaiveDateTime,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
 }

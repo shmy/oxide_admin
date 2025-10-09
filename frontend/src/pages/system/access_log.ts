@@ -17,10 +17,16 @@ const schema = {
     ],
     operations: [],
     deletable: false,
+    showCreatedAt: false,
+    showUpdatedAt: false,
     columns: [
       {
         "name": "user_id",
         "label": "用户ID",
+      },
+      {
+        "name": "status",
+        "label": "状态码",
       },
       {
         "name": "method",
@@ -35,22 +41,15 @@ const schema = {
         "label": "IP地址",
       },
       {
-        "name": "ip_region",
-        "label": "IP地区",
-      },
-      {
-        "name": "status",
-        "label": "状态码",
-      },
-      {
         "name": "elapsed",
         "label": "请求时长",
         "type": "pretty-ms",
       },
       {
-        "name": "user_agent",
-        "label": "客户端",
-      },
+        name: "occurred_at",
+        label: "请求时间",
+        type: "datetime",
+      }
     ],
   }),
 };

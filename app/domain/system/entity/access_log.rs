@@ -11,9 +11,9 @@ pub struct AccessLog {
     pub uri: String,
     pub user_agent: Option<String>,
     pub ip: Option<String>,
-    pub ip_region: Option<String>,
     pub status: i16,
     pub elapsed: i64,
+    pub occurred_at: chrono::NaiveDateTime,
 }
 
 impl AccessLog {
@@ -32,13 +32,14 @@ impl AccessLog {
     pub fn update_ip(&mut self, ip: Option<String>) {
         self.ip = ip;
     }
-    pub fn update_ip_region(&mut self, ip_region: Option<String>) {
-        self.ip_region = ip_region;
-    }
+
     pub fn update_status(&mut self, status: i16) {
         self.status = status;
     }
     pub fn update_elapsed(&mut self, elapsed: i64) {
         self.elapsed = elapsed;
+    }
+    pub fn update_occurred_at(&mut self, occurred_at: chrono::NaiveDateTime) {
+        self.occurred_at = occurred_at;
     }
 }

@@ -30,7 +30,7 @@ impl QueryHandler for RetrieveAccessLogQueryHandler {
         let row_opt = sqlx::query_as!(
             AccessLogDto,
             r#"
-            SELECT id, user_id, method, uri, user_agent, ip, ip_region, status, elapsed, created_at, updated_at
+            SELECT id, user_id, method, uri, user_agent, ip, status, elapsed, occurred_at, created_at, updated_at
             FROM _access_logs
             WHERE id = $1
         "#,
