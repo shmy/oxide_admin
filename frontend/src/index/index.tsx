@@ -63,12 +63,11 @@ const buildDropdown = () => {
   };
 };
 
-const assetPrefix = import.meta.env.ASSET_PREFIX;
 
 const schemas = {
   type: "app",
   brandName: "Oxide Admin",
-  logo: assetPrefix + "/static/image/logo.png",
+  logo: logoUrl,
   api: {
     method: "get",
     url: "/profile",

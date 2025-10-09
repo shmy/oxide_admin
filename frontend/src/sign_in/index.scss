@@ -1,1 +1,8 @@
 @import 'tailwindcss';
+
+body {
+    background-image: url(./bg.webp);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
