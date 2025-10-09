@@ -1,7 +1,5 @@
-use infrastructure::error::InfrastructureResult;
-use infrastructure::shared::event_bus::EventSubscriber;
 use nject::injectable;
-
+use event_kit::{EventSubscriber, error::Result};
 use crate::shared::event::Event;
 
 #[derive(Clone)]
@@ -9,7 +7,7 @@ use crate::shared::event::Event;
 pub struct {{name | pascal_case}}EventSubscriber;
 
 impl EventSubscriber<Event> for {{name | pascal_case}}EventSubscriber {
-    async fn on_received(&self, event: Event) -> InfrastructureResult<()> {
+    async fn on_received(&self, event: Event) -> Result<()> {
         tracing::info!("on_received: {event:?}");
         Ok(())
     }

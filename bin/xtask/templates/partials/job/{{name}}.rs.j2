@@ -9,7 +9,8 @@ pub struct {{name | pascal_case}} {
 }
 
 impl ScheduledJob for {{name | pascal_case}} {
-    const SCHEDULER: &'static str = "every 3 seconds";
+    const EXPR: &'static str = "every 3 seconds";
+    const NAME: &'static str = "{{name | pascal_case}}";
 
     async fn run(&self) -> Result<()> {
         info!("{{name | pascal_case}} runing");

@@ -1,9 +1,10 @@
 use nject::injectable;
 use crate::shared::command_handler::{CommandHandler, CommandResult};
-use domain::{{module}}::{error::{{module | pascal_case}}Error, event::{{module | pascal_case}}Event};
+use domain::{{module}}::event::{{module | pascal_case}}Event;
 use bon::Builder;
 use serde::Deserialize;
 use utoipa::ToSchema;
+use crate::error::ApplicationError;
 
 #[derive(Debug, Deserialize, Builder, ToSchema)]
 pub struct {{name | pascal_case}}Command {
@@ -18,12 +19,11 @@ impl CommandHandler for {{name | pascal_case}}CommandHandler {
     type Command = {{name | pascal_case}}Command;
     type Output = ();
     type Event = {{module | pascal_case}}Event;
-    type Error = {{module | pascal_case}}Error;
 
     async fn execute(
             &self,
             _cmd: Self::Command,
-        ) -> Result<CommandResult<Self::Output, Self::Event>, Self::Error> {
+        ) -> Result<CommandResult<Self::Output, Self::Event>, ApplicationError> {
 
         Ok(CommandResult::without_events(()))
     }
