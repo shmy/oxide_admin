@@ -2270,6 +2270,7 @@ dependencies = [
  "chrono-tz",
  "domain",
  "flag_kit",
+ "include_dir",
  "jsonwebtoken",
  "kvdb_kit",
  "nject",

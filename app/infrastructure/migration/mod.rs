@@ -1,24 +1,24 @@
 use std::ops::Deref;
 
 use crate::error::InfrastructureResult;
+use crate::migration::migrator::Migrator;
+use crate::repository::organization::role_repository::RoleRepositoryImpl;
+use crate::repository::organization::user_repository::UserRepositoryImpl;
+use crate::shared::pg_pool::PgPool;
 use domain::organization::entity::user::User;
 use domain::organization::value_object::hashed_password::HashedPassword;
 use domain::organization::value_object::user_id::UserId;
 use domain::organization::{entity::role::Role, value_object::role_id::RoleId};
 use domain::shared::port::domain_repository::DomainRepository;
 use tracing::info;
-
-use crate::repository::organization::role_repository::RoleRepositoryImpl;
-use crate::repository::organization::user_repository::UserRepositoryImpl;
-use crate::shared::pg_pool::PgPool;
+mod migrator;
 
 pub async fn migrate(
     pool: PgPool,
     user_repository: UserRepositoryImpl,
     role_repository: RoleRepositoryImpl,
 ) -> InfrastructureResult<()> {
-    sqlx::migrate!("migration/sql").run(&pool).await?;
-    insert_user_role(&pool, &user_repository, &role_repository).await?;
+    Migrator::new(pool).migrate().await?;
     Ok(())
 }
 

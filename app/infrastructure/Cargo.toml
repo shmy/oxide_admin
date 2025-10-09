@@ -49,7 +49,6 @@ sqlx = { workspace = true, features = [
     "runtime-tokio",
     "postgres",
     "macros",
-    "migrate",
     "chrono",
     "json",
     "derive",
@@ -64,3 +63,4 @@ testcontainers-modules = { workspace = true, features = [
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
+include_dir = { workspace = true }
