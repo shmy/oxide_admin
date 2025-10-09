@@ -72,12 +72,12 @@
         <td rowspan="3">后台任务，<b>只能同时选择一个</b></td>
          <td>bg_sqlite</td>
         <td>使用sqlite作为后台任务，适合单体项目</td>
-        <td>✅</td>
+        <td></td>
     </tr>
     <tr>
         <td>bg_postgres</td>
         <td>使用postgres作为后台任务，适合分布式项目</td>
-        <td></td>
+        <td>✅</td>
     </tr>
     <tr>
         <td>定时任务</td>

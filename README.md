@@ -70,12 +70,12 @@ English | [简体中文](./README_ZH_CN.md)
         <td rowspan="3">Background Tasks <b>(choose one only)</b></td>
         <td>bg_sqlite</td>
         <td>Use sqlite for background tasks, suitable for monolithic projects</td>
-        <td>✅</td>
+        <td></td>
     </tr>
     <tr>
         <td>bg_postgres</td>
         <td>Use postgres for background tasks, suitable for distributed projects</td>
-        <td></td>
+        <td>✅</td>
     </tr>
     <tr>
         <td>Scheduled Tasks</td>
