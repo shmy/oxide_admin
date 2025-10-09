@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM _access_logs WHERE id = ANY($1) RETURNING id as \"id: AccessLogId\", user_id, method, uri, user_agent, ip, status, elapsed, occurred_at\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id: AccessLogId",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "method",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "uri",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "user_agent",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "ip",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "status",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 7,
+        "name": "elapsed",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "occurred_at",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "BpcharArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "908988052ef9973860be9b228704fdc47e38164bd668dba4f0d9187f52b97ed7"
+}

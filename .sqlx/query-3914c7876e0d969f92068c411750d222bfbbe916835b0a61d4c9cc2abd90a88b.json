@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT COUNT(*) AS \"count!\"\n            FROM _departments\n            ",
+  "query": "\n            SELECT COUNT(*) AS \"count!\"\n            FROM _access_logs\n            ",
   "describe": {
     "columns": [
       {
@@ -16,5 +16,5 @@
       null
     ]
   },
-  "hash": "6c54d1312e120c00b8d6fe90ba69f468d1af2dc65e043027f285cda075c1d3cf"
+  "hash": "3914c7876e0d969f92068c411750d222bfbbe916835b0a61d4c9cc2abd90a88b"
 }

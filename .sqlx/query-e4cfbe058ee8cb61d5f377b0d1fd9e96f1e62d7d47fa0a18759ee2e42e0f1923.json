@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            DELETE FROM _departments WHERE id = ANY($1) RETURNING id as \"id: DepartmentId\", name, code, parent_id, enabled\n            ",
+  "query": "\n            DELETE FROM _departments WHERE id = ANY($1) RETURNING id as \"id: DepartmentId\", name, code, parent_code\n            ",
   "describe": {
     "columns": [
       {
@@ -20,13 +20,8 @@
       },
       {
         "ordinal": 3,
-        "name": "parent_id",
-        "type_info": "Bpchar"
-      },
-      {
-        "ordinal": 4,
-        "name": "enabled",
-        "type_info": "Bool"
+        "name": "parent_code",
+        "type_info": "Varchar"
       }
     ],
     "parameters": {
@@ -38,9 +33,8 @@
       false,
       false,
       false,
-      true,
-      false
+      true
     ]
   },
-  "hash": "03243ca23bd1c2044ba61415e45f63b0c5a4e87e86b0385ce82390d86546e564"
+  "hash": "e4cfbe058ee8cb61d5f377b0d1fd9e96f1e62d7d47fa0a18759ee2e42e0f1923"
 }

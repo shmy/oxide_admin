@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO _access_logs (id, user_id, method, uri, user_agent, ip, status, elapsed, occurred_at, created_at, updated_at)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)\n            ON CONFLICT (id) DO UPDATE SET\n                user_id = EXCLUDED.user_id,\n                method = EXCLUDED.method,\n                uri = EXCLUDED.uri,\n                user_agent = EXCLUDED.user_agent,\n                ip = EXCLUDED.ip,\n                status = EXCLUDED.status,\n                elapsed = EXCLUDED.elapsed,\n                occurred_at = EXCLUDED.occurred_at,\n                updated_at = EXCLUDED.updated_at\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bpchar",
+        "Bpchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Int2",
+        "Int8",
+        "Timestamp",
+        "Timestamp",
+        "Timestamp"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2e3c1f7308b17e822c8f48fd9123efefde513438bb50dccb84b7e42c9cf9b138"
+}

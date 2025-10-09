@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id as \"id: AccessLogId\", user_id, method, uri, user_agent, ip, status, elapsed, occurred_at FROM _access_logs WHERE id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id: AccessLogId",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "method",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "uri",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "user_agent",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "ip",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "status",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 7,
+        "name": "elapsed",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "occurred_at",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bpchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "670f7e093718fc94444134c1ce2c76ec14669f7db77f2da47b16ed85a8704b9e"
+}

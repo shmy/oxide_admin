@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT a.id as id,\n                a.user_id as user_id,\n                a.method as method, \n                a.uri as uri,\n                a.user_agent as user_agent,\n                a.ip as ip,\n                a.status as status,\n                a.elapsed as elapsed, \n                a.occurred_at as occurred_at, \n                a.created_at as created_at, \n                a.updated_at as updated_at,\n                u.name as \"user_name?\"\n            FROM _access_logs as a\n            LEFT JOIN _users as u ON u.id = a.user_id\n            WHERE a.id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "method",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "uri",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "user_agent",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "ip",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "status",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 7,
+        "name": "elapsed",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "occurred_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_at",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 11,
+        "name": "user_name?",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bpchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "374de60c9909619e21ca09d08c83c22f0e3d29ab411544397a77e30749788a55"
+}
