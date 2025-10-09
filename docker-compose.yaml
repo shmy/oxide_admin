@@ -21,25 +21,11 @@ services:
     restart: always
     ports:
       - "9000:9000"
-    environment:
-      - FAKTORY_PASSWORD=123123
     volumes:
       - $PWD/containers/rustfs:/data
 
-  faktory:
-    image: contribsys/faktory
-    restart: always
-    ports:
-      - "7419:7419"
-      - "7420:7420"
-    environment:
-      - FAKTORY_PASSWORD=123123
-    volumes:
-      - $PWD/containers/faktory:/var/lib/faktory/db
-    command: /faktory -b :7419 -w :7420 -e production
-
   flipt:
-    image:  docker.flipt.io/flipt/flipt:v2
+    image: docker.flipt.io/flipt/flipt:v2
     restart: always
     ports:
       - "8081:8080"
@@ -47,7 +33,7 @@ services:
       - $PWD/containers/flipt:/var/opt/flipt
       - $PWD/containers/flipt/config.yaml:/etc/flipt/config.yaml
     command: ./flipt server --config /etc/flipt/config.yaml
-  
+
   jaeger:
     image: cr.jaegertracing.io/jaegertracing/jaeger:2.10.0
     restart: always

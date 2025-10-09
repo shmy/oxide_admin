@@ -40,7 +40,7 @@
 - **内建*single_flight*宏**：缓解数据库压力；
 - **文件上传及访问签名**：内建单文件上传、图片上传、分片上传等接口，适配`Amis`，支持`本地文件系统`和`S3`兼容协议；
 - **KV缓存**：支持`ttl`，使用`redis`或[`redb`](https://github.com/cberner/redb)；
-- **后台任务**：支持单机`sqlite`，分布式[`faktory`](https://github.com/contribsys/faktory)；
+- **后台任务**：支持单机`sqlite`，分布式`postgres`；
 - **定时任务**：支持内嵌运行或者单独运行；
 - **优雅关停**：严谨地结束服务、释放资源；
 - **多源配置**：支持环境变量、`.env`/`cli`参数；
@@ -75,13 +75,8 @@
         <td>✅</td>
     </tr>
     <tr>
-        <td>bg_faktory</td>
-        <td>使用faktory作为后台任务，适合分布式项目</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>bg_faktory_tls</td>
-        <td>使用faktory作为后台任务，适合分布式项目，启用tls</td>
+        <td>bg_postgres</td>
+        <td>使用postgres作为后台任务，适合分布式项目</td>
         <td></td>
     </tr>
     <tr>

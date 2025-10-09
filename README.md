@@ -39,7 +39,7 @@ English | [简体中文](./README_ZH_CN.md)
 - **Built-in `single_flight` macro**: Reduce DB load.
 - **File Upload & Access Signature**: APIs for single file, image, and chunked upload; supports `local FS` and `S3-compatible` storage.
 - **KV Cache**: With TTL support, via `redis` or [`redb`](https://github.com/cberner/redb).
-- **Background Tasks**: Single-node via `sqlite`, distributed via [`faktory`](https://github.com/contribsys/faktory).
+- **Background Tasks**: Single-node via `sqlite`, distributed via `postgres`.
 - **Scheduled Task**: Supports embedded execution or separate execution.
 - **Graceful Shutdown**: Properly terminates services and releases resources.
 - **Multi-Source Config**: Supports env vars, `.env`, and CLI args.
@@ -73,13 +73,8 @@ English | [简体中文](./README_ZH_CN.md)
         <td>✅</td>
     </tr>
     <tr>
-        <td>bg_faktory</td>
-        <td>Use faktory for background tasks, suitable for distributed projects</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>bg_faktory_tls</td>
-        <td>Use faktory for background tasks with TLS enabled</td>
+        <td>bg_postgres</td>
+        <td>Use postgres for background tasks, suitable for distributed projects</td>
         <td></td>
     </tr>
     <tr>
