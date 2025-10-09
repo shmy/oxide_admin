@@ -35,7 +35,7 @@ impl Migrator {
     }
 
     async fn apply_migration(&self, conn: &mut PgConnection, migration: &Migration) -> Result<()> {
-        conn.execute(&*migration.content).await?;
+        conn.execute(migration.content).await?;
         sqlx::query(&format!(
             "INSERT INTO {}(version, checksum) VALUES($1, $2)",
             self.table_name,
@@ -75,7 +75,7 @@ impl Migrator {
                     );
                 }
             } else {
-                self.apply_migration(&mut tx, &m).await?;
+                self.apply_migration(&mut tx, m).await?;
             }
         }
         tx.commit().await?;

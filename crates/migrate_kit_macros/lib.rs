@@ -15,7 +15,7 @@ pub fn embed_dir(input: TokenStream) -> TokenStream {
         if path.is_file() {
             files.push(path);
         }
-        files.sort_by(|a, b| a.cmp(&b));
+        files.sort();
     }
 
     for path in files {

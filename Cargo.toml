@@ -17,7 +17,7 @@ members = [
     "crates/event_kit",
     "crates/flag_kit",
     "crates/kvdb_kit",
-    "crates/migrate_kit", 
+    "crates/migrate_kit",
     "crates/migrate_kit_macros",
     "crates/object_storage_kit",
     "crates/sched_kit",
@@ -37,6 +37,7 @@ axum_typed_multipart = { version = "0.16", default-features = false }
 
 bb8-redis = { version = "0.24", default-features = false }
 bg_worker_kit = { path = "crates/bg_worker_kit" }
+blake3 = { version = "1.8", default-features = false }
 bon = { version = "3.8", default-features = false }
 captcha_kit = { path = "crates/captcha_kit" }
 chrono = { version = "0.4", default-features = false }
@@ -73,7 +74,6 @@ object_storage_kit = { path = "crates/object_storage_kit" }
 open-feature = { version = "0.2", default-features = false }
 quote = { version = "1.0" }
 readonly = { version = "0.2", default-features = false }
-blake3 = { version = "1.8", default-features = false}
 
 redb = { version = "3", default-features = false }
 
