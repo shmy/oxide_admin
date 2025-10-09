@@ -34,6 +34,7 @@ chrono-tz = { workspace = true, features = ["std"] }
 
 domain = { workspace = true }
 flag_kit = { workspace = true }
+include_dir = { workspace = true }
 jsonwebtoken = { workspace = true, features = ["rust_crypto"] }
 kvdb_kit = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
@@ -63,4 +64,3 @@ testcontainers-modules = { workspace = true, features = [
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
-include_dir = { workspace = true }

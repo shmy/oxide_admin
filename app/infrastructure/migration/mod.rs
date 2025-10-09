@@ -10,15 +10,20 @@ use domain::organization::value_object::hashed_password::HashedPassword;
 use domain::organization::value_object::user_id::UserId;
 use domain::organization::{entity::role::Role, value_object::role_id::RoleId};
 use domain::shared::port::domain_repository::DomainRepository;
+use include_dir::Dir;
 use tracing::info;
 mod migrator;
+use include_dir::include_dir;
+
+const MIGRATIONS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/migration/versions");
 
 pub async fn migrate(
     pool: PgPool,
     user_repository: UserRepositoryImpl,
     role_repository: RoleRepositoryImpl,
 ) -> InfrastructureResult<()> {
-    Migrator::new(pool).migrate().await?;
+    Migrator::new(pool.clone()).migrate(&MIGRATIONS_DIR).await?;
+    insert_user_role(&pool, &user_repository, &role_repository).await?;
     Ok(())
 }
 

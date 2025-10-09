@@ -1,11 +1,8 @@
 use crate::error::InfrastructureResult;
 use include_dir::Dir;
-use include_dir::include_dir;
 use sqlx::Executor;
 use sqlx::{PgConnection, PgPool, prelude::FromRow};
 use std::collections::HashSet;
-
-static MIGRATIONS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/migration/sql");
 
 #[derive(Debug, Clone)]
 struct Migration {
@@ -17,10 +14,10 @@ struct AppliedMigration {
     version: String,
 }
 
-async fn load_migrations() -> InfrastructureResult<Vec<Migration>> {
+async fn load_migrations(dir: &Dir<'_>) -> InfrastructureResult<Vec<Migration>> {
     let mut migrations = vec![];
 
-    for file in MIGRATIONS_DIR.files() {
+    for file in dir.files() {
         let name = file
             .path()
             .file_stem()
@@ -70,7 +67,7 @@ impl Migrator {
         Self { pool }
     }
 
-    pub async fn migrate(&mut self) -> InfrastructureResult<()> {
+    pub async fn migrate(&mut self, dir: &Dir<'_>) -> InfrastructureResult<()> {
         sqlx::query(
             r#"
         CREATE TABLE IF NOT EXISTS _migrations (
@@ -82,14 +79,14 @@ impl Migrator {
         .execute(&self.pool)
         .await?;
 
-        let migrations = load_migrations().await?;
+        let migrations = load_migrations(dir).await?;
         let applied = get_applied_versions(&self.pool).await?;
 
         let pool = self.pool.clone();
         let mut tx = pool.begin().await?;
         for m in migrations {
             if !applied.contains(&m.version) {
-                apply_migration(&mut *tx, &m).await?;
+                apply_migration(&mut tx, &m).await?;
             }
         }
         tx.commit().await?;
