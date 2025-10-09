@@ -42,11 +42,11 @@ impl WorkerManager {
     }
 
     async fn resume(&self) -> Result<()> {
-        let query = "Update apalis.jobs SET status = 'Pending', done_at = NULL, lock_by = NULL, lock_at = NULL, last_error = 'Job was abandoned' WHERE status = 'Running'";
         let mut tx = self.pool.acquire().await?;
-
-        sqlx::query(query).execute(&mut *tx).await?;
-
+        sqlx::query("DELETE FROM apalis.jobs WHERE status='Done'")
+            .execute(&mut *tx)
+            .await?;
+        sqlx::query("UPDATE apalis.jobs SET status = 'Pending', done_at = NULL, lock_by = NULL, lock_at = NULL, last_error = 'Job was abandoned' WHERE status = 'Running'").execute(&mut *tx).await?;
         Ok(())
     }
 
