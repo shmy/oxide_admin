@@ -13,8 +13,6 @@ pub struct Config {
     pub database: Database,
     #[cfg(feature = "kv_redis")]
     pub redis: Redis,
-    #[cfg(feature = "bg_faktory")]
-    pub faktory: Faktory,
     pub server: Server,
     pub jwt: Jwt,
     #[cfg(feature = "object_storage_fs")]
@@ -66,14 +64,6 @@ pub struct Redis {
     pub min_idle: u32,
     pub max_lifetime: Duration,
     pub idle_timeout: Duration,
-}
-
-#[cfg(feature = "bg_faktory")]
-#[derive(Clone, Builder)]
-#[readonly::make]
-pub struct Faktory {
-    pub endpoint: String,
-    pub queue: String,
 }
 
 #[derive(Clone, Builder)]

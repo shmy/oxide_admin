@@ -7,25 +7,31 @@ edition = "2024"
 path = "lib.rs"
 
 [features]
-faktory = ["dep:faktory"]
-faktory_tls = ["faktory/rustls"]
-sqlite = ["dep:sqlx"]
+default = ["sqlite"]
+sqlite = ["dep:sqlx", "dep:apalis", "dep:apalis-core", "dep:apalis-sql"]
 
 [dependencies]
-async-trait = { version = "0.1", default-features = false }
-faktory = { version = "0.13", default-features = false, optional = true }
-futures-util = { workspace = true }
+
+apalis = { version = "0.7", default-features = false, features = [
+    "limit",
+    "tracing",
+    "retry",
+], optional = true }
+apalis-core = { version = "0.7", default-features = false, optional = true }
+apalis-sql = { version = "0.7", default-features = false, features = [
+    "migrate",
+    "postgres",
+    "sqlite",
+], optional = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["std"] }
 sqlx = { workspace = true, features = [
     "runtime-tokio",
-    "sqlite",
     "derive",
     "migrate",
 ], optional = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
-tracing = { workspace = true }
 
 [dev-dependencies]
 tempfile = { workspace = true }

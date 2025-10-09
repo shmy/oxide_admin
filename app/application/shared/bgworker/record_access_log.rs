@@ -1,9 +1,7 @@
-use bg_worker_kit::{
-    Worker,
-    error::{Result, WorkerError},
-};
+use bg_worker_kit::Worker;
+use bg_worker_kit::error::{Result, WorkerError};
 use bon::Builder;
-use nject::injectable;
+use infrastructure::shared::provider::Provider;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -12,7 +10,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, Builder)]
-pub struct RecordAccessLogParams {
+pub struct RecordAccessLog {
     user_id: String,
     method: String,
     uri: String,
@@ -23,17 +21,18 @@ pub struct RecordAccessLogParams {
     occurred_at: chrono::NaiveDateTime,
 }
 
-#[derive(Clone)]
-#[injectable]
-pub struct RecordAccessLog {
-    command_handler: CreateAccessLogCommandHandler,
-}
-
 impl Worker for RecordAccessLog {
-    const KIND: &'static str = "record_access_log";
-    type Params = RecordAccessLogParams;
+    type State = Provider;
 
-    async fn run(&self, params: Self::Params) -> Result<()> {
+    const NAME: &'static str = "record_access_log";
+
+    const CONCURRENCY: usize = 1;
+
+    const RETRIES: usize = 3;
+
+    const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30);
+
+    async fn execute(params: Self, state: &Self::State) -> Result<()> {
         let command = CreateAccessLogCommand::builder()
             .user_id(params.user_id)
             .method(params.method)
@@ -44,7 +43,8 @@ impl Worker for RecordAccessLog {
             .elapsed(params.elapsed)
             .occurred_at(params.occurred_at)
             .build();
-        self.command_handler
+        let command_handler = state.provide::<CreateAccessLogCommandHandler>();
+        command_handler
             .handle(command)
             .await
             .map_err(|e| WorkerError::Custom(e.to_string()))?;

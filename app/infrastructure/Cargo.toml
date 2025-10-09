@@ -9,8 +9,6 @@ path = "lib.rs"
 [features]
 kv_redb = ["kvdb_kit/redb"]
 kv_redis = ["kvdb_kit/redis"]
-bg_faktory = ["bg_worker_kit/faktory"]
-bg_faktory_tls = ["bg_worker_kit/faktory_tls"]
 bg_sqlite = ["bg_worker_kit/sqlite"]
 object_storage_fs = ["object_storage_kit/fs"]
 object_storage_s3 = ["object_storage_kit/s3"]

@@ -11,11 +11,11 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 fn main() -> Result<()> {
     generate_subscribers()?;
-    generate_background_workers()?;
+    generate_bgworkers()?;
     generate_scheduler_jobs()?;
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=shared/event_subscriber");
-    println!("cargo:rerun-if-changed=shared/background_worker");
+    println!("cargo:rerun-if-changed=shared/bgworker");
     println!("cargo:rerun-if-changed=shared/scheduler_job");
     Ok(())
 }
@@ -41,8 +41,8 @@ fn generate_subscribers() -> Result<()> {
     Ok(())
 }
 
-fn generate_background_workers() -> Result<()> {
-    let entries = read_rs("shared/background_worker")?;
+fn generate_bgworkers() -> Result<()> {
+    let entries = read_rs("shared/bgworker")?;
     let mut workers = Vec::new();
     for entry in entries {
         let stem = entry.file_stem().unwrap().to_string_lossy();
@@ -56,9 +56,9 @@ fn generate_background_workers() -> Result<()> {
     }
 
     let env = build_env();
-    let code = env.render_str(WORKER_TEMPLATE, JobContext { jobs: workers })?;
+    let code = env.render_str(BGWORKER_TEMPLATE, JobContext { jobs: workers })?;
     let out_dir = std::env::var("OUT_DIR")?;
-    let out_path = Path::new(&out_dir).join("background_worker.rs");
+    let out_path = Path::new(&out_dir).join("bgworker.rs");
 
     fs::write(out_path, code)?;
     Ok(())
@@ -137,46 +137,49 @@ pub struct JobContext {
     jobs: Vec<String>,
 }
 
-const WORKER_TEMPLATE: &str = r#"#[allow(unused_imports)]
-use bg_worker_kit::worker_manager::WorkerManager;
-#[allow(unused_imports)]
-use bg_worker_kit::queuer::Queuer;
-#[allow(unused_imports)]
-use bg_worker_kit::Worker;
-#[allow(unused_imports)]
-use bg_worker_kit::error::Result;
-#[allow(unused_imports)]
+const BGWORKER_TEMPLATE: &str = r#"use bg_worker_kit::WorkerManager;
+use bg_worker_kit::{Storage, StorageBackend};
+use infrastructure::shared::pg_pool::PgPool;
 use infrastructure::shared::provider::Provider;
-
-#[allow(unused_imports)]
 use nject::injectable;
+use bg_worker_kit::error::WorkerError;
 
-pub fn register_background_workers(
-    #[allow(unused)]
-    worker_manager: &mut WorkerManager,
-    #[allow(unused)]
-    provider: &Provider) {
-    {%- for job in jobs %}
+{%- for job in jobs %}
+use crate::shared::bgworker::{{job}}::{{job | pascal_case}};
+{%- endfor %}
 
-    worker_manager.register(provider.provide::<crate::shared::background_worker::{{job}}::{{job | pascal_case}}>());
-    tracing::info!("Worker [{{job | pascal_case}}] has been registered");
-    {%- endfor %}
-
-}
-{%- for item in jobs %}
-
-#[derive(Debug, Clone)]
+{%- for job in jobs %}
 #[injectable]
-pub struct {{item | pascal_case}}Queuer {
-     queuer: Queuer,
+pub struct {{job | pascal_case}}Storage {
+    pool: PgPool,
 }
 
-impl {{item | pascal_case}}Queuer {
-    pub async fn enqueue(&self, params: <crate::shared::background_worker::{{item}}::{{item | pascal_case}} as Worker>::Params) -> Result<()> {
-        self.queuer.enqueue("{{item}}", params).await
+impl {{job | pascal_case}}Storage {
+    fn storage(&self) -> StorageBackend<{{job | pascal_case}}> {
+        StorageBackend::new(self.pool.clone())
+    }
+
+    pub async fn push(&self, worker: {{job | pascal_case}}) -> Result<(), WorkerError> {
+        self.storage().push(worker).await?;
+        Ok(())
     }
 }
+
 {%- endfor %}
+pub fn register_bgworkers(
+    manager: WorkerManager,
+    provider: Provider) -> WorkerManager {
+    {%- for job in jobs %}
+    let manager = manager.register::<{{job | pascal_case}}>(
+        provider.provide::<{{job | pascal_case}}Storage>().storage(),
+        provider.clone(),
+    );
+    tracing::info!("Worker [{{job | pascal_case}}] has been registered");
+    {%- endfor %}
+   
+    manager
+
+}
 "#;
 
 const JOB_TEMPLATE: &str = r#"#[allow(unused_imports)]

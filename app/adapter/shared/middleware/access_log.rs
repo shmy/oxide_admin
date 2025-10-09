@@ -1,8 +1,8 @@
 use std::net::SocketAddr;
 
 use application::{
-    re_export::{ChronoTz, Queuer, Worker as _},
-    shared::background_worker::record_access_log::{RecordAccessLog, RecordAccessLogParams},
+    re_export::ChronoTz,
+    shared::{bgworker::record_access_log::RecordAccessLog, bgworker_impl::RecordAccessLogStorage},
 };
 use axum::{
     extract::{ConnectInfo, Request, State},
@@ -37,7 +37,7 @@ pub async fn access_log(State(state): State<WebState>, request: Request, next: N
     let status = response.status();
     let elapsed = now.elapsed();
     let ct = state.provider().provide::<ChronoTz>();
-    let params = RecordAccessLogParams::builder()
+    let job = RecordAccessLog::builder()
         .user_id(valid_user.0.to_string())
         .method(method)
         .uri(uri)
@@ -49,8 +49,8 @@ pub async fn access_log(State(state): State<WebState>, request: Request, next: N
         .build();
     if let Err(err) = state
         .provider()
-        .provide::<Queuer>()
-        .enqueue(RecordAccessLog::KIND, params)
+        .provide::<RecordAccessLogStorage>()
+        .push(job)
         .await
     {
         tracing::error!(error = %err, "Failed to enqueue record_access_log");

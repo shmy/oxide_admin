@@ -1,4 +1,4 @@
-pub mod background_worker;
+pub mod bgworker;
 pub mod cache_provider;
 pub mod command_handler;
 pub mod dto;
@@ -9,8 +9,8 @@ pub mod paging_result;
 pub mod query_handler;
 pub mod scheduler_job;
 
-pub mod background_worker_impl {
-    include!(concat!(env!("OUT_DIR"), "/background_worker.rs"));
+pub mod bgworker_impl {
+    include!(concat!(env!("OUT_DIR"), "/bgworker.rs"));
 }
 
 pub mod event_subscriber_impl {

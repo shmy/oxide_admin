@@ -3,14 +3,12 @@ use anyhow::Result;
 use application::{
     re_export::WorkspaceRef,
     shared::{
-        background_worker_impl::register_background_workers,
-        event_subscriber_impl::register_event_subscribers,
+        bgworker_impl::register_bgworkers, event_subscriber_impl::register_event_subscribers,
         scheduler_job_impl::register_scheduled_jobs,
     },
 };
 use axum::Router;
-use bg_worker_kit::queuer::Queuer;
-use bg_worker_kit::worker_manager::WorkerManager;
+use bg_worker_kit::WorkerManager;
 use infrastructure::{migration, shared::pg_pool::PgPool, shared::provider::Provider};
 use infrastructure::{
     port::sched_receiver_impl::SchedReceiverImpl,
@@ -42,12 +40,12 @@ pub async fn serve(config: ConfigRef) -> Result<()> {
     #[cfg(feature = "serve_with_sched")]
     let (_, worker_manager, sched) = try_join!(
         run_migration(&provider),
-        build_worker_manager(&provider),
+        build_bgworker_manager(&provider),
         build_scheduler_job(&provider),
     )?;
     #[cfg(not(feature = "serve_with_sched"))]
     let (_, worker_manager) =
-        try_join!(run_migration(&provider), build_worker_manager(&provider),)?;
+        try_join!(run_migration(&provider), build_bgworker_manager(&provider),)?;
     register_event_subscribers(&provider);
     let pg_pool = provider.provide::<PgPool>();
     let kvdb = provider.provide::<Kvdb>();
@@ -114,10 +112,9 @@ async fn build_listener(server: &Server) -> Result<TcpListener> {
 }
 
 async fn build_provider(config: &ConfigRef, workspace: WorkspaceRef) -> Result<Provider> {
-    let (pg_pool, kvdb, queuer, object_storage, feature_flag) = tokio::try_join!(
+    let (pg_pool, kvdb, object_storage, feature_flag) = tokio::try_join!(
         build_pg_pool(config),
         build_kvdb(config, &workspace),
-        build_queuer(config, &workspace),
         build_object_storage(config, &workspace),
         build_feature_flag(config),
     )?;
@@ -125,25 +122,12 @@ async fn build_provider(config: &ConfigRef, workspace: WorkspaceRef) -> Result<P
         .pg_pool(pg_pool)
         .kvdb(kvdb)
         .config(config.clone())
-        .queuer(queuer)
         .object_storage(object_storage)
         .feature_flag(feature_flag)
         .chrono_tz(ChronoTz::builder().tz(config.timezone).build())
         .workspace(workspace)
         .build();
     Ok(provider)
-}
-
-#[allow(unused_variables)]
-async fn build_queuer(config: &ConfigRef, workspace: &WorkspaceRef) -> Result<Queuer> {
-    #[cfg(feature = "bg_faktory")]
-    return Ok(Queuer::try_new(&config.faktory.endpoint, &config.faktory.queue).await?);
-    #[cfg(feature = "bg_sqlite")]
-    return {
-        use bg_worker_kit::helper::connect_sqlite;
-        let pool = connect_sqlite(workspace.data_dir().join("job.sqlite")).await?;
-        Ok(Queuer::new(pool))
-    };
 }
 
 async fn build_object_storage(
@@ -206,19 +190,10 @@ async fn build_kvdb(config: &ConfigRef, workspace: &WorkspaceRef) -> Result<Kvdb
     };
 }
 
-async fn build_worker_manager(provider: &Provider) -> Result<WorkerManager> {
-    #[cfg(feature = "bg_faktory")]
-    let mut worker_manager = {
-        let config = &provider.provide::<ConfigRef>();
-        WorkerManager::new(&config.faktory.endpoint, &config.faktory.queue)
-    };
-    #[cfg(feature = "bg_sqlite")]
-    let mut worker_manager = {
-        let queuer = provider.provide::<Queuer>();
-        WorkerManager::new(queuer)
-    };
-    register_background_workers(&mut worker_manager, provider);
-    Ok(worker_manager)
+async fn build_bgworker_manager(provider: &Provider) -> Result<WorkerManager> {
+    let manager = WorkerManager::try_new(provider.provide::<PgPool>()).await?;
+    let manager = register_bgworkers(manager, provider.clone());
+    Ok(manager)
 }
 
 async fn build_scheduler_job(
@@ -266,13 +241,11 @@ async fn start_scheduler_job(
     Ok(())
 }
 
-async fn start_background_worker(
-    mut worker_manager: WorkerManager,
-    notify: Arc<Notify>,
-) -> Result<()> {
+async fn start_background_worker(worker_manager: WorkerManager, notify: Arc<Notify>) -> Result<()> {
     let shutdown = async move {
         notify.notified().await;
         info!("Received shutdown signal, shutting down background worker...");
+        Ok(())
     };
     worker_manager.run_with_signal(shutdown).await?;
     info!("Background worker shutdown complete");
