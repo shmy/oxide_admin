@@ -18,6 +18,9 @@ pub type StorageBackend<T, C = JsonCodec<String>> = apalis_sql::sqlite::SqliteSt
 pub type StorageBackend<T, C = JsonCodec<serde_json::Value>> =
     apalis_sql::postgres::PostgresStorage<T, C>;
 
+#[cfg(feature = "sqlite")]
+pub mod sqlite_helper;
+
 pub struct WorkerManager {
     pool: Pool,
     monitor: Monitor,
@@ -43,17 +46,24 @@ impl WorkerManager {
 
     async fn resume(&self) -> Result<()> {
         let mut tx = self.pool.acquire().await?;
-        sqlx::query("DELETE FROM apalis.jobs WHERE status='Done'")
-            .execute(&mut *tx)
-            .await?;
-        sqlx::query("UPDATE apalis.jobs SET status = 'Pending', done_at = NULL, lock_by = NULL, lock_at = NULL, last_error = 'Job was abandoned' WHERE status = 'Running'").execute(&mut *tx).await?;
+        #[cfg(feature = "sqlite")]
+        let query = "DELETE FROM Jobs WHERE status='Done'";
+        #[cfg(feature = "postgres")]
+        let query = "DELETE FROM apalis.jobs WHERE status='Done'";
+        sqlx::query(query).execute(&mut *tx).await?;
+        #[cfg(feature = "sqlite")]
+        let query = "UPDATE Jobs SET status = 'Pending', done_at = NULL, lock_by = NULL, lock_at = NULL, last_error = 'Job was abandoned' WHERE status = 'Running'";
+        #[cfg(feature = "postgres")]
+        let query = "UPDATE apalis.jobs SET status = 'Pending', done_at = NULL, lock_by = NULL, lock_at = NULL, last_error = 'Job was abandoned' WHERE status = 'Running'";
+        sqlx::query(query).execute(&mut *tx).await?;
         Ok(())
     }
 
-    pub fn register<T>(mut self, backend: StorageBackend<T>, data: T::State) -> Self
+    pub fn register<T>(mut self, data: T::State) -> (Self, StorageBackend<T>)
     where
         T: Worker,
     {
+        let backend = StorageBackend::new(self.pool.clone());
         let worker = WorkerBuilder::new(T::NAME)
             .enable_tracing()
             .concurrency(T::CONCURRENCY)
@@ -67,7 +77,7 @@ impl WorkerManager {
                 }
             });
         self.monitor = self.monitor.register(worker);
-        self
+        (self, backend)
     }
 
     pub async fn run_with_signal<S>(self, signal: S) -> Result<()>

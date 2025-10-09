@@ -47,12 +47,7 @@ pub async fn access_log(State(state): State<WebState>, request: Request, next: N
         .elapsed(elapsed.as_millis() as i64)
         .occurred_at(ct.now())
         .build();
-    if let Err(err) = state
-        .provider()
-        .provide::<RecordAccessLogStorage>()
-        .push(job)
-        .await
-    {
+    if let Err(err) = RecordAccessLogStorage::push(job).await {
         tracing::error!(error = %err, "Failed to enqueue record_access_log");
     }
     response

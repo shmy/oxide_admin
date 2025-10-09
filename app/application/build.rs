@@ -110,6 +110,9 @@ fn build_env() -> Environment<'static> {
     let mut env = Environment::new();
     env.add_filter("pascal_case", |s: String| s.to_pascal_case());
     env.add_filter("uppercase", |s: String| s.to_uppercase());
+    env.add_filter("screaming_snake_case", |s: String| {
+        s.to_screaming_snake_case()
+    });
     env
 }
 
@@ -139,28 +142,27 @@ pub struct JobContext {
 
 const BGWORKER_TEMPLATE: &str = r#"use bg_worker_kit::WorkerManager;
 use bg_worker_kit::{Storage, StorageBackend};
-use infrastructure::shared::pg_pool::PgPool;
 use infrastructure::shared::provider::Provider;
-use nject::injectable;
 use bg_worker_kit::error::WorkerError;
+use std::sync::OnceLock;
 
 {%- for job in jobs %}
 use crate::shared::bgworker::{{job}}::{{job | pascal_case}};
 {%- endfor %}
 
 {%- for job in jobs %}
-#[injectable]
-pub struct {{job | pascal_case}}Storage {
-    pool: PgPool,
-}
+static {{job | screaming_snake_case}}: OnceLock<StorageBackend<{{job | pascal_case}}>> = OnceLock::new();
+{%- endfor %}
+
+{%- for job in jobs %}
+pub struct {{job | pascal_case}}Storage;
 
 impl {{job | pascal_case}}Storage {
-    fn storage(&self) -> StorageBackend<{{job | pascal_case}}> {
-        StorageBackend::new(self.pool.clone())
-    }
-
-    pub async fn push(&self, worker: {{job | pascal_case}}) -> Result<(), WorkerError> {
-        self.storage().push(worker).await?;
+  
+    pub async fn push(job: {{job | pascal_case}}) -> Result<(), WorkerError> {
+        if let Some(backend) = {{job | screaming_snake_case}}.get() {
+            backend.clone().push(job).await?;
+        }
         Ok(())
     }
 }
@@ -170,10 +172,10 @@ pub fn register_bgworkers(
     manager: WorkerManager,
     provider: Provider) -> WorkerManager {
     {%- for job in jobs %}
-    let manager = manager.register::<{{job | pascal_case}}>(
-        provider.provide::<{{job | pascal_case}}Storage>().storage(),
+    let (manager, backend) = manager.register::<{{job | pascal_case}}>(
         provider.clone(),
     );
+    {{job | screaming_snake_case}}.set(backend).expect("Failed to set backend");
     tracing::info!("Worker [{{job | pascal_case}}] has been registered");
     {%- endfor %}
    

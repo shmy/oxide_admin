@@ -191,6 +191,15 @@ async fn build_kvdb(config: &ConfigRef, workspace: &WorkspaceRef) -> Result<Kvdb
 }
 
 async fn build_bgworker_manager(provider: &Provider) -> Result<WorkerManager> {
+    #[cfg(feature = "bg_sqlite")]
+    let manager = {
+        use bg_worker_kit::sqlite_helper::new_sqlite_pool;
+        let workspace = provider.provide::<WorkspaceRef>();
+        let pool =
+            new_sqlite_pool(workspace.data_dir().join("worker.db").to_string_lossy()).await?;
+        WorkerManager::try_new(pool).await?
+    };
+    #[cfg(feature = "bg_postgres")]
     let manager = WorkerManager::try_new(provider.provide::<PgPool>()).await?;
     let manager = register_bgworkers(manager, provider.clone());
     Ok(manager)
