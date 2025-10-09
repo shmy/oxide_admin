@@ -10,6 +10,7 @@ const captchaWrapperEl = document.getElementById("captcha-wrapper") as HTMLDivEl
 const captchaKeyEl = document.getElementById("captcha-key") as HTMLInputElement;
 const captchaValueEl = document.getElementById("captcha") as HTMLInputElement;
 const loadingTplEl = document.getElementById("loading-tpl") as HTMLTemplateElement;
+const errorTplEl = document.getElementById("error-tpl") as HTMLTemplateElement;
 
 const redirect =
   new URLSearchParams(window.location.search).get("redirect") ??
@@ -24,9 +25,13 @@ let captchaImageUrl = '';
 
 const setRefreshing = (refreshing: boolean) => {
   if (refreshing) {
+    captchaImageUrl = "";
     captchaKeyEl.value = "";
     captchaValueEl.value = "";
     captchaWrapperEl.innerHTML = loadingTplEl.innerHTML;
+  }
+  else if (captchaImageUrl === "") {
+    captchaWrapperEl.innerHTML = errorTplEl.innerHTML;
   }
   captchaRefreshing = refreshing;
 };
@@ -58,6 +63,7 @@ const refreshCaptcha = () => {
     return;
   }
 
+  setError("");
   setRefreshing(true);
   xior
     .get("/api/auth/captcha", {
@@ -69,7 +75,18 @@ const refreshCaptcha = () => {
         captchaKeyEl.value = key;
         const objectUrl = window.URL.createObjectURL(res.data);
         setCaptchaImageUrl(objectUrl);
+      } else {
+        res.data.text().then((text: string) => {
+          try {
+            let json = JSON.parse(text);
+            setError(json.msg);
+          } catch (_) {
+            setError(text);
+          }
+        });
       }
+    }).catch(e => {
+      setError(e.message);
     }).finally(() => {
       setRefreshing(false);
     });

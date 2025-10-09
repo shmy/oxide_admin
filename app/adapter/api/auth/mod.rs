@@ -111,5 +111,5 @@ pub fn routing() -> OpenApiRouter<WebState> {
     OpenApiRouter::new()
         .routes(routes!(sign_in).rate_limit_layer(Duration::from_secs(3), 1))
         .routes(routes!(refresh_token).rate_limit_layer(Duration::from_secs(5), 1))
-        .routes(routes!(refresh_captcha))
+        .routes(routes!(refresh_captcha).rate_limit_layer(Duration::from_secs(5), 5))
 }
