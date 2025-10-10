@@ -4,6 +4,8 @@ use std::time::Duration;
 use crate::error::{Result, WorkerError};
 use apalis::layers::WorkerBuilderExt as _;
 use apalis::layers::retry::RetryPolicy;
+pub use apalis::prelude::BackendExpose;
+pub use apalis::prelude::Stat;
 use apalis::prelude::{Data, Monitor, WorkerBuilder, WorkerFactoryFn as _};
 use apalis_core::codec::json::JsonCodec;
 pub use apalis_core::storage::Storage;
@@ -24,41 +26,38 @@ pub mod sqlite_helper;
 pub struct WorkerManager {
     pool: Pool,
     monitor: Monitor,
+    table_name: &'static str,
 }
 
 impl WorkerManager {
     pub async fn try_new(pool: Pool) -> Result<Self> {
+        #[cfg(feature = "sqlite")]
+        let table_name = "Jobs";
+        #[cfg(feature = "postgres")]
+        let table_name = "apalis.jobs";
         let instance = Self {
-            pool,
+            pool: pool.clone(),
             monitor: Monitor::new(),
+            table_name,
         };
-        instance.migrate().await?;
-        instance.resume().await?;
+        instance.setup().await?;
         Ok(instance)
     }
 }
 
 impl WorkerManager {
-    async fn migrate(&self) -> Result<()> {
+    async fn setup(&self) -> Result<()> {
         #[cfg(feature = "sqlite")]
         tracing::info!("Choosing database backend: SQLite");
         #[cfg(feature = "postgres")]
         tracing::info!("Choosing database backend: PosgreSQL");
         StorageBackend::setup(&self.pool).await?;
-        Ok(())
-    }
-
-    async fn resume(&self) -> Result<()> {
         let mut tx = self.pool.acquire().await?;
-        #[cfg(feature = "sqlite")]
-        let table_name = "Jobs";
-        #[cfg(feature = "postgres")]
-        let table_name = "apalis.jobs";
-        let query = format!("DELETE FROM {} WHERE status='Done'", table_name);
+        let query = format!("DELETE FROM {} WHERE status='Done'", self.table_name);
         sqlx::query(&query).execute(&mut *tx).await?;
         let query = format!(
             "UPDATE {} SET status = 'Pending', done_at = NULL, lock_by = NULL, lock_at = NULL, last_error = 'Job was abandoned' WHERE status = 'Running'",
-            table_name
+            self.table_name
         );
         sqlx::query(&query).execute(&mut *tx).await?;
         Ok(())

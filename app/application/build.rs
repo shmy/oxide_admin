@@ -145,24 +145,34 @@ use bg_worker_kit::{Storage, StorageBackend};
 use infrastructure::shared::provider::Provider;
 use bg_worker_kit::error::WorkerError;
 use std::sync::OnceLock;
+use bg_worker_kit::Stat;
+use bg_worker_kit::BackendExpose as _;
 
 {%- for job in jobs %}
 use crate::shared::bgworker::{{job}}::{{job | pascal_case}};
 {%- endfor %}
 
 {%- for job in jobs %}
-static {{job | screaming_snake_case}}_WORKER: OnceLock<StorageBackend<{{job | pascal_case}}>> = OnceLock::new();
+static {{job | screaming_snake_case}}_BACKEND: OnceLock<StorageBackend<{{job | pascal_case}}>> = OnceLock::new();
 {%- endfor %}
 
 {%- for job in jobs %}
+pub struct {{job | pascal_case}}Impl;
 
-impl {{job | pascal_case}} {
-    pub async fn enqueue(self) -> Result<(), WorkerError> {
-        if let Some(backend) = {{job | screaming_snake_case}}_WORKER.get() {
+impl {{job | pascal_case}}Impl {
+    pub async fn enqueue(worker: {{job | pascal_case}}) -> Result<(), WorkerError> {
+        if let Some(backend) = {{job | screaming_snake_case}}_BACKEND.get() {
             let mut backend = backend.to_owned();
-            backend.push(self).await?;
+            backend.push(worker).await?;
         }
         Ok(())
+    }
+
+    pub async fn stats() -> Stat {
+        if let Some(backend) = {{job | screaming_snake_case}}_BACKEND.get() {
+            return backend.stats().await.unwrap_or_default();
+        }
+        Stat::default()
     }
 }
 
@@ -172,7 +182,7 @@ pub fn register_bgworkers(manager: WorkerManager, provider: Provider) -> WorkerM
     let (manager, backend) = manager.register::<{{job | pascal_case}}>(
         provider.clone(),
     );
-    {{job | screaming_snake_case}}_WORKER.set(backend).expect("Failed to set backend");
+    {{job | screaming_snake_case}}_BACKEND.set(backend).expect("Failed to set backend");
     tracing::info!("Worker [{{job | pascal_case}}] has been registered");
     {%- endfor %}
    
