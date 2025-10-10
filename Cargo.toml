@@ -12,7 +12,7 @@ members = [
     "bin/migrate",
     "bin/server",
     "bin/xtask",
-    "crates/bg_worker_kit",
+    "crates/bg_worker_kit", "crates/cache_kit", "crates/cache_kit_macros",
     "crates/captcha_kit",
     "crates/event_kit",
     "crates/flag_kit",

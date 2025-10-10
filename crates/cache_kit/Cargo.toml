@@ -1,0 +1,20 @@
+[package]
+name = "cache_kit"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "lib.rs"
+
+[features]
+default = ["moka"]
+moka = ["dep:moka"]
+
+[dependencies]
+moka = { version = "0.12", default-features = false, features = [
+    "future",
+], optional = true }
+chrono = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+minicbor-serde = { workspace = true, features = ["alloc"] }

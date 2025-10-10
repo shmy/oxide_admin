@@ -1,0 +1,10 @@
+[package]
+name = "cache_kit_macros"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "lib.rs"
+proc-macro = true
+
+[dependencies]
