@@ -155,14 +155,12 @@ static {{job | screaming_snake_case}}_WORKER: OnceLock<StorageBackend<{{job | pa
 {%- endfor %}
 
 {%- for job in jobs %}
-pub struct {{job | pascal_case}}Storage;
 
-impl {{job | pascal_case}}Storage {
-  
-    pub async fn push(worker: {{job | pascal_case}}) -> Result<(), WorkerError> {
+impl {{job | pascal_case}} {
+    pub async fn enqueue(self) -> Result<(), WorkerError> {
         if let Some(backend) = {{job | screaming_snake_case}}_WORKER.get() {
             let mut backend = backend.to_owned();
-            backend.push(worker).await?;
+            backend.push(self).await?;
         }
         Ok(())
     }
