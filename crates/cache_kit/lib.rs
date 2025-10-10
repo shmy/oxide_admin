@@ -4,6 +4,7 @@ mod moka;
 #[cfg(feature = "redis")]
 mod redis;
 mod serde_util;
+pub use cache_kit_macros::cached_impl;
 use std::time::Duration;
 
 use serde::{Serialize, de::DeserializeOwned};

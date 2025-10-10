@@ -1,5 +1,5 @@
 use bon::Builder;
-use cache_kit::Cache;
+use cache_kit::{Cache, cached_impl};
 use domain::{
     auth::value_object::{menu::Menu, permission::Permission},
     organization::error::OrganizationError,
@@ -52,13 +52,15 @@ pub struct SearchRolesQueryHandler {
     cache_provider: CacheProvider,
 }
 
+#[cached_impl]
 impl QueryHandler for SearchRolesQueryHandler {
     type Query = SearchRolesQuery;
     type Output = PagingResult<RoleDto>;
     type Error = OrganizationError;
 
-    #[single_flight]
     #[tracing::instrument]
+    #[single_flight]
+    #[cached]
     async fn query(
         &self,
         query: SearchRolesQuery,
@@ -107,20 +109,5 @@ impl QueryHandler for SearchRolesQueryHandler {
         .fetch_all(&self.pool);
         let (total, rows) = tokio::try_join!(total_future, rows_future)?;
         Ok(PagingResult { total, items: rows })
-    }
-}
-
-impl SearchRolesQueryHandler {
-    #[tracing::instrument]
-    pub async fn clean_cache(&self) -> ApplicationResult<()> {
-        self.cache_provider.clear().await
-    }
-
-    #[tracing::instrument]
-    pub async fn query_cached(
-        &self,
-        query: SearchRolesQuery,
-    ) -> Result<PagingResult<RoleDto>, OrganizationError> {
-        self.cache_provider.get_with(query, |q| self.query(q)).await
     }
 }

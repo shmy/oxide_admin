@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use bon::Builder;
-use cache_kit::Cache;
+use cache_kit::{Cache, cached_impl};
 use domain::organization::{error::OrganizationError, value_object::role_id::RoleId};
 use infrastructure::shared::pg_pool::PgPool;
 use nject::injectable;
@@ -50,13 +50,15 @@ pub struct SearchUsersQueryHandler {
     cache_provider: CacheProvider,
 }
 
+#[cached_impl]
 impl QueryHandler for SearchUsersQueryHandler {
     type Query = SearchUsersQuery;
     type Output = PagingResult<UserDto>;
     type Error = OrganizationError;
 
-    #[single_flight]
     #[tracing::instrument]
+    #[single_flight]
+    #[cached]
     async fn query(
         &self,
         query: SearchUsersQuery,
@@ -118,20 +120,5 @@ impl QueryHandler for SearchUsersQueryHandler {
         .fetch_all(&self.pool);
         let (total, rows) = tokio::try_join!(total_future, rows_future)?;
         Ok(PagingResult { total, items: rows })
-    }
-}
-
-impl SearchUsersQueryHandler {
-    #[tracing::instrument]
-    pub async fn clean_cache(&self) -> ApplicationResult<()> {
-        self.cache_provider.clear().await
-    }
-
-    #[tracing::instrument]
-    pub async fn query_cached(
-        &self,
-        query: SearchUsersQuery,
-    ) -> Result<PagingResult<UserDto>, OrganizationError> {
-        self.cache_provider.get_with(query, |q| self.query(q)).await
     }
 }

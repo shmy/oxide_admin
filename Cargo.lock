@@ -656,6 +656,7 @@ name = "cache_kit"
 version = "0.1.0"
 dependencies = [
  "bb8-redis",
+ "cache_kit_macros",
  "chrono",
  "minicbor-serde",
  "moka",
@@ -667,6 +668,10 @@ dependencies = [
 [[package]]
 name = "cache_kit_macros"
 version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "captcha_kit"

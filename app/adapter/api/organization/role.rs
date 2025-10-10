@@ -58,7 +58,7 @@ async fn search(
     Inject(query_handler): Inject<SearchRolesQueryHandler>,
     Query(query): Query<SearchRolesQuery>,
 ) -> JsonResponsePagingType<RoleDto> {
-    let PagingResult { total, items } = query_handler.query_cached(query).await?;
+    let PagingResult { total, items } = query_handler.cached_query(query).await?;
     JsonResponse::ok(PagingResponse { total, items })
 }
 

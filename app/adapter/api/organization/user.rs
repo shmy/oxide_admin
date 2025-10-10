@@ -59,7 +59,7 @@ async fn search(
     Inject(service): Inject<AuthService>,
     Query(query): Query<SearchUsersQuery>,
 ) -> JsonResponsePagingType<UserDto> {
-    let PagingResult { total, mut items } = query_handler.query_cached(query).await?;
+    let PagingResult { total, mut items } = query_handler.cached_query(query).await?;
     service.replenish_user_portrait(&mut items).await;
     JsonResponse::ok(PagingResponse { total, items })
 }

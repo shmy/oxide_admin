@@ -13,6 +13,7 @@ redis = ["dep:bb8-redis"]
 [dependencies]
 bb8-redis = { workspace = true, optional = true }
 chrono = { workspace = true }
+cache_kit_macros = { workspace = true }
 minicbor-serde = { workspace = true, features = ["alloc"] }
 moka = { version = "0.12", default-features = false, features = [
     "future",
