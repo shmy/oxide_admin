@@ -1,4 +1,3 @@
-[ ] 改进cache
 [ ] 操作日志
 [ ] 用户绑定部门
 [ ] Frontend code generation
