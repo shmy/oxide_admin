@@ -10,6 +10,7 @@ path = "lib.rs"
 axum = { workspace = true }
 bg_worker_kit = { workspace = true }
 bon = { workspace = true }
+cache_kit = { workspace = true }
 chrono = { workspace = true }
 domain = { workspace = true }
 event_kit = { workspace = true }
@@ -18,7 +19,6 @@ image = { workspace = true, features = ["png", "webp", "jpeg"] }
 imageformat = { workspace = true }
 infrastructure = { workspace = true }
 kvdb_kit = { workspace = true }
-cache_kit = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 object_storage_kit = { workspace = true }
 sched_kit = { workspace = true }

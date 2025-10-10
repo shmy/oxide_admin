@@ -13,10 +13,10 @@ redis = ["dep:bb8-redis"]
 [dependencies]
 bb8-redis = { workspace = true, optional = true }
 chrono = { workspace = true }
-serde_json = { workspace = true, features = ["std"] }
 minicbor-serde = { workspace = true, features = ["alloc"] }
 moka = { version = "0.12", default-features = false, features = [
     "future",
 ], optional = true }
 serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true, features = ["std"] }
 thiserror = { workspace = true }

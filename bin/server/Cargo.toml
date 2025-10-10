@@ -27,10 +27,7 @@ cache_moka = ["infrastructure/cache_moka"]
 cache_redis = ["infrastructure/cache_redis"]
 object_storage_fs = ["infrastructure/object_storage_fs"]
 object_storage_s3 = ["infrastructure/object_storage_s3"]
-object_storage_s3_tls = [
-    "object_storage_s3",
-    "infrastructure/object_storage_s3_tls",
-]
+object_storage_s3_tls = ["object_storage_s3", "infrastructure/object_storage_s3_tls"]
 trace_console = ["trace_kit/console"]
 trace_rolling = ["trace_kit/rolling", "infrastructure/trace_rolling"]
 trace_otlp = [
@@ -56,6 +53,7 @@ anyhow = { workspace = true }
 application = { workspace = true }
 axum = { workspace = true }
 bg_worker_kit = { workspace = true }
+cache_kit = { workspace = true }
 chrono-tz = { workspace = true }
 clap = { workspace = true, features = [
     "std",
@@ -74,7 +72,6 @@ sched_kit = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 trace_kit = { workspace = true }
 tracing = { workspace = true }
-cache_kit = { workspace = true }
 
 [dev-dependencies]
 reqwest = { version = "0.12", default-features = false, features = ["json"] }

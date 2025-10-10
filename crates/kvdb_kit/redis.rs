@@ -1,8 +1,8 @@
-use crate::{IterItem, KvItem, KvJson, error::Result};
+use crate::error::Result;
 use bb8_redis::{
     RedisConnectionManager,
     bb8::Pool,
-    redis::{AsyncCommands as _, cmd, pipe},
+    redis::{AsyncCommands as _, cmd},
 };
 use bon::Builder;
 use chrono::Utc;
@@ -90,82 +90,11 @@ impl RedisKvdb {
 }
 impl KvdbTrait for RedisKvdb {
     async fn get<T: DeserializeOwned>(&self, key: &str) -> Option<T> {
-        self.get_raw(key)
-            .await
-            .and_then(|item| serde_util::cbor_decode::<T>(&item.value).ok())
-    }
-
-    async fn get_raw(&self, key: &str) -> Option<KvItem> {
         let mut conn = self.pool.get().await.ok()?;
-        let results: (Option<Vec<u8>>, i64) = pipe()
-            .get(key)
-            .ttl(key)
-            .query_async(&mut *conn)
+        conn.get(key)
             .await
-            .ok()?;
-
-        let (value, ttl) = results;
-        let expired_at = if ttl > 0 {
-            Some(chrono::Utc::now().timestamp() + ttl)
-        } else {
-            None
-        };
-
-        value.map(|v| KvItem {
-            value: v,
-            expired_at,
-        })
-    }
-
-    async fn get_raw_string(&self, key: &str) -> Option<KvJson> {
-        self.get_raw(key).await.and_then(|item| {
-            serde_util::cbor_decode::<serde_json::Value>(&item.value)
-                .ok()
-                .map(|value| KvJson {
-                    value,
-                    expired_at: item.expired_at,
-                })
-        })
-    }
-
-    async fn iter_prefix(&self, prefix: &str) -> Result<Vec<IterItem>> {
-        let mut conn = self.pool.get().await?;
-        let mut cursor: u64 = 0;
-        let mut all_items = Vec::new();
-
-        loop {
-            let (next_cursor, keys): (u64, Vec<String>) = cmd("SCAN")
-                .cursor_arg(cursor)
-                .arg("MATCH")
-                .arg(format!("{}*", prefix))
-                .arg("COUNT")
-                .arg(1000)
-                .query_async(&mut *conn)
-                .await?;
-
-            if !keys.is_empty() {
-                let mut pipe = pipe();
-                for k in &keys {
-                    pipe.pttl(k);
-                }
-                let ttls: Vec<i64> = pipe.query_async(&mut *conn).await?;
-                for (k, ttl) in keys.into_iter().zip(ttls.into_iter()) {
-                    let expired_at = if ttl > 0 {
-                        Some((chrono::Utc::now().timestamp_millis() + ttl) / 1000)
-                    } else {
-                        None
-                    };
-                    all_items.push(IterItem { key: k, expired_at });
-                }
-            }
-
-            if next_cursor == 0 {
-                break;
-            }
-            cursor = next_cursor;
-        }
-
-        Ok(all_items)
+            .ok()
+            .and_then(|v: Vec<u8>| serde_util::cbor_decode(&v).ok())
     }
 
     async fn set_with_ex<T: Serialize>(
