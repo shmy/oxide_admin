@@ -19,14 +19,14 @@ fn hash_encode(query: &impl Hash) -> u64 {
 pub const CACHE_PREFIX: &str = "cache:";
 #[derive(Debug, Clone, Builder)]
 pub struct CacheProvider {
-    key: &'static str,
+    prefix: &'static str,
     ttl: Duration,
     kvdb: Kvdb,
 }
 
 impl CacheProvider {
     fn fill_key(&self) -> String {
-        format!("{}{}", CACHE_PREFIX, self.key)
+        format!("{}{}", CACHE_PREFIX, self.prefix)
     }
     #[tracing::instrument]
     pub async fn clear(&self) -> ApplicationResult<()> {
