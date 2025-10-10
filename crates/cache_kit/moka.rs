@@ -25,16 +25,16 @@ fn now_timestamp() -> u64 {
 }
 
 #[derive(Clone)]
-pub struct MokaCache {
+pub struct MokaCacheImpl {
     cache: Cache<String, CacheItem>,
 }
 
-impl MokaCache {
-    pub fn new(max_capacity: u64) -> Self {
+impl MokaCacheImpl {
+    pub fn new(max_capacity: u64, time_to_idle: Duration) -> Self {
         Self {
             cache: Cache::builder()
                 .max_capacity(max_capacity)
-                .time_to_idle(Duration::from_secs(60 * 60 * 24))
+                .time_to_idle(time_to_idle)
                 .build(),
         }
     }
@@ -58,7 +58,7 @@ impl MokaCache {
     }
 }
 
-impl CacheTrait for MokaCache {
+impl CacheTrait for MokaCacheImpl {
     async fn get<T>(&self, key: &str) -> Option<T>
     where
         T: DeserializeOwned,
