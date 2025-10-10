@@ -11,10 +11,10 @@ default = ["moka"]
 moka = ["dep:moka"]
 
 [dependencies]
+chrono = { workspace = true }
+minicbor-serde = { workspace = true, features = ["alloc"] }
 moka = { version = "0.12", default-features = false, features = [
     "future",
 ], optional = true }
-chrono = { workspace = true }
-thiserror = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-minicbor-serde = { workspace = true, features = ["alloc"] }
+thiserror = { workspace = true }

@@ -16,8 +16,12 @@ impl CacheItem {
         if self.expires_at == 0 {
             return false;
         }
-        chrono::Utc::now().timestamp() as u64 >= self.expires_at
+        now_timestamp() >= self.expires_at
     }
+}
+
+fn now_timestamp() -> u64 {
+    chrono::Utc::now().timestamp() as u64
 }
 
 #[derive(Clone)]
@@ -78,7 +82,7 @@ impl CacheTrait for MokaCache {
     where
         T: Serialize,
     {
-        let expires_at = chrono::Utc::now().timestamp() as u64 + ttl.as_secs();
+        let expires_at = now_timestamp() + ttl.as_secs();
         self.insert_inner(key, value, expires_at).await
     }
 }
