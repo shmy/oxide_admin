@@ -7,16 +7,16 @@ edition = "2024"
 path = "lib.rs"
 
 [features]
-default = ["moka", "redis"]
 moka = ["dep:moka"]
 redis = ["dep:bb8-redis"]
 
 [dependencies]
+bb8-redis = { workspace = true, optional = true }
 chrono = { workspace = true }
+serde_json = { workspace = true, features = ["std"] }
 minicbor-serde = { workspace = true, features = ["alloc"] }
-serde = { workspace = true, features = ["derive"] }
-thiserror = { workspace = true }
 moka = { version = "0.12", default-features = false, features = [
     "future",
 ], optional = true }
-bb8-redis = { workspace = true, optional = true }
+serde = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }

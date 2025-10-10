@@ -5,9 +5,15 @@ use bb8_redis::redis::AsyncCommands as _;
 use bb8_redis::{RedisConnectionManager, bb8::Pool};
 use serde::{Serialize, de::DeserializeOwned};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct RedisCacheImpl {
     pool: Pool<RedisConnectionManager>,
+}
+
+impl RedisCacheImpl {
+    pub fn new(pool: Pool<RedisConnectionManager>) -> Self {
+        Self { pool }
+    }
 }
 
 impl CacheTrait for RedisCacheImpl {

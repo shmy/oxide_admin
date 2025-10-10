@@ -3,6 +3,7 @@ use crate::shared::{
     workspace::WorkspaceRef,
 };
 use bon::Builder;
+use cache_kit::Cache;
 use kvdb_kit::Kvdb;
 use nject::provider;
 use object_storage_kit::ObjectStorage;
@@ -16,6 +17,8 @@ pub struct Provider {
     object_storage: ObjectStorage,
     #[provide(Kvdb, |dep| dep.clone())]
     kvdb: Kvdb,
+    #[provide(Cache, |dep| dep.clone())]
+    cache: Cache,
     #[provide(ConfigRef, |dep| dep.clone())]
     config: ConfigRef,
     #[provide(FeatureFlag, |dep| dep.clone())]

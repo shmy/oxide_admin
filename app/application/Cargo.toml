@@ -18,6 +18,7 @@ image = { workspace = true, features = ["png", "webp", "jpeg"] }
 imageformat = { workspace = true }
 infrastructure = { workspace = true }
 kvdb_kit = { workspace = true }
+cache_kit = { workspace = true }
 nject = { workspace = true, features = ["macro"] }
 object_storage_kit = { workspace = true }
 sched_kit = { workspace = true }

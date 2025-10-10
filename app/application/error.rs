@@ -1,3 +1,4 @@
+use cache_kit::error::CacheError;
 use domain::{
     auth::error::AuthError,
     organization::{error::OrganizationError, value_object::hashed_password::PasswordError},
@@ -59,6 +60,9 @@ pub enum ApplicationError {
 
     #[error("{0}")]
     Sched(#[from] SchedError),
+
+    #[error("{0}")]
+    Cache(#[from] CacheError),
 
     #[error("{0}")]
     Password(#[from] PasswordError),

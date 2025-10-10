@@ -5,7 +5,7 @@ use std::{
 
 use crate::error::ApplicationResult;
 use bon::Builder;
-use kvdb_kit::{Kvdb, KvdbTrait as _};
+use cache_kit::{Cache, CacheTrait as _};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::warn;
 use twox_hash::XxHash64;
@@ -21,8 +21,7 @@ pub const CACHE_PREFIX: &str = "cache:";
 pub struct CacheProvider {
     prefix: &'static str,
     ttl: Duration,
-    kvdb: Kvdb,
-    // todo: replace with cache_kit
+    cache: Cache,
 }
 
 impl CacheProvider {
@@ -31,7 +30,7 @@ impl CacheProvider {
     }
     #[tracing::instrument]
     pub async fn clear(&self) -> ApplicationResult<()> {
-        self.kvdb.delete_prefix(&self.fill_key()).await?;
+        self.cache.delete_prefix(&self.fill_key()).await?;
         Ok(())
     }
 
@@ -44,13 +43,13 @@ impl CacheProvider {
         Fut: Future<Output = Result<V, E>>,
     {
         let cache_key = format!("{}{}", &self.fill_key(), hash_encode(&key));
-        if let Some(cache) = self.kvdb.get::<V>(&cache_key).await {
+        if let Some(cache) = self.cache.get::<V>(&cache_key).await {
             return Ok(cache);
         }
         let value = resolve(key).await?;
         if let Err(err) = self
-            .kvdb
-            .set_with_ex(&cache_key, value.clone(), self.ttl)
+            .cache
+            .insert_with_ttl(&cache_key, value.clone(), self.ttl)
             .await
         {
             warn!(%err, "failed to set cache {}", &cache_key)

@@ -41,6 +41,8 @@ bb8-redis = { version = "0.24", default-features = false }
 bg_worker_kit = { path = "crates/bg_worker_kit" }
 blake3 = { version = "1.8", default-features = false }
 bon = { version = "3.8", default-features = false }
+cache_kit = { path = "crates/cache_kit" }
+cache_kit_macros = { path = "crates/cache_kit_macros" }
 captcha_kit = { path = "crates/captcha_kit" }
 chrono = { version = "0.4", default-features = false }
 chrono-tz = { version = "0.10", default-features = false }

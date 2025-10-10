@@ -1,15 +1,28 @@
-mod error;
+pub mod error;
 #[cfg(feature = "moka")]
-pub mod moka;
+mod moka;
 #[cfg(feature = "redis")]
-pub mod redis;
+mod redis;
 mod serde_util;
 use std::time::Duration;
 
 use serde::{Serialize, de::DeserializeOwned};
 
 use crate::error::Result;
+#[cfg(feature = "moka")]
+pub use moka::MokaCacheImpl as Cache;
 
+#[cfg(feature = "redis")]
+pub use redis::RedisCacheImpl as Cache;
+
+pub struct IterItem {
+    pub key: String,
+    pub expired_at: Option<u64>,
+}
+pub struct JsonItem {
+    pub value: serde_json::Value,
+    pub expired_at: Option<u64>,
+}
 pub trait CacheTrait: Clone {
     fn get<T>(&self, key: &str) -> impl Future<Output = Option<T>>
     where
@@ -25,4 +38,7 @@ pub trait CacheTrait: Clone {
     ) -> impl Future<Output = Result<()>>
     where
         T: Serialize;
+    fn iter_prefix(&self, prefix: &str) -> impl Future<Output = Result<Vec<IterItem>>>;
+    fn delete_prefix(&self, prefix: &str) -> impl Future<Output = Result<()>>;
+    fn get_raw_string(&self, key: &str) -> impl Future<Output = Option<JsonItem>>;
 }

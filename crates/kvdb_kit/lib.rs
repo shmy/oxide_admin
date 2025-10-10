@@ -17,25 +17,8 @@ pub type Kvdb = crate::redis::RedisKvdb;
 #[cfg(feature = "redis")]
 pub use redis::RedisKvdbConfig;
 
-pub struct IterItem {
-    pub key: String,
-    pub expired_at: Option<i64>,
-}
-
-pub struct KvItem {
-    pub value: Vec<u8>,
-    pub expired_at: Option<i64>,
-}
-
-pub struct KvJson {
-    pub value: serde_json::Value,
-    pub expired_at: Option<i64>,
-}
-
 pub trait KvdbTrait: Clone {
     fn get<T: DeserializeOwned>(&self, key: &str) -> impl Future<Output = Option<T>>;
-    fn get_raw(&self, key: &str) -> impl Future<Output = Option<KvItem>>;
-    fn get_raw_string(&self, key: &str) -> impl Future<Output = Option<KvJson>>;
     fn set_with_ex<T: Serialize>(
         &self,
         key: &str,
@@ -51,6 +34,5 @@ pub trait KvdbTrait: Clone {
     fn set<T: Serialize>(&self, key: &str, value: T) -> impl Future<Output = Result<()>>;
     fn delete(&self, key: &str) -> impl Future<Output = Result<()>>;
     fn delete_prefix(&self, prefix: &str) -> impl Future<Output = Result<()>>;
-    fn iter_prefix(&self, prefix: &str) -> impl Future<Output = Result<Vec<IterItem>>>;
     fn close(&self) -> impl Future<Output = ()>;
 }

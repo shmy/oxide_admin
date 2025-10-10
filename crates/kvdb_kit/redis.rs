@@ -35,6 +35,10 @@ impl Debug for RedisKvdb {
 }
 
 impl RedisKvdb {
+    pub fn pool_owned(&self) -> Pool<RedisConnectionManager> {
+        self.pool.clone()
+    }
+
     pub async fn try_new(config: RedisKvdbConfig) -> Result<Self> {
         let manager = RedisConnectionManager::new(&*config.url)?;
         let pool = Pool::builder()

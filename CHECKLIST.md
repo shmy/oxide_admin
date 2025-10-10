@@ -1,5 +1,5 @@
 [ ] 改进cache
-[ ] 全局清除缓存按钮
+[ ] 删除kv里关于支持缓存的代码
 [ ] 操作日志
 [ ] 用户绑定部门
 [ ] Frontend code generation

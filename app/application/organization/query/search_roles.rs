@@ -1,10 +1,10 @@
 use bon::Builder;
+use cache_kit::Cache;
 use domain::{
     auth::value_object::{menu::Menu, permission::Permission},
     organization::error::OrganizationError,
 };
 use infrastructure::shared::pg_pool::PgPool;
-use kvdb_kit::Kvdb;
 use nject::{inject, injectable};
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
@@ -48,7 +48,7 @@ pub struct SearchRolesQuery {
 #[injectable]
 pub struct SearchRolesQueryHandler {
     pool: PgPool,
-    #[inject(|kvdb: Kvdb| CacheProvider::builder().prefix("organization:search_roles:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
+    #[inject(|cache: Cache| CacheProvider::builder().prefix("organization:search_roles:").ttl(Duration::from_secs(15 * 60)).cache(cache).build())]
     cache_provider: CacheProvider,
 }
 

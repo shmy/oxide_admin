@@ -1,9 +1,9 @@
 use std::time::Duration;
 
 use bon::Builder;
+use cache_kit::Cache;
 use domain::organization::{error::OrganizationError, value_object::role_id::RoleId};
 use infrastructure::shared::pg_pool::PgPool;
-use kvdb_kit::Kvdb;
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
@@ -46,7 +46,7 @@ pub struct SearchUsersQuery {
 #[injectable]
 pub struct SearchUsersQueryHandler {
     pool: PgPool,
-    #[inject(|kvdb: Kvdb| CacheProvider::builder().prefix("organization:search_users:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
+    #[inject(|cache: Cache| CacheProvider::builder().prefix("organization:search_users:").ttl(Duration::from_secs(15 * 60)).cache(cache).build())]
     cache_provider: CacheProvider,
 }
 

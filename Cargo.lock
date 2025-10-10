@@ -155,6 +155,7 @@ dependencies = [
  "axum",
  "bg_worker_kit",
  "bon",
+ "cache_kit",
  "chrono",
  "cruet",
  "domain",
@@ -659,6 +660,7 @@ dependencies = [
  "minicbor-serde",
  "moka",
  "serde",
+ "serde_json",
  "thiserror 2.0.17",
 ]
 
@@ -2252,6 +2254,7 @@ version = "0.1.0"
 dependencies = [
  "bg_worker_kit",
  "bon",
+ "cache_kit",
  "captcha_kit",
  "chrono",
  "chrono-tz",
@@ -4247,6 +4250,7 @@ dependencies = [
  "application",
  "axum",
  "bg_worker_kit",
+ "cache_kit",
  "chrono-tz",
  "clap",
  "dotenvy",

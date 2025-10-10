@@ -9,6 +9,7 @@ use application::{
 };
 use axum::Router;
 use bg_worker_kit::WorkerManager;
+use cache_kit::Cache;
 use infrastructure::{migration, shared::pg_pool::PgPool, shared::provider::Provider};
 use infrastructure::{
     port::sched_receiver_impl::SchedReceiverImpl,
@@ -118,6 +119,7 @@ async fn build_provider(config: &ConfigRef, workspace: WorkspaceRef) -> Result<P
         build_object_storage(config, &workspace),
         build_feature_flag(config),
     )?;
+    let cache = build_cache(config, &kvdb).await?;
     let provider = Provider::builder()
         .pg_pool(pg_pool)
         .kvdb(kvdb)
@@ -126,6 +128,7 @@ async fn build_provider(config: &ConfigRef, workspace: WorkspaceRef) -> Result<P
         .feature_flag(feature_flag)
         .chrono_tz(ChronoTz::builder().tz(config.timezone).build())
         .workspace(workspace)
+        .cache(cache)
         .build();
     Ok(provider)
 }
@@ -165,6 +168,18 @@ async fn build_pg_pool(config: &ConfigRef) -> Result<PgPool> {
 async fn build_feature_flag(config: &ConfigRef) -> Result<FeatureFlag> {
     let feature_flag = FeatureFlag::try_new(config).await?;
     Ok(feature_flag)
+}
+
+async fn build_cache(
+    #[allow(unused)] config: &ConfigRef,
+    #[allow(unused)] kvdb: &Kvdb,
+) -> Result<Cache> {
+    // TODO: configable
+    #[cfg(feature = "cache_moka")]
+    let cache = Cache::new(10000, std::time::Duration::from_secs(60 * 60 * 24));
+    #[cfg(feature = "cache_redis")]
+    let cache = Cache::new(kvdb.pool_owned());
+    Ok(cache)
 }
 
 #[allow(unused_variables)]

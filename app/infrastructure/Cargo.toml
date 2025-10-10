@@ -14,6 +14,8 @@ bg_postgres = ["bg_worker_kit/postgres"]
 object_storage_fs = ["object_storage_kit/fs"]
 object_storage_s3 = ["object_storage_kit/s3"]
 object_storage_s3_tls = ["object_storage_kit/s3_tls"]
+cache_moka = ["cache_kit/moka"]
+cache_redis = ["cache_kit/redis"]
 trace_rolling = []
 trace_otlp = []
 flag_flipt = ["flag_kit/flipt"]
@@ -27,6 +29,7 @@ test = [
 [dependencies]
 bg_worker_kit = { workspace = true }
 bon = { workspace = true }
+cache_kit = { workspace = true }
 captcha_kit = { workspace = true }
 chrono = { workspace = true }
 chrono-tz = { workspace = true, features = ["std"] }

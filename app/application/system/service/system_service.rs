@@ -1,5 +1,5 @@
 use crate::{error::ApplicationResult, shared::cache_provider::CACHE_PREFIX};
-use kvdb_kit::{Kvdb, KvdbTrait};
+use cache_kit::{Cache, CacheTrait as _};
 use nject::injectable;
 use serde::Serialize;
 use std::sync::LazyLock;
@@ -15,7 +15,7 @@ static SNAPSHOT: LazyLock<SystemSnapshot> = LazyLock::new(SystemService::build_s
 #[derive(Debug)]
 #[injectable]
 pub struct SystemService {
-    kv: Kvdb,
+    cache: Cache,
 }
 
 impl SystemService {
@@ -26,7 +26,7 @@ impl SystemService {
 
     #[tracing::instrument]
     pub async fn cache_tree(&self) -> ApplicationResult<Vec<CacheTreeItem>> {
-        let items = self.kv.iter_prefix(CACHE_PREFIX).await?;
+        let items = self.cache.iter_prefix(CACHE_PREFIX).await?;
         let mut roots: Vec<CacheTreeItem> = Vec::new();
 
         for item in items {
@@ -53,7 +53,7 @@ impl SystemService {
 
     #[tracing::instrument]
     pub async fn retrieve_cache(&self, key: &str) -> Option<RetrieveCacheItem> {
-        self.kv.get_raw_string(key).await.and_then(|item| {
+        self.cache.get_raw_string(key).await.and_then(|item| {
             let item = RetrieveCacheItem {
                 value: serde_json::to_string_pretty(&item.value).ok()?,
                 expired_at: item.expired_at,
@@ -64,7 +64,7 @@ impl SystemService {
 
     #[tracing::instrument]
     pub async fn delete_cache_by_prefix(&self, prefix: &str) -> ApplicationResult<()> {
-        self.kv.delete_prefix(prefix).await?;
+        self.cache.delete_prefix(prefix).await?;
         Ok(())
     }
 
@@ -181,5 +181,5 @@ impl CacheTreeItem {
 #[derive(Debug, Default, Serialize, ToSchema)]
 pub struct RetrieveCacheItem {
     pub value: String,
-    pub expired_at: Option<i64>,
+    pub expired_at: Option<u64>,
 }

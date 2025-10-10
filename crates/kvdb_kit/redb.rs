@@ -9,7 +9,7 @@ use tracing::{debug, error, info};
 
 use redb::{Database, ReadableDatabase as _, ReadableTable as _, TableDefinition};
 
-use crate::{IterItem, KvItem, KvJson, KvdbTrait, serde_util};
+use crate::{KvdbTrait, serde_util};
 
 const TABLE_NAME: TableDefinition<&str, &[u8]> = TableDefinition::new("app_data");
 
@@ -112,6 +112,24 @@ impl RedbKvdb {
         }
         Ok(())
     }
+
+    async fn iter_prefix(&self, prefix: &str) -> Result<Vec<String>> {
+        let tx = self.db.begin_read()?;
+        let table = tx.open_table(TABLE_NAME)?;
+        let iter = table.iter()?;
+        let items = iter
+            .filter_map(|access| {
+                if let Ok((key, _)) = access {
+                    let key = key.value().to_string();
+                    if key.starts_with(prefix) {
+                        return Some(key);
+                    }
+                }
+                None
+            })
+            .collect();
+        Ok(items)
+    }
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -122,12 +140,6 @@ pub struct KvValue {
 
 impl KvdbTrait for RedbKvdb {
     async fn get<T: DeserializeOwned>(&self, key: &str) -> Option<T> {
-        self.get_raw(key)
-            .await
-            .and_then(|item| serde_util::cbor_decode::<T>(&item.value).ok())
-    }
-
-    async fn get_raw(&self, key: &str) -> Option<KvItem> {
         let tx = self.db.begin_read().ok()?;
         let table = tx.open_table(TABLE_NAME).ok()?;
         let value_opt = table.get(key).ok()?;
@@ -135,32 +147,15 @@ impl KvdbTrait for RedbKvdb {
             let kv: KvValue = serde_util::cbor_decode(value.value()).ok()?;
             if let Some(expires_at) = kv.expires_at {
                 let now = Utc::now().timestamp();
-                let self_inner = self.clone();
                 if now > expires_at {
-                    tokio::spawn(async move {
-                        let _ = self_inner.delete_expired().await;
-                    });
                     return None;
                 }
             }
-            return Some(KvItem {
-                value: kv.value,
-                expired_at: kv.expires_at,
-            });
+            return serde_util::cbor_decode(&kv.value).ok();
         }
         None
     }
 
-    async fn get_raw_string(&self, key: &str) -> Option<KvJson> {
-        self.get_raw(key).await.and_then(|item| {
-            serde_util::cbor_decode::<serde_json::Value>(&item.value)
-                .ok()
-                .map(|value| KvJson {
-                    value,
-                    expired_at: item.expired_at,
-                })
-        })
-    }
     async fn set_with_ex<T: Serialize>(
         &self,
         key: &str,
@@ -231,8 +226,8 @@ impl KvdbTrait for RedbKvdb {
             let tx = self.db.begin_write()?;
             {
                 let mut table = tx.open_table(TABLE_NAME)?;
-                for item in items {
-                    let _ = table.remove(item.key.as_str());
+                for key in items {
+                    let _ = table.remove(key.as_str());
                 }
             }
             tx.commit()?;
@@ -240,27 +235,6 @@ impl KvdbTrait for RedbKvdb {
         Ok(())
     }
 
-    async fn iter_prefix(&self, prefix: &str) -> Result<Vec<IterItem>> {
-        let tx = self.db.begin_read()?;
-        let table = tx.open_table(TABLE_NAME)?;
-        let iter = table.iter()?;
-        let items = iter
-            .filter_map(|access| {
-                if let Ok((key, val)) = access {
-                    let value: KvValue = serde_util::cbor_decode(val.value()).ok()?;
-                    let key = key.value().to_string();
-                    if key.starts_with(prefix) {
-                        return Some(IterItem {
-                            key,
-                            expired_at: value.expires_at,
-                        });
-                    }
-                }
-                None
-            })
-            .collect();
-        Ok(items)
-    }
     async fn close(&self) {
         let guard = self.sched.lock().await;
         guard.stop().await;
@@ -314,7 +288,7 @@ mod tests {
         let kvdb = build_redb().await;
         assert!(kvdb.set("key", "value").await.is_ok());
         assert!(kvdb.set("bkey2", "value2").await.is_ok());
-        assert!(kvdb.delete_prefix("key").await.is_ok());
+        assert!(kvdb.delete("key").await.is_ok());
         assert!(kvdb.get::<String>("key").await.is_none());
         assert!(kvdb.get::<String>("bkey2").await.is_some());
         kvdb.close().await;
