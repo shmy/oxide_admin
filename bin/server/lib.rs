@@ -243,21 +243,21 @@ async fn start_scheduler_job(
 ) -> Result<()> {
     let shutdown = async move {
         notify.notified().await;
-        info!("Received shutdown signal, shutting down scheduled job...");
+        info!("Received shutdown signal, shutting down scheduled...");
     };
     scheduler_job.run_with_signal(shutdown).await?;
-    info!("Scheduler job shutdown complete");
+    info!("Scheduled shutdown complete");
     Ok(())
 }
 
 async fn start_background_worker(worker_manager: WorkerManager, notify: Arc<Notify>) -> Result<()> {
     let shutdown = async move {
         notify.notified().await;
-        info!("Received shutdown signal, shutting down background worker...");
+        info!("Received shutdown signal, shutting down bgworker...");
         Ok(())
     };
     worker_manager.run_with_signal(shutdown).await?;
-    info!("Background worker shutdown complete");
+    info!("Bgworker shutdown complete");
     Ok(())
 }
 
