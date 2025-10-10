@@ -5,9 +5,10 @@ mod moka;
 mod redis;
 mod serde_util;
 pub use cache_kit_macros::cached_impl;
-use std::time::Duration;
-
 use serde::{Serialize, de::DeserializeOwned};
+use std::hash::{Hash, Hasher as _};
+use std::time::Duration;
+use twox_hash::XxHash64;
 
 use crate::error::Result;
 #[cfg(feature = "moka")]
@@ -43,3 +44,11 @@ pub trait CacheTrait: Clone {
     fn delete_prefix(&self, prefix: &str) -> impl Future<Output = Result<()>>;
     fn get_raw_string(&self, key: &str) -> impl Future<Output = Option<JsonItem>>;
 }
+
+pub fn encode_cache_key(query: &impl Hash) -> u64 {
+    let mut hasher = XxHash64::default();
+    query.hash(&mut hasher);
+    hasher.finish()
+}
+
+pub const CACHE_PREFIX: &str = "cache_kit";

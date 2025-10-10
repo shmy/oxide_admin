@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use bon::Builder;
 use cache_kit::{Cache, cached_impl};
 use domain::organization::{error::OrganizationError, value_object::role_id::RoleId};
@@ -13,10 +11,7 @@ use utoipa::IntoParams;
 use crate::{
     error::ApplicationResult,
     organization::dto::user::UserDto,
-    shared::{
-        cache_provider::CacheProvider, paging_query::PagingQuery, paging_result::PagingResult,
-        query_handler::QueryHandler,
-    },
+    shared::{paging_query::PagingQuery, paging_result::PagingResult, query_handler::QueryHandler},
 };
 
 #[serde_as]
@@ -46,8 +41,7 @@ pub struct SearchUsersQuery {
 #[injectable]
 pub struct SearchUsersQueryHandler {
     pool: PgPool,
-    #[inject(|cache: Cache| CacheProvider::builder().prefix("organization:search_users:").ttl(Duration::from_secs(15 * 60)).cache(cache).build())]
-    cache_provider: CacheProvider,
+    cache: Cache,
 }
 
 #[cached_impl]
@@ -58,7 +52,7 @@ impl QueryHandler for SearchUsersQueryHandler {
 
     #[tracing::instrument]
     #[single_flight]
-    #[cached]
+    #[cached(prefix = "organization:search_users:", ttl = "15min")]
     async fn query(
         &self,
         query: SearchUsersQuery,

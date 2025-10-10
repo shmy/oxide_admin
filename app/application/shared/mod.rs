@@ -1,5 +1,4 @@
 pub mod bgworker;
-pub mod cache_provider;
 pub mod command_handler;
 pub mod dto;
 pub mod event;

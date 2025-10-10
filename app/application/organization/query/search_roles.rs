@@ -5,20 +5,16 @@ use domain::{
     organization::error::OrganizationError,
 };
 use infrastructure::shared::pg_pool::PgPool;
-use nject::{inject, injectable};
+use nject::injectable;
 use serde::Deserialize;
 use serde_with::{NoneAsEmptyString, serde_as};
 use single_flight::single_flight;
-use std::time::Duration;
 use utoipa::IntoParams;
 
 use crate::{
     error::ApplicationResult,
     organization::dto::role::RoleDto,
-    shared::{
-        cache_provider::CacheProvider, paging_query::PagingQuery, paging_result::PagingResult,
-        query_handler::QueryHandler,
-    },
+    shared::{paging_query::PagingQuery, paging_result::PagingResult, query_handler::QueryHandler},
 };
 
 #[serde_as]
@@ -48,8 +44,7 @@ pub struct SearchRolesQuery {
 #[injectable]
 pub struct SearchRolesQueryHandler {
     pool: PgPool,
-    #[inject(|cache: Cache| CacheProvider::builder().prefix("organization:search_roles:").ttl(Duration::from_secs(15 * 60)).cache(cache).build())]
-    cache_provider: CacheProvider,
+    cache: Cache,
 }
 
 #[cached_impl]
@@ -60,7 +55,7 @@ impl QueryHandler for SearchRolesQueryHandler {
 
     #[tracing::instrument]
     #[single_flight]
-    #[cached]
+    #[cached(prefix = "organization:search_roles:", ttl = "30min")]
     async fn query(
         &self,
         query: SearchRolesQuery,

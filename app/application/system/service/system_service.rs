@@ -1,5 +1,5 @@
-use crate::{error::ApplicationResult, shared::cache_provider::CACHE_PREFIX};
-use cache_kit::{Cache, CacheTrait as _};
+use crate::error::ApplicationResult;
+use cache_kit::{CACHE_PREFIX, Cache, CacheTrait as _};
 use nject::injectable;
 use serde::Serialize;
 use std::sync::LazyLock;
