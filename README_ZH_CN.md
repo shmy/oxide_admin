@@ -1,5 +1,6 @@
 > 一个基于Rust和Amis.js/React的后台管理系统起始模版
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/shmy/oxide_admin)
 [![Build](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml/badge.svg)](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml)
 [![Codecov](https://img.shields.io/codecov/c/github/shmy/oxide_admin)](https://app.codecov.io/github/shmy/oxide_admin)
 ![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)
@@ -39,7 +40,7 @@
 - **日志与trace**：支持多种日志方式，支持[`OpenTelemetry`](https://opentelemetry.io/)；
 - **内建*single_flight*宏**：缓解数据库压力；
 - **文件上传及访问签名**：内建单文件上传、图片上传、分片上传等接口，适配`Amis`，支持`本地文件系统`和`S3`兼容协议；
-- **KV缓存**：支持`ttl`，使用`redis`或[`redb`](https://github.com/cberner/redb)；
+- **KV缓存**：支持`ttl`，使用`redis`或[`moka`](https://github.com/moka-rs/moka)；
 - **后台任务**：支持单机`sqlite`，分布式`postgres`；
 - **定时任务**：支持内嵌运行或者单独运行；
 - **优雅关停**：严谨地结束服务、释放资源；
@@ -78,6 +79,17 @@
         <td>bg_postgres</td>
         <td>使用postgres作为后台任务，适合分布式项目</td>
         <td>✅</td>
+    </tr>
+    <tr>
+        <td rowspan="2">缓存，<b>只能同时选择一个</b></td>
+        <td>cache_moka</td>
+        <td>使用moka作为缓存，适用于单体项目</td>
+        <td>✅</td>
+    </tr>
+    <tr>
+        <td>cache_redis</td>
+        <td>使用redis进行缓存，适合分布式项目</td>
+        <td></td>
     </tr>
     <tr>
         <td>定时任务</td>

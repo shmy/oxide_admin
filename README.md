@@ -1,5 +1,6 @@
 > A Starter Template for Admin Panel Based on Rust and Amis.js/React
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/shmy/oxide_admin)
 [![Build](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml/badge.svg)](https://github.com/shmy/oxide_admin/actions/workflows/build.yaml)
 [![Codecov](https://img.shields.io/codecov/c/github/shmy/oxide_admin)](https://app.codecov.io/github/shmy/oxide_admin)
 ![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)
@@ -38,7 +39,7 @@ English | [简体中文](./README_ZH_CN.md)
 - **Logging & Tracing**: Multiple logging options, supports [`OpenTelemetry`](https://opentelemetry.io/).
 - **Built-in `single_flight` macro**: Reduce DB load.
 - **File Upload & Access Signature**: APIs for single file, image, and chunked upload; supports `local FS` and `S3-compatible` storage.
-- **KV Cache**: With TTL support, via `redis` or [`redb`](https://github.com/cberner/redb).
+- **KV Cache**: With TTL support, via `redis` or [`moka`](https://github.com/moka-rs/moka).
 - **Background Tasks**: Single-node via `sqlite`, distributed via `postgres`.
 - **Scheduled Task**: Supports embedded execution or separate execution.
 - **Graceful Shutdown**: Properly terminates services and releases resources.
@@ -76,6 +77,17 @@ English | [简体中文](./README_ZH_CN.md)
         <td>bg_postgres</td>
         <td>Use postgres for background tasks, suitable for distributed projects</td>
         <td>✅</td>
+    </tr>
+    <tr>
+        <td rowspan="2">Cache <b>(choose one only)</b></td>
+        <td>cache_moka</td>
+        <td>Use moka for cache, suitable for monolithic projects</td>
+        <td>✅</td>
+    </tr>
+    <tr>
+        <td>cache_redis</td>
+        <td>Use redis for cache, suitable for distributed projects</td>
+        <td></td>
     </tr>
     <tr>
         <td>Scheduled Tasks</td>

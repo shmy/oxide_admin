@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM _access_logs WHERE occurred_at < NOW() - INTERVAL '7 days'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "b54d32ebc4d8d784ff6d7599ee0548d5fd3e7aec4a77b48036a58caa3a97b8f8"
+}
