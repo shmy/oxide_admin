@@ -26,6 +26,7 @@ pub fn embed_dir(input: TokenStream) -> TokenStream {
             .expect("Failed to convert to str")
             .to_string();
         let content = fs::read_to_string(&path).expect("Failed to read file");
+        let content = content.trim();
         let checksum = blake3::hash(content.as_bytes()).to_hex().to_string();
         entries.push(quote! {
             migrate_kit::Migration {
