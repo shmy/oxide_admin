@@ -4,20 +4,18 @@ use domain::{{module}}::error::{{module | pascal_case}}Error;
 use nject::injectable;
 use serde::Deserialize;
 use serde_with::serde_as;
-use std::time::Duration;
 use single_flight::single_flight;
 use crate::{
-    error::ApplicationResult,
     {{module}}::dto::{{entity}}::{{entity | pascal_case}}Dto,
     shared::{
-        cache_provider::CacheProvider,
         paging_query::PagingQuery,
         paging_result::PagingResult,
     },
 };
-use kvdb_kit::Kvdb;
 use crate::shared::query_handler::QueryHandler;
 use utoipa::IntoParams;
+use cache_kit::Cache;
+use cache_kit::cached_impl;
 
 #[serde_as]
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, IntoParams, Builder)]
@@ -31,17 +29,18 @@ pub struct Search{{entity | pluralize | pascal_case}}Query {
 #[injectable]
 pub struct Search{{entity | pluralize | pascal_case}}QueryHandler {
     pool: PgPool,
-    #[inject(|kvdb: Kvdb| CacheProvider::builder().key("{{module}}_search_{{entity | pluralize}}:").ttl(Duration::from_secs(15 * 60)).kvdb(kvdb).build())]
-    cache_provider: CacheProvider,
+    cache: Cache,
 }
 
+#[cached_impl]
 impl QueryHandler for Search{{entity | pluralize | pascal_case}}QueryHandler {
     type Query = Search{{entity | pluralize | pascal_case}}Query;
     type Output = PagingResult<{{entity | pascal_case}}Dto>;
     type Error = {{module | pascal_case}}Error;
 
-    #[single_flight]
     #[tracing::instrument]
+    #[single_flight]
+    #[cached(prefix = "{{module}}:search_{{entity | pluralize | snake_case}}:", ttl = "15min")]
     async fn query(
         &self,
         query: Search{{entity | pluralize | pascal_case}}Query,
@@ -69,22 +68,5 @@ impl QueryHandler for Search{{entity | pluralize | pascal_case}}QueryHandler {
         .fetch_all(&self.pool);
         let (total, rows) = tokio::try_join!(total_future, rows_future)?;
         Ok(PagingResult { total, items: rows })
-    }
-}
-
-
-impl Search{{entity | pluralize | pascal_case}}QueryHandler {
-
-    #[tracing::instrument]
-    pub async fn clean_cache(&self) -> ApplicationResult<()> {
-        self.cache_provider.clear().await
-    }
-
-    #[tracing::instrument]
-    pub async fn query_cached(
-        &self,
-        query: Search{{entity | pluralize | pascal_case}}Query,
-    ) ->  Result<PagingResult<{{entity | pascal_case}}Dto>, {{module | pascal_case}}Error> {
-        self.cache_provider.get_with(query, |q| self.query(q)).await
     }
 }

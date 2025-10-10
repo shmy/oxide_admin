@@ -69,7 +69,7 @@ pub fn cached_impl(_attr: TokenStream, item: TokenStream) -> TokenStream {
                         Ok(value)
                     }
 
-                    pub async fn #clean_cached_name(&self) -> ApplicationResult<()> {
+                    pub async fn #clean_cached_name(&self) -> crate::error::ApplicationResult<()> {
                         let cache_key = format!("{}:{}",cache_kit::CACHE_PREFIX, #prefix);
                         self.cache.delete_prefix(&cache_key).await?;
                         Ok(())

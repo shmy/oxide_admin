@@ -9,7 +9,6 @@ use single_flight::single_flight;
 use utoipa::IntoParams;
 
 use crate::{
-    error::ApplicationResult,
     organization::dto::user::UserDto,
     shared::{paging_query::PagingQuery, paging_result::PagingResult, query_handler::QueryHandler},
 };
