@@ -1,6 +1,8 @@
 mod error;
 #[cfg(feature = "moka")]
 pub mod moka;
+#[cfg(feature = "redis")]
+pub mod redis;
 mod serde_util;
 use std::time::Duration;
 

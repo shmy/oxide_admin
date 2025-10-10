@@ -7,4 +7,12 @@ pub enum CacheError {
 
     #[error("{0}")]
     CborDecode(#[from] minicbor_serde::error::DecodeError),
+
+    #[cfg(feature = "redis")]
+    #[error("{0}")]
+    Redis(#[from] bb8_redis::redis::RedisError),
+
+    #[cfg(feature = "redis")]
+    #[error("{0}")]
+    RunRedis(#[from] bb8_redis::bb8::RunError<bb8_redis::redis::RedisError>),
 }

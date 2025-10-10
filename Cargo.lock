@@ -654,6 +654,7 @@ checksum = "d71b6127be86fdcfddb610f7182ac57211d4b18a3e9c82eb2d17662f2227ad6a"
 name = "cache_kit"
 version = "0.1.0"
 dependencies = [
+ "bb8-redis",
  "chrono",
  "minicbor-serde",
  "moka",
