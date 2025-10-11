@@ -1,4 +1,4 @@
-use bg_worker_kit::Worker;
+use bg_worker_kit::WorkerTrait;
 use bg_worker_kit::error::{Result, WorkerError};
 use bon::Builder;
 use infrastructure::shared::provider::Provider;
@@ -21,12 +21,12 @@ pub struct RecordAccessLog {
     occurred_at: chrono::NaiveDateTime,
 }
 
-impl Worker for RecordAccessLog {
+impl WorkerTrait for RecordAccessLog {
     type State = Provider;
 
     const NAME: &'static str = "record_access_log";
 
-    const CONCURRENCY: usize = 1;
+    const CONCURRENCY: usize = 3;
 
     const RETRIES: usize = 3;
 

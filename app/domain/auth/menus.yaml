@@ -32,14 +32,18 @@ private:
         icon: fas fa-clock
         url: /system/sched
       - key: 203
+        label: 后台任务
+        icon: fas fa-circle-nodes
+        url: /system/bgworker
+      - key: 204
         label: 访问日志
         icon: fas fa-record-vinyl
         url: /system/access_log
-      - key: 204
+      - key: 205
         label: 系统信息
         icon: fas fa-info
         url: /system/stat
-      - key: 205
+      - key: 206
         label: 示例页面
         icon: fas fa-hexagon-nodes
         url: /system/example

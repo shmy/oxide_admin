@@ -4,11 +4,9 @@ use std::time::Duration;
 use crate::error::{Result, WorkerError};
 use apalis::layers::WorkerBuilderExt as _;
 use apalis::layers::retry::RetryPolicy;
-pub use apalis::prelude::BackendExpose;
-pub use apalis::prelude::Stat;
+pub use apalis::prelude::{BackendExpose, Stat, Storage, Worker, WorkerState};
 use apalis::prelude::{Data, Monitor, WorkerBuilder, WorkerFactoryFn as _};
 use apalis_core::codec::json::JsonCodec;
-pub use apalis_core::storage::Storage;
 use serde::{Serialize, de::DeserializeOwned};
 #[cfg(feature = "sqlite")]
 pub type Pool = apalis_sql::sqlite::SqlitePool;
@@ -26,19 +24,13 @@ pub mod sqlite_helper;
 pub struct WorkerManager {
     pool: Pool,
     monitor: Monitor,
-    table_name: &'static str,
 }
 
 impl WorkerManager {
     pub async fn try_new(pool: Pool) -> Result<Self> {
-        #[cfg(feature = "sqlite")]
-        let table_name = "Jobs";
-        #[cfg(feature = "postgres")]
-        let table_name = "apalis.jobs";
         let instance = Self {
             pool: pool.clone(),
             monitor: Monitor::new(),
-            table_name,
         };
         instance.setup().await?;
         Ok(instance)
@@ -52,20 +44,12 @@ impl WorkerManager {
         #[cfg(feature = "postgres")]
         tracing::info!("Choosing database backend: PosgreSQL");
         StorageBackend::setup(&self.pool).await?;
-        let mut tx = self.pool.acquire().await?;
-        let query = format!("DELETE FROM {} WHERE status='Done'", self.table_name);
-        sqlx::query(&query).execute(&mut *tx).await?;
-        let query = format!(
-            "UPDATE {} SET status = 'Pending', done_at = NULL, lock_by = NULL, lock_at = NULL, last_error = 'Job was abandoned' WHERE status = 'Running'",
-            self.table_name
-        );
-        sqlx::query(&query).execute(&mut *tx).await?;
         Ok(())
     }
 
     pub fn register<T>(mut self, data: T::State) -> (Self, StorageBackend<T>)
     where
-        T: Worker,
+        T: WorkerTrait,
     {
         let backend = StorageBackend::new(self.pool.clone());
         let worker = WorkerBuilder::new(T::NAME)
@@ -94,7 +78,9 @@ impl WorkerManager {
     }
 }
 
-pub trait Worker: Serialize + DeserializeOwned + Clone + Send + Sync + Unpin + 'static {
+pub trait WorkerTrait:
+    Serialize + DeserializeOwned + Clone + Send + Sync + Unpin + 'static
+{
     type State: Clone + Send + Sync + Unpin + 'static;
     const NAME: &'static str;
     const CONCURRENCY: usize;

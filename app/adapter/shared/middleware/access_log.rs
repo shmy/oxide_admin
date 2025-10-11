@@ -2,7 +2,7 @@ use std::net::SocketAddr;
 
 use application::{
     re_export::ChronoTz,
-    shared::{bgworker::record_access_log::RecordAccessLog, bgworker_impl::RecordAccessLogImpl},
+    shared::{bgworker::record_access_log::RecordAccessLog, bgworker_impl::WorkerRegistry},
 };
 use axum::{
     extract::{ConnectInfo, Request, State},
@@ -47,7 +47,7 @@ pub async fn access_log(State(state): State<WebState>, request: Request, next: N
         .elapsed(elapsed.as_millis() as i64)
         .occurred_at(ct.now())
         .build();
-    if let Err(err) = RecordAccessLogImpl::enqueue(task).await {
+    if let Err(err) = WorkerRegistry::enqueue_record_access_log(task).await {
         tracing::error!(error = %err, "Failed to enqueue record_access_log");
     }
     response

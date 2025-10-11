@@ -110,6 +110,7 @@ fn build_env() -> Environment<'static> {
     let mut env = Environment::new();
     env.add_filter("pascal_case", |s: String| s.to_pascal_case());
     env.add_filter("uppercase", |s: String| s.to_uppercase());
+    env.add_filter("snake_case", |s: String| s.to_snake_case());
     env.add_filter("screaming_snake_case", |s: String| {
         s.to_screaming_snake_case()
     });
@@ -146,7 +147,10 @@ use infrastructure::shared::provider::Provider;
 use bg_worker_kit::error::WorkerError;
 use std::sync::OnceLock;
 use bg_worker_kit::Stat;
+use bg_worker_kit::Worker;
+use bg_worker_kit::WorkerState;
 use bg_worker_kit::BackendExpose as _;
+use bg_worker_kit::WorkerTrait as _;
 
 {%- for job in jobs %}
 use crate::shared::bgworker::{{job}}::{{job | pascal_case}};
@@ -156,27 +160,65 @@ use crate::shared::bgworker::{{job}}::{{job | pascal_case}};
 static {{job | screaming_snake_case}}_BACKEND: OnceLock<StorageBackend<{{job | pascal_case}}>> = OnceLock::new();
 {%- endfor %}
 
+const BGWORKER_NAMESPACES: &[Namespace] = &[
 {%- for job in jobs %}
-pub struct {{job | pascal_case}}Impl;
+    Namespace {
+        name: {{job | pascal_case}}::NAME,
+    },
+{%- endfor %}
+];
 
-impl {{job | pascal_case}}Impl {
-    pub async fn enqueue(worker: {{job | pascal_case}}) -> Result<(), WorkerError> {
+pub struct WorkerRegistry;
+
+impl WorkerRegistry {
+
+    {%- for job in jobs %}
+    pub async fn enqueue_{{job | snake_case}}(worker: {{job | pascal_case}}) -> Result<(), WorkerError> {
         if let Some(backend) = {{job | screaming_snake_case}}_BACKEND.get() {
             let mut backend = backend.to_owned();
             backend.push(worker).await?;
         }
         Ok(())
     }
+    {%- endfor %}
 
-    pub async fn stats() -> Stat {
-        if let Some(backend) = {{job | screaming_snake_case}}_BACKEND.get() {
-            return backend.stats().await.unwrap_or_default();
+    pub fn list_namespaces() -> &'static [Namespace] {
+        BGWORKER_NAMESPACES
+    }
+
+    pub async fn stats(ns: String) -> Stat {
+        match ns.as_str() {
+            {%- for job in jobs %}
+            {{job | pascal_case}}::NAME => {
+                if let Some(backend) = {{job | screaming_snake_case}}_BACKEND.get() {
+                    let backend = backend.to_owned();
+                    backend.stats().await.unwrap_or_default()
+                } else {
+                    Stat::default()
+                }
+            }
+            {%- endfor %}
+            _ => Stat::default(),
         }
-        Stat::default()
+    }
+
+    pub async fn list_workers(ns: String) -> Vec<Worker<WorkerState>> {
+        match ns.as_str() {
+            {%- for job in jobs %}
+            {{job | pascal_case}}::NAME => {
+                if let Some(backend) = {{job | screaming_snake_case}}_BACKEND.get() {
+                    let backend = backend.to_owned();
+                    backend.list_workers().await.unwrap_or_default()
+                } else {
+                    vec![]
+                }
+            }
+            {%- endfor %}
+            _ => vec![],
+        }
     }
 }
 
-{%- endfor %}
 pub fn register_bgworkers(manager: WorkerManager, provider: Provider) -> WorkerManager {
     {%- for job in jobs %}
     let (manager, backend) = manager.register::<{{job | pascal_case}}>(

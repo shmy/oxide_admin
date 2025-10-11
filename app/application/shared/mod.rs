@@ -9,6 +9,11 @@ pub mod query_handler;
 pub mod scheduler_job;
 
 pub mod bgworker_impl {
+
+    #[derive(Debug, Clone)]
+    pub struct Namespace {
+        pub name: &'static str,
+    }
     include!(concat!(env!("OUT_DIR"), "/bgworker.rs"));
 }
 

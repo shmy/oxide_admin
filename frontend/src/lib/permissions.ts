@@ -26,24 +26,21 @@ export const PERMISSIONS = {
       READ: 400,
       DELETE: 401,
     },
-    DEPARTMENT: {
+    BGWORKER: {
       READ: 500,
-      CREATE: 501,
-      UPDATE: 502,
-      DELETE: 503,
+    },
+    DEPARTMENT: {
+      READ: 600,
+      CREATE: 601,
+      UPDATE: 602,
+      DELETE: 603,
     },
     CACHE: {
-      READ: 600,
-      DELETE: 601,
+      READ: 700,
+      DELETE: 701,
     },
     ACCESS_LOG: {
-      READ: 700,
-      ACCESS_LOG: {
-        READ: 1000,
-        CREATE: 1001,
-        UPDATE: 1002,
-        DELETE: 1003,
-      },
+      READ: 800,
     },
   },
 };
