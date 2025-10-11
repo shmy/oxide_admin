@@ -147,10 +147,9 @@ use infrastructure::shared::provider::Provider;
 use bg_worker_kit::error::WorkerError;
 use std::sync::OnceLock;
 use bg_worker_kit::Stat;
-use bg_worker_kit::Worker;
-use bg_worker_kit::WorkerState;
 use bg_worker_kit::BackendExpose as _;
 use bg_worker_kit::WorkerTrait as _;
+use bg_worker_kit::State;
 
 {%- for job in jobs %}
 use crate::shared::bgworker::{{job}}::{{job | pascal_case}};
@@ -164,6 +163,9 @@ const BGWORKER_NAMESPACES: &[Namespace] = &[
 {%- for job in jobs %}
     Namespace {
         name: {{job | pascal_case}}::NAME,
+        concurrency: {{job | pascal_case}}::CONCURRENCY,
+        retries: {{job | pascal_case}}::RETRIES,
+        timeout: {{job | pascal_case}}::TIMEOUT,
     },
 {%- endfor %}
 ];
@@ -186,8 +188,8 @@ impl WorkerRegistry {
         BGWORKER_NAMESPACES
     }
 
-    pub async fn stats(ns: String) -> Stat {
-        match ns.as_str() {
+    pub async fn stats(ns: &str) -> Stat {
+        match ns {
             {%- for job in jobs %}
             {{job | pascal_case}}::NAME => {
                 if let Some(backend) = {{job | screaming_snake_case}}_BACKEND.get() {
@@ -202,15 +204,25 @@ impl WorkerRegistry {
         }
     }
 
-    pub async fn list_workers(ns: String) -> Vec<Worker<WorkerState>> {
-        match ns.as_str() {
+     pub async fn list_jobs(ns: &str, state: &State, page: i32) -> Vec<WorkerJob> {
+        match ns {
             {%- for job in jobs %}
             {{job | pascal_case}}::NAME => {
                 if let Some(backend) = {{job | screaming_snake_case}}_BACKEND.get() {
                     let backend = backend.to_owned();
-                    backend.list_workers().await.unwrap_or_default()
+                    let items = backend.list_jobs(state, page).await.unwrap_or_default();
+                    items.into_iter().filter_map(|item| {
+                        if let (Ok(args), Ok(parts)) = (
+                            serde_json::to_value(item.args),
+                            serde_json::to_value(item.parts.context),
+                        ) {
+                            Some(WorkerJob { args, parts })
+                        } else {
+                            None
+                        }
+                    }).collect()
                 } else {
-                    vec![]
+                   vec![]
                 }
             }
             {%- endfor %}

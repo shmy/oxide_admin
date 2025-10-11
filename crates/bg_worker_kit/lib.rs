@@ -4,7 +4,7 @@ use std::time::Duration;
 use crate::error::{Result, WorkerError};
 use apalis::layers::WorkerBuilderExt as _;
 use apalis::layers::retry::RetryPolicy;
-pub use apalis::prelude::{BackendExpose, Stat, Storage, Worker, WorkerState};
+pub use apalis::prelude::{BackendExpose, Stat, State, Storage};
 use apalis::prelude::{Data, Monitor, WorkerBuilder, WorkerFactoryFn as _};
 use apalis_core::codec::json::JsonCodec;
 use serde::{Serialize, de::DeserializeOwned};

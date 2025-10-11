@@ -9,10 +9,20 @@ pub mod query_handler;
 pub mod scheduler_job;
 
 pub mod bgworker_impl {
+    use serde::Serialize;
 
     #[derive(Debug, Clone)]
     pub struct Namespace {
         pub name: &'static str,
+        pub concurrency: usize,
+        pub retries: usize,
+        pub timeout: std::time::Duration,
+    }
+
+    #[derive(Debug, Clone, Serialize)]
+    pub struct WorkerJob {
+        pub args: serde_json::Value,
+        pub parts: serde_json::Value,
     }
     include!(concat!(env!("OUT_DIR"), "/bgworker.rs"));
 }
