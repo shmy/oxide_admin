@@ -105,6 +105,8 @@ jobs:
         run: cd frontend && bun install
       - name: Build backend
         run: just build_linux_x86_64_musl_ci
+      - name: Extract binary
+        run: mv target/x86_64-unknown-linux-musl/release/server server
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Build and push docker image
