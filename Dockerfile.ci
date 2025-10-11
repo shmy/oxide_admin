@@ -1,5 +1,5 @@
 # https://github.com/GoogleContainerTools/distroless/blob/main/README.md#debian-12
-FROM gcr.io/distroless/base-debian12:latest
+FROM gcr.io/distroless/cc-debian12:latest
 WORKDIR /opt
 COPY ./server server
 ENTRYPOINT ["/opt/server", "serve"]
