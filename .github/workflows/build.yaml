@@ -34,7 +34,7 @@ jobs:
     steps:
       - name: Clone code
         uses: actions/checkout@v4
-      - name: Cache
+      - name: Restore cache
         uses: actions/cache@v4
         with:
           path: |
