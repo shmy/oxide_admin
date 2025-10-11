@@ -49,7 +49,7 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
 single_flight = { workspace = true }
 sqlx = { workspace = true, features = [
-    "runtime-tokio",
+    "runtime-tokio-rustls",
     "postgres",
     "macros",
     "chrono",
