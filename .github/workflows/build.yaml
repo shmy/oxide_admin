@@ -105,7 +105,7 @@ jobs:
       - name: Setup rust for musl
         run: |
           rustup target add x86_64-unknown-linux-musl
-          apt update && apt install musl-tools -y
+          sudo apt update && sudo apt install musl-tools -y
       - name: Install frontend dependencies
         run: cd frontend && bun install
       - name: Build backend
