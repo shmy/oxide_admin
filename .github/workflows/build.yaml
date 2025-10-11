@@ -44,7 +44,7 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Set up rust
+      - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
@@ -93,13 +93,13 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Set up rust
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+      - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
           override: true
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
       - name: Install just
         uses: extractions/setup-just@v3
       - name: Add x86_64-unknown-linux-musl
