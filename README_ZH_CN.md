@@ -46,7 +46,7 @@
 - **优雅关停**：严谨地结束服务、释放资源；
 - **多源配置**：支持环境变量、`.env`/`cli`参数；
 - **Feature Flag**：支持[`flipt`](https://github.com/flipt-io/flipt)；
-- **Github CI**：自动构建`x86_64-unknown-linux-musl`；
+- **Github CI**：自动构建`x86_64-unknown-linux-gnu`；
 - **Docker 镜像**：提供`Dockerfile`，实现容器化部署；
 
 
