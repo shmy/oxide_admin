@@ -34,7 +34,7 @@ jobs:
     steps:
       - name: Clone code
         uses: actions/checkout@v4
-      - name: Restore cache
+      - name: Restore rust cache
         uses: actions/cache@v4
         with:
           path: |
@@ -77,12 +77,43 @@ jobs:
     steps:
       - name: Clone code
         uses: actions/checkout@v4
+      - name: Restore bun cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+      - name: Restore rust cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Set up rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+      - name: Install just
+        uses: extractions/setup-just@v3
+      - name: Add x86_64-unknown-linux-musl
+        run: rustup target add x86_64-unknown-linux-musl
+      - name: Install frontend dependencies
+        run: cd frontend && bun install
+      - name: Build backend
+        run: just build_linux_x86_64_musl_ci
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Build and push docker image
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}
           RUN_NUMBER_ID=${{ github.run_number }}
-          docker build -t $IMAGE_ID:$RUN_NUMBER_ID -t $IMAGE_ID:latest .
+          docker build -f Dockerfile.ci -t $IMAGE_ID:$RUN_NUMBER_ID -t $IMAGE_ID:latest .
           docker push $IMAGE_ID:$RUN_NUMBER_ID
           docker push $IMAGE_ID:latest
