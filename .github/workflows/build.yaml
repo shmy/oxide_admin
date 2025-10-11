@@ -32,6 +32,18 @@ jobs:
       SQLX_OFFLINE: true
 
     steps:
+      - name: Clone code
+        uses: actions/checkout@v4
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Set up rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
@@ -46,8 +58,6 @@ jobs:
         uses: gacts/install-hurl@v1
       - name: Install just
         uses: extractions/setup-just@v3
-      - name: Clone code
-        uses: actions/checkout@v4
       - name: Backend test
         run: just test_coverage_ci
       - name: Upload coverage to Codecov
