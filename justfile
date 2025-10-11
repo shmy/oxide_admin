@@ -43,9 +43,9 @@ build_linux_x86_64_musl: build_frontend sqlx_prepare
     ls -lh target/x86_64-unknown-linux-musl/release
     terminal-notifier -title "构建成功" -message "x86_64-unknown-linux-musl 已完成"
 
-build_linux_x86_64_musl_ci: build_frontend
-    cargo build --package server --release --target x86_64-unknown-linux-musl --locked
-    ls -lh target/x86_64-unknown-linux-musl/release
+build_linux_x86_64_gnu_ci: build_frontend
+    cargo build --package server --release --target x86_64-unknown-linux-gnu --locked
+    ls -lh target/x86_64-unknown-linux-gnu/release
 
 build_windows_x86_64_msvc: build_frontend
     cargo-xwin build --package server --release --target x86_64-pc-windows-msvc --locked
