@@ -8,7 +8,8 @@ path = "lib.rs"
 
 [features]
 redb = ["dep:redb", "dep:tokio", "dep:cron_tab"]
-redis = ["dep:bb8-redis", "dep:redis"]
+redis = ["dep:bb8-redis"]
+redis_tls = ["dep:redis"]
 
 [dependencies]
 bb8-redis = { workspace = true, optional = true }

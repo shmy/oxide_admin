@@ -59,7 +59,7 @@
         <th>默认启用</th>
     </tr>
     <tr>
-        <td rowspan="2">Kv存储，<b>只能同时选择一个</b></td>
+        <td rowspan="3">Kv存储，<b>只能同时选择一个</b></td>
         <td>kv_redb</td>
         <td>使用redb作为kv/缓存，适合单体项目</td>
         <td>✅</td>
@@ -67,6 +67,11 @@
     <tr>
         <td>kv_redis</td>
         <td>使用redis作为kv/缓存，适合分布式项目</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>kv_redis_tls</td>
+        <td>使用redis作为kv/缓存，启用tls</td>
         <td></td>
     </tr>
     <tr>

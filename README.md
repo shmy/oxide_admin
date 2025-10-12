@@ -57,7 +57,7 @@ English | [简体中文](./README_ZH_CN.md)
         <th>Enabled by Default</th>
     </tr>
     <tr>
-        <td rowspan="2">KV Storage <b>(choose one only)</b></td>
+        <td rowspan="3">KV Storage <b>(choose one only)</b></td>
         <td>kv_redb</td>
         <td>Use redb as kv/cache, suitable for monolithic projects</td>
         <td>✅</td>
@@ -65,6 +65,11 @@ English | [简体中文](./README_ZH_CN.md)
     <tr>
         <td>kv_redis</td>
         <td>Use redis as kv/cache, suitable for distributed projects</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>kv_redis_tls</td>
+        <td>Use redis as kv/cache with TLS enabled</td>
         <td></td>
     </tr>
     <tr>
