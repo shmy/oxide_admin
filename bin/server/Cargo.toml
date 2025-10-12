@@ -38,10 +38,7 @@ cache_moka = ["infrastructure/cache_moka"]
 cache_redis = ["infrastructure/cache_redis"]
 object_storage_fs = ["infrastructure/object_storage_fs"]
 object_storage_s3 = ["infrastructure/object_storage_s3"]
-object_storage_s3_tls = [
-    "object_storage_s3",
-    "infrastructure/object_storage_s3_tls",
-]
+object_storage_s3_tls = ["object_storage_s3", "infrastructure/object_storage_s3_tls"]
 trace_console = ["trace_kit/console"]
 trace_rolling = ["trace_kit/rolling", "infrastructure/trace_rolling"]
 trace_otlp = [
