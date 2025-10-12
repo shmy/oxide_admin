@@ -59,6 +59,12 @@
         <th>默认启用</th>
     </tr>
     <tr>
+        <td>Postgres tls</td>
+        <td>postgres_tls</td>
+        <td>启用tls</td>
+        <td></td>
+    </tr>
+    <tr>
         <td rowspan="3">Kv存储，<b>只能同时选择一个</b></td>
         <td>kv_redb</td>
         <td>使用redb作为kv/缓存，适合单体项目</td>

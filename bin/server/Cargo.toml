@@ -19,6 +19,7 @@ default = [
     "trace_console",
     "serve_with_sched",
 ]
+postgres_tls = ["infrastructure/postgres_tls"]
 kv_redb = ["infrastructure/kv_redb"]
 kv_redis = ["infrastructure/kv_redis"]
 kv_redis_tls = ["kv_redis", "kvdb_kit/redis_tls"]

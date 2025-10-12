@@ -7,6 +7,7 @@ edition = "2024"
 path = "lib.rs"
 
 [features]
+postgres_tls = ["sqlx/tls-rustls"]
 kv_redb = ["kvdb_kit/redb"]
 kv_redis = ["kvdb_kit/redis"]
 bg_sqlite = ["bg_worker_kit/sqlite"]
@@ -49,7 +50,7 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
 single_flight = { workspace = true }
 sqlx = { workspace = true, features = [
-    "runtime-tokio-rustls",
+    "runtime-tokio",
     "postgres",
     "macros",
     "chrono",

@@ -57,6 +57,12 @@ English | [简体中文](./README_ZH_CN.md)
         <th>Enabled by Default</th>
     </tr>
     <tr>
+        <td>Postgres tls</td>
+        <td>postgres_tls</td>
+        <td>Enable tls</td>
+        <td></td>
+    </tr>
+    <tr>
         <td rowspan="3">KV Storage <b>(choose one only)</b></td>
         <td>kv_redb</td>
         <td>Use redb as kv/cache, suitable for monolithic projects</td>
