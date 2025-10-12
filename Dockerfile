@@ -9,7 +9,7 @@ WORKDIR /_
 RUN rustup target add x86_64-unknown-linux-gnu
 COPY . ./
 COPY --from=frontend-build /frontend/dist /_/frontend/dist
-RUN cargo build --package server --no-default-features  --features tls --release --target x86_64-unknown-linux-gnu --locked
+RUN cargo build --package server --no-default-features --features tls --release --target x86_64-unknown-linux-gnu --locked
 
 # https://github.com/GoogleContainerTools/distroless/blob/main/README.md#debian-12
 FROM gcr.io/distroless/cc-debian12:latest
