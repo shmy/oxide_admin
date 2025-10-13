@@ -42,3 +42,4 @@ tracing = { workspace = true }
 utoipa = { workspace = true, features = ["macros", "chrono", "axum_extras"] }
 utoipa-axum = { workspace = true }
 utoipa-scalar = { workspace = true, features = ["axum"] }
+i18n = { workspace = true }

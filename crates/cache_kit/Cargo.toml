@@ -21,4 +21,4 @@ moka = { version = "0.12", default-features = false, features = [
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
 thiserror = { workspace = true }
-twox-hash = { workspace = true }
+twox-hash = { workspace = true, features = ["xxhash64"] }

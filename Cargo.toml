@@ -116,6 +116,7 @@ utoipa = { version = "5.4", default-features = false }
 utoipa-axum = { version = "0.2", default-features = false }
 utoipa-scalar = { version = "0.3", default-features = false }
 uuid = { version = "1.8", default-features = false }
+i18n = { git = "https://github.com/Instant-Reactive-Systems/i18n", tag = "0.1.1" }
 
 [profile.dev]
 debug = "line-tables-only"   # Generate debugging information for easy debugging
