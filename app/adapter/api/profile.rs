@@ -75,10 +75,12 @@ async fn current(
     service
         .replenish_user_portrait(std::slice::from_mut(&mut user))
         .await;
+    let lang_id = language.identifier();
     JsonResponse::ok(response::CurrentResponse {
         user,
-        pages: tranlate_menus(pages.to_vec(), language.identifier()),
+        pages: tranlate_menus(pages.to_vec(), lang_id),
         permissions,
+        lang_id: lang_id.to_string(),
     })
 }
 
@@ -150,7 +152,7 @@ async fn password(
 #[tracing::instrument]
 async fn language(language: AcceptLanguage) -> JsonResponseType<response::CurrentLanguageResponse> {
     JsonResponse::ok(response::CurrentLanguageResponse {
-        language: language.identifier().to_string(),
+        lang_id: language.identifier().to_string(),
     })
 }
 
@@ -168,7 +170,7 @@ async fn set_language(
     cookie_jar: CookieJar,
     Json(request): Json<request::SetLanguageRequest>,
 ) -> impl IntoResponse {
-    let language_cookie = Cookie::build((LANGUAGE_COOKIE_NAME, request.language))
+    let language_cookie = Cookie::build((LANGUAGE_COOKIE_NAME, request.lang_id))
         .path("/")
         .secure(true)
         .http_only(true)
@@ -190,7 +192,7 @@ mod request {
 
     #[derive(Deserialize, ToSchema)]
     pub struct SetLanguageRequest {
-        pub language: String,
+        pub lang_id: String,
     }
 }
 mod response {
@@ -207,6 +209,7 @@ mod response {
         pub user: UserDto,
         pub pages: Vec<TranslatedMenuTree>,
         pub permissions: Vec<&'static Permission>,
+        pub lang_id: String,
     }
 
     #[derive(Debug, Clone, Serialize, ToSchema)]
@@ -255,7 +258,7 @@ mod response {
 
     #[derive(Serialize, ToSchema)]
     pub struct CurrentLanguageResponse {
-        pub language: String,
+        pub lang_id: String,
     }
 }
 pub fn routing() -> OpenApiRouter<WebState> {

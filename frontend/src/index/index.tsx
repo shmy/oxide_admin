@@ -44,7 +44,7 @@ const buildDropdown = () => {
               {
                 type: "select",
                 label: "语言",
-                name: "language",
+                name: "lang_id",
                 options: [
                   { value: "en-US", label: "English" },
                   { value: "zh-CN", label: "简体中文" },

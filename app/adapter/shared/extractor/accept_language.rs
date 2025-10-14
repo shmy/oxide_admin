@@ -7,7 +7,7 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 
-pub const LANGUAGE_COOKIE_NAME: &str = "lang";
+pub const LANGUAGE_COOKIE_NAME: &str = "lang_id";
 
 const DEFAULT_LANG_ID: i18n::LanguageIdentifier = i18n::langid!("en-US");
 
