@@ -7,7 +7,7 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 
-const COOKIE_NAME: &str = "lang";
+pub const LANGUAGE_COOKIE_NAME: &str = "lang";
 
 const DEFAULT_LANG_ID: i18n::LanguageIdentifier = i18n::langid!("en-US");
 
@@ -24,7 +24,10 @@ where
         let cookie_lang = CookieJar::from_request_parts(parts, state)
             .await
             .ok()
-            .and_then(|jar| jar.get(COOKIE_NAME).map(|cookie| cookie.value().to_owned()));
+            .and_then(|jar| {
+                jar.get(LANGUAGE_COOKIE_NAME)
+                    .map(|cookie| cookie.value().to_owned())
+            });
 
         let header_lang = parts
             .headers

@@ -31,6 +31,41 @@ const buildDropdown = () => {
     buttons: [
       {
         type: "button",
+        label: "  切换语言",
+        icon: "fas fa-language",
+        actionType: "dialog",
+        dialog: {
+          title: "切换语言",
+          body: {
+            type: "form",
+            initApi: "/profile/language",
+            api: "/profile/language",
+            body: [
+              {
+                type: "select",
+                label: "语言",
+                name: "language",
+                options: [
+                  { value: "en-US", label: "English" },
+                  { value: "zh-CN", label: "简体中文" },
+                ],
+              }
+            ],
+            onEvent: {
+              submitSucc: {
+                actions: [
+                  {
+                    actionType: "custom",
+                    script: "window.location.reload()"
+                  }
+                ]
+              }
+            }
+          }
+        },
+      },
+      {
+        type: "button",
         label: " 修改密码",
         icon: "fas fa-key",
         actionType: "link",

@@ -12,7 +12,8 @@ use application::{
     shared::{command_handler::CommandHandler, query_handler::QueryHandler as _},
 };
 
-use axum::Json;
+use axum::{Json, response::IntoResponse};
+use axum_extra::extract::{CookieJar, cookie::Cookie};
 use domain::auth::value_object::menu::MenuTree;
 use i18n::LanguageIdentifier;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -22,7 +23,11 @@ use crate::{
     api::profile::response::TranslatedMenuTree,
     i18n::LOCALES,
     shared::{
-        extractor::{accept_language::AcceptLanguage, inject::Inject, valid_user::ValidUser},
+        extractor::{
+            accept_language::{AcceptLanguage, LANGUAGE_COOKIE_NAME},
+            inject::Inject,
+            valid_user::ValidUser,
+        },
         response::{JsonResponse, JsonResponseEmpty, JsonResponseType},
     },
 };
@@ -133,6 +138,45 @@ async fn password(
     JsonResponse::ok(())
 }
 
+#[utoipa::path(
+    get,
+    path = "/language",
+    summary = "Current language",
+    tag = "Profile",
+    responses(
+        (status = 200, body = inline(JsonResponse<response::CurrentLanguageResponse>))
+    )
+)]
+#[tracing::instrument]
+async fn language(language: AcceptLanguage) -> JsonResponseType<response::CurrentLanguageResponse> {
+    JsonResponse::ok(response::CurrentLanguageResponse {
+        language: language.identifier().to_string(),
+    })
+}
+
+#[utoipa::path(
+    post,
+    path = "/language",
+    summary = "Set current language",
+    tag = "Profile",
+    responses(
+        (status = 200, body = inline(JsonResponseEmpty))
+    )
+)]
+#[tracing::instrument(skip(request))]
+async fn set_language(
+    cookie_jar: CookieJar,
+    Json(request): Json<request::SetLanguageRequest>,
+) -> impl IntoResponse {
+    let language_cookie = Cookie::build((LANGUAGE_COOKIE_NAME, request.language))
+        .path("/")
+        .secure(true)
+        .http_only(true)
+        .build();
+    let set_cookie = cookie_jar.add(language_cookie);
+    (set_cookie, JsonResponse::ok(())).into_response()
+}
+
 mod request {
     use serde::Deserialize;
     use utoipa::ToSchema;
@@ -142,6 +186,11 @@ mod request {
         pub password: String,
         pub new_password: String,
         pub confirm_new_password: String,
+    }
+
+    #[derive(Deserialize, ToSchema)]
+    pub struct SetLanguageRequest {
+        pub language: String,
     }
 }
 mod response {
@@ -203,11 +252,17 @@ mod response {
             }
         }
     }
-}
 
+    #[derive(Serialize, ToSchema)]
+    pub struct CurrentLanguageResponse {
+        pub language: String,
+    }
+}
 pub fn routing() -> OpenApiRouter<WebState> {
     OpenApiRouter::new()
         .routes(routes!(current))
         .routes(routes!(sign_out))
         .routes(routes!(password))
+        .routes(routes!(language))
+        .routes(routes!(set_language))
 }
