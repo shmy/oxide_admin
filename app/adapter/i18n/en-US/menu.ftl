@@ -1,14 +1,14 @@
-menu_organization = Organization
-menu_department = Department
-menu_user = User
-menu_role = Role
+menu_organization = Organizations
+menu_department = Departments
+menu_user = Users
+menu_role = Roles
 menu_system = System
-menu_cache = Cache
-menu_file = File
-menu_sched = Sched
-menu_bgworker = Bgworker
-menu_access_log = Access Log
-menu_stat = Stat
-menu_example = Example
+menu_cache = Caches
+menu_file = Files
+menu_sched = Schedulers
+menu_bgworker = Bgworkers
+menu_access_log = Access Logs
+menu_stat = Stats
+menu_example = Examples
 
 menu_change_password = Change Password
