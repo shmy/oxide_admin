@@ -1,55 +1,55 @@
 private:
   - key: 1
-    label: 组织架构
+    label: menu_organization
     icon: fas fa-sitemap
     children:
       - key: 100
-        label: 部门管理
+        label: menu_department
         icon: fas fa-building
         url: /organization/department
       - key: 101
-        label: 用户管理
+        label: menu_user
         icon: fas fa-user
         url: /organization/user
       - key: 102
-        label: 角色管理
+        label: menu_role
         icon: fas fa-people-group
         url: /organization/role
   - key: 2
-    label: 系统管理
+    label: menu_system
     icon: fas fa-gear
     children:
       - key: 200
-        label: 缓存管理
+        label: menu_cache
         icon: fas fa-server
         url: /system/cache
       - key: 201
-        label: 文件管理
+        label: menu_file
         icon: fas fa-folder
         url: /system/file
       - key: 202
-        label: 定时任务
+        label: menu_sched
         icon: fas fa-clock
         url: /system/sched
       - key: 203
-        label: 后台任务
+        label: menu_bgworker
         icon: fas fa-circle-nodes
         url: /system/bgworker
       - key: 204
-        label: 访问日志
+        label: menu_access_log
         icon: fas fa-record-vinyl
         url: /system/access_log
       - key: 205
-        label: 系统信息
+        label: menu_stat
         icon: fas fa-info
         url: /system/stat
       - key: 206
-        label: 示例页面
+        label: menu_example
         icon: fas fa-hexagon-nodes
         url: /system/example
 
 public:
   - key: 0
-    label: 修改密码
+    label: menu_change_password
     visible: false
     url: /profile/update_password

@@ -9,7 +9,7 @@ use axum_extra::extract::CookieJar;
 
 const COOKIE_NAME: &str = "lang";
 
-const DEFAULT_LANGUAGE: i18n::LanguageIdentifier = i18n::langid!("en-US");
+const DEFAULT_LANG_ID: i18n::LanguageIdentifier = i18n::langid!("en-US");
 
 #[derive(Clone, Debug)]
 pub struct AcceptLanguage(i18n::LanguageIdentifier);
@@ -32,16 +32,16 @@ where
             .and_then(|v| v.to_str().ok())
             .and_then(|s| accept_language::parse(s).first().cloned());
 
-        let lang = cookie_lang.or(header_lang).and_then(|lang| {
-            let lang = match lang.as_str() {
+        let lang_id = cookie_lang.or(header_lang).and_then(|lang| {
+            let lang_str = match lang.as_str() {
                 "zh" => "zh-CN",
                 "en" => "en-US",
                 other => other,
             };
-            i18n::LanguageIdentifier::from_str(lang).ok()
+            i18n::LanguageIdentifier::from_str(lang_str).ok()
         });
 
-        Ok(Self(lang.unwrap_or(DEFAULT_LANGUAGE)))
+        Ok(Self(lang_id.unwrap_or(DEFAULT_LANG_ID)))
     }
 }
 
