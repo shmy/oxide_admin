@@ -1,23 +1,23 @@
 use crate::organization::{error::OrganizationError, value_object::hashed_password::PasswordError};
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum AuthError {
-    #[error("Captcha generation failed")]
+    #[error("failed_to_generate_captcha")]
     CaptchaGenerationFailed,
     #[error("invalid_captcha")]
     CaptchaInvalid,
     #[error("incorrect_captcha")]
     CaptchaIncorrect,
-    #[error("Failed to generate access token")]
+    #[error("failed_to_generate_access_token")]
     AccessTokenSignFailed,
-    #[error("Failed to verify access token")]
+    #[error("failed_to_verify_access_token")]
     AccessTokenVerifyFailed,
-    #[error("Failed to save access token")]
+    #[error("failed_to_save_access_token")]
     AccessTokenSaveFailed,
-    #[error("{0}")]
+    #[error(transparent)]
     Password(#[from] PasswordError),
-    #[error("{0}")]
+    #[error(transparent)]
     Organization(#[from] OrganizationError),
-    #[error("{0}")]
+    #[error("database_error")]
     Sqlx(String),
 }
 impl From<sqlx::Error> for AuthError {

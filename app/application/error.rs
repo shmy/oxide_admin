@@ -14,56 +14,56 @@ pub type ApplicationResult<T> = std::result::Result<T, ApplicationError>;
 
 #[derive(Debug, Error)]
 pub enum ApplicationError {
-    #[error("Unsupported image format")]
+    #[error("unsupported_image_format")]
     UnsupportedImageFormat,
-    #[error("Illegal token")]
+    #[error("illegal_token")]
     IllegalToken,
 
-    #[error("Recycled token")]
+    #[error("recycled_token")]
     RecycledToken,
 
-    #[error("Permission denied")]
+    #[error("permission_denied")]
     PermissionDenied,
 
-    #[error("{0}")]
+    #[error(transparent)]
     System(#[from] SystemError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Auth(#[from] AuthError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Organization(#[from] OrganizationError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Sqlx(#[from] sqlx::Error),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Io(#[from] std::io::Error),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Image(#[from] image::ImageError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Join(#[from] tokio::task::JoinError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Persist(#[from] tempfile::PersistError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Infrastructure(#[from] InfrastructureError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     ObjectStorage(#[from] ObjectStorageError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Kvdb(#[from] KvdbError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Sched(#[from] SchedError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Cache(#[from] CacheError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Password(#[from] PasswordError),
 }

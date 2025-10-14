@@ -4,17 +4,17 @@ use domain::{
 };
 #[derive(Debug, thiserror::Error)]
 pub enum WebError {
-    #[error("{0}")]
+    #[error(transparent)]
     Application(#[from] application::error::ApplicationError),
-    #[error("{0}")]
+    #[error("invalid_header_value")]
     InvalidHeaderValue(#[from] axum::http::header::InvalidHeaderValue),
-    #[error("Authorized user does not exist")]
+    #[error("authorized_user_not_found")]
     ValidUserNotFound,
-    #[error("{0}")]
+    #[error(transparent)]
     Auth(#[from] AuthError),
-    #[error("{0}")]
+    #[error(transparent)]
     Organization(#[from] OrganizationError),
-    #[error("{0}")]
+    #[error(transparent)]
     System(#[from] SystemError),
 }
 

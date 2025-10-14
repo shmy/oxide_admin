@@ -11,24 +11,24 @@ pub enum InfrastructureError {
     #[error("{0}")]
     Custom(String),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Sqlx(#[from] sqlx::Error),
 
-    #[error("{0}")]
+    #[error(transparent)]
     System(#[from] SystemError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Organization(#[from] OrganizationError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Password(#[from] PasswordError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Kvdb(#[from] KvdbError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Flag(#[from] flag_kit::error::FlagError),
 
-    #[error("{0}")]
+    #[error(transparent)]
     Migrate(#[from] migrate_kit::error::MigrateError),
 }

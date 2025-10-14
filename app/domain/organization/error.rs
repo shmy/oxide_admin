@@ -1,33 +1,33 @@
 use crate::organization::value_object::hashed_password::PasswordError;
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum OrganizationError {
-    #[error("Department not exists")]
+    #[error("department_not_found")]
     DepartmentNotFound,
-    #[error("User not found")]
+    #[error("user_not_found")]
     UserNotFound,
-    #[error("User disabled")]
+    #[error("user_disabled")]
     UserDisabled,
-    #[error("User duplicated")]
+    #[error("user_duplicated")]
     UserDuplicated,
-    #[error("Password mismatch")]
+    #[error("password_mismatch")]
     PasswordMismatch,
-    #[error("Password unchanged")]
+    #[error("password_unchanged")]
     PasswordUnchanged,
-    #[error("Privileged user immutable")]
+    #[error("privileged_user_immutable")]
     UserPrivilegedImmutable,
-    #[error("Role not found")]
+    #[error("role_not_found")]
     RoleNotFound,
-    #[error("Role disabled")]
+    #[error("role_disabled")]
     RoleDisabled,
-    #[error("Role duplicated")]
+    #[error("role_duplicated")]
     RoleDuplicated,
-    #[error("Privileged role immutable")]
+    #[error("privileged_role_immutable")]
     RolePrivilegedImmutable,
-    #[error("Refresh token expired")]
+    #[error("refresh_token_expired")]
     RefreshTokenExpired,
-    #[error("{0}")]
+    #[error(transparent)]
     Password(#[from] PasswordError),
-    #[error("{0}")]
+    #[error("database_error")]
     Sqlx(String),
 }
 impl From<sqlx::Error> for OrganizationError {

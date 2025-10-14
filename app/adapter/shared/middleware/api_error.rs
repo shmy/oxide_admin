@@ -17,8 +17,11 @@ pub async fn api_error(accept_language: AcceptLanguage, request: Request, next: 
     if let Some(data) = response.extensions().get::<WebErrorData>() {
         let lang = accept_language.identifier();
         let query = i18n::Query::new(&data.code);
-        let info = LOCALES.query(lang, &query).unwrap_or_default();
-        return JsonResponse::<()>::err(info.value).into_response();
+        let info = LOCALES
+            .query(lang, &query)
+            .map(|message| message.value)
+            .unwrap_or(data.code.to_string());
+        return JsonResponse::<()>::err(info).into_response();
     }
     let is_json_content_type = response
         .headers()
