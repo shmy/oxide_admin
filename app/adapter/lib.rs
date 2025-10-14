@@ -1,6 +1,7 @@
 mod api;
 #[cfg(not(debug_assertions))]
 mod frontend;
+mod i18n;
 mod shared;
 mod upload;
 use axum::Router;

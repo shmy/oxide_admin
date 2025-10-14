@@ -1,8 +1,4 @@
-use super::response::JsonResponse;
-use axum::{
-    http::StatusCode,
-    response::{IntoResponse, Response},
-};
+use axum::response::{IntoResponse, Response};
 use domain::{
     auth::error::AuthError, organization::error::OrganizationError, system::error::SystemError,
 };
@@ -21,10 +17,18 @@ pub enum WebError {
     #[error("{0}")]
     System(#[from] SystemError),
 }
+
 impl IntoResponse for WebError {
     fn into_response(self) -> Response {
-        let info = self.to_string();
-        tracing::error!(error = % self, info);
-        (StatusCode::OK, JsonResponse::<()>::err(info)).into_response()
+        let code = self.to_string();
+        tracing::error!(error = % self, code);
+        let mut response = Response::default();
+        response.extensions_mut().insert(WebErrorData { code });
+        response
     }
+}
+
+#[derive(Clone, Debug)]
+pub struct WebErrorData {
+    pub code: String,
 }

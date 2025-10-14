@@ -1,3 +1,5 @@
+[ ] i18n for backend
+[ ] i18n for frontend
 [ ] 操作日志
 [ ] 用户绑定部门
 [ ] 默认头像

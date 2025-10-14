@@ -1,3 +1,7 @@
+use crate::i18n::LOCALES;
+use crate::shared::extractor::accept_language::AcceptLanguage;
+use crate::shared::{error::WebErrorData, response::JsonResponse};
+use axum::response::IntoResponse as _;
 use axum::{
     body::{Body, to_bytes},
     extract::Request,
@@ -5,13 +9,17 @@ use axum::{
     middleware::Next,
     response::Response,
 };
-
-use crate::shared::response::JsonResponse;
 const JSON_CONTENT_TYPE: HeaderValue = HeaderValue::from_static("application/json");
 
-pub async fn api_error(request: Request, next: Next) -> Response {
+pub async fn api_error(accept_language: AcceptLanguage, request: Request, next: Next) -> Response {
     let response = next.run(request).await;
-
+    // is the web error
+    if let Some(data) = response.extensions().get::<WebErrorData>() {
+        let lang = accept_language.identifier();
+        let query = i18n::Query::new(&data.code);
+        let info = LOCALES.query(lang, &query).unwrap_or_default();
+        return JsonResponse::<()>::err(info.value).into_response();
+    }
     let is_json_content_type = response
         .headers()
         .get(CONTENT_TYPE)
@@ -22,6 +30,7 @@ pub async fn api_error(request: Request, next: Next) -> Response {
     if status.is_redirection() {
         return response;
     }
+    // fix axum json/path/query eg. error
     if !status.is_success() && !is_json_content_type {
         let body_bytes = to_bytes(response.into_body(), usize::MAX)
             .await
