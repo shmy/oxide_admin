@@ -6,8 +6,8 @@ use domain::{
 pub enum WebError {
     #[error(transparent)]
     Application(#[from] application::error::ApplicationError),
-    #[error("invalid_header_value")]
-    InvalidHeaderValue(#[from] axum::http::header::InvalidHeaderValue),
+    #[error("illegal_header_value")]
+    IllegalHeaderValue(#[from] axum::http::header::InvalidHeaderValue),
     #[error("authorized_user_not_found")]
     ValidUserNotFound,
     #[error(transparent)]

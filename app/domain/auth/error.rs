@@ -3,10 +3,10 @@ use crate::organization::{error::OrganizationError, value_object::hashed_passwor
 pub enum AuthError {
     #[error("failed_to_generate_captcha")]
     CaptchaGenerationFailed,
-    #[error("invalid_captcha")]
-    CaptchaInvalid,
+    #[error("illegal_captcha")]
+    IllegalCaptcha,
     #[error("incorrect_captcha")]
-    CaptchaIncorrect,
+    IncorrectCaptcha,
     #[error("failed_to_generate_access_token")]
     AccessTokenSignFailed,
     #[error("failed_to_verify_access_token")]

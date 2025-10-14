@@ -45,11 +45,11 @@ impl CaptchaIssuerTrait for CaptchaIssuerImpl {
     async fn verify(&self, key: &str, value: &str) -> Result<(), Self::Error> {
         let full_key = Self::fill_captcha_key(key);
         let Some(existing_value) = self.kvdb.get::<String>(&full_key).await else {
-            return Err(AuthError::CaptchaInvalid);
+            return Err(AuthError::IllegalCaptcha);
         };
 
         if existing_value != value {
-            return Err(AuthError::CaptchaIncorrect);
+            return Err(AuthError::IncorrectCaptcha);
         }
 
         let _ = self.kvdb.delete(&full_key).await;
@@ -90,9 +90,9 @@ mod tests {
             .await
             .unwrap();
         let result = captcha_issuer.verify(&result.key, "fake_value").await;
-        assert_eq!(result.err(), Some(AuthError::CaptchaIncorrect));
+        assert_eq!(result.err(), Some(AuthError::IncorrectCaptcha));
 
         let result = captcha_issuer.verify("not_exist_key", "fake_value").await;
-        assert_eq!(result.err(), Some(AuthError::CaptchaInvalid));
+        assert_eq!(result.err(), Some(AuthError::IllegalCaptcha));
     }
 }

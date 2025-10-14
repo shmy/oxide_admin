@@ -16,6 +16,7 @@ pub type ApplicationResult<T> = std::result::Result<T, ApplicationError>;
 pub enum ApplicationError {
     #[error("unsupported_image_format")]
     UnsupportedImageFormat,
+
     #[error("illegal_token")]
     IllegalToken,
 
