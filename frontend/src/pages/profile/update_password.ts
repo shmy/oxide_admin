@@ -1,26 +1,26 @@
-export {};
+export { };
 
 const schema = {
   type: "page",
   body: {
     type: "form",
-    title: "修改密码",
+    title: "",
     api: "put:/profile/password",
     body: [
       {
-        label: "旧密码",
+        label: _t('current_password'),
         name: "password",
         required: true,
         type: "input-password",
       },
       {
-        label: "新密码",
+        label: _t('new_password'),
         name: "new_password",
         required: true,
         type: "input-password",
       },
       {
-        label: "确认密码",
+        label: _t('confirm_new_password'),
         name: "confirm_new_password",
         required: true,
         type: "input-password",

@@ -28,12 +28,12 @@ const buildFilter = (items?: any[]) => {
         type: "submit",
         icon: "fas fa-search",
         level: "primary",
-        label: "查询",
+        label: _t('query'),
       },
       {
         icon: "fas fa-broom",
         type: "reset",
-        label: "重置",
+        label: _t('reset'),
       },
     ],
   };
@@ -62,10 +62,10 @@ export const buildCrudTable = (props: buildCrudTableProps) => {
   const deleteEndpoint = props.deleteEndpoint ?? props.endpoint;
   if (deletable) {
     bulkActions.push({
-      label: "删除",
+      label: _t('delete'),
       icon: "fas fa-trash",
       level: "danger",
-      tooltip: "删除所选中项",
+      tooltip: _t('delete_selected_items'),
       actionType: "ajax",
       api: {
         method: "post",
@@ -74,7 +74,7 @@ export const buildCrudTable = (props: buildCrudTableProps) => {
           ids: "${ids | split}",
         },
       },
-      confirmText: "确定要批量删除?",
+      confirmText: _t('are_you_sure_to_batch_delete'),
     });
   }
   bulkActions.push(...(props.bulkActions || []));
@@ -85,10 +85,10 @@ export const buildCrudTable = (props: buildCrudTableProps) => {
       type: "button",
       level: "link",
       icon: "fas fa-trash",
-      label: " 删除",
+      label: " " + _t('delete'),
       size: "lg",
       disabledOn: props.itemDeletableOn,
-      confirmText: "确定要删除吗？",
+      confirmText: _t('are_you_sure_to_delete'),
       actionType: "ajax",
       className: "text-danger",
       api: {
@@ -104,7 +104,7 @@ export const buildCrudTable = (props: buildCrudTableProps) => {
       level: "link",
       icon: "fa fa-ellipsis-h",
       hideCaret: true,
-      tooltip: "更多选项",
+      tooltip: _t("more_options"),
       buttons: buttons,
     });
   }
@@ -113,16 +113,14 @@ export const buildCrudTable = (props: buildCrudTableProps) => {
   if (props.showCreatedAt ?? true) {
     columns.push({
       name: "created_at",
-      label: "创建时间",
-      // "sortable": sortable,
+      label: _t('created_at'),
       type: "datetime",
     });
   }
   if (props.showUpdatedAt ?? true) {
     columns.push({
       name: "updated_at",
-      label: "更新时间",
-      // "sortable": sortable,
+      label: _t('updated_at'),
       type: "datetime",
     });
   }
@@ -145,7 +143,7 @@ export const buildCrudTable = (props: buildCrudTableProps) => {
         icon: "fas fa-repeat",
         type: "button",
         actionType: "reload",
-        tooltip: "刷新数据",
+        tooltip: _t('refresh'),
       },
       ...(props.headerToolbar || []),
     ],
@@ -155,7 +153,7 @@ export const buildCrudTable = (props: buildCrudTableProps) => {
   };
   if (operationButtons.length > 0) {
     data.columns.push({
-      label: "操作",
+      label: _t('oprations'),
       type: "operation",
       width: `${operationButtons.length * 50}px`,
       fixed: "right",

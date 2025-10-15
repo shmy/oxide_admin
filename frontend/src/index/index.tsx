@@ -31,11 +31,11 @@ const buildDropdown = () => {
     buttons: [
       {
         type: "button",
-        label: "  切换语言",
+        label: " " + _t('switch_language'),
         icon: "fas fa-language",
         actionType: "dialog",
         dialog: {
-          title: "切换语言",
+          title: _t('switch_language'),
           body: {
             type: "form",
             initApi: "/profile/language",
@@ -43,7 +43,7 @@ const buildDropdown = () => {
             body: [
               {
                 type: "select",
-                label: "语言",
+                label: _t('language'),
                 name: "lang_id",
                 options: [
                   { value: "en-US", label: "English" },
@@ -66,29 +66,29 @@ const buildDropdown = () => {
       },
       {
         type: "button",
-        label: " 修改密码",
+        label: " " + _t('change_password'),
         icon: "fas fa-key",
         actionType: "link",
         link: "/profile/update_password",
       },
       {
         type: "button",
-        label: " 退出登录",
+        label: " " + _t('sign_out'),
         icon: "fas fa-sign-out",
         actionType: "dialog",
         dialog: {
-          title: "注销",
-          body: "确定要注销登录吗？",
+          title: _t('sign_out'),
+          body: _t('are_you_sure_to_sign_out'),
           actions: [
             {
               type: "button",
-              label: "取消",
+              label: _t('cancel'),
               close: true,
             },
             {
               type: "button",
               level: "primary",
-              label: "确定",
+              label: _t('confirm'),
               onClick: signOut,
             },
           ],
@@ -129,7 +129,7 @@ const amisScoped = amis.embed(
   "#root",
   schemas,
   {
-    locale: "zh-CN",
+    locale: "en-US",
     context: {},
   },
   {

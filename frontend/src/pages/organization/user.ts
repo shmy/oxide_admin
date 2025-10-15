@@ -13,11 +13,11 @@ const roleEndpoint = {
 };
 
 const buildDrawer = (isAdd = true) => {
-  const label = isAdd ? "创建用户" : null;
-  const title = isAdd ? "创建用户" : "编辑用户";
+  const label = isAdd ? _t('create_user') : null;
+  const title = isAdd ? _t('create_user') : _t('edit_user');
   const level = isAdd ? "primary" : "link";
   const icon = isAdd ? "fas fa-plus" : "fas fa-edit";
-  const tooltip = isAdd ? null : "编辑";
+  const tooltip = isAdd ? null : _t('edit_user');
 
   const api = isAdd ? `post:${endpoint}` : `put:${endpoint}/$id`;
   const initApi = isAdd ? null : `get:${endpoint}/$id`;
@@ -56,34 +56,34 @@ const buildDrawer = (isAdd = true) => {
           {
             type: "switch",
             name: "enabled",
-            label: "状态",
+            label: _t('enable'),
             required: true,
             disabledOn: "this.privileged",
           },
           {
             type: "input-text",
             name: "name",
-            label: "用户姓名",
+            label: _t('user_name'),
             required: true,
             disabledOn: "this.privileged",
           },
           {
             type: "input-text",
             name: "account",
-            label: "登录账号",
+            label: _t('user_login_account'),
             required: true,
             disabledOn: "this.privileged",
           },
           {
             type: isAdd ? "input-password" : "hidden",
             name: "password",
-            label: "登录密码",
+            label: _t('user_login_password'),
             required: isAdd,
           },
           {
             type: "input-image",
             name: "portrait",
-            label: "头像",
+            label: _t('user_portrait'),
             receiver: "/uploads/image",
             maxLength: 1,
             crop: {
@@ -95,7 +95,7 @@ const buildDrawer = (isAdd = true) => {
           {
             type: "select",
             name: "role_ids",
-            label: "角色列表",
+            label: _t('user_roles'),
             source: roleEndpoint,
             multiple: true,
             joinValues: false,
@@ -115,16 +115,15 @@ const buildDrawer = (isAdd = true) => {
 
 const buildUpdatePasswordDrawer = () => {
   return {
-    label: " 修改密码",
+    label: " " + _t('change_password'),
     icon: "fas fa-key",
-    tooltip: "修改用户密码",
     type: "button",
     align: "right",
     actionType: "drawer",
     level: "link",
     disabledOn: "this.privileged",
     drawer: {
-      title: "修改密码",
+      title: _t('change_password'),
       size: "lg",
       body: {
         type: "form",
@@ -134,13 +133,13 @@ const buildUpdatePasswordDrawer = () => {
           {
             type: "input-password",
             name: "new_password",
-            label: "新密码",
+            label: _t('new_password'),
             required: true,
           },
           {
             type: "input-password",
             name: "confirm_new_password",
-            label: "确认新密码",
+            label: _t('confirm_new_password'),
             required: true,
           },
         ],
@@ -157,34 +156,34 @@ const schema = {
       {
         type: "input-text",
         name: "name",
-        label: "用户姓名",
-        placeholder: "请输入用户姓名",
+        label: _t('user_name'),
+        placeholder: "",
         clearable: true,
       },
       {
         type: "input-text",
         name: "account",
-        label: "登录账号",
-        placeholder: "请输入登录账号",
+        label: _t('user_login_account'),
+        placeholder: "",
         clearable: true,
       },
       {
         type: "select",
         name: "enabled",
-        label: "用户状态",
-        placeholder: "请选择用户状态",
+        label: _t('enable'),
+        placeholder: "",
         clearable: true,
         options: enabledStatuses,
       },
       {
         type: "select",
         name: "role_id",
-        label: "用户角色",
+        label: _t('user_roles'),
+        placeholder: "",
         joinValues: false,
         extractValue: true,
         searchable: true,
         clearable: true,
-        placeholder: "请选择角色",
         source: roleEndpoint,
       },
     ],
@@ -193,10 +192,10 @@ const schema = {
     ],
     bulkActions: [
       ...ifElementAuthorized(PERMISSIONS.SYSTEM.USER.ENABLE, {
-        label: "启用",
+        label: _t('enable'),
         icon: "fas fa-check",
         level: "success",
-        tooltip: "将所选中项的状态设为启用",
+        tooltip: _t('enable_selected_items'),
         actionType: "ajax",
         api: {
           method: "post",
@@ -205,13 +204,13 @@ const schema = {
             ids: "${ids | split}",
           },
         },
-        confirmText: "确定要批量将状态设为启用?",
+        confirmText: _t('are_you_sure_to_batch_enable'),
       }),
       ...ifElementAuthorized(PERMISSIONS.SYSTEM.USER.DISABLE, {
-        label: "禁用",
+        label: _t('disable'),
         icon: "fas fa-close",
         level: "warning",
-        tooltip: "将所选中项的状态设为禁用",
+        tooltip: _t('disable_selected_items'),
         actionType: "ajax",
         api: {
           method: "post",
@@ -220,7 +219,7 @@ const schema = {
             ids: "${ids | split}",
           },
         },
-        confirmText: "确定要批量将状态设为禁用?",
+        confirmText: _t('are_you_sure_to_batch_disable'),
       }),
     ],
     operations: [
@@ -235,11 +234,11 @@ const schema = {
     columns: [
       {
         name: "name",
-        label: "用户姓名",
+        label: _t('user_name'),
       },
       {
         name: "portrait",
-        label: "头像",
+        label: _t('user_portrait'),
         type: "avatar",
         defaultAvatar: logoUrl,
         shape: "rounded",
@@ -248,20 +247,20 @@ const schema = {
       },
       {
         name: "account",
-        label: "登录账号",
+        label: _t('user_login_account'),
       },
       {
         name: "role_names",
-        label: "角色列表",
+        label: _t('user_roles'),
       },
       {
         name: "enabled",
-        label: "状态",
+        label: _t('enable'),
         type: "status",
       },
       {
         name: "privileged",
-        label: "特权账号",
+        label: _t('privileged_account'),
         type: "status",
       },
     ],

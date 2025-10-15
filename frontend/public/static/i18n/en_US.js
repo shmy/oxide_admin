@@ -1,0 +1,48 @@
+;(function (window) {
+    const ftl = `
+create_user = Create User
+edit_user = Edit User
+more_options = More Options
+delete = Delete
+delete_selected_items = Delete Selected items
+are_you_sure_to_delete = Are you sure to delete?
+are_you_sure_to_batch_delete = Are you sure to batch delete?
+change_password = Change Password
+created_at = Created At
+updated_at = Updated At
+query = Query
+reset = Reset
+oprations = Operations
+refresh = Refresh
+enable = Enable
+enable_selected_items = Enable Selected items
+are_you_sure_to_batch_enable = Are you sure to batch enable?
+disable = Disable
+disable_selected_items = Disable Selected items
+are_you_sure_to_batch_disable = Are you sure to batch disable?
+language = Language
+switch_language = Switch Language
+sign_out = Sign Out
+are_you_sure_to_sign_out = Are you sure to sign out?
+cancel = Cancel
+confirm = Confirm
+user_name = User Name
+user_login_account = User Login Account
+user_login_password = User Login Password
+user_portrait = User Portrait
+user_roles = User Roles
+privileged_account = Privileged Account
+current_password = Current Password
+new_password = New Password
+confirm_new_password = Confirm New Password
+`;
+    const bundle = new window.FluentBundle.FluentBundle('en_US');
+    bundle.addResource(new window.FluentBundle.FluentResource(ftl));
+    window._t = (key, arg) => {
+        const data = bundle.getMessage(key);
+        if (!data) {
+            return key;
+        }
+        return bundle.formatPattern(data.value, arg);
+    };
+})(window);

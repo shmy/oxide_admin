@@ -17,3 +17,4 @@ declare var amisRequire: (name: string) => any;
 declare var _permissions: Set<number>;
 declare var _hasPermission: (permission: number) => boolean;
 declare var _j: (schema: Record<string, unknown>) => void;
+declare var _t: (key: string, args?: Record<string, unknown>) => string;

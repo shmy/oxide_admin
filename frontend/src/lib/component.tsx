@@ -19,7 +19,6 @@ export const registerComponents = (amisLib: any) => {
         type: "pretty-ms",
         autoVar: true,
     })(withSuspense(PrettyMs));
-
 };
 
 const withSuspense = (Comp: any) => {
