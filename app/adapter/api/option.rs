@@ -3,14 +3,16 @@ use application::{
     organization::query::option_roles::OptionRolesQueryHandler,
     shared::{dto::OptionStringDto, query_handler::QueryHandler as _},
 };
-use domain::auth::value_object::{menu::MenuTree, permission::PermissionTree};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     WebState,
     shared::{
-        extractor::inject::Inject,
+        extractor::{accept_language::AcceptLanguage, inject::Inject},
         response::{JsonResponse, JsonResponseType},
+        translation::{
+            TranslatedMenuTree, TranslatedPermissionTree, tranlate_menus, tranlate_permissions,
+        },
     },
 };
 
@@ -37,13 +39,18 @@ async fn roles(
     summary = "List menu tree",
     tag = "Option",
     responses(
-        (status = 200, body = inline(JsonResponse<Vec<MenuTree>>))
+        (status = 200, body = inline(JsonResponse<Vec<TranslatedMenuTree>>))
     )
 )]
 #[tracing::instrument]
-async fn menus(Inject(service): Inject<AuthService>) -> JsonResponseType<&'static [MenuTree]> {
+async fn menus(
+    language: AcceptLanguage,
+    Inject(service): Inject<AuthService>,
+) -> JsonResponseType<Vec<TranslatedMenuTree>> {
     let pages = service.get_all_privated_pages();
-    JsonResponse::ok(pages)
+    let lang_id = language.identifier();
+    let menus = tranlate_menus(pages.to_vec(), &lang_id);
+    JsonResponse::ok(menus)
 }
 
 #[utoipa::path(
@@ -52,15 +59,17 @@ async fn menus(Inject(service): Inject<AuthService>) -> JsonResponseType<&'stati
     summary = "List permission tree",
     tag = "Option",
     responses(
-        (status = 200, body = inline(JsonResponse<Vec<PermissionTree>>))
+        (status = 200, body = inline(JsonResponse<Vec<TranslatedPermissionTree>>))
     )
 )]
 #[tracing::instrument]
 async fn permissions(
+    language: AcceptLanguage,
     Inject(service): Inject<AuthService>,
-) -> JsonResponseType<&'static [PermissionTree]> {
+) -> JsonResponseType<Vec<TranslatedPermissionTree>> {
     let tree = service.get_permission_tree();
-    JsonResponse::ok(tree)
+    let lang_id = language.identifier();
+    JsonResponse::ok(tranlate_permissions(tree.to_vec(), lang_id))
 }
 
 pub fn routing() -> OpenApiRouter<WebState> {

@@ -2,6 +2,16 @@
     const ftl = `
 create_user = Create User
 edit_user = Edit User
+
+create_role = Create Role
+edit_role = Edit Role
+role_name = Role Name
+role_menus = Role Menus
+role_permissions = Role Permissions
+privileged_role = Privileged Role
+
+system = System
+
 more_options = More Options
 delete = Delete
 delete_selected_items = Delete Selected items

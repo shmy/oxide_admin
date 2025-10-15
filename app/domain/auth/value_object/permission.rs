@@ -23,12 +23,12 @@ impl Deref for Permission {
 
 #[derive(Debug, Clone, Serialize, ToSchema)]
 pub struct PermissionTree {
-    label: &'static str,
+    pub label: &'static str,
     #[serde(skip_serializing_if = "Option::is_none")]
-    value: Option<Permission>,
+    pub value: Option<Permission>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(no_recursion)]
-    children: Option<&'static [PermissionTree]>,
+    pub children: Option<&'static [PermissionTree]>,
 }
 
 include!(concat!(env!("OUT_DIR"), "/permissions.rs"));

@@ -129,7 +129,7 @@ const amisScoped = amis.embed(
   "#root",
   schemas,
   {
-    locale: "en-US",
+    locale: _locale,
     context: {},
   },
   {

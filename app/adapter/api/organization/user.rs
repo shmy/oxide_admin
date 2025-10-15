@@ -25,8 +25,9 @@ use axum::{
     extract::{Path, Query},
 };
 use domain::auth::value_object::permission::{
-    SYSTEM_USER_CREATE, SYSTEM_USER_DELETE, SYSTEM_USER_DISABLE, SYSTEM_USER_ENABLE,
-    SYSTEM_USER_READ, SYSTEM_USER_UPDATE, SYSTEM_USER_UPDATE_PASSWORD,
+    ORGANIZATION_USER_CREATE, ORGANIZATION_USER_DELETE, ORGANIZATION_USER_DISABLE,
+    ORGANIZATION_USER_ENABLE, ORGANIZATION_USER_READ, ORGANIZATION_USER_UPDATE,
+    ORGANIZATION_USER_UPDATE_PASSWORD,
 };
 use domain::organization::value_object::user_id::UserId;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -216,12 +217,12 @@ mod request {
 
 pub fn routing() -> OpenApiRouter<WebState> {
     OpenApiRouter::new()
-        .routes(routes!(search).permit_all(perms!(SYSTEM_USER_READ)))
-        .routes(routes!(retrieve).permit_all(perms!(SYSTEM_USER_READ)))
-        .routes(routes!(batch_delete).permit_all(perms!(SYSTEM_USER_DELETE)))
-        .routes(routes!(batch_enable).permit_all(perms!(SYSTEM_USER_ENABLE)))
-        .routes(routes!(batch_disable).permit_all(perms!(SYSTEM_USER_DISABLE)))
-        .routes(routes!(create).permit_all(perms!(SYSTEM_USER_CREATE)))
-        .routes(routes!(update).permit_all(perms!(SYSTEM_USER_UPDATE)))
-        .routes(routes!(update_password).permit_all(perms!(SYSTEM_USER_UPDATE_PASSWORD)))
+        .routes(routes!(search).permit_all(perms!(ORGANIZATION_USER_READ)))
+        .routes(routes!(retrieve).permit_all(perms!(ORGANIZATION_USER_READ)))
+        .routes(routes!(batch_delete).permit_all(perms!(ORGANIZATION_USER_DELETE)))
+        .routes(routes!(batch_enable).permit_all(perms!(ORGANIZATION_USER_ENABLE)))
+        .routes(routes!(batch_disable).permit_all(perms!(ORGANIZATION_USER_DISABLE)))
+        .routes(routes!(create).permit_all(perms!(ORGANIZATION_USER_CREATE)))
+        .routes(routes!(update).permit_all(perms!(ORGANIZATION_USER_UPDATE)))
+        .routes(routes!(update_password).permit_all(perms!(ORGANIZATION_USER_UPDATE_PASSWORD)))
 }

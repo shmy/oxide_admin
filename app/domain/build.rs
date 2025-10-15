@@ -6,7 +6,6 @@ use std::path::Path;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PermissionItem {
-    label: String,
     key: String,
     #[serde(default)]
     value: Option<i32>,
@@ -118,7 +117,13 @@ fn generate_permissions() {
 
         if !node.children.is_empty() {
             writeln!(rs, "{}PermissionTree {{", indent).unwrap();
-            writeln!(rs, "{}    label: \"{}\",", indent, node.label).unwrap();
+            writeln!(
+                rs,
+                "{}    label: \"{}\",",
+                indent,
+                format!("perm_{}", node.key),
+            )
+            .unwrap();
             writeln!(rs, "{}    value: {},", indent, value_str).unwrap();
             writeln!(rs, "{}    children: Some(&[", indent).unwrap();
             for child in &node.children {
@@ -130,7 +135,9 @@ fn generate_permissions() {
             writeln!(
                 rs,
                 "{}PermissionTree {{ label: \"{}\", value: {}, children: None }},",
-                indent, node.label, value_str
+                indent,
+                format!("perm_{}", node.key),
+                value_str
             )
             .unwrap();
         }

@@ -188,10 +188,10 @@ const schema = {
       },
     ],
     headerToolbar: [
-      ...ifElementAuthorized(PERMISSIONS.SYSTEM.USER.CREATE, buildDrawer()),
+      ...ifElementAuthorized(PERMISSIONS.ORGANIZATION.USER.CREATE, buildDrawer()),
     ],
     bulkActions: [
-      ...ifElementAuthorized(PERMISSIONS.SYSTEM.USER.ENABLE, {
+      ...ifElementAuthorized(PERMISSIONS.ORGANIZATION.USER.ENABLE, {
         label: _t('enable'),
         icon: "fas fa-check",
         level: "success",
@@ -206,7 +206,7 @@ const schema = {
         },
         confirmText: _t('are_you_sure_to_batch_enable'),
       }),
-      ...ifElementAuthorized(PERMISSIONS.SYSTEM.USER.DISABLE, {
+      ...ifElementAuthorized(PERMISSIONS.ORGANIZATION.USER.DISABLE, {
         label: _t('disable'),
         icon: "fas fa-close",
         level: "warning",
@@ -223,12 +223,12 @@ const schema = {
       }),
     ],
     operations: [
-      ...ifElementAuthorized(PERMISSIONS.SYSTEM.USER.UPDATE, buildDrawer(false)),
+      ...ifElementAuthorized(PERMISSIONS.ORGANIZATION.USER.UPDATE, buildDrawer(false)),
     ],
     subOperations: [
-      ...ifElementAuthorized(PERMISSIONS.SYSTEM.USER.UPDATE_PASSWORD, buildUpdatePasswordDrawer()),
+      ...ifElementAuthorized(PERMISSIONS.ORGANIZATION.USER.UPDATE_PASSWORD, buildUpdatePasswordDrawer()),
     ],
-    deletable: _hasPermission(PERMISSIONS.SYSTEM.USER.DELETE),
+    deletable: _hasPermission(PERMISSIONS.ORGANIZATION.USER.DELETE),
     itemDeletableOn: "this.privileged",
     itemCheckableOn: "!this.privileged",
     columns: [

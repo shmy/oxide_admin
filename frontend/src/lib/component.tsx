@@ -19,6 +19,10 @@ export const registerComponents = (amisLib: any) => {
         type: "pretty-ms",
         autoVar: true,
     })(withSuspense(PrettyMs));
+
+    amisLib.registerFilter('t', (input: any) => {
+        return window._t(input);
+    });
 };
 
 const withSuspense = (Comp: any) => {

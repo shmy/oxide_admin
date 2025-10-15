@@ -17,11 +17,11 @@ const permissionEndpoint = {
 };
 
 const buildDrawer = (isAdd = true) => {
-  const label = isAdd ? "创建角色" : null;
-  const title = isAdd ? "创建角色" : "编辑角色";
+  const label = isAdd ? _t('create_role') : null;
+  const title = isAdd ? _t('create_role') : _t('edit_role');
   const level = isAdd ? "primary" : "link";
   const icon = isAdd ? "fas fa-plus" : "fas fa-edit";
-  const tooltip = isAdd ? null : "编辑";
+  const tooltip = isAdd ? null : _t('edit_role');
 
   const api = isAdd ? `post:${endpoint}` : `put:${endpoint}/$id`;
   const initApi = isAdd ? null : `get:${endpoint}/$id`;
@@ -61,21 +61,21 @@ const buildDrawer = (isAdd = true) => {
           {
             type: "switch",
             name: "enabled",
-            label: "状态",
+            label: _t('enable'),
             required: true,
             disabledOn: "this.privileged",
           },
           {
             type: "input-text",
             name: "name",
-            label: "角色名称",
+            label: _t('role_name'),
             required: true,
             disabledOn: "this.privileged",
           },
           {
             type: "tree-select",
             name: "menus",
-            label: "角色菜单",
+            label: _t('role_menus'),
             source: menuEndpoint,
             labelField: "label",
             valueField: "key",
@@ -89,9 +89,9 @@ const buildDrawer = (isAdd = true) => {
           {
             name: "permissions",
             type: "checkboxes",
-            label: "角色权限",
+            label: _t('role_permissions'),
             checkAll: true,
-            columnsCount: 4,
+            columnsCount: 3,
             inline: false,
             joinValues: false,
             extractValue: true,
@@ -117,37 +117,37 @@ const schema = {
       {
         type: "input-text",
         name: "name",
-        label: "角色名称",
-        placeholder: "请输入角色名称",
+        label: _t('role_name'),
+        placeholder: "",
         clearable: true,
       },
       {
         type: "select",
         name: "enabled",
-        label: "角色状态",
-        placeholder: "请选择角色状态",
+        label: _t('enable'),
+        placeholder: "",
         clearable: true,
         options: enabledStatuses,
       },
       {
         type: "tree-select",
         name: "menu",
-        label: "角色菜单",
+        label: _t('role_menus'),
         source: menuEndpoint,
-        placeholder: "请选择权限",
+        placeholder: "",
         labelField: "label",
         valueField: "key",
       },
     ],
     headerToolbar: [
-      ...ifElementAuthorized(PERMISSIONS.SYSTEM.ROLE.CREATE, buildDrawer()),
+      ...ifElementAuthorized(PERMISSIONS.ORGANIZATION.ROLE.CREATE, buildDrawer()),
     ],
     bulkActions: [
-      ...ifElementAuthorized(PERMISSIONS.SYSTEM.ROLE.ENABLE, {
-        label: "启用",
+      ...ifElementAuthorized(PERMISSIONS.ORGANIZATION.ROLE.ENABLE, {
+        label: _t('enable'),
         icon: "fas fa-check",
         level: "success",
-        tooltip: "将所选中项的状态设为启用",
+        tooltip: _t('enable_selected_items'),
         actionType: "ajax",
         api: {
           method: "post",
@@ -156,13 +156,13 @@ const schema = {
             ids: "${ids | split}",
           },
         },
-        confirmText: "确定要批量将状态设为启用?",
+        confirmText: _t('are_you_sure_to_batch_enable'),
       }),
-      ...ifElementAuthorized(PERMISSIONS.SYSTEM.ROLE.DISABLE, {
-        label: "禁用",
+      ...ifElementAuthorized(PERMISSIONS.ORGANIZATION.ROLE.DISABLE, {
+        label: _t('disable'),
         icon: "fas fa-close",
         level: "warning",
-        tooltip: "将所选中项的状态设为禁用",
+        tooltip: _t('disable_selected_items'),
         actionType: "ajax",
         api: {
           method: "post",
@@ -171,28 +171,28 @@ const schema = {
             ids: "${ids | split}",
           },
         },
-        confirmText: "确定要批量将状态设为禁用?",
+        confirmText: _t('are_you_sure_to_batch_disable'),
       }),
     ],
     operations: [
-      ...ifElementAuthorized(PERMISSIONS.SYSTEM.ROLE.UPDATE, buildDrawer(false)),
+      ...ifElementAuthorized(PERMISSIONS.ORGANIZATION.ROLE.UPDATE, buildDrawer(false)),
     ],
-    deletable: _hasPermission(PERMISSIONS.SYSTEM.ROLE.DELETE),
+    deletable: _hasPermission(PERMISSIONS.ORGANIZATION.ROLE.DELETE),
     itemDeletableOn: "this.privileged",
     itemCheckableOn: "!this.privileged",
     columns: [
       {
         name: "name",
-        label: "角色名称",
+        label: _t('role_name'),
       },
       {
         name: "enabled",
-        label: "状态",
+        label: _t('enable'),
         type: "status",
       },
       {
         name: "privileged",
-        label: "特权角色",
+        label: _t('privileged_role'),
         type: "status",
       },
     ],

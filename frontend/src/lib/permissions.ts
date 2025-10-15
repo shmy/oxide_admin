@@ -1,5 +1,11 @@
 export const PERMISSIONS = {
-  SYSTEM: {
+  ORGANIZATION: {
+    DEPARTMENT: {
+      READ: 600,
+      CREATE: 601,
+      UPDATE: 602,
+      DELETE: 603,
+    },
     USER: {
       READ: 100,
       CREATE: 101,
@@ -17,6 +23,8 @@ export const PERMISSIONS = {
       ENABLE: 204,
       DISABLE: 205,
     },
+  },
+  SYSTEM: {
     FILE: {
       READ: 300,
       UPLOAD: 301,
@@ -28,12 +36,6 @@ export const PERMISSIONS = {
     },
     BGWORKER: {
       READ: 500,
-    },
-    DEPARTMENT: {
-      READ: 600,
-      CREATE: 601,
-      UPDATE: 602,
-      DELETE: 603,
     },
     CACHE: {
       READ: 700,

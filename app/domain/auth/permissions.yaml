@@ -1,105 +1,72 @@
-- label: 系统
-  key: system
+- key: organization
   children:
-    - label: 用户
-      key: user
+    - key: department
       children:
-        - label: 读取
-          key: read
-          value: 100
-        - label: 创建
-          key: create
-          value: 101
-        - label: 更新
-          key: update
-          value: 102
-        - label: 删除
-          key: delete
-          value: 103
-        - label: 启用
-          key: enable
-          value: 104
-        - label: 禁用
-          key: disable
-          value: 105
-        - label: 修改密码
-          key: update_password
-          value: 106
-    - label: 角色
-      key: role
-      children:
-        - label: 读取
-          key: read
-          value: 200
-        - label: 创建
-          key: create
-          value: 201
-        - label: 更新
-          key: update
-          value: 202
-        - label: 删除
-          key: delete
-          value: 203
-        - label: 启用
-          key: enable
-          value: 204
-        - label: 禁用
-          key: disable
-          value: 205
-    - label: 文件
-      key: file
-      children:
-        - label: 读取
-          key: read
-          value: 300
-        - label: 上传
-          key: upload
-          value: 301
-        - label: 下载
-          key: download
-          value: 302
-    - label: 定时任务
-      key: sched
-      children:
-        - label: 读取
-          key: read
-          value: 400
-        - label: 删除
-          key: delete
-          value: 401
-    - label: 后台任务
-      key: bgworker
-      children:
-        - label: 读取
-          key: read
-          value: 500
-    - label: 部门
-      key: department
-      children:
-        - label: 读取
-          key: read
+        - key: read
           value: 600
-        - label: 创建
-          key: create
+        - key: create
           value: 601
-        - label: 更新
-          key: update
+        - key: update
           value: 602
-        - label: 删除
-          key: delete
+        - key: delete
           value: 603
-    - label: 缓存
-      key: cache
+    - key: user
       children:
-        - label: 读取
-          key: read
+        - key: read
+          value: 100
+        - key: create
+          value: 101
+        - key: update
+          value: 102
+        - key: delete
+          value: 103
+        - key: enable
+          value: 104
+        - key: disable
+          value: 105
+        - key: update_password
+          value: 106
+    - key: role
+      children:
+        - key: read
+          value: 200
+        - key: create
+          value: 201
+        - key: update
+          value: 202
+        - key: delete
+          value: 203
+        - key: enable
+          value: 204
+        - key: disable
+          value: 205
+- key: system
+  children:
+    - key: file
+      children:
+        - key: read
+          value: 300
+        - key: upload
+          value: 301
+        - key: download
+          value: 302
+    - key: sched
+      children:
+        - key: read
+          value: 400
+        - key: delete
+          value: 401
+    - key: bgworker
+      children:
+        - key: read
+          value: 500
+    - key: cache
+      children:
+        - key: read
           value: 700
-        - label: 删除
-          key: delete
+        - key: delete
           value: 701
-    - label: 访问记录
-      key: access_log
+    - key: access_log
       children:
-        - label: 读取
-          key: read
+        - key: read
           value: 800

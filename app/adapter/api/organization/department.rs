@@ -18,8 +18,8 @@ use axum::{
 };
 use domain::{
     auth::value_object::permission::{
-        SYSTEM_DEPARTMENT_CREATE, SYSTEM_DEPARTMENT_DELETE, SYSTEM_DEPARTMENT_READ,
-        SYSTEM_DEPARTMENT_UPDATE,
+        ORGANIZATION_DEPARTMENT_CREATE, ORGANIZATION_DEPARTMENT_DELETE,
+        ORGANIZATION_DEPARTMENT_READ, ORGANIZATION_DEPARTMENT_UPDATE,
     },
     organization::value_object::department_id::DepartmentId,
 };
@@ -110,8 +110,8 @@ async fn update(
 
 pub fn routing() -> OpenApiRouter<WebState> {
     OpenApiRouter::new()
-        .routes(routes!(tree).permit_all(perms!(SYSTEM_DEPARTMENT_READ)))
-        .routes(routes!(create).permit_all(perms!(SYSTEM_DEPARTMENT_CREATE)))
-        .routes(routes!(update).permit_all(perms!(SYSTEM_DEPARTMENT_UPDATE)))
-        .routes(routes!(batch_delete).permit_all(perms!(SYSTEM_DEPARTMENT_DELETE)))
+        .routes(routes!(tree).permit_all(perms!(ORGANIZATION_DEPARTMENT_READ)))
+        .routes(routes!(create).permit_all(perms!(ORGANIZATION_DEPARTMENT_CREATE)))
+        .routes(routes!(update).permit_all(perms!(ORGANIZATION_DEPARTMENT_UPDATE)))
+        .routes(routes!(batch_delete).permit_all(perms!(ORGANIZATION_DEPARTMENT_DELETE)))
 }
