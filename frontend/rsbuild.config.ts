@@ -61,6 +61,14 @@ export default defineConfig(async () => {
         experiments: {
           rspackFuture: { bundlerInfo: { force: false } },
         },
+        module: {
+          rules: [
+            {
+              test: /\.ftl$/,
+              type: "asset/source", // 表示以纯文本导入
+            }
+          ]
+        },
         externals: {
           react: "React",
           "react-dom": "ReactDOM",

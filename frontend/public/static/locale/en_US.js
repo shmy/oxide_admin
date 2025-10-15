@@ -1,17 +1,13 @@
-;(function (window) {
+; (function (w) {
     const ftl = `
 create_user = Create User
 edit_user = Edit User
-
 create_role = Create Role
 edit_role = Edit Role
 role_name = Role Name
 role_menus = Role Menus
 role_permissions = Role Permissions
 privileged_role = Privileged Role
-
-system = System
-
 more_options = More Options
 delete = Delete
 delete_selected_items = Delete Selected items
@@ -46,9 +42,9 @@ current_password = Current Password
 new_password = New Password
 confirm_new_password = Confirm New Password
 `;
-    const bundle = new window.FluentBundle.FluentBundle('en_US');
-    bundle.addResource(new window.FluentBundle.FluentResource(ftl));
-    window._t = (key, arg) => {
+    const bundle = new w.FluentBundle.FluentBundle('en_US');
+    bundle.addResource(new w.FluentBundle.FluentResource(ftl));
+    w._t = (key, arg) => {
         const data = bundle.getMessage(key);
         if (!data) {
             return key;
