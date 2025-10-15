@@ -1,5 +1,3 @@
-; (function (w) {
-    const ftl = `
 create_user = Create User
 edit_user = Edit User
 create_role = Create Role
@@ -41,14 +39,3 @@ privileged_account = Privileged Account
 current_password = Current Password
 new_password = New Password
 confirm_new_password = Confirm New Password
-`;
-    const bundle = new w.FluentBundle.FluentBundle('en_US');
-    bundle.addResource(new w.FluentBundle.FluentResource(ftl));
-    w._t = (key, arg) => {
-        const data = bundle.getMessage(key);
-        if (!data) {
-            return key;
-        }
-        return bundle.formatPattern(data.value, arg);
-    };
-})(window);

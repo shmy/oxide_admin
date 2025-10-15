@@ -1,5 +1,3 @@
-; (function (w) {
-    const ftl = `
 create_user = 创建用户
 edit_user = 编辑用户
 create_role = 创建角色
@@ -41,14 +39,3 @@ privileged_account = 特权账号
 current_password = 当前密码
 new_password = 新密码
 confirm_new_password = 确认新密码
-`;
-    const bundle = new w.FluentBundle.FluentBundle('zh_CN');
-    bundle.addResource(new w.FluentBundle.FluentResource(ftl));
-    w._t = (key, arg) => {
-        const data = bundle.getMessage(key);
-        if (!data) {
-            return key;
-        }
-        return bundle.formatPattern(data.value, arg);
-    };
-})(window);

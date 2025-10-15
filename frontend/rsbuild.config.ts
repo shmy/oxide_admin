@@ -28,6 +28,18 @@ export default defineConfig(async () => {
       entry: {
         index: "./src/index/index.tsx",
         sign_in: "./src/sign_in/index.tsx",
+        zh_CN: {
+          import: "./src/locale/zh_CN.ts",
+          filename: "./static/locale/zh_CN.js",
+          html: false,
+          runtime: false,
+        },
+        en_US: {
+          import: "./src/locale/en_US.ts",
+          filename: "./static/locale/en_US.js",
+          html: false,
+          runtime: false,
+        },
         ...entry,
       },
       define: {},

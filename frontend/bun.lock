@@ -4,6 +4,7 @@
     "": {
       "name": "frontend",
       "dependencies": {
+        "@fluent/bundle": "^0.19.1",
         "antd": "^5.27.4",
         "es-toolkit": "^1.39.10",
         "file-saver": "^2.0.5",
@@ -87,6 +88,8 @@
     "@fast-csv/format": ["@fast-csv/format@4.3.5", "https://mirrors.cloud.tencent.com/npm/@fast-csv/format/-/format-4.3.5.tgz", { "dependencies": { "@types/node": "^14.0.1", "lodash.escaperegexp": "^4.1.2", "lodash.isboolean": "^3.0.3", "lodash.isequal": "^4.5.0", "lodash.isfunction": "^3.0.9", "lodash.isnil": "^4.0.0" } }, "sha512-8iRn6QF3I8Ak78lNAa+Gdl5MJJBM5vRHivFtMRUWINdevNo00K7OXxS2PshawLKTejVwieIlPmK5YlLu6w4u8A=="],
 
     "@fast-csv/parse": ["@fast-csv/parse@4.3.6", "https://mirrors.cloud.tencent.com/npm/@fast-csv/parse/-/parse-4.3.6.tgz", { "dependencies": { "@types/node": "^14.0.1", "lodash.escaperegexp": "^4.1.2", "lodash.groupby": "^4.6.0", "lodash.isfunction": "^3.0.9", "lodash.isnil": "^4.0.0", "lodash.isundefined": "^3.0.1", "lodash.uniq": "^4.5.0" } }, "sha512-uRsLYksqpbDmWaSmzvJcuApSEe38+6NQZBUsuAyMZKqHxH0g1wcJgsKUvN3WC8tewaqFjBMMGrkHmC+T7k8LvA=="],
+
+    "@fluent/bundle": ["@fluent/bundle@0.19.1", "https://mirrors.cloud.tencent.com/npm/@fluent/bundle/-/bundle-0.19.1.tgz", {}, "sha512-SWJLZrPamDPsJlFFOW1nkgN0j0rbPbmSdmK0XAoXlyqKieLtMVl4vzng3aR5pwKoUx0scug8+YY2oct3fdfy9A=="],
 
     "@gulpjs/messages": ["@gulpjs/messages@1.1.0", "https://mirrors.cloud.tencent.com/npm/@gulpjs/messages/-/messages-1.1.0.tgz", {}, "sha512-Ys9sazDatyTgZVb4xPlDufLweJ/Os2uHWOv+Caxvy2O85JcnT4M3vc73bi8pdLWlv3fdWQz3pdI9tVwo8rQQSg=="],
 
