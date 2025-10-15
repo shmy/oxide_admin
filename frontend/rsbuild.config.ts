@@ -7,10 +7,18 @@ import { glob } from "glob";
 const isProd = process.env.NODE_ENV === "production";
 const base = "/_";
 
+const collectLocale = (lang_id: string) => {
+  return {
+    import: `./src/locale/${lang_id}.ts`,
+    filename: `./static/locale/${lang_id}.js`,
+    html: false,
+    runtime: false,
+  };
+};
 // @ts-ignore
 export default defineConfig(async () => {
   const entryPagesFiles = await glob("./src/pages/**/*.ts");
-  const entry = {};
+  const entry: Record<string, any> = {};
   entryPagesFiles.forEach((file) => {
     const filename = file.replace("src/", "").replace(".ts", ".js");
     entry[file] = {
@@ -23,23 +31,13 @@ export default defineConfig(async () => {
     };
   });
   return {
-    plugins: [pluginReact(), pluginSass()],
+    plugins: [pluginReact(), pluginSass(), pluginHtmlMinifierTerser()],
     source: {
       entry: {
         index: "./src/index/index.tsx",
         sign_in: "./src/sign_in/index.tsx",
-        zh_CN: {
-          import: "./src/locale/zh_CN.ts",
-          filename: "./static/locale/zh_CN.js",
-          html: false,
-          runtime: false,
-        },
-        en_US: {
-          import: "./src/locale/en_US.ts",
-          filename: "./static/locale/en_US.js",
-          html: false,
-          runtime: false,
-        },
+        zh_CN: collectLocale("zh_CN"),
+        en_US: collectLocale("en_US"),
         ...entry,
       },
       define: {},
@@ -59,12 +57,15 @@ export default defineConfig(async () => {
       },
     },
     html: {
-      template({ entryName }) {
+      template({ entryName }: { entryName: "index" | "sign_in" }) {
         const templates = {
           index: "./template/index.html",
           sign_in: "./template/sign_in.html",
         };
-        return templates[entryName];
+        return templates[entryName] as string;
+      },
+      templateParameters: {
+        isDev: !isProd,
       },
     },
     tools: {

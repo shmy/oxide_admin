@@ -14,14 +14,25 @@
     <div id="<%= mountId %>"></div>
     <script src="<%= assetPrefix %>/static/lib/jssdk/sdk.js"></script>
     <script src="<%= assetPrefix %>/static/lib/jssdk/rest.js"></script>
-    <script src="<%= assetPrefix %>/static/locale/en_US.js"></script>
     <script>
         (function (w) {
-            w._locale = "en_US";
             w.React = w.amisRequire("react");
             w.ReactDOM = w.amisRequire("react-dom");
         })(window);
     </script>
+    <% if (isDev) { %>
+        <script src="<%= assetPrefix %>/static/locale/zh_CN.js"></script>
+        <script>
+            window._locale = "zh_CN";
+        </script>
+        <% } else { %>
+            <script src="<%= assetPrefix %>/static/locale/{{locale}}.js"></script>
+            <script>
+                window._locale = "{{locale}}";
+            </script>
+            <% } %>
+
+
 </body>
 
 </html>

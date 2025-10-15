@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const destPath = './dist';
-const includeExtensions = ['.json', '.html', '.mjs', '.js', '.css', '.svg', '.ttf', '.woff', '.woff2', '.eot'];
+const includeExtensions = ['.json', '.mjs', '.js', '.css', '.svg', '.ttf', '.woff', '.woff2', '.eot'];
 
 const clean = (done) => {
     del([destPath], done);
