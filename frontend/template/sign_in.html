@@ -14,14 +14,15 @@
 
 <body>
     <div id="<%= mountId %>" class="h-screen w-screen flex flex-col justify-center items-center">
-        <div class="flex justify-end fixed right-4 top-4">
-            <select v-model="locale" @change="setLanguage($event.target.value)"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-2">
+        <div class="flex justify-end items-center fixed right-4 top-4 h-8 w-24">
+            <div class="w-full flex justify-center" v-if="switchLocaleing" v-scope="Loading"></div>
+            <select v-else v-model="locale" @change="setLanguage($event.target.value)"
+                class="block h-full w-full px-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500">
                 <option value="zh-CN">简体中文</option>
                 <option value="en-US">English</option>
             </select>
         </div>
-        <form @submit.prevent="handleSubmit" @vue:mounted="mounted" @vue:unmounted="unmonuted"
+        <form v-scope @submit.prevent="handleSubmit" @vue:mounted="mounted" @vue:unmounted="unmonuted"
             class="w-[360px] flex flex-col gap-4 bg-white p-6 rounded-lg shadow-lg" v-cloak>
             <div>
                 <label for="account" class="block mb-2 text-sm font-medium text-gray-900">
@@ -90,6 +91,16 @@
             </div>
         </form>
     </div>
+    <template id="loading">
+        <svg class="size-5" fill="hsl(228, 97%, 42%)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" />
+            <path
+                d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z">
+                <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12"
+                    repeatCount="indefinite" />
+            </path>
+        </svg>
+    </template>
     <script src="<%= assetPrefix %>/static/lib/petite-vue.umd.min.js"></script>
 
     <% if (!isProd) { %>

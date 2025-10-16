@@ -7,12 +7,16 @@ const redirect =
   import.meta.env.BASE_URL;
 
 PetiteVue.createApp({
+  Loading: {
+    $template: "#loading"
+  },
   formData: {
     account: "",
     password: "",
     captcha_key: "",
     captcha_value: "",
   },
+  switchLocaleing: false,
   locale: window._locale,
   submitting: false,
   signInSucced: false,
@@ -97,6 +101,7 @@ PetiteVue.createApp({
       });
   },
   setLanguage(langId: string) {
+    this.switchLocaleing = true;
     xior
       .post("/api/language", {
         lang_id: langId,
@@ -105,4 +110,4 @@ PetiteVue.createApp({
         window.location.reload();
       });
   }
-}).mount('#root');
+}).mount();
