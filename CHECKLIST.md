@@ -1,5 +1,3 @@
-[ ] i18n for backend
-[ ] i18n for frontend
 [ ] 操作日志
 [ ] 用户绑定部门
 [ ] 默认头像
@@ -12,3 +10,5 @@
 [x] Filpt 支持 Tls
 [x] Opendal 支持 Tls
 [x] Postgresql 支持 Tls
+[x] i18n for backend
+[x] i18n for frontend
