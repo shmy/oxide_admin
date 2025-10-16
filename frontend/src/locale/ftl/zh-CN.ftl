@@ -39,3 +39,13 @@ privileged_account = 特权账号
 current_password = 当前密码
 new_password = 新密码
 confirm_new_password = 确认新密码
+
+sign_in_account = 账号
+sign_in_please_enter_account = 请输入账号
+sign_in_password = 密码
+sign_in_please_enter_password = 请输入密码
+sign_in_captcha = 验证码
+sign_in_please_enter_captcha = 请输入验证码
+sign_in_now = 登录
+sign_in_submitting = 登录中...
+sign_in_success_after_redirect = 登录成功，正在重定向...

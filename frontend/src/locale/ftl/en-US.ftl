@@ -39,3 +39,13 @@ privileged_account = Privileged Account
 current_password = Current Password
 new_password = New Password
 confirm_new_password = Confirm New Password
+
+sign_in_account = Account
+sign_in_please_enter_account = Please enter account
+sign_in_password = Password
+sign_in_please_enter_password = Please enter password
+sign_in_captcha = Captcha
+sign_in_please_enter_captcha = Please enter captcha
+sign_in_now = Sign In
+sign_in_submitting = Signing in...
+sign_in_success_after_redirect = Sign in success, redirecting...

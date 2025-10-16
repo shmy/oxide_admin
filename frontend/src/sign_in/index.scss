@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+[v-cloak] {
+    display: none;
+}
+
 body {
     background-image: url(./bg.webp);
     background-size: cover;

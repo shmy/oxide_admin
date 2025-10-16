@@ -1,2 +1,8 @@
 [general]
 dirs = ["../../frontend/dist"]
+default_syntax = "override"
+
+[[syntax]]
+name = "override"
+expr_start = "%%"
+expr_end = "%%"

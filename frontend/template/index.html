@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="%%locale%%">
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Oxide Admin</title>
     <link rel="icon" type="image/png" href="<%= assetPrefix %>/static/image/logo.webp" />
     <link rel="stylesheet" href="<%= assetPrefix %>/static/lib/jssdk/antd.css" />
@@ -26,9 +26,9 @@
             window._locale = "zh-CN";
         </script>
         <% } else { %>
-            <script src="<%= assetPrefix %>/static/locale/{{locale}}.js"></script>
+            <script src="<%= assetPrefix %>/static/locale/%%locale%%.js"></script>
             <script>
-                window._locale = "{{locale}}";
+                window._locale = "%%locale%%";
             </script>
             <% } %>
 
