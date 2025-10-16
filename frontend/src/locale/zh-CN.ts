@@ -1,6 +1,6 @@
 import { FluentBundle, FluentResource } from "@fluent/bundle";
-import ftl from "./ftl/zh_CN.ftl";
-const bundle = new FluentBundle('zh_CN');
+import ftl from "./ftl/zh-CN.ftl";
+const bundle = new FluentBundle('zh-CN');
 bundle.addResource(new FluentResource(ftl));
 window._t = (key, args) => {
     const data = bundle.getMessage(key);

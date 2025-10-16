@@ -84,6 +84,17 @@
             <path d="M3 3l18 18" />
         </svg>
     </template>
+    <% if (!isProd) { %>
+        <script src="<%= assetPrefix %>/static/locale/zh-CN.js"></script>
+        <script>
+            window._locale = "zh-CN";
+        </script>
+        <% } else { %>
+            <script src="<%= assetPrefix %>/static/locale/{{locale}}.js"></script>
+            <script>
+                window._locale = "{{locale}}";
+            </script>
+            <% } %>
 </body>
 
 </html>

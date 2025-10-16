@@ -36,8 +36,8 @@ export default defineConfig(async () => {
       entry: {
         index: "./src/index/index.tsx",
         sign_in: "./src/sign_in/index.tsx",
-        zh_CN: collectLocale("zh_CN"),
-        en_US: collectLocale("en_US"),
+        zh_CN: collectLocale("zh-CN"),
+        en_US: collectLocale("en-US"),
         ...entry,
       },
       define: {},
@@ -65,7 +65,7 @@ export default defineConfig(async () => {
         return templates[entryName] as string;
       },
       templateParameters: {
-        isDev: !isProd,
+        isProd,
       },
     },
     tools: {

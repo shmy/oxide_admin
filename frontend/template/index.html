@@ -20,10 +20,10 @@
             w.ReactDOM = w.amisRequire("react-dom");
         })(window);
     </script>
-    <% if (isDev) { %>
-        <script src="<%= assetPrefix %>/static/locale/zh_CN.js"></script>
+    <% if (!isProd) { %>
+        <script src="<%= assetPrefix %>/static/locale/zh-CN.js"></script>
         <script>
-            window._locale = "zh_CN";
+            window._locale = "zh-CN";
         </script>
         <% } else { %>
             <script src="<%= assetPrefix %>/static/locale/{{locale}}.js"></script>
@@ -31,7 +31,6 @@
                 window._locale = "{{locale}}";
             </script>
             <% } %>
-
 
 </body>
 
