@@ -100,7 +100,7 @@ impl From<PermissionTree> for TranslatedPermissionTree {
             value: value.value,
             children: value
                 .children
-                .map(|d| d.to_vec().into_iter().map(Into::into).collect()),
+                .map(|d| d.to_vec().iter().cloned().map(Into::into).collect()),
         }
     }
 }

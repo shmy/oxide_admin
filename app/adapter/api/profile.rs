@@ -12,18 +12,13 @@ use application::{
     shared::{command_handler::CommandHandler, query_handler::QueryHandler as _},
 };
 
-use axum::{Json, response::IntoResponse};
-use axum_extra::extract::{CookieJar, cookie::Cookie};
+use axum::Json;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     WebState,
     shared::{
-        extractor::{
-            accept_language::{AcceptLanguage, LANGUAGE_COOKIE_NAME},
-            inject::Inject,
-            valid_user::ValidUser,
-        },
+        extractor::{accept_language::AcceptLanguage, inject::Inject, valid_user::ValidUser},
         response::{JsonResponse, JsonResponseEmpty, JsonResponseType},
         translation::tranlate_menus,
     },
@@ -122,29 +117,6 @@ async fn language(language: AcceptLanguage) -> JsonResponseType<response::Curren
     })
 }
 
-#[utoipa::path(
-    post,
-    path = "/language",
-    summary = "Set current language",
-    tag = "Profile",
-    responses(
-        (status = 200, body = inline(JsonResponseEmpty))
-    )
-)]
-#[tracing::instrument(skip(request))]
-async fn set_language(
-    cookie_jar: CookieJar,
-    Json(request): Json<request::SetLanguageRequest>,
-) -> impl IntoResponse {
-    let language_cookie = Cookie::build((LANGUAGE_COOKIE_NAME, request.lang_id))
-        .path("/")
-        .secure(true)
-        .http_only(true)
-        .build();
-    let set_cookie = cookie_jar.add(language_cookie);
-    (set_cookie, JsonResponse::ok(())).into_response()
-}
-
 mod request {
     use serde::Deserialize;
     use utoipa::ToSchema;
@@ -154,11 +126,6 @@ mod request {
         pub password: String,
         pub new_password: String,
         pub confirm_new_password: String,
-    }
-
-    #[derive(Deserialize, ToSchema)]
-    pub struct SetLanguageRequest {
-        pub lang_id: String,
     }
 }
 
@@ -189,5 +156,4 @@ pub fn routing() -> OpenApiRouter<WebState> {
         .routes(routes!(sign_out))
         .routes(routes!(password))
         .routes(routes!(language))
-        .routes(routes!(set_language))
 }

@@ -49,7 +49,7 @@ async fn menus(
 ) -> JsonResponseType<Vec<TranslatedMenuTree>> {
     let pages = service.get_all_privated_pages();
     let lang_id = language.identifier();
-    let menus = tranlate_menus(pages.to_vec(), &lang_id);
+    let menus = tranlate_menus(pages.to_vec(), lang_id);
     JsonResponse::ok(menus)
 }
 

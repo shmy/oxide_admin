@@ -39,7 +39,7 @@ const buildDropdown = () => {
           body: {
             type: "form",
             initApi: "/profile/language",
-            api: "/profile/language",
+            api: "/language",
             body: [
               {
                 type: "select",

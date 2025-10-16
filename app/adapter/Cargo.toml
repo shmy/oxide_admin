@@ -13,6 +13,7 @@ openapi = []
 [dependencies]
 accept-language = { workspace = true }
 application = { workspace = true }
+askama = { workspace = true, features = ["default"] }
 axum = { workspace = true, features = [
     "http1",
     "tokio",
@@ -24,7 +25,6 @@ axum-extra = { workspace = true, features = ["cookie"] }
 axum-tracing-opentelemetry = { workspace = true, optional = true }
 axum_typed_multipart = { workspace = true, features = ["tempfile_3"] }
 bon = { workspace = true }
-askama = { workspace = true, features = ["default"] }
 domain = { workspace = true }
 futures-util = { workspace = true }
 governor = { workspace = true }
