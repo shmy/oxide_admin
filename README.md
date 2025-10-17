@@ -45,6 +45,7 @@ English | [简体中文](./README_ZH_CN.md)
 - **Graceful Shutdown**: Properly terminates services and releases resources.
 - **Multi-Source Config**: Supports env vars, `.env`, and CLI args.
 - **Feature Flags**: Supports [`flipt`](https://github.com/flipt-io/flipt).
+- **I18n**: Supports `i18n` using [`fluent`](https://projectfluent.org). both frontend and backend are supported.
 - **Github CI**: Auto build for `x86_64-unknown-linux-gnu`.
 - **Docker Image**: Provides a `Dockerfile` for containerized deployment.
 
