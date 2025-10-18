@@ -32,9 +32,4 @@ pub trait TokenIssuerTrait {
         access_token: &str,
         secret: &[u8],
     ) -> Result<T, Self::Error>;
-
-    fn decode_without_validation<T: DeserializeOwned + Clone>(
-        &self,
-        access_token: &str,
-    ) -> Result<T, Self::Error>;
 }

@@ -83,21 +83,6 @@ impl TokenIssuerTrait for TokenIssuerImpl {
                 .map_err(|_| AuthError::AccessTokenVerifyFailed)?;
         Ok(token_data.claims)
     }
-
-    #[tracing::instrument(skip(access_token))]
-    fn decode_without_validation<T: DeserializeOwned + Clone>(
-        &self,
-        access_token: &str,
-    ) -> Result<T, Self::Error> {
-        let mut validation = Validation::new(ALGORITHM);
-        validation.validate_exp = false;
-        validation.insecure_disable_signature_validation();
-        validation.leeway = 0;
-        let tokendata =
-            jsonwebtoken::decode(access_token, &DecodingKey::from_secret(&[]), &validation)
-                .map_err(|_| AuthError::AccessTokenVerifyFailed)?;
-        Ok(tokendata.claims)
-    }
 }
 
 #[cfg(test)]
@@ -196,33 +181,7 @@ mod tests {
     #[rstest]
     #[tokio::test]
     async fn test_generate(#[future(awt)] token_issuer: TokenIssuerImpl) {
-        #[derive(Debug, Clone, Serialize, Deserialize)]
-        struct UserClaims {
-            sub: String,
-            iat: i64,
-            exp: i64,
-        }
         let token_data = token_issuer.generate("test".to_string()).unwrap();
-        let claims: UserClaims = token_issuer
-            .decode_without_validation(&token_data.access_token)
-            .unwrap();
-        assert_eq!(claims.sub, "test");
-        assert!(claims.iat > 0);
-        assert!(claims.exp > 0);
         assert_eq!(token_data.refresh_token.len(), 21);
-    }
-
-    #[rstest]
-    #[tokio::test]
-    async fn test_decode_without_validation_err(#[future(awt)] token_issuer: TokenIssuerImpl) {
-        #[derive(Debug, Clone, Serialize, Deserialize)]
-        struct UserClaims {
-            sub: String,
-            iat: i64,
-            exp: i64,
-        }
-        let token = "xxxx";
-        let result = token_issuer.decode_without_validation::<UserClaims>(token);
-        assert_eq!(result.err(), Some(AuthError::AccessTokenVerifyFailed));
     }
 }
