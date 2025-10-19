@@ -21,7 +21,3 @@ cp $sdk/cropperjs.js $dist
 
 cp $sdk/thirds/@fortawesome/fontawesome-free/webfonts/fa-solid-900.ttf $fontawesome_dist
 cp $sdk/thirds/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2 $fontawesome_dist
-cp $sdk/thirds/monaco-editor/min/vs/loader.js $monaco_dist
-cp $sdk/thirds/monaco-editor/min/vs/editor/editor.main.js $monaco_dist/editor
-cp $sdk/thirds/monaco-editor/min/vs/editor/editor.main.nls.js $monaco_dist/editor
-cp $sdk/thirds/monaco-editor/min/vs/language/json/jsonMode.js $monaco_dist/language/json

@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import PreCode from "../components/pre-code";
 
 const LazyReactTest = lazy(() => import("../components/react-test"));
 const PrettyBytes = lazy(() => import("../components/pretty-bytes"));
@@ -19,6 +20,10 @@ export const registerComponents = (amisLib: any) => {
         type: "pretty-ms",
         autoVar: true,
     })(withSuspense(PrettyMs));
+    amisLib.FormItem({
+        type: "pre-code",
+        autoVar: true,
+    })(withSuspense(PreCode));
 
     amisLib.registerFilter('t', (input: any) => {
         return window._t(input);

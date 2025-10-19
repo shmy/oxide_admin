@@ -41,9 +41,8 @@ const schema = {
                             displayFormat: "过期时间：YYYY-MM-DD HH:mm:ss",
                           },
                           {
-                            type: "code",
+                            type: "pre-code",
                             name: "value",
-                            language: "json",
                           },
                         ]
                       }
