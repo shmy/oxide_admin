@@ -26,6 +26,7 @@ members = [
     "crates/single_flight",
     "crates/single_flight_macros",
     "crates/trace_kit",
+    "crates/wukongim_kit",
 ]
 
 [workspace.dependencies]
@@ -90,6 +91,7 @@ rstest = { version = "0.26", default-features = false }
 sched_kit = { path = "crates/sched_kit" }
 serde = { version = "1", default-features = false }
 serde_json = { version = "1", default-features = false }
+serde_repr = { version = "0.1", default-features = false }
 serde_urlencoded = { version = "0.7", default-features = false }
 serde_with = { version = "3", default-features = false }
 single_flight = { path = "crates/single_flight" }
@@ -120,6 +122,7 @@ utoipa = { version = "5.4", default-features = false }
 utoipa-axum = { version = "0.2", default-features = false }
 utoipa-scalar = { version = "0.3", default-features = false }
 uuid = { version = "1.8", default-features = false }
+wukongim_kit = { path = "crates/wukongim_kit" }
 
 [profile.dev]
 debug = "line-tables-only"   # Generate debugging information for easy debugging
