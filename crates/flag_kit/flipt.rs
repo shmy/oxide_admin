@@ -7,12 +7,12 @@ use flipt::{
     error::UpstreamError,
     evaluation::models::{EvaluationRequest, VariantEvaluationResponse},
 };
+use http_client_kit::header::{HeaderMap, HeaderValue};
 use open_feature::{
     EvaluationContext, EvaluationError, EvaluationErrorCode, EvaluationResult, StructValue, Value,
     async_trait,
     provider::{FeatureProvider, ProviderMetadata, ResolutionDetails},
 };
-use reqwest::header::{HeaderMap, HeaderValue};
 use std::result::Result;
 
 const DEFAULT_ENTITY_ID: &str = "";

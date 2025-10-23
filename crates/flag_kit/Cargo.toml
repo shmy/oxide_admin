@@ -7,13 +7,13 @@ edition = "2024"
 path = "lib.rs"
 
 [features]
-flipt = ["dep:flipt", "dep:reqwest", "dep:url", "dep:serde_json"]
+flipt = ["dep:flipt", "dep:http_client_kit", "dep:url", "dep:serde_json"]
 
 [dependencies]
 bon = { workspace = true }
 flipt = { git = "https://github.com/flipt-io/flipt-server-sdks", branch = "main", default-features = false, optional = true }
+http_client_kit = { workspace = true, optional = true }
 open-feature = { workspace = true, features = ["default"] }
-reqwest = { version = "0.12", default-features = false, optional = true }
 serde_json = { workspace = true, features = ["std"], optional = true }
 thiserror = { workspace = true }
 url = { version = "2.5", default-features = false, features = [

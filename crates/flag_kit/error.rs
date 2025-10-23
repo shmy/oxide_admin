@@ -6,7 +6,7 @@ pub type Result<T> = std::result::Result<T, FlagError>;
 pub enum FlagError {
     #[cfg(feature = "flipt")]
     #[error("{0}")]
-    InvalidHeaderValue(#[from] reqwest::header::InvalidHeaderValue),
+    InvalidHeaderValue(#[from] http_client_kit::header::InvalidHeaderValue),
 
     #[cfg(feature = "flipt")]
     #[error("{0}")]

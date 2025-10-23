@@ -1,0 +1,23 @@
+[package]
+name = "http_client_kit"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "lib.rs"
+
+[features]
+deflate = ["reqwest/deflate"]
+gzip = ["reqwest/gzip"]
+brotli = ["reqwest/brotli"]
+stream = ["reqwest/stream"]
+
+[dependencies]
+reqwest = { workspace = true, features = ["json", "rustls-tls"] }
+reqwest-middleware = { workspace = true, features = ["json"] }
+reqwest-retry = { workspace = true, features = ["tracing"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }

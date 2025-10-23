@@ -18,6 +18,7 @@ members = [
     "crates/captcha_kit",
     "crates/event_kit",
     "crates/flag_kit",
+    "crates/http_client_kit",
     "crates/kvdb_kit",
     "crates/migrate_kit",
     "crates/migrate_kit_macros",
@@ -25,6 +26,7 @@ members = [
     "crates/sched_kit",
     "crates/single_flight",
     "crates/single_flight_macros",
+    "crates/tencent_location_kit",
     "crates/trace_kit",
     "crates/wukongim_kit",
 ]
@@ -63,6 +65,7 @@ futures-util = { version = "0.3", default-features = false }
 governor = { version = "0.10", default-features = false }
 hex = { version = "0.4", default-features = false }
 hmac-sha256 = { version = "1.1", default-features = false }
+http_client_kit = { path = "crates/http_client_kit" }
 humantime = { version = "2.3", default-features = false }
 i18n = { git = "https://github.com/Instant-Reactive-Systems/i18n", tag = "0.1.1", default-features = false }
 image = { version = "0.25", default-features = false }
@@ -86,6 +89,9 @@ readonly = { version = "0.2", default-features = false }
 redb = { version = "3", default-features = false }
 
 redis = { version = "0.32", default-features = false }
+reqwest = { version = "0.12", default-features = false }
+reqwest-middleware = { version = "0.4", default-features = false }
+reqwest-retry = { version = "0.7", default-features = false }
 
 rstest = { version = "0.26", default-features = false }
 sched_kit = { path = "crates/sched_kit" }
@@ -103,6 +109,7 @@ syn = { version = "2.0" }
 sysinfo = { version = "0.37", default-features = false }
 tempfile = { version = "3", default-features = false }
 tempoid = { version = "0.1", default-features = false }
+tencent_location_kit = { path = "crates/tencent_location_kit" }
 
 testcontainers = { version = "0.25", default-features = false }
 testcontainers-modules = { version = "0.13", default-features = false }

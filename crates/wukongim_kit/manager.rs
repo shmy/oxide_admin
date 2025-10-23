@@ -1,3 +1,5 @@
+use http_client_kit::HTTP_CLIENT;
+
 use crate::{
     error::Result,
     response::{
@@ -5,17 +7,14 @@ use crate::{
         user::OnlineStatus,
     },
 };
-use reqwest::Client;
 
 pub struct WukongIMManager {
     base_url: String,
-    client: Client,
 }
 
 impl WukongIMManager {
     pub fn new(base_url: String) -> Self {
-        let client = Client::default();
-        Self { base_url, client }
+        Self { base_url }
     }
 
     // https://docs.githubim.com/zh/api/user/online-status
@@ -26,8 +25,7 @@ impl WukongIMManager {
         device_flag: DeviceFlag,
     ) -> Result<StatusResponse> {
         let url = format!("{}/user/token", self.base_url);
-        let response: StatusResponse = self
-            .client
+        let response: StatusResponse = HTTP_CLIENT
             .post(url)
             .json(&serde_json::json!({ "uid": uid, "token": token, "device_flag": device_flag }))
             .send()
@@ -44,8 +42,7 @@ impl WukongIMManager {
         device_flag: DeviceFlag,
     ) -> Result<StatusResponse> {
         let url = format!("{}/user/device_quit", self.base_url);
-        let response: StatusResponse = self
-            .client
+        let response: StatusResponse = HTTP_CLIENT
             .post(url)
             .json(&serde_json::json!({ "uid": uid, "device_flag": device_flag }))
             .send()
@@ -58,8 +55,7 @@ impl WukongIMManager {
     // https://docs.githubim.com/zh/api/user/online-status
     pub async fn user_onlinestatus(&self, uids: &[String]) -> Result<Vec<OnlineStatus>> {
         let url = format!("{}/user/onlinestatus", self.base_url);
-        let response: Vec<OnlineStatus> = self
-            .client
+        let response: Vec<OnlineStatus> = HTTP_CLIENT
             .post(url)
             .json(uids)
             .send()

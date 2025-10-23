@@ -1,7 +1,7 @@
 [package]
-name = "wukongim_kit"
+name = "tencent_location_kit"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [lib]
 path = "lib.rs"
@@ -10,6 +10,5 @@ path = "lib.rs"
 http_client_kit = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["std"] }
-serde_repr = { workspace = true }
-thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
